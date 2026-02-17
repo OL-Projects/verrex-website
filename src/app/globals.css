@@ -539,7 +539,7 @@ html {
   outline-offset: 2px;
 }
 
-/* Mobile bottom action bar */
+/* Mobile bottom action bar — Glassmorphism */
 .mobile-action-bar {
   position: fixed;
   bottom: 0;
@@ -549,19 +549,17 @@ html {
   display: flex;
   justify-content: space-around;
   padding: 0.5rem 0;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  background: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.08), 0 -1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .dark .mobile-action-bar {
-  border-top-color: rgba(255, 255, 255, 0.06);
-  background: rgba(2, 6, 23, 0.9);
-}
-
-.light .mobile-action-bar,
-:not(.dark) .mobile-action-bar {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(2, 6, 23, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3), 0 -1px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== DESKTOP FORCED MODE ===== */
