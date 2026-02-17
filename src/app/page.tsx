@@ -354,7 +354,7 @@ export default function HomePage() {
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950/55 via-slate-900/15 to-transparent dark:from-slate-950/60 dark:via-slate-950/20 dark:to-transparent" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 
-        <div className="relative z-[2] px-6 sm:px-8 lg:px-16 py-24 md:py-32">
+        <div className="relative z-[2] px-8 sm:px-12 lg:px-20 py-24 md:py-32">
           <div className="max-w-lg">
             <FadeIn>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
