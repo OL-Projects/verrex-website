@@ -519,7 +519,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/appointments">
-                <Button variant="outline" size="xl" className="w-full sm:w-auto border-white/30 !text-white hover:bg-white/10 hover:!text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
+                <Button variant="outline" size="xl" className="w-full sm:w-auto !border-white/30 !bg-transparent !text-white hover:!bg-white/10 hover:!text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
                   <Phone className="h-5 w-5" /> Schedule Consultation
                 </Button>
               </Link>
