@@ -329,23 +329,25 @@ export default function HomePage() {
         {/* Day Background (Light Mode) */}
         <div className="absolute inset-0 z-0 block dark:hidden">
           <Image
-            src="/images/hero/Day.PNG"
+            src="/images/hero/Day.svg"
             alt="Modern home with VERREX windows — daytime"
             fill
             className="object-cover object-center"
             sizes="100vw"
             priority
+            unoptimized
           />
         </div>
         {/* Night Background (Dark Mode) */}
         <div className="absolute inset-0 z-0 hidden dark:block">
           <Image
-            src="/images/hero/Night.PNG"
+            src="/images/hero/Night.svg"
             alt="Modern home with VERREX windows — nighttime"
             fill
             className="object-cover object-center"
             sizes="100vw"
             priority
+            unoptimized
           />
         </div>
         {/* Overlay — minimal, only on right side behind text */}
