@@ -35,7 +35,7 @@ const windowTypes: WindowType[] = [
     id: "casement",
     name: "Casement",
     icon: "↗",
-    image: "/images/products/casement-3.jpg",
+    image: "/images/window-types/casement.png",
     description: "Hinged at the side and opens outward like a door using a crank mechanism. Provides maximum airflow and an unobstructed view when open.",
     bestFor: ["Above kitchen sinks", "Hard-to-reach areas", "Modern homes"],
     benefits: ["Maximum ventilation", "Excellent energy efficiency", "Tight seal when closed", "Unobstructed views"],
