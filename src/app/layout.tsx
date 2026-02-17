@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | VERREX",
   },
   description:
-    "VERREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Ontario.",
+    "VERREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Canada.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -51,8 +51,8 @@ export const metadata: Metadata = {
     "window replacement",
     "door systems",
     "fenestration",
-    "Toronto windows",
-    "Ontario",
+    "Canadian windows",
+    "Canada",
     "government buildings",
     "institutional",
   ],

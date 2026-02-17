@@ -31,7 +31,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Our Mission</h2>
               <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">At VERREX, we believe every space deserves the perfect window. Our mission is to provide premium glass and window solutions that combine beauty, energy efficiency, and security for residential, commercial, and industrial clients.</p>
-              <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">Founded with a commitment to excellence, we have grown into a trusted name in the industry, serving hundreds of satisfied clients across the region.</p>
+              <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">Founded with a commitment to excellence, we have grown into a trusted name in the industry, serving hundreds of satisfied clients across Canada.</p>
               <div className="mt-8 grid grid-cols-2 gap-6">
                 {[
                   { icon: Shield, label: "Licensed & Insured" },

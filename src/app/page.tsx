@@ -45,10 +45,10 @@ const stats = [
 ]
 
 const certifications = [
-  { name: "AAMA Certified", icon: BadgeCheck },
-  { name: "NFRC Rated", icon: ShieldCheck },
-  { name: "Energy Star", icon: Award },
-  { name: "WDMA Member", icon: Shield },
+  { name: "CSA A440 Certified", icon: BadgeCheck },
+  { name: "NAFS Rated", icon: ShieldCheck },
+  { name: "ENERGY STAR® Canada", icon: Award },
+  { name: "FenestrationCanada", icon: Shield },
 ]
 
 const categoryCards = [
@@ -96,7 +96,7 @@ export default function HomePage() {
                 <p className="mt-5 text-base md:text-lg text-slate-300 leading-relaxed">
                   VERREX delivers high-performance window and door systems for
                   residential, commercial, institutional, and industrial projects.
-                  Trusted by developers, architects, and facility managers across Ontario.
+                  Trusted by developers, architects, and facility managers across Canada.
                 </p>
               </FadeIn>
               <FadeIn delay={0.45}>
@@ -370,7 +370,7 @@ export default function HomePage() {
             <div className="mt-10 space-y-6">
               {[
                 { icon: Shield, title: "Fully Licensed & Bonded", desc: "Complete liability coverage, WSIB compliant, and licensed professionals on every project." },
-                { icon: BadgeCheck, title: "Code Compliant", desc: "All products meet or exceed Ontario Building Code, AAMA, and NFRC standards." },
+                { icon: BadgeCheck, title: "Code Compliant", desc: "All products meet or exceed the National Building Code of Canada, CSA A440, and NAFS standards." },
                 { icon: Truck, title: "On-Time, On-Budget", desc: "98% on-time completion rate with transparent project management and milestone tracking." },
                 { icon: FileText, title: "Volume & Contract Pricing", desc: "Competitive pricing for multi-unit, institutional, and recurring maintenance contracts." },
               ].map((item, i) => (
@@ -411,7 +411,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Trusted by Industry Leaders</h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">What property managers, architects, and facility directors say about working with VERREX.</p>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">What property managers, architects, and facility directors across Canada say about working with VERREX.</p>
           </FadeIn>
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
