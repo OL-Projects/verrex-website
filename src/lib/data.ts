@@ -10,7 +10,7 @@ export const products: Product[] = [
       "Energy-efficient casement windows with modern design and superior ventilation.",
     category: "residential",
     subcategory: "Windows",
-    images: ["/images/products/casement-3.jpg", "/images/products/casement-1.jpg", "/images/products/casement-2.jpg"],
+    images: ["/images/products/casement-featured.png", "/images/products/casement-3.jpg", "/images/products/casement-1.jpg", "/images/products/casement-2.jpg"],
     features: [
       "Energy Star certified",
       "Multi-point locking system",
@@ -72,7 +72,7 @@ export const products: Product[] = [
       "Professional storefront glazing with aluminum framing for commercial buildings.",
     category: "commercial",
     subcategory: "Storefront",
-    images: ["/images/products/storefront-1.jpg", "/images/products/storefront-2.jpg"],
+    images: ["/images/products/storefront-featured.png", "/images/products/storefront-1.jpg", "/images/products/storefront-2.jpg"],
     features: [
       "Thermally broken frames",
       "Structural silicone glazing",
