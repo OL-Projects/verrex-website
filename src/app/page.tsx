@@ -354,8 +354,8 @@ export default function HomePage() {
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950/55 via-slate-900/15 to-transparent dark:from-slate-950/60 dark:via-slate-950/20 dark:to-transparent" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 
-        <div className="relative z-[2] mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 py-24 md:py-32">
-          <div className="max-w-lg -ml-2 lg:-ml-4">
+        <div className="relative z-[2] px-6 sm:px-8 lg:px-16 py-24 md:py-32">
+          <div className="max-w-lg">
             <FadeIn>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
                 Why Choose <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">VERREX</span>?
