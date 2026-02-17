@@ -1,0 +1,587 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode for next-themes (Tailwind v4 requirement) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ===== BASE STYLES ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth theme transitions */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
+}
+
+/* ===== DARK MODE COLOR SCHEME ===== */
+.dark {
+  color-scheme: dark;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ===== GLASS MORPHISM ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass {
+  background: rgba(2, 6, 23, 0.8);
+}
+
+/* ===== GRADIENT TEXT ===== */
+.gradient-text {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .gradient-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #93c5fd 50%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== HERO GRADIENTS ===== */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e293b 30%,
+    #1e3a5f 60%,
+    #1e40af 100%
+  );
+}
+
+.dark .hero-gradient {
+  background: linear-gradient(
+    135deg,
+    #000000 0%,
+    #020617 30%,
+    #0c1a3a 60%,
+    #172554 100%
+  );
+}
+
+/* =============================================
+   DARK MODE OVERRIDES - TRUE BLACK/DEEP DARK
+   =============================================
+   Color Scale (darkest to lightest):
+   #000000 → #020617 → #030712 → #0a0f1a → #0f172a → #1e293b
+   ============================================= */
+
+/* --- Surface Backgrounds (MUCH darker) --- */
+.dark .bg-white {
+  background-color: #030712 !important;
+}
+.dark .bg-slate-50 {
+  background-color: #020617 !important;
+}
+.dark .bg-slate-100 {
+  background-color: #0a0f1a !important;
+}
+.dark .bg-slate-200 {
+  background-color: #0f172a !important;
+}
+.dark .bg-slate-300 {
+  background-color: #1e293b !important;
+}
+
+/* --- Text Colors (HIGH contrast) --- */
+.dark .text-slate-900 { color: #f8fafc !important; }
+.dark .text-slate-800 { color: #f1f5f9 !important; }
+.dark .text-slate-700 { color: #e2e8f0 !important; }
+.dark .text-slate-600 { color: #cbd5e1 !important; }
+.dark .text-slate-500 { color: #94a3b8 !important; }
+.dark .text-slate-400 { color: #94a3b8; }
+
+/* --- Border Colors (subtle but visible) --- */
+.dark .border-slate-200 { border-color: #1e293b !important; }
+.dark .border-slate-300 { border-color: #1e293b !important; }
+.dark .border-slate-100 { border-color: #0f172a !important; }
+.dark .border-b { border-color: #1e293b; }
+
+/* --- Hover States --- */
+.dark .hover\:bg-slate-50:hover { background-color: #0f172a !important; }
+.dark .hover\:bg-slate-100:hover { background-color: #1e293b !important; }
+.dark .hover\:text-slate-600:hover { color: #e2e8f0 !important; }
+.dark .hover\:text-slate-900:hover { color: #f8fafc !important; }
+
+/* --- Card & Shadow (deep shadows) --- */
+.dark .shadow-sm { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5) !important; }
+.dark .shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4) !important; }
+.dark .shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.4) !important; }
+.dark .shadow-xl { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.4) !important; }
+
+/* --- INPUT FIELDS (SOLID DARK - NO transparency) --- */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #020617 !important;
+  border-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #475569 !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background-color: #020617 !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Date input, color input, and other native inputs */
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"] {
+  background-color: #020617 !important;
+  color: #f1f5f9 !important;
+  color-scheme: dark;
+}
+
+/* Radio buttons and checkboxes in dark mode */
+.dark input[type="radio"],
+.dark input[type="checkbox"] {
+  accent-color: #3b82f6;
+}
+
+/* Select dropdown specific */
+.dark select option {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* --- Gradient backgrounds (DARKER for product image placeholders) --- */
+.dark .from-slate-100 { --tw-gradient-from: #0a0f1a !important; }
+.dark .to-slate-200 { --tw-gradient-to: #0f172a !important; }
+.dark .from-slate-50 { --tw-gradient-from: #020617 !important; }
+.dark .to-slate-100 { --tw-gradient-to: #0a0f1a !important; }
+
+/* --- Hero Quote Form: Force light-mode inputs (immune to dark mode) --- */
+.dark .hero-quote-form input,
+.dark .hero-quote-form textarea,
+.dark .hero-quote-form select {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color-scheme: auto !important;
+}
+.dark .hero-quote-form input::placeholder,
+.dark .hero-quote-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.dark .hero-quote-form input:focus,
+.dark .hero-quote-form textarea:focus,
+.dark .hero-quote-form select:focus {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(96, 165, 250, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.3) !important;
+}
+.dark .hero-quote-form input[type="checkbox"] {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  accent-color: #3b82f6 !important;
+}
+.dark .hero-quote-form input[type="number"] {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+/* --- Blue accents (bright for contrast on dark) --- */
+.dark .bg-blue-50 { background-color: rgba(23, 37, 84, 0.4) !important; }
+.dark .bg-blue-100 { background-color: rgba(30, 58, 95, 0.5) !important; }
+.dark .text-blue-600 { color: #60a5fa !important; }
+.dark .text-blue-700 { color: #93c5fd !important; }
+.dark .text-blue-800 { color: #bfdbfe !important; }
+.dark .bg-blue-600 { background-color: #2563eb !important; }
+.dark .hover\:bg-blue-700:hover { background-color: #1d4ed8 !important; }
+.dark .hover\:text-blue-600:hover { color: #60a5fa !important; }
+
+/* --- Emerald/Green accents --- */
+.dark .bg-emerald-50 { background-color: rgba(6, 78, 59, 0.25) !important; }
+.dark .bg-emerald-100 { background-color: rgba(6, 78, 59, 0.4) !important; }
+.dark .text-emerald-500 { color: #34d399 !important; }
+.dark .text-emerald-600 { color: #6ee7b7 !important; }
+.dark .text-emerald-700 { color: #a7f3d0 !important; }
+.dark .text-emerald-800 { color: #a7f3d0 !important; }
+.dark .bg-emerald-600 { background-color: #059669 !important; }
+
+/* --- Amber/Warning accents --- */
+.dark .bg-amber-50 { background-color: rgba(120, 53, 15, 0.2) !important; }
+.dark .bg-amber-100 { background-color: rgba(120, 53, 15, 0.4) !important; }
+.dark .text-amber-500 { color: #fbbf24 !important; }
+.dark .text-amber-600 { color: #fcd34d !important; }
+.dark .fill-amber-400 { fill: #fbbf24 !important; }
+
+/* --- Red/Danger accents --- */
+.dark .bg-red-50 { background-color: rgba(127, 29, 29, 0.2) !important; }
+.dark .bg-red-100 { background-color: rgba(127, 29, 29, 0.4) !important; }
+.dark .text-red-500 { color: #f87171 !important; }
+.dark .text-red-600 { color: #fca5a5 !important; }
+
+/* --- Purple accents --- */
+.dark .bg-purple-50 { background-color: rgba(88, 28, 135, 0.2) !important; }
+.dark .bg-purple-100 { background-color: rgba(88, 28, 135, 0.4) !important; }
+.dark .text-purple-600 { color: #c084fc !important; }
+
+/* --- Cyan accents --- */
+.dark .bg-cyan-50 { background-color: rgba(8, 51, 68, 0.3) !important; }
+.dark .bg-cyan-100 { background-color: rgba(8, 51, 68, 0.5) !important; }
+.dark .text-cyan-600 { color: #22d3ee !important; }
+
+/* --- White button override removed - now handled via Tailwind dark: classes --- */
+
+/* --- Ring / Focus ring --- */
+.dark .ring-slate-200 { --tw-ring-color: #1e293b !important; }
+.dark .ring-slate-300 { --tw-ring-color: #334155 !important; }
+.dark .focus\:ring-blue-500:focus { --tw-ring-color: #3b82f6 !important; }
+
+/* --- Divide colors --- */
+.dark .divide-slate-200 > :not(:last-child) { border-color: #0f172a !important; }
+.dark .divide-slate-100 > :not(:last-child) { border-color: #0f172a !important; }
+
+/* --- Page Section Banner bg-slate-900 → even darker --- */
+.dark .bg-slate-900 {
+  background-color: #020617 !important;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-delay-1 {
+  animation: fade-in 0.6s ease-out 0.15s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fade-in 0.6s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay-3 {
+  animation: fade-in 0.6s ease-out 0.45s forwards;
+  opacity: 0;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(59, 130, 246, 0.2); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ===== PREMIUM EFFECTS ===== */
+@keyframes subtle-shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.premium-shine {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 55%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: subtle-shine 8s ease-in-out infinite;
+}
+
+.premium-border {
+  position: relative;
+}
+
+.premium-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(147, 197, 253, 0.1), rgba(59, 130, 246, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(1deg); }
+  66% { transform: translateY(4px) rotate(-1deg); }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+@keyframes glow-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.glow-line-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-line-animation::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  animation: glow-line 4s ease-in-out infinite;
+}
+
+/* Frosted glass card */
+.frosted-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gold accent for premium */
+.gold-accent {
+  background: linear-gradient(135deg, #b8860b, #daa520, #ffd700, #daa520, #b8860b);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgba(96, 165, 250, 0.3);
+}
+
+/* ===== MOBILE OPTIMIZATION ===== */
+/* Dense mobile layout - show more content */
+@media (max-width: 640px) {
+  /* Tighter padding on mobile */
+  .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+  
+  /* Smaller text for compact layout */
+  .text-4xl { font-size: 1.75rem; line-height: 2rem; }
+  .text-3xl { font-size: 1.5rem; line-height: 1.875rem; }
+  .text-2xl { font-size: 1.25rem; line-height: 1.625rem; }
+  
+  /* Compact section spacing */
+  .py-20 { padding-top: 3rem; padding-bottom: 3rem; }
+  .py-16 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .mb-12 { margin-bottom: 2rem; }
+  .gap-6 { gap: 0.75rem; }
+  
+  /* Ensure touch targets are minimum 44px */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+}
+
+/* 2-column grid on mobile for denser layout */
+@media (min-width: 375px) and (max-width: 639px) {
+  .mobile-dense-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .sticky-bottom-bar {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Smooth scroll on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text size adjust on rotation */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ===== REFINED DARK MODE ===== */
+/* Premium dark mode glow effects */
+.dark .glow-blue {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15), 0 0 45px rgba(59, 130, 246, 0.05);
+}
+
+.dark .glow-border {
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Dark mode card refinements */
+.dark .card-premium {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(2, 6, 23, 0.95) 100%);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+/* Improved dark mode text hierarchy */
+.dark .text-primary-heading { color: #f8fafc; }
+.dark .text-secondary-heading { color: #e2e8f0; }
+.dark .text-body { color: #94a3b8; }
+.dark .text-muted { color: #64748b; }
+
+/* Dark mode focus rings - more visible */
+.dark *:focus-visible {
+  outline: 2px solid rgba(96, 165, 250, 0.6);
+  outline-offset: 2px;
+}
+
+/* Light mode focus rings */
+*:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* Mobile bottom action bar */
+.mobile-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .mobile-action-bar {
+  border-top-color: rgba(255, 255, 255, 0.06);
+  background: rgba(2, 6, 23, 0.9);
+}
+
+.light .mobile-action-bar,
+:not(.dark) .mobile-action-bar {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== DESKTOP FORCED MODE ===== */
+/* When user toggles "Desktop View" on mobile */
+.desktop-forced .mobile-action-bar {
+  display: none !important;
+}
+
+.desktop-forced .lg\:hidden {
+  display: none !important;
+}
+
+.desktop-forced .hidden.lg\:flex {
+  display: flex !important;
+}
+
+.desktop-forced .hidden.lg\:block {
+  display: block !important;
+}
+
+.desktop-forced .lg\:pb-0 {
+  padding-bottom: 0 !important;
+}
