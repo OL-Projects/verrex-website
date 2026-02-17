@@ -10,7 +10,7 @@ export const products: Product[] = [
       "Energy-efficient casement windows with modern design and superior ventilation.",
     category: "residential",
     subcategory: "Windows",
-    images: ["/images/products/casement-2.jpg", "/images/products/casement-3.jpg", "/images/products/casement-1.jpg"],
+    images: ["/images/products/casement-3.jpg", "/images/products/casement-1.jpg", "/images/products/casement-2.jpg"],
     features: [
       "Energy Star certified",
       "Multi-point locking system",
