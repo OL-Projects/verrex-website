@@ -54,8 +54,8 @@ export function DoubleHungWindow({ width, height, frameColor, glassType, isOpen 
             <meshStandardMaterial color={frameColor} roughness={0.45} metalness={0.02} />
           </mesh>
 
-          {/* Lever handle */}
-          <LeverHandle position={[0, 0, d * 0.3]} />
+          {/* Lever handle — centered on meeting rail for easy grip */}
+          <LeverHandle position={[0, sashH / 2 - 0.04, d * 0.3]} />
 
           {/* Dual lock points at meeting rail */}
           <LockPoint position={[width / 4, sashH / 2 - 0.01, d * 0.25]} />

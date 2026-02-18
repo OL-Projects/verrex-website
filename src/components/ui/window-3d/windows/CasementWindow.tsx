@@ -73,9 +73,9 @@ export function CasementWindow({ width, height, frameColor, glassType, isOpen }:
         <Hinge key={`rh${i}`} position={[width / 2 - t * 0.4, y, d * 0.2]} />
       ))}
 
-      {/* Crank handles (interior side) */}
-      <CrankHandle position={[-0.06, -height / 4, d * 0.3]} />
-      <CrankHandle position={[0.06, -height / 4, d * 0.3]} />
+      {/* Crank handles — bottom center of each panel (interior side) */}
+      <CrankHandle position={[-halfW / 2 - 0.01, -height / 3, d * 0.3]} />
+      <CrankHandle position={[halfW / 2 + 0.01, -height / 3, d * 0.3]} />
 
       {/* Lock points at center mullion */}
       <LockPoint position={[-0.015, height / 4, d * 0.25]} />

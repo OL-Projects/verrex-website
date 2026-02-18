@@ -1,13 +1,9 @@
 "use client"
-import { MeshTransmissionMaterial } from "@react-three/drei"
 
 // ═══════════════════════════════════════════════════════════════
-// Physically-based glass configurations
+// Physically-based glass using native meshPhysicalMaterial
 // IOR: Soda-lime float glass = 1.52 (ASTM C1036 / CSA A440)
-// Real-world glass thickness reference:
-//   Single pane: 3–6 mm | IGU double: 22 mm (4-14-4) | IGU triple: 36 mm
-// MeshTransmissionMaterial from Drei — real refraction, caustics,
-// chromatic aberration, anisotropic blur
+// Uses Three.js built-in transmission (no infinite mirror recursion)
 // ═══════════════════════════════════════════════════════════════
 
 export const GLASS_CONFIGS: Record<string, {
@@ -15,65 +11,54 @@ export const GLASS_CONFIGS: Record<string, {
   transmission: number
   thickness: number
   roughness: number
-  chromaticAberration: number
-  anisotropicBlur: number
-  distortion: number
   ior: number
+  clearcoat: number
+  opacity: number
 }> = {
-  // Standard clear float glass — maximum transparency, slight edge refraction
   clear: {
-    color: "#ffffff",
-    transmission: 1,
-    thickness: 0.4,
-    roughness: 0,
-    chromaticAberration: 0.04,
-    anisotropicBlur: 0.06,
-    distortion: 0,
+    color: "#f8fbff",
+    transmission: 0.96,
+    thickness: 0.5,
+    roughness: 0.05,
     ior: 1.52,
+    clearcoat: 0.1,
+    opacity: 1,
   },
-  // Low-emissivity coating — slight green tint, reduced solar heat gain
   "low-e": {
     color: "#dceeda",
-    transmission: 0.92,
+    transmission: 0.88,
     thickness: 0.5,
-    roughness: 0.02,
-    chromaticAberration: 0.02,
-    anisotropicBlur: 0.04,
-    distortion: 0,
+    roughness: 0.08,
     ior: 1.52,
+    clearcoat: 0.15,
+    opacity: 1,
   },
-  // Solar tinted (grey-blue) — reduces glare and heat transmission
   tinted: {
     color: "#7aaec8",
-    transmission: 0.7,
+    transmission: 0.65,
     thickness: 0.6,
-    roughness: 0.01,
-    chromaticAberration: 0.03,
-    anisotropicBlur: 0.05,
-    distortion: 0,
+    roughness: 0.06,
     ior: 1.52,
+    clearcoat: 0.1,
+    opacity: 1,
   },
-  // Acid-etched / sandblasted frosted — privacy glass with diffused light
   frosted: {
     color: "#e4eaef",
-    transmission: 0.82,
+    transmission: 0.7,
     thickness: 0.35,
-    roughness: 0.6,
-    chromaticAberration: 0.01,
-    anisotropicBlur: 0.9,
-    distortion: 0.08,
+    roughness: 0.55,
     ior: 1.52,
+    clearcoat: 0,
+    opacity: 1,
   },
-  // Tempered safety glass (CSA certified) — optically clear, thicker for strength
   tempered: {
     color: "#f2f9ff",
-    transmission: 0.98,
+    transmission: 0.95,
     thickness: 0.55,
-    roughness: 0,
-    chromaticAberration: 0.045,
-    anisotropicBlur: 0.05,
-    distortion: 0,
+    roughness: 0.03,
     ior: 1.52,
+    clearcoat: 0.15,
+    opacity: 1,
   },
 }
 
@@ -95,19 +80,18 @@ export function GlassPane({
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[width, height, 0.012]} />
-      <MeshTransmissionMaterial
-        transmissionSampler
+      <meshPhysicalMaterial
         color={g.color}
         transmission={g.transmission}
         thickness={g.thickness}
         roughness={g.roughness}
-        chromaticAberration={g.chromaticAberration}
-        anisotropicBlur={g.anisotropicBlur}
-        distortion={g.distortion}
-        distortionScale={0.5}
-        temporalDistortion={0}
+        metalness={0}
         ior={g.ior}
-        envMapIntensity={1.5}
+        clearcoat={g.clearcoat}
+        clearcoatRoughness={0.1}
+        envMapIntensity={0.6}
+        transparent
+        opacity={g.opacity}
       />
     </mesh>
   )
