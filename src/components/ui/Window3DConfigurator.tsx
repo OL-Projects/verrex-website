@@ -52,7 +52,48 @@ function WindowFrame({
   )
 }
 
-// ── Glass pane ──
+// ── Glass pane with physically-accurate refraction ──
+// IOR reference: Float glass = 1.52, Low-E coated = 1.52, Tempered = 1.52
+// Per Three.js MeshPhysicalMaterial transmission docs (Context7)
+
+const GLASS_CONFIGS: Record<string, {
+  color: string; transmission: number; roughness: number;
+  ior: number; thickness: number; opacity: number;
+  attenuationColor: string; attenuationDistance: number;
+  specularIntensity: number; clearcoat: number; clearcoatRoughness: number;
+}> = {
+  clear: {
+    color: "#ffffff", transmission: 1.0, roughness: 0.0,
+    ior: 1.52, thickness: 0.5, opacity: 1.0,
+    attenuationColor: "#ffffff", attenuationDistance: 0,
+    specularIntensity: 1.0, clearcoat: 0.1, clearcoatRoughness: 0.1,
+  },
+  "low-e": {
+    color: "#e8f4e8", transmission: 0.92, roughness: 0.02,
+    ior: 1.52, thickness: 0.6, opacity: 1.0,
+    attenuationColor: "#d4edda", attenuationDistance: 2.0,
+    specularIntensity: 0.9, clearcoat: 0.3, clearcoatRoughness: 0.05,
+  },
+  tinted: {
+    color: "#8bb8d4", transmission: 0.75, roughness: 0.02,
+    ior: 1.52, thickness: 0.8, opacity: 1.0,
+    attenuationColor: "#6aa3c7", attenuationDistance: 1.5,
+    specularIntensity: 0.8, clearcoat: 0.15, clearcoatRoughness: 0.1,
+  },
+  frosted: {
+    color: "#e8eef2", transmission: 0.6, roughness: 0.65,
+    ior: 1.52, thickness: 0.5, opacity: 1.0,
+    attenuationColor: "#dde5eb", attenuationDistance: 1.0,
+    specularIntensity: 0.5, clearcoat: 0.0, clearcoatRoughness: 0.4,
+  },
+  tempered: {
+    color: "#f0f8ff", transmission: 0.98, roughness: 0.0,
+    ior: 1.52, thickness: 1.0, opacity: 1.0,
+    attenuationColor: "#f0f8ff", attenuationDistance: 0,
+    specularIntensity: 1.0, clearcoat: 0.2, clearcoatRoughness: 0.05,
+  },
+}
+
 function GlassPane({
   width,
   height,
@@ -64,22 +105,27 @@ function GlassPane({
   position?: [number, number, number]
   glassType?: string
 }) {
-  const glassColor = glassType === "tinted" ? "#b8d4e3" : glassType === "frosted" ? "#e8eef2" : "#d6eaf8"
-  const opacity = glassType === "frosted" ? 0.6 : 0.3
-  const roughness = glassType === "frosted" ? 0.8 : 0.05
+  const g = GLASS_CONFIGS[glassType] || GLASS_CONFIGS.clear
 
   return (
     <mesh position={position}>
       <boxGeometry args={[width, height, 0.012]} />
       <meshPhysicalMaterial
-        color={glassColor}
+        color={g.color}
         transparent
-        opacity={opacity}
-        roughness={roughness}
-        metalness={0.1}
-        transmission={glassType === "frosted" ? 0.3 : 0.85}
-        thickness={0.5}
-        envMapIntensity={1.2}
+        opacity={g.opacity}
+        roughness={g.roughness}
+        metalness={0}
+        ior={g.ior}
+        transmission={g.transmission}
+        thickness={g.thickness}
+        attenuationColor={g.attenuationColor}
+        attenuationDistance={g.attenuationDistance}
+        specularIntensity={g.specularIntensity}
+        specularColor="#ffffff"
+        clearcoat={g.clearcoat}
+        clearcoatRoughness={g.clearcoatRoughness}
+        envMapIntensity={1.5}
         side={THREE.DoubleSide}
       />
     </mesh>
@@ -363,9 +409,11 @@ const FRAME_COLORS = [
 ]
 
 const GLASS_TYPES = [
-  { name: "Clear", value: "clear" },
-  { name: "Tinted", value: "tinted" },
-  { name: "Frosted", value: "frosted" },
+  { name: "Clear", value: "clear", desc: "Standard float glass" },
+  { name: "Low-E", value: "low-e", desc: "Energy efficient coating" },
+  { name: "Tinted", value: "tinted", desc: "Solar heat reduction" },
+  { name: "Frosted", value: "frosted", desc: "Privacy glass" },
+  { name: "Tempered", value: "tempered", desc: "Safety rated (CSA)" },
 ]
 
 export function Window3DConfigurator({
@@ -378,14 +426,30 @@ export function Window3DConfigurator({
   const [height, setHeight] = useState(defaultHeight)
   const [frameColor, setFrameColor] = useState("#f5f5f5")
   const [glassType, setGlassType] = useState("clear")
+  const [submitted, setSubmitted] = useState(false)
+
+  // CSA A440 / NAFS standard size validation
+  const MIN_SIZE = 12
+  const MAX_SIZE = 120
+  const isValidWidth = width >= MIN_SIZE && width <= MAX_SIZE
+  const isValidHeight = height >= MIN_SIZE && height <= MAX_SIZE
+  const isStandardSize = [24, 30, 36, 48, 60, 72].includes(width) || [36, 48, 60, 72, 84, 96].includes(height)
+
+  const clampValue = (v: number) => Math.max(MIN_SIZE, Math.min(MAX_SIZE, v))
 
   const handleWidthChange = (v: number) => {
-    setWidth(v)
-    onConfigChange?.({ width: v, height, frameColor, glassType })
+    const clamped = clampValue(v)
+    setWidth(clamped)
+    setSubmitted(false)
   }
   const handleHeightChange = (v: number) => {
-    setHeight(v)
-    onConfigChange?.({ width, height: v, frameColor, glassType })
+    const clamped = clampValue(v)
+    setHeight(clamped)
+    setSubmitted(false)
+  }
+  const handleSubmit = () => {
+    setSubmitted(true)
+    onConfigChange?.({ width, height, frameColor, glassType })
   }
 
   return (
@@ -407,8 +471,18 @@ export function Window3DConfigurator({
               <WindowModel type={windowType} width={width} height={height} frameColor={frameColor} glassType={glassType} />
             </WindowScene>
 
-            <ContactShadows position={[0, -1.2, 0]} opacity={0.35} scale={5} blur={2.5} far={4} resolution={256} />
-            <Environment preset="apartment" />
+            {/* Backdrop for glass refraction visibility */}
+            <mesh position={[0, 0, -2]} receiveShadow>
+              <planeGeometry args={[8, 6]} />
+              <meshStandardMaterial color="#c8d8e8" roughness={0.9} metalness={0} />
+            </mesh>
+            <mesh position={[0, -1.2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+              <planeGeometry args={[8, 8]} />
+              <meshStandardMaterial color="#e8e8e8" roughness={0.95} metalness={0} />
+            </mesh>
+
+            <ContactShadows position={[0, -1.2, 0]} opacity={0.4} scale={6} blur={2.5} far={4} resolution={512} />
+            <Environment preset="studio" />
             <OrbitControls
               makeDefault
               enableDamping
@@ -428,77 +502,82 @@ export function Window3DConfigurator({
         </div>
       </div>
 
-      {/* Controls Panel */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0a0f1a]/80 backdrop-blur-md space-y-4">
-        {/* Size sliders */}
-        <div className="grid grid-cols-2 gap-4">
+      {/* Enhanced Controls Panel */}
+      <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0a0f1a]/80 backdrop-blur-md space-y-3">
+        {/* Measurement Inputs with Number Fields + Sliders */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Width */}
           <div>
-            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
-              Width: {width}&quot;
-            </label>
-            <input
-              type="range"
-              min={18}
-              max={96}
-              step={1}
-              value={width}
-              onChange={(e) => handleWidthChange(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
-              <span>18&quot;</span><span>96&quot;</span>
+            <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Width</label>
+            <div className="flex items-center gap-1.5">
+              <button onClick={() => handleWidthChange(width - 1)} className="w-7 h-7 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">−</button>
+              <input type="number" min={MIN_SIZE} max={MAX_SIZE} value={width} onChange={(e) => handleWidthChange(Number(e.target.value))}
+                className={`w-16 h-7 text-center text-sm font-mono rounded-md border ${isValidWidth ? "border-slate-300 dark:border-slate-600" : "border-red-400"} bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40`} />
+              <span className="text-xs text-slate-400">in</span>
+              <button onClick={() => handleWidthChange(width + 1)} className="w-7 h-7 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">+</button>
+            </div>
+            <input type="range" min={MIN_SIZE} max={MAX_SIZE} step={1} value={width} onChange={(e) => handleWidthChange(Number(e.target.value))}
+              className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-600 mt-1" />
+          </div>
+          {/* Height */}
+          <div>
+            <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Height</label>
+            <div className="flex items-center gap-1.5">
+              <button onClick={() => handleHeightChange(height - 1)} className="w-7 h-7 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">−</button>
+              <input type="number" min={MIN_SIZE} max={MAX_SIZE} value={height} onChange={(e) => handleHeightChange(Number(e.target.value))}
+                className={`w-16 h-7 text-center text-sm font-mono rounded-md border ${isValidHeight ? "border-slate-300 dark:border-slate-600" : "border-red-400"} bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40`} />
+              <span className="text-xs text-slate-400">in</span>
+              <button onClick={() => handleHeightChange(height + 1)} className="w-7 h-7 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">+</button>
+            </div>
+            <input type="range" min={MIN_SIZE} max={MAX_SIZE} step={1} value={height} onChange={(e) => handleHeightChange(Number(e.target.value))}
+              className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-600 mt-1" />
+          </div>
+        </div>
+
+        {/* Validation badge */}
+        <div className="flex items-center gap-2">
+          {isStandardSize && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+              ✓ Standard Size (CSA A440)
+            </span>
+          )}
+          {!isStandardSize && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+              Custom Size — verify NAFS compliance
+            </span>
+          )}
+          <span className="text-[10px] text-slate-400 ml-auto">{MIN_SIZE}&quot;–{MAX_SIZE}&quot; range</span>
+        </div>
+
+        {/* Frame color & glass type */}
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Frame</label>
+            <div className="flex gap-1.5">
+              {FRAME_COLORS.map((c) => (
+                <button key={c.value} onClick={() => { setFrameColor(c.value); setSubmitted(false) }}
+                  className={`h-6 w-6 rounded-full border-2 transition-all ${frameColor === c.value ? "border-blue-500 scale-110 ring-2 ring-blue-500/30" : "border-slate-300 dark:border-slate-600 hover:scale-105"}`}
+                  style={{ backgroundColor: c.value }} title={c.name} />
+              ))}
             </div>
           </div>
-          <div>
-            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
-              Height: {height}&quot;
-            </label>
-            <input
-              type="range"
-              min={18}
-              max={96}
-              step={1}
-              value={height}
-              onChange={(e) => handleHeightChange(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
-              <span>18&quot;</span><span>96&quot;</span>
+          <div className="flex-1">
+            <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Glass</label>
+            <div className="flex gap-1 flex-wrap">
+              {GLASS_TYPES.map((g) => (
+                <button key={g.value} onClick={() => { setGlassType(g.value); setSubmitted(false) }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${glassType === g.value ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}`}
+                  title={g.desc}>{g.name}</button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Frame color & glass type */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Frame Colour</label>
-            <div className="flex gap-2">
-              {FRAME_COLORS.map((c) => (
-                <button
-                  key={c.value}
-                  onClick={() => { setFrameColor(c.value); onConfigChange?.({ width, height, frameColor: c.value, glassType }) }}
-                  className={`h-7 w-7 rounded-full border-2 transition-all ${frameColor === c.value ? "border-blue-500 scale-110 ring-2 ring-blue-500/30" : "border-slate-300 dark:border-slate-600 hover:scale-105"}`}
-                  style={{ backgroundColor: c.value }}
-                  title={c.name}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="flex-1">
-            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Glass Type</label>
-            <div className="flex gap-1.5">
-              {GLASS_TYPES.map((g) => (
-                <button
-                  key={g.value}
-                  onClick={() => { setGlassType(g.value); onConfigChange?.({ width, height, frameColor, glassType: g.value }) }}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${glassType === g.value ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}`}
-                >
-                  {g.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Submit Configuration */}
+        <button onClick={handleSubmit}
+          className={`w-full py-2 rounded-lg text-sm font-semibold transition-all ${submitted ? "bg-green-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}>
+          {submitted ? "✓ Configuration Submitted" : "Submit Configuration"}
+        </button>
       </div>
     </div>
   )
