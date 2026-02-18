@@ -3,173 +3,202 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Window3DViewer } from "@/components/ui/window-3d-viewer"
 import { X, ArrowRight, ArrowLeft, Home, Building2, Factory, Ruler, Shield, Thermometer, ChevronLeft, ChevronRight } from "lucide-react"
+
+// Dynamically import 3D configurator (no SSR - WebGL needs browser)
+const Window3DConfigurator = dynamic(
+  () => import("@/components/ui/Window3DConfigurator").then((mod) => mod.Window3DConfigurator),
+  { ssr: false, loading: () => (
+    <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-2xl">
+      <div className="text-center">
+        <div className="h-10 w-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm text-slate-500 dark:text-slate-400">Loading 3D Viewer...</p>
+      </div>
+    </div>
+  )}
+)
 
 interface WindowType {
   id: string
   name: string
-  icon: string
   image: string
   description: string
   bestFor: string[]
   benefits: string[]
   categories: ("residential" | "commercial" | "industrial")[]
+  defaultWidth: number
+  defaultHeight: number
 }
 
 const windowTypes: WindowType[] = [
   {
     id: "double-hung",
     name: "Double-Hung",
-    icon: "⬍",
     image: "/images/window-types/double-hung.png",
     description: "Two sashes that slide vertically within the frame. Both the upper and lower sash can be opened, allowing for versatile ventilation and easy cleaning.",
     bestFor: ["Living rooms", "Bedrooms", "Kitchens", "Traditional homes"],
     benefits: ["Easy to clean from inside", "Excellent ventilation control", "Classic aesthetic", "Compatible with most architectures"],
     categories: ["residential"],
+    defaultWidth: 36,
+    defaultHeight: 60,
   },
   {
     id: "casement",
     name: "Casement",
-    icon: "↗",
     image: "/images/window-types/casement.png",
     description: "Hinged at the side and opens outward like a door using a crank mechanism. Provides maximum airflow and an unobstructed view when open.",
     bestFor: ["Above kitchen sinks", "Hard-to-reach areas", "Modern homes"],
     benefits: ["Maximum ventilation", "Excellent energy efficiency", "Tight seal when closed", "Unobstructed views"],
     categories: ["residential", "commercial"],
+    defaultWidth: 30,
+    defaultHeight: 48,
   },
   {
     id: "sliding",
     name: "Sliding",
-    icon: "⟷",
     image: "/images/window-types/sliding.png",
     description: "Operates horizontally along a track. One or both sashes slide left or right. Low maintenance and space-efficient since they don't protrude outward.",
     bestFor: ["Patios", "Decks", "Wide openings", "Contemporary designs"],
     benefits: ["Easy to operate", "Space-saving design", "Low maintenance", "Wide views"],
     categories: ["residential", "commercial"],
+    defaultWidth: 60,
+    defaultHeight: 36,
   },
   {
     id: "bay-bow",
     name: "Bay & Bow",
-    icon: "🏠",
     image: "/images/window-types/bay-bow.png",
     description: "Bay windows project outward in an angled shape (typically 3 panels), while bow windows use 4-6 panels in a gentle curve. Both add space and light to rooms.",
     bestFor: ["Living rooms", "Master bedrooms", "Dining areas", "Reading nooks"],
     benefits: ["Adds interior space", "Panoramic views", "Dramatic architectural element", "Increased natural light"],
     categories: ["residential"],
+    defaultWidth: 72,
+    defaultHeight: 48,
   },
   {
     id: "awning",
     name: "Awning",
-    icon: "⬆",
     image: "/images/window-types/awning.png",
     description: "Hinged at the top and opens outward from the bottom. Can remain open during light rain without letting water in, making them ideal for ventilation in various weather.",
     bestFor: ["Basements", "Bathrooms", "Above doors", "Rainy climates"],
     benefits: ["Ventilation in rain", "Good security", "Energy efficient", "Weather resistant"],
     categories: ["residential", "commercial"],
+    defaultWidth: 36,
+    defaultHeight: 24,
   },
   {
     id: "picture",
     name: "Picture / Fixed",
-    icon: "🖼",
     image: "/images/window-types/picture-fixed.png",
     description: "Large, non-opening windows designed to frame a view and maximize natural light. Often combined with operable windows on either side.",
     bestFor: ["Scenic views", "High walls", "Accent windows", "Storefronts"],
     benefits: ["Maximum light", "Best energy efficiency", "Unobstructed views", "No moving parts"],
     categories: ["residential", "commercial", "industrial"],
+    defaultWidth: 48,
+    defaultHeight: 60,
   },
   {
     id: "garden",
     name: "Garden",
-    icon: "🌿",
     image: "/images/window-types/garden.jpg",
-    description: "Extends outward from the wall creating a small shelf. Originally designed for growing herbs, now used for plants, décor, or additional kitchen space.",
+    description: "Extends outward from the wall creating a small shelf. Originally designed for growing herbs, now used for plants, decor, or additional kitchen space.",
     bestFor: ["Kitchens", "Plant lovers", "Small spaces"],
     benefits: ["Additional shelf space", "Brings nature inside", "Unique design element", "Extra light"],
     categories: ["residential"],
+    defaultWidth: 36,
+    defaultHeight: 36,
   },
   {
     id: "skylight",
     name: "Skylight",
-    icon: "☀",
     image: "/images/window-types/skylight.jpg",
     description: "Installed in the roof or ceiling to bring natural light from above. Available in fixed, vented, and tubular styles for various applications.",
     bestFor: ["Dark rooms", "Hallways", "Bathrooms", "Attics"],
     benefits: ["Natural overhead light", "Reduces energy costs", "Ventilation option", "Star gazing"],
     categories: ["residential", "commercial"],
+    defaultWidth: 30,
+    defaultHeight: 48,
   },
   {
     id: "transom",
     name: "Transom",
-    icon: "▬",
     image: "/images/window-types/transom.jpg",
     description: "Narrow windows placed above doors or other windows. Can be fixed or operable. Add architectural interest and extra light to entryways.",
     bestFor: ["Above front doors", "Above other windows", "Hallways", "Decorative accents"],
     benefits: ["Additional natural light", "Architectural detail", "Privacy maintained", "Classic elegance"],
     categories: ["residential", "commercial"],
+    defaultWidth: 48,
+    defaultHeight: 18,
   },
   {
     id: "hopper",
     name: "Hopper",
-    icon: "⬇",
     image: "/images/window-types/hopper.jpg",
     description: "Hinged at the bottom and opens inward from the top. Commonly used in basements and bathrooms for ventilation while maintaining security.",
     bestFor: ["Basements", "Bathrooms", "Small spaces", "Utility rooms"],
     benefits: ["Good ventilation", "Compact design", "Security", "Water deflection"],
     categories: ["residential"],
+    defaultWidth: 32,
+    defaultHeight: 18,
   },
   {
     id: "tilt-turn",
     name: "Tilt & Turn",
-    icon: "⟳",
     image: "/images/window-types/tilt-turn.jpg",
     description: "European-style window that can tilt inward from the top for ventilation or swing open from the side like a door. Offers maximum flexibility.",
     bestFor: ["Modern buildings", "High-rise apartments", "European-style homes"],
     benefits: ["Dual opening modes", "Easy to clean", "Excellent seal", "Multi-function"],
     categories: ["residential", "commercial"],
+    defaultWidth: 30,
+    defaultHeight: 48,
   },
   {
     id: "glass-block",
     name: "Glass Block",
-    icon: "▦",
     image: "/images/window-types/glass-block.jpg",
     description: "Constructed from thick glass blocks that let light through while providing privacy and security. Ideal for areas where light is wanted without visibility.",
     bestFor: ["Bathrooms", "Basements", "Stairwells", "Privacy areas"],
     benefits: ["Maximum privacy", "Natural light", "Sound insulation", "Security"],
     categories: ["residential", "commercial", "industrial"],
+    defaultWidth: 32,
+    defaultHeight: 32,
   },
   {
     id: "jalousie",
     name: "Jalousie / Louvre",
-    icon: "≡",
     image: "/images/window-types/jalousie.jpg",
     description: "Features horizontal glass slats that open and close like blinds. Provides excellent ventilation control. Common in tropical and warm climates.",
     bestFor: ["Porches", "Sunrooms", "Tropical climates", "Ventilation zones"],
     benefits: ["Maximum airflow", "Adjustable ventilation", "Light control", "Tropical style"],
     categories: ["residential", "commercial"],
+    defaultWidth: 24,
+    defaultHeight: 48,
   },
   {
     id: "curtain-wall",
     name: "Curtain Wall",
-    icon: "▥",
     image: "/images/window-types/curtain-wall.jpg",
-    description: "Non-structural glass façade system that hangs from the building structure. Creates seamless glass exteriors for modern commercial and industrial buildings.",
+    description: "Non-structural glass facade system that hangs from the building structure. Creates seamless glass exteriors for modern commercial and industrial buildings.",
     bestFor: ["Office buildings", "Skyscrapers", "Showrooms", "Atriums"],
     benefits: ["Stunning aesthetics", "Energy efficient systems", "Natural daylight", "Modern appearance"],
     categories: ["commercial", "industrial"],
+    defaultWidth: 60,
+    defaultHeight: 96,
   },
   {
     id: "storefront",
     name: "Storefront",
-    icon: "🏪",
     image: "/images/window-types/storefront.png",
     description: "Large glass panels framed in aluminum, designed for commercial ground-floor applications. Provides maximum product visibility and curb appeal.",
     bestFor: ["Retail stores", "Restaurants", "Lobbies", "Ground-floor commercial"],
     benefits: ["Maximum visibility", "Curb appeal", "Durable framing", "Custom sizing"],
     categories: ["commercial"],
+    defaultWidth: 72,
+    defaultHeight: 84,
   },
 ]
 
@@ -195,7 +224,7 @@ export default function WindowTypesPage() {
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold text-white">Types of Windows</h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            Explore every window style available. Click on any type to see details, benefits, and best applications.
+            Explore every window style available. Click on any type to see a real-time 3D preview with customizable dimensions.
           </p>
         </div>
       </section>
@@ -261,7 +290,7 @@ export default function WindowTypesPage() {
         </div>
       </section>
 
-      {/* Full-Screen Split View with 3D Viewer */}
+      {/* Full-Screen Split View with 3D Configurator */}
       {selectedType && (
         <div className="fixed inset-0 z-50 bg-white dark:bg-[#030712] overflow-hidden">
           {/* Top Bar */}
@@ -311,9 +340,14 @@ export default function WindowTypesPage() {
 
           {/* Split Layout */}
           <div className="h-[calc(100vh-3.5rem)] flex flex-col lg:flex-row">
-            {/* LEFT: 3D Viewer */}
+            {/* LEFT: 3D Configurator */}
             <div className="w-full lg:w-1/2 h-[45vh] lg:h-full p-3 sm:p-4">
-              <Window3DViewer windowType={selectedType.id} icon={selectedType.icon} />
+              <Window3DConfigurator
+                key={selectedType.id}
+                windowType={selectedType.id}
+                defaultWidth={selectedType.defaultWidth}
+                defaultHeight={selectedType.defaultHeight}
+              />
             </div>
 
             {/* RIGHT: Specifications */}
@@ -321,10 +355,7 @@ export default function WindowTypesPage() {
               <div className="p-6 sm:p-8 space-y-6">
                 {/* Title */}
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl">{selectedType.icon}</span>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{selectedType.name}</h2>
-                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{selectedType.name}</h2>
                   <div className="flex gap-2 mt-2">
                     {selectedType.categories.map((cat) => (
                       <Badge key={cat} variant="secondary">{cat}</Badge>
@@ -353,7 +384,7 @@ export default function WindowTypesPage() {
                   <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-center">
                     <Thermometer className="h-5 w-5 text-amber-600 dark:text-amber-400 mx-auto mb-1" />
                     <p className="text-xs text-slate-500 dark:text-slate-400">Energy</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">A+ Rated</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">ENERGY STAR\u00AE</p>
                   </div>
                 </div>
 

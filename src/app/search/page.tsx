@@ -53,7 +53,7 @@ interface SearchResult {
   meta?: string
 }
 
-const typeConfig: Record<SearchResultType, { icon: React.ElementType; color: string; label: string }> = {
+const typeConfig: Record<SearchResultType, { icon: React.ComponentType<{ className?: string }>; color: string; label: string }> = {
   product: { icon: Package, color: "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40", label: "Product" },
   service: { icon: Wrench, color: "text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40", label: "Service" },
   team: { icon: Users, color: "text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/40", label: "Team" },

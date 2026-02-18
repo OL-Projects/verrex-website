@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react"
 
-const categories: { value: ProductCategory | "all"; label: string; icon: React.ElementType }[] = [
+const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { value: "all", label: "All Products", icon: SlidersHorizontal },
   { value: "residential", label: "Residential", icon: Home },
   { value: "commercial", label: "Commercial", icon: Building2 },

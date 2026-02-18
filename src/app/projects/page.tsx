@@ -28,7 +28,7 @@ import {
 
 type ViewMode = "grid" | "masonry" | "list"
 
-const categories: { value: ProductCategory | "all"; label: string; icon: React.ElementType }[] = [
+const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { value: "all", label: "All Projects", icon: SlidersHorizontal },
   { value: "residential", label: "Residential", icon: Home },
   { value: "commercial", label: "Commercial", icon: Building2 },

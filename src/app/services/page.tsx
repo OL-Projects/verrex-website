@@ -4,11 +4,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { services } from "@/lib/data"
 import { ArrowRight, Clock, CheckCircle2, MessageSquare, Ruler, Wrench, Search, Sparkles, Settings, Phone } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = { title: "Services" }
 
-const iconMap: Record<string, React.ElementType> = { MessageSquare, Ruler, Wrench, Search, Sparkles, Settings }
+const iconMap: Record<string, LucideIcon> = { MessageSquare, Ruler, Wrench, Search, Sparkles, Settings }
 
 const process_steps = [
   { step: "01", title: "Initial Consultation", description: "Free consultation to understand your needs, budget, and timeline. Available in-person or via video call." },
@@ -36,12 +37,12 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => {
-              const Icon = iconMap[service.icon] || Settings
+              const IconComp = iconMap[service.icon] ?? Settings
               return (
                 <Card key={service.id} className="h-full hover:shadow-lg transition-all">
                   <CardContent className="p-8">
                     <div className="h-14 w-14 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center mb-5">
-                      <Icon className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                      {IconComp && <IconComp className="h-7 w-7 text-blue-600 dark:text-blue-400" />}
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">{service.name}</h3>
                     <p className="mt-3 text-slate-600 dark:text-slate-400 leading-relaxed">{service.description}</p>

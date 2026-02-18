@@ -33,7 +33,9 @@ import {
   Truck,
 } from "lucide-react"
 
-const iconMap: Record<string, React.ElementType> = {
+import type { LucideIcon } from "lucide-react"
+
+const iconMap: Record<string, LucideIcon> = {
   MessageSquare, Ruler, Wrench, Search, Sparkles, Settings,
 }
 
@@ -292,14 +294,14 @@ export default function HomePage() {
 
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => {
-              const Icon = iconMap[service.icon] || Settings
+              const IconComp = iconMap[service.icon] ?? Settings
               return (
                 <StaggerItem key={service.id}>
                   <HoverCard>
                     <Card className="h-full">
                       <CardContent className="p-6">
                         <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center mb-4">
-                          <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                          {IconComp && <IconComp className="h-6 w-6 text-blue-600 dark:text-blue-400" />}
                         </div>
                         <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{service.name}</h3>
                         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{service.description}</p>
