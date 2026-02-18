@@ -1,64 +1,52 @@
 "use client"
 
 // ═══════════════════════════════════════════════════════════════
-// Physically-based glass using native meshPhysicalMaterial
-// IOR: Soda-lime float glass = 1.52 (ASTM C1036 / CSA A440)
-// Uses Three.js built-in transmission (no infinite mirror recursion)
+// Clean glass material — simple transparency with env reflections
+// No transmission buffer = no self-reflection artifacts
+// Uses meshStandardMaterial for clean, artifact-free rendering
 // ═══════════════════════════════════════════════════════════════
 
 export const GLASS_CONFIGS: Record<string, {
   color: string
-  transmission: number
-  thickness: number
-  roughness: number
-  ior: number
-  clearcoat: number
   opacity: number
+  roughness: number
+  metalness: number
+  envMapIntensity: number
 }> = {
   clear: {
-    color: "#f8fbff",
-    transmission: 0.96,
-    thickness: 0.5,
+    color: "#f0f5fa",
+    opacity: 0.12,
     roughness: 0.05,
-    ior: 1.52,
-    clearcoat: 0.1,
-    opacity: 1,
+    metalness: 0.1,
+    envMapIntensity: 0.4,
   },
   "low-e": {
-    color: "#dceeda",
-    transmission: 0.88,
-    thickness: 0.5,
+    color: "#d4ecd6",
+    opacity: 0.18,
     roughness: 0.08,
-    ior: 1.52,
-    clearcoat: 0.15,
-    opacity: 1,
+    metalness: 0.1,
+    envMapIntensity: 0.35,
   },
   tinted: {
-    color: "#7aaec8",
-    transmission: 0.65,
-    thickness: 0.6,
+    color: "#6a9ab8",
+    opacity: 0.35,
     roughness: 0.06,
-    ior: 1.52,
-    clearcoat: 0.1,
-    opacity: 1,
+    metalness: 0.08,
+    envMapIntensity: 0.3,
   },
   frosted: {
-    color: "#e4eaef",
-    transmission: 0.7,
-    thickness: 0.35,
-    roughness: 0.55,
-    ior: 1.52,
-    clearcoat: 0,
-    opacity: 1,
+    color: "#dce3e8",
+    opacity: 0.6,
+    roughness: 0.5,
+    metalness: 0.02,
+    envMapIntensity: 0.15,
   },
   tempered: {
-    color: "#f2f9ff",
-    transmission: 0.95,
-    thickness: 0.55,
+    color: "#f2f8ff",
+    opacity: 0.1,
     roughness: 0.03,
-    ior: 1.52,
-    clearcoat: 0.15,
-    opacity: 1,
+    metalness: 0.12,
+    envMapIntensity: 0.45,
   },
 }
 
@@ -79,19 +67,14 @@ export function GlassPane({
 
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[width, height, 0.012]} />
-      <meshPhysicalMaterial
+      <boxGeometry args={[width, height, 0.008]} />
+      <meshStandardMaterial
         color={g.color}
-        transmission={g.transmission}
-        thickness={g.thickness}
-        roughness={g.roughness}
-        metalness={0}
-        ior={g.ior}
-        clearcoat={g.clearcoat}
-        clearcoatRoughness={0.1}
-        envMapIntensity={0.6}
         transparent
         opacity={g.opacity}
+        roughness={g.roughness}
+        metalness={g.metalness}
+        envMapIntensity={g.envMapIntensity}
       />
     </mesh>
   )
