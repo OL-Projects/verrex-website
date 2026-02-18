@@ -1,6 +1,7 @@
 "use client"
 
-import Link from "next/link"
+import { useTranslations } from 'next-intl'
+import { Link as IntlLink } from '@/i18n/navigation'
 import { Phone, FileText, Calendar, Search, Home } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { companyInfo } from "@/lib/data"
@@ -15,12 +16,13 @@ const actions = [
 
 export function MobileActionBar() {
   const pathname = usePathname()
+  const t = useTranslations('MobileActionBar')
 
   return (
     <div className="mobile-action-bar lg:hidden sticky-bottom-bar">
       {actions.map((action) => {
         const isActive = !action.isExternal && pathname === action.href
-        const Component = action.isExternal ? "a" : Link
+        const Component = action.isExternal ? "a" : IntlLink
 
         return (
           <Component

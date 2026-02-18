@@ -1,8 +1,10 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useTranslations } from 'next-intl'
+import { Link as IntlLink } from '@/i18n/navigation'
+import { LanguageSwitcher } from './language-switcher'
+import { useRouter } from '@/i18n/navigation'
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
@@ -46,6 +48,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const router = useRouter()
+  const t = useTranslations('Navigation')
 
   // Keyboard shortcut: Ctrl/Cmd + K to open search
   useEffect(() => {
@@ -95,7 +98,7 @@ export function Header() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
+            <IntlLink href="/" className="flex items-center gap-3 group">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -111,7 +114,7 @@ export function Header() {
                   Windows & Doors
                 </span>
               </div>
-            </Link>
+            </IntlLink>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
@@ -124,7 +127,7 @@ export function Header() {
                   }
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  <Link
+                  <IntlLink
                     href={item.href}
                     className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-white/40 dark:hover:bg-white/10 transition-all duration-200"
                   >
@@ -132,7 +135,7 @@ export function Header() {
                     {item.children && (
                       <ChevronDown className="h-3.5 w-3.5" />
                     )}
-                  </Link>
+                  </IntlLink>
 
                   {/* Dropdown */}
                   <AnimatePresence>
@@ -146,14 +149,14 @@ export function Header() {
                       >
                         <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl shadow-xl shadow-black/10 dark:shadow-black/40 border border-white/30 dark:border-white/10 py-2 overflow-hidden">
                           {item.children.map((child) => (
-                            <Link
+                            <IntlLink
                               key={child.name}
                               href={child.href}
                               className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200"
                             >
                               <child.icon className="h-4 w-4" />
                               {child.name}
-                            </Link>
+                            </IntlLink>
                           ))}
                         </div>
                       </motion.div>
@@ -195,20 +198,21 @@ export function Header() {
 
               {/* View toggles */}
               <ViewportToggle />
+              <LanguageSwitcher />
               <ThemeToggle />
 
               {/* CTA Buttons */}
               <div className="hidden lg:flex items-center gap-2 ml-2">
-                <Link href="/quote">
+                <IntlLink href="/quote">
                   <Button variant="outline" size="sm">
                     Get a Quote
                   </Button>
-                </Link>
-                <Link href="/appointments">
+                </IntlLink>
+                <IntlLink href="/appointments">
                   <Button variant="primary" size="sm">
                     Book Appointment
                   </Button>
-                </Link>
+                </IntlLink>
               </div>
 
               {/* Mobile menu button */}
@@ -240,26 +244,26 @@ export function Header() {
             >
               <div className="px-4 py-4 space-y-1">
                 {/* Mobile Search - Prominent */}
-                <Link href="/search" onClick={() => setMobileMenuOpen(false)}>
+                <IntlLink href="/search" onClick={() => setMobileMenuOpen(false)}>
                   <div className="flex items-center gap-3 px-4 py-3 mb-3 rounded-lg bg-white/40 dark:bg-white/5 border border-white/30 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/10 hover:border-blue-400/30 transition-all duration-200">
                     <Search className="h-5 w-5 text-blue-500" />
                     <span className="text-sm text-slate-600 dark:text-slate-400">Search products, services, team...</span>
                   </div>
-                </Link>
+                </IntlLink>
 
                 {navigation.map((item) => (
                   <div key={item.name}>
-                    <Link
+                    <IntlLink
                       href={item.href}
                       className="block px-4 py-2.5 text-base font-medium text-slate-800 dark:text-slate-200 hover:bg-white/40 dark:hover:bg-white/10 rounded-md transition-all duration-200"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {item.name}
-                    </Link>
+                    </IntlLink>
                     {item.children && (
                       <div className="ml-4 space-y-1">
                         {item.children.map((child) => (
-                          <Link
+                          <IntlLink
                             key={child.name}
                             href={child.href}
                             className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 rounded-md transition-all duration-200"
@@ -267,26 +271,26 @@ export function Header() {
                           >
                             <child.icon className="h-4 w-4" />
                             {child.name}
-                          </Link>
+                          </IntlLink>
                         ))}
                       </div>
                     )}
                   </div>
                 ))}
                 <div className="pt-4 space-y-2 border-t border-white/20 dark:border-white/10 mt-4">
-                  <Link href="/quote" onClick={() => setMobileMenuOpen(false)}>
+                  <IntlLink href="/quote" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full">
                       Get a Quote
                     </Button>
-                  </Link>
-                  <Link
+                  </IntlLink>
+                  <IntlLink
                     href="/appointments"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Button variant="primary" className="w-full">
                       Book Appointment
                     </Button>
-                  </Link>
+                  </IntlLink>
                 </div>
               </div>
             </motion.div>

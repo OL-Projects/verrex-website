@@ -1,4 +1,7 @@
-import Link from "next/link"
+"use client"
+
+import { useTranslations } from 'next-intl'
+import { Link as IntlLink } from '@/i18n/navigation'
 import { companyInfo } from "@/lib/data"
 import {
   Phone,
@@ -33,6 +36,7 @@ const footerLinks = {
 }
 
 export function Footer() {
+  const t = useTranslations('Footer')
   return (
     <footer className="bg-slate-900 dark:bg-[#000000] text-white">
       {/* Main Footer */}
@@ -40,7 +44,7 @@ export function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
+            <IntlLink href="/" className="flex items-center gap-2 mb-4">
               <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-lg">VX</span>
               </div>
@@ -52,7 +56,7 @@ export function Footer() {
                   Windows & Doors
                 </span>
               </div>
-            </Link>
+            </IntlLink>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-md">
               {companyInfo.description}
             </p>
@@ -94,12 +98,12 @@ export function Footer() {
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.products.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <IntlLink
                       href={link.href}
                       className="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors"
                     >
                       {link.name}
-                    </Link>
+                    </IntlLink>
                   </li>
                 ))}
               </ul>
@@ -113,12 +117,12 @@ export function Footer() {
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.services.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <IntlLink
                       href={link.href}
                       className="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors"
                     >
                       {link.name}
-                    </Link>
+                    </IntlLink>
                   </li>
                 ))}
               </ul>
@@ -132,12 +136,12 @@ export function Footer() {
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.company.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <IntlLink
                       href={link.href}
                       className="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors"
                     >
                       {link.name}
-                    </Link>
+                    </IntlLink>
                   </li>
                 ))}
               </ul>

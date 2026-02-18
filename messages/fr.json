@@ -1,0 +1,648 @@
+{
+  "Navigation": {
+    "home": "Accueil",
+    "products": "Produits",
+    "residential": "Résidentiel",
+    "commercial": "Commercial",
+    "industrial": "Industriel",
+    "windowTypes": "Types de fenêtres",
+    "catalog": "Catalogue",
+    "projects": "Projets",
+    "services": "Services",
+    "about": "À propos",
+    "contact": "Contact",
+    "getQuote": "Obtenir une soumission",
+    "bookAppointment": "Prendre rendez-vous",
+    "searchPlaceholder": "Rechercher...",
+    "searchFullPlaceholder": "Rechercher produits, services, équipe...",
+    "verrex": "VERREX",
+    "windowsAndDoors": "Fenêtres et portes",
+    "monFri": "Lun-Ven : ",
+    "callUs": "Appelez-nous",
+    "search": "Recherche"
+  },
+  "Footer": {
+    "products": "Produits",
+    "services": "Services",
+    "company": "Entreprise",
+    "residentialWindows": "Fenêtres résidentielles",
+    "commercialGlass": "Vitrage commercial",
+    "industrialSolutions": "Solutions industrielles",
+    "allProducts": "Tous les produits",
+    "freeConsultation": "Consultation gratuite",
+    "onSiteMeasurement": "Mesure sur place",
+    "professionalInstallation": "Installation professionnelle",
+    "repairMaintenance": "Réparation et entretien",
+    "aboutUs": "À propos de nous",
+    "contactLink": "Contact",
+    "partners": "Partenaires",
+    "careers": "Carrières",
+    "description": "Solutions de fenêtres et de portes haut de gamme pour les projets résidentiels, commerciaux et industriels partout au Canada.",
+    "allRightsReserved": "Tous droits réservés.",
+    "premiumWindows": "Fenêtres et portes haut de gamme"
+  },
+  "MobileActionBar": {
+    "home": "Accueil",
+    "products": "Produits",
+    "quote": "Soumission",
+    "call": "Appeler",
+    "menu": "Menu"
+  },
+  "HomePage": {
+    "badge": "Fenêtres et portes haut de gamme",
+    "heroTitle": "Conçu pour",
+    "heroTitleGradient": "chaque projet",
+    "heroDescription": "VERREX offre des systèmes de fenêtres et de portes haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels. Fait confiance par les promoteurs, architectes et gestionnaires d'installations partout au Canada.",
+    "viewCatalog": "Voir le catalogue de produits",
+    "bookConsultation": "Réserver une consultation",
+    "heroAlt": "Systèmes de fenêtres et portes haut de gamme VERREX",
+    "stat1Value": "500+",
+    "stat1Label": "Projets livrés",
+    "stat2Value": "2M+",
+    "stat2Label": "Pi² installés",
+    "stat3Value": "98%",
+    "stat3Label": "Livraison à temps",
+    "stat4Value": "15+",
+    "stat4Label": "Années d'expérience",
+    "cert1": "Certifié CSA A440",
+    "cert2": "Classé NAFS",
+    "cert3": "ENERGY STAR® Canada",
+    "cert4": "FenestrationCanada",
+    "categoryResidential": "Résidentiel et multifamilial",
+    "categoryResidentialDesc": "Systèmes de fenêtres et de portes écoénergétiques pour maisons, condominiums et développements multi-logements.",
+    "categoryCommercial": "Commercial et institutionnel",
+    "categoryCommercialDesc": "Systèmes de devantures, murs-rideaux et portes d'entrée pour bureaux, bâtiments gouvernementaux et commerces.",
+    "categoryIndustrial": "Industriel et manufacturier",
+    "categoryIndustrialDesc": "Portes coupe-feu robustes, vitrage de sécurité et systèmes haute performance pour installations industrielles.",
+    "exploreProducts": "Explorer les produits",
+    "featuredProducts": "Produits vedettes",
+    "featuredProductsDesc": "Découvrez nos systèmes de fenêtres et de portes les plus populaires.",
+    "featured": "Vedette",
+    "from": "À partir de",
+    "viewDetails": "Voir les détails",
+    "viewAllProducts": "Voir tous les produits",
+    "ourServices": "Nos services",
+    "ourServicesDesc": "Solutions complètes de fenêtres et de portes, de la consultation à l'installation.",
+    "learnMore": "En savoir plus",
+    "viewAllServices": "Voir tous les services",
+    "recentProjects": "Projets récents",
+    "recentProjectsDesc": "Explorez nos dernières installations complétées.",
+    "client": "Client",
+    "viewProject": "Voir le projet",
+    "viewAllProjects": "Voir tous les projets",
+    "trustedPartners": "Partenaires de confiance",
+    "trustedPartnersDesc": "Nous travaillons avec des fabricants et fournisseurs de premier plan.",
+    "manufacturer": "Fabricant",
+    "partner": "Partenaire",
+    "whatClientsSay": "Ce que disent nos clients",
+    "whatClientsSayDesc": "Témoignages de nos clients satisfaits partout au Canada.",
+    "ctaTitle": "Prêt à démarrer votre projet?",
+    "ctaDesc": "Obtenez une consultation et une soumission gratuites pour vos besoins en fenêtres et portes.",
+    "getFreeQuote": "Soumission gratuite",
+    "contactUs": "Nous contacter",
+    "quickQuote": "Soumission rapide",
+    "quickQuoteDesc": "Obtenez une estimation rapide pour votre projet",
+    "fullName": "Nom complet",
+    "email": "Courriel",
+    "phone": "Téléphone",
+    "projectType": "Type de projet",
+    "selectType": "Sélectionner le type...",
+    "residentialOption": "Résidentiel",
+    "commercialOption": "Commercial",
+    "industrialOption": "Industriel",
+    "getEstimate": "Obtenir une estimation",
+    "quoteFormTitle": "Fenêtres et portes haut de gamme",
+    "quoteFormSubtitle": "Obtenir une soumission gratuite"
+  },
+  "AboutPage": {
+    "title": "À propos de VERREX",
+    "description": "Découvrez notre engagement à offrir des solutions de fenestration haut de gamme partout au Canada.",
+    "missionTitle": "Notre mission",
+    "missionText1": "VERREX est une entreprise de fenêtres et de portes de premier plan qui offre des systèmes de fenestration haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels.",
+    "missionText2": "Avec plus de 15 ans d'expérience, nous avons bâti une réputation de qualité artisanale, de service fiable et de solutions innovantes. Notre équipe travaille étroitement avec les architectes, promoteurs, entrepreneurs et propriétaires pour livrer des résultats exceptionnels sur chaque projet.",
+    "licensedInsured": "Licencié et assuré",
+    "qualityCertified": "Certifié qualité",
+    "expertTeam": "Équipe d'experts",
+    "clientFocused": "Axé sur le client",
+    "coreValues": "Valeurs fondamentales",
+    "qualityTitle": "Qualité",
+    "qualityDesc": "Nous ne faisons jamais de compromis sur la qualité. Chaque produit que nous installons respecte les normes et certifications les plus élevées de l'industrie.",
+    "integrityTitle": "Intégrité",
+    "integrityDesc": "Une communication honnête, des prix transparents et des échéanciers fiables sont le fondement de chaque relation client.",
+    "innovationTitle": "Innovation",
+    "innovationDesc": "Nous restons à l'avant-garde de la technologie de fenestration, offrant les dernières avancées en efficacité énergétique et en design.",
+    "serviceTitle": "Service",
+    "serviceDesc": "De la consultation initiale au soutien après-installation, nous offrons un service exceptionnel à chaque étape.",
+    "ourTeam": "Notre équipe",
+    "teamDesc": "Rencontrez les professionnels derrière VERREX.",
+    "partnersTitle": "Partenaires et affiliés",
+    "partnersDesc": "Nous collaborons avec des fabricants et des organisations de premier plan.",
+    "ctaTitle": "Prêt à travailler avec nous?",
+    "ctaDesc": "Contactez-nous pour discuter de votre prochain projet de fenêtres et de portes.",
+    "contactUsBtn": "Nous contacter",
+    "getQuoteBtn": "Obtenir une soumission"
+  },
+  "AppointmentsPage": {
+    "title": "Prendre rendez-vous",
+    "description": "Planifiez une consultation, une prise de mesures ou une visite en salle de montre avec notre équipe.",
+    "successTitle": "Rendez-vous confirmé!",
+    "successDesc": "Nous confirmerons votre rendez-vous sous peu. Vous recevrez un courriel de confirmation avec tous les détails.",
+    "bookAnother": "Prendre un autre rendez-vous",
+    "selectType": "Sélectionner le type de rendez-vous",
+    "onSiteMeasurement": "Mesure sur place",
+    "onSiteMeasurementDesc": "Prise de mesures professionnelle à votre emplacement",
+    "virtualConsultation": "Consultation virtuelle",
+    "virtualConsultationDesc": "Appel vidéo avec nos experts",
+    "showroomVisit": "Visite en salle de montre",
+    "showroomVisitDesc": "Visitez notre salle de montre en personne",
+    "selectDateAndTime": "Sélectionner la date et l'heure",
+    "availableTimeSlots": "Plages horaires disponibles",
+    "yourInformation": "Vos informations",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Jean Tremblay",
+    "email": "Adresse courriel",
+    "emailPlaceholder": "jean@exemple.com",
+    "phone": "Numéro de téléphone",
+    "phonePlaceholder": "(416) 555-0100",
+    "notes": "Notes supplémentaires",
+    "notesPlaceholder": "Parlez-nous de votre projet...",
+    "bookAppointment": "Prendre rendez-vous",
+    "officeHours": "Heures de bureau",
+    "monFri": "Lundi - Vendredi",
+    "monFriHours": "8h00 - 18h00",
+    "saturday": "Samedi",
+    "saturdayHours": "9h00 - 16h00",
+    "sunday": "Dimanche",
+    "sundayHours": "Fermé",
+    "needHelp": "Besoin d'aide?",
+    "callUs": "Appelez-nous au",
+    "phoneNumber": "(416) 555-0199"
+  },
+  "CatalogPage": {
+    "title": "Catalogue de produits",
+    "supplier": "Enggia 2025",
+    "description": "Parcourez notre catalogue complet de fournisseur présentant des fenêtres, portes et systèmes de fenestration haut de gamme. 98 pages de produits et de spécifications.",
+    "grid": "Grille",
+    "reader": "Lecteur",
+    "pagesInfo": "{count} pages • Cliquez sur une page pour voir en taille réelle",
+    "catalogPageAlt": "Page du catalogue {page}",
+    "pageIndicator": "Page {current} / {total}",
+    "pageOf": "Page {current} de {total}",
+    "interestedTitle": "Quelque chose vous intéresse?",
+    "interestedDesc": "Contactez-nous pour obtenir une soumission sur tout produit de notre catalogue.",
+    "getQuote": "Obtenir une soumission",
+    "contactUs": "Nous contacter",
+    "bookConsultation": "Réserver une consultation"
+  },
+  "ContactPage": {
+    "title": "Nous contacter",
+    "description": "Communiquez avec notre équipe pour des soumissions, des consultations ou toute question sur nos produits et services.",
+    "successTitle": "Message envoyé!",
+    "successDesc": "Merci de nous avoir contactés. Notre équipe vous répondra dans les 24 heures.",
+    "sendAnother": "Envoyer un autre message",
+    "sendMessage": "Envoyez-nous un message",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Jean Tremblay",
+    "email": "Adresse courriel",
+    "emailPlaceholder": "jean@exemple.com",
+    "phone": "Numéro de téléphone",
+    "phonePlaceholder": "(416) 555-0100",
+    "subject": "Sujet",
+    "subjectPlaceholder": "Comment pouvons-nous vous aider?",
+    "message": "Message",
+    "messagePlaceholder": "Parlez-nous de votre projet ou de votre question...",
+    "submitBtn": "Envoyer le message",
+    "getInTouch": "Entrez en contact",
+    "visitUs": "Visitez-nous",
+    "address": "1234 Industrial Parkway, Unité 5-6, Toronto, ON M1P 4R7",
+    "callUs": "Appelez-nous",
+    "mainPhone": "(416) 555-0199",
+    "tollFree": "1-800-555-0199",
+    "emailUs": "Écrivez-nous",
+    "generalEmail": "info@verrex.com",
+    "salesEmail": "ventes@verrex.com",
+    "businessHours": "Heures d'ouverture",
+    "monFri": "Lundi - Vendredi : 8h00 - 18h00",
+    "saturday": "Samedi : 9h00 - 16h00",
+    "sunday": "Dimanche : Fermé",
+    "followUs": "Suivez-nous"
+  },
+  "SearchPage": {
+    "title": "Recherche",
+    "placeholder": "Rechercher produits, services, projets...",
+    "noResults": "Aucun résultat trouvé",
+    "noResultsDesc": "Essayez d'autres mots-clés ou parcourez nos sections.",
+    "browseProducts": "Parcourir les produits",
+    "browseServices": "Parcourir les services",
+    "resultsFor": "Résultats pour",
+    "products": "Produits",
+    "servicesSection": "Services",
+    "projectsSection": "Projets",
+    "viewDetails": "Voir les détails",
+    "learnMore": "En savoir plus",
+    "viewProject": "Voir le projet"
+  },
+  "ProductsPage": {
+    "title": "Nos produits",
+    "description": "Parcourez notre catalogue complet de fenêtres, portes et systèmes de portes haut de gamme pour les projets résidentiels, commerciaux et industriels.",
+    "allProducts": "Tous les produits",
+    "residential": "Résidentiel",
+    "commercial": "Commercial",
+    "industrial": "Industriel",
+    "searchPlaceholder": "Rechercher des produits...",
+    "showing": "Affichage de {filtered} sur {total} produits",
+    "featured": "Vedette",
+    "productImage": "Image du produit",
+    "customizable": "Personnalisable",
+    "viewDetails": "Voir les détails",
+    "noProducts": "Aucun produit trouvé",
+    "noProductsDesc": "Essayez de modifier vos critères de recherche ou de filtrage.",
+    "clearFilters": "Effacer les filtres",
+    "from": "À partir de"
+  },
+  "ProductDetail": {
+    "home": "Accueil",
+    "products": "Produits",
+    "customizable": "Personnalisable",
+    "productImage": "Image du produit",
+    "keyFeatures": "Caractéristiques principales",
+    "specifications": "Spécifications",
+    "requestQuote": "Demander une soumission",
+    "bookConsultation": "Réserver une consultation",
+    "callUs": "Ou appelez-nous au (416) 555-0199",
+    "relatedProducts": "Produits connexes",
+    "from": "À partir de",
+    "viewDetails": "Voir les détails",
+    "productNotFound": "Produit non trouvé",
+    "backToProducts": "Retour aux produits"
+  },
+  "WindowTypes": {
+    "title": "Types de fenêtres",
+    "description": "Explorez nos types de fenêtres avec une visualisation 3D interactive. Choisissez votre style préféré, la couleur du cadre et le type de verre.",
+    "configure3d": "Configurer en 3D",
+    "configure3dDesc": "Utilisez notre configurateur 3D interactif pour visualiser différents styles de fenêtres, couleurs et types de verre.",
+    "specifications": "Spécifications",
+    "windowType": "Type de fenêtre",
+    "frameColor": "Couleur du cadre",
+    "glassType": "Type de verre",
+    "requestQuote": "Demander une soumission",
+    "requestQuoteDesc": "Vous aimez ce que vous voyez? Obtenez une soumission personnalisée pour votre configuration de fenêtre.",
+    "getQuote": "Obtenir une soumission"
+  },
+  "ProjectsPage": {
+    "title": "Notre portfolio",
+    "completedBold": "Projets ",
+    "projects": "réalisés",
+    "description": "Explorez notre portfolio d'installations de fenêtres et de portes complétées dans les secteurs résidentiel, commercial et industriel.",
+    "allProjects": "Tous les projets",
+    "residential": "Résidentiel",
+    "commercial": "Commercial",
+    "industrial": "Industriel",
+    "statsCompleted": "Projets complétés",
+    "statsResidential": "Résidentiel",
+    "statsCommercial": "Commercial",
+    "statsIndustrial": "Industriel",
+    "featuredProjects": "Projets vedettes",
+    "projectImage": "Image du projet",
+    "featured": "Vedette",
+    "viewDetails": "Voir les détails",
+    "allProjectsSection": "Tous les projets",
+    "showing": "Affichage de {filtered} sur {total} projets",
+    "client": "Client : ",
+    "ctaTitle": "Vous voulez que votre projet soit présenté ici?",
+    "ctaDesc": "Discutons de votre prochain projet de fenêtres et de portes. Obtenez une consultation gratuite dès aujourd'hui.",
+    "getFreeQuote": "Soumission gratuite",
+    "bookConsultation": "Réserver une consultation"
+  },
+  "QuotePage": {
+    "title": "Demander une soumission",
+    "description": "Obtenez une soumission détaillée pour votre projet de fenêtres et de portes. Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les 24 heures.",
+    "step1": "Coordonnées",
+    "step2": "Détails du projet",
+    "step3": "Info supplémentaire",
+    "step4": "Révision",
+    "successTitle": "Demande de soumission envoyée!",
+    "successDesc": "Merci de votre intérêt! Notre équipe examinera votre demande et vous répondra dans les 24 heures avec une estimation détaillée.",
+    "submitAnother": "Soumettre une autre demande",
+    "backToHome": "Retour à l'accueil",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom de famille",
+    "lastNamePlaceholder": "Tremblay",
+    "email": "Courriel",
+    "emailPlaceholder": "jean@exemple.com",
+    "phone": "Téléphone",
+    "phonePlaceholder": "(416) 555-0100",
+    "company": "Entreprise (Optionnel)",
+    "companyPlaceholder": "Nom de votre entreprise",
+    "projectType": "Type de projet",
+    "selectProjectType": "Sélectionner le type de projet",
+    "residentialOption": "Résidentiel",
+    "commercialOption": "Commercial",
+    "industrialOption": "Industriel",
+    "institutionalOption": "Institutionnel",
+    "projectScope": "Portée du projet",
+    "selectScope": "Sélectionner la portée",
+    "newConstruction": "Nouvelle construction",
+    "renovation": "Rénovation",
+    "replacement": "Remplacement",
+    "addition": "Agrandissement",
+    "productInterest": "Produits d'intérêt",
+    "timeline": "Échéancier préféré",
+    "selectTimeline": "Sélectionner l'échéancier",
+    "urgent": "Urgent (Moins de 2 semaines)",
+    "oneMonth": "Moins d'un mois",
+    "threeMonths": "Moins de 3 mois",
+    "sixMonths": "Moins de 6 mois",
+    "flexible": "Flexible / Pas certain",
+    "budget": "Budget estimé",
+    "selectBudget": "Sélectionner la fourchette de budget",
+    "budgetUnder10k": "Moins de 10 000 $",
+    "budget10to25k": "10 000 $ - 25 000 $",
+    "budget25to50k": "25 000 $ - 50 000 $",
+    "budget50to100k": "50 000 $ - 100 000 $",
+    "budgetOver100k": "Plus de 100 000 $",
+    "additionalDetails": "Détails supplémentaires",
+    "additionalDetailsPlaceholder": "Dites-nous en plus sur votre projet...",
+    "preferredContact": "Méthode de contact préférée",
+    "emailContact": "Courriel",
+    "phoneContact": "Téléphone",
+    "eitherContact": "Les deux",
+    "reviewTitle": "Réviser votre demande",
+    "contactInfo": "Coordonnées",
+    "projectDetails": "Détails du projet",
+    "additionalInfo": "Informations supplémentaires",
+    "name": "Nom",
+    "type": "Type",
+    "scope": "Portée",
+    "productsInterest": "Produits",
+    "timelineLabel": "Échéancier",
+    "budgetLabel": "Budget",
+    "details": "Détails",
+    "contactMethod": "Méthode de contact",
+    "back": "Retour",
+    "next": "Suivant",
+    "submitRequest": "Soumettre la demande"
+  },
+  "ServicesPage": {
+    "title": "Nos services",
+    "description": "Solutions complètes de fenêtres et de portes, de la consultation experte à l'installation professionnelle et à l'entretien continu.",
+    "estimatedDuration": "Durée estimée",
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer",
+    "whyChoose": "Pourquoi choisir VERREX?",
+    "whyChooseDesc": "Nous offrons des solutions complètes avec une expertise de premier plan.",
+    "certifiedExperts": "Experts certifiés",
+    "certifiedExpertsDesc": "Tous nos techniciens sont certifiés et formés selon les normes les plus élevées de l'industrie.",
+    "qualityGuarantee": "Garantie de qualité",
+    "qualityGuaranteeDesc": "Nous garantissons notre travail avec des garanties complètes sur toutes les installations.",
+    "timelyService": "Service ponctuel",
+    "timelyServiceDesc": "Nous respectons votre horaire et complétons les projets à temps, à chaque fois.",
+    "ctaTitle": "Besoin d'une solution sur mesure?",
+    "ctaDesc": "Contactez notre équipe pour discuter de vos besoins spécifiques et obtenir une soumission personnalisée.",
+    "getFreeQuote": "Soumission gratuite",
+    "bookConsultation": "Réserver une consultation"
+  },
+  "WindowControls": {
+    "windowType": "Type de fenêtre",
+    "frameColor": "Couleur du cadre",
+    "glassType": "Type de verre"
+  },
+  "HeroSection": {
+    "home": "Accueil"
+  },
+  "Common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "previous": "Précédent",
+    "nextLabel": "Suivant",
+    "of": "de",
+    "page": "Page"
+  },
+  "Data": {
+    "products": {
+      "casement-windows": {
+        "name": "Fenêtres à battant",
+        "description": "Fenêtres à battant haut de gamme avec systèmes de verrouillage multipoints et étanchéité supérieure. Idéales pour les applications résidentielles et commerciales légères avec ventilation maximale et vues sans obstruction.",
+        "shortDescription": "Fenêtres à battant écoénergétiques avec ventilation supérieure et esthétique moderne."
+      },
+      "sliding-patio-doors": {
+        "name": "Portes-fenêtres coulissantes",
+        "description": "Portes-fenêtres coulissantes à fonctionnement souple avec roulettes haut de gamme, serrures multipoints et cadres à rupture thermique. Parfaites pour relier les espaces intérieurs et extérieurs.",
+        "shortDescription": "Portes coulissantes haut de gamme pour des transitions intérieur-extérieur harmonieuses."
+      },
+      "double-hung-windows": {
+        "name": "Fenêtres à guillotine",
+        "description": "Fenêtres à guillotine classiques avec châssis basculants pour un nettoyage facile. Caractéristiques : intercalaires à bord chaud, remplissage d'argon et motifs de grilles optionnels.",
+        "shortDescription": "Fenêtres à guillotine traditionnelles avec performances modernes."
+      },
+      "storefront-systems": {
+        "name": "Systèmes de devanture",
+        "description": "Systèmes de vitrage de devanture de qualité commerciale conçus pour les bâtiments de vente au détail, de bureaux et institutionnels. Cadres en aluminium à rupture thermique et vitrage haute performance.",
+        "shortDescription": "Systèmes de devanture professionnels pour applications commerciales."
+      },
+      "curtain-wall-systems": {
+        "name": "Systèmes de murs-rideaux",
+        "description": "Systèmes de murs-rideaux architecturaux pour bâtiments de moyenne et grande hauteur. Conçus pour la performance structurelle, l'efficacité thermique et l'excellence esthétique.",
+        "shortDescription": "Systèmes de murs-rideaux haute performance pour l'architecture moderne."
+      },
+      "commercial-entry-systems": {
+        "name": "Systèmes d'entrée commerciale",
+        "description": "Systèmes de portes d'entrée commerciale robustes avec quincaillerie antipanique, opérateurs automatiques et conformité à l'accessibilité. Disponibles en aluminium, acier et verre.",
+        "shortDescription": "Systèmes d'entrée durables pour bâtiments commerciaux et institutionnels."
+      },
+      "safety-glass-panels": {
+        "name": "Panneaux de verre de sécurité",
+        "description": "Panneaux de verre de sécurité de qualité industrielle incluant des options trempées, laminées et coupe-feu. Conforme à toutes les normes canadiennes de sécurité pour les environnements industriels.",
+        "shortDescription": "Solutions de verre de sécurité industriel pour environnements exigeants."
+      },
+      "overhead-doors": {
+        "name": "Portes basculantes",
+        "description": "Portes basculantes robustes pour entrepôts, quais de chargement et installations industrielles. Disponibles en configurations isolées, coupe-feu et haute vitesse.",
+        "shortDescription": "Portes basculantes industrielles pour entrepôts et installations."
+      }
+    },
+    "services": {
+      "installation": {
+        "name": "Installation professionnelle",
+        "description": "Installation experte par des techniciens certifiés. Nous prenons en charge tout, du retrait des anciennes unités aux finitions et au nettoyage final."
+      },
+      "measurement": {
+        "name": "Mesure sur place",
+        "description": "Mesures précises sur place par nos professionnels formés pour assurer un ajustement parfait et des performances optimales."
+      },
+      "inspection": {
+        "name": "Inspection de fenêtres et portes",
+        "description": "Services d'inspection complets pour évaluer l'état des fenêtres et portes existantes, avec rapports détaillés et recommandations."
+      },
+      "consultation": {
+        "name": "Consultation gratuite",
+        "description": "Conseils d'experts sur le choix de produits, l'efficacité énergétique et les options de design. Disponible en personne ou virtuellement."
+      },
+      "repair": {
+        "name": "Réparation et entretien",
+        "description": "Services professionnels de réparation et d'entretien pour prolonger la durée de vie de vos fenêtres et portes. Service d'urgence disponible."
+      },
+      "custom": {
+        "name": "Design sur mesure",
+        "description": "Solutions de fenêtres et de portes sur mesure adaptées à vos exigences et spécifications architecturales uniques."
+      }
+    },
+    "projects": {
+      "lakeside-villa": {
+        "title": "Rénovation Villa au Lac",
+        "description": "Remplacement complet des fenêtres d'une propriété de luxe au bord du lac avec fenêtres à battant du sol au plafond et portes-fenêtres coulissantes.",
+        "client": "Propriétaire privé",
+        "scope": "Remplacement complet des fenêtres et portes"
+      },
+      "pinnacle-tower": {
+        "title": "Tour Pinnacle",
+        "description": "Installation de murs-rideaux pour une tour à usage mixte de 25 étages au centre-ville de Toronto, avec vitrage haute performance.",
+        "client": "Pinnacle Developments",
+        "scope": "Installation de système de murs-rideaux"
+      },
+      "riverside-commons": {
+        "title": "Riverside Commons",
+        "description": "Développement résidentiel multi-logements avec fenêtres écoénergétiques et systèmes de portes de balcon pour 150 unités.",
+        "client": "Groupe de développement Riverside",
+        "scope": "Fenêtres et portes pour 150 unités"
+      },
+      "heritage-house": {
+        "title": "Restauration Maison patrimoniale",
+        "description": "Restauration sensible de fenêtres patrimoniales avec des remplacements modernes écoénergétiques qui maintiennent l'esthétique originale.",
+        "client": "Conseil de conservation du patrimoine",
+        "scope": "Restauration de fenêtres patrimoniales"
+      },
+      "skyline-business": {
+        "title": "Centre d'affaires Skyline",
+        "description": "Installation de devantures et de systèmes d'entrée pour un complexe de bureaux moderne avec systèmes d'entrée automatisés.",
+        "client": "Skyline Properties",
+        "scope": "Devantures et systèmes d'entrée"
+      },
+      "autotech-manufacturing": {
+        "title": "AutoTech Manufacturing",
+        "description": "Installation de verre de sécurité et de portes basculantes pour une grande usine de fabrication automobile.",
+        "client": "AutoTech Industries",
+        "scope": "Verre de sécurité et portes basculantes"
+      },
+      "brewery-district": {
+        "title": "Lofts du Quartier Brassicole",
+        "description": "Conversion d'une brasserie historique en résidences loft modernes avec fenêtres et portes de style industriel sur mesure.",
+        "client": "Urban Revival Inc.",
+        "scope": "Fenêtres et portes sur mesure pour 80 unités"
+      }
+    },
+    "partners": {
+      "premiumglass-pro": {
+        "name": "PremiumGlass Pro",
+        "description": "Fabricant de premier plan de systèmes de vitrage haute performance"
+      },
+      "thermalframe-systems": {
+        "name": "ThermalFrame Systems",
+        "description": "Technologie innovante de cadres à rupture thermique"
+      },
+      "securevision-glass": {
+        "name": "SecureVision Glass",
+        "description": "Produits spécialisés de verre de sécurité et de sûreté"
+      },
+      "buildright-contractors": {
+        "name": "BuildRight Contractors",
+        "description": "Partenaire entrepreneur général de premier plan"
+      },
+      "archvision-design": {
+        "name": "ArchVision Design Studio",
+        "description": "Firme de design architectural primée"
+      },
+      "greenbuild-consulting": {
+        "name": "GreenBuild Consulting",
+        "description": "Consultants en construction durable"
+      }
+    },
+    "testimonials": {
+      "t1": {
+        "content": "VERREX a livré une qualité exceptionnelle sur notre projet de condos. Le système de murs-rideaux a dépassé nos attentes en termes de performance et d'esthétique.",
+        "name": "David Chen",
+        "role": "Gestionnaire de projet",
+        "company": "Pinnacle Developments"
+      },
+      "t2": {
+        "content": "Un service exceptionnel du début à la fin. L'équipe était professionnelle, ponctuelle et la qualité de l'installation est superbe.",
+        "name": "Sarah Mitchell",
+        "role": "Propriétaire",
+        "company": "Villa au Lac"
+      },
+      "t3": {
+        "content": "Nous avons fait appel à VERREX pour plusieurs projets commerciaux. Leurs systèmes de devanture sont de premier ordre et leur service est fiable.",
+        "name": "Michael Torres",
+        "role": "Directeur des installations",
+        "company": "Skyline Properties"
+      },
+      "t4": {
+        "content": "La restauration des fenêtres patrimoniales a été réalisée avec un soin et une attention aux détails incroyables. Un artisanat vraiment impressionnant.",
+        "name": "Elizabeth Grant",
+        "role": "Agente de conservation",
+        "company": "Conseil du patrimoine"
+      },
+      "t5": {
+        "content": "Rapide, professionnel et de haute qualité. VERREX a installé le verre de sécurité dans toute notre usine en avance sur l'échéancier.",
+        "name": "Robert Kim",
+        "role": "Directeur d'usine",
+        "company": "AutoTech Industries"
+      },
+      "t6": {
+        "content": "Le design de fenêtres sur mesure pour notre conversion de brasserie en lofts était parfait. VERREX a compris l'esthétique industrielle que nous recherchions.",
+        "name": "Jessica Lavoie",
+        "role": "Directrice créative",
+        "company": "Urban Revival Inc."
+      },
+      "t7": {
+        "content": "D'excellentes améliorations en efficacité énergétique. Nos coûts de chauffage ont considérablement diminué après que VERREX ait remplacé toutes nos fenêtres.",
+        "name": "Thomas Anderson",
+        "role": "Gestionnaire d'immeuble",
+        "company": "Riverside Commons"
+      }
+    },
+    "team": {
+      "member1": {
+        "name": "Alexandra Dumont",
+        "role": "PDG et fondatrice"
+      },
+      "member2": {
+        "name": "Marcus Chen",
+        "role": "Directeur des opérations"
+      },
+      "member3": {
+        "name": "Sarah Williams",
+        "role": "Designer principale"
+      },
+      "member4": {
+        "name": "David Petrov",
+        "role": "Directeur de l'installation"
+      }
+    },
+    "windowTypes": {
+      "casement": "À battant",
+      "awning": "Auvent",
+      "fixed": "Fixe",
+      "sliding": "Coulissante",
+      "doubleHung": "À guillotine"
+    },
+    "frameColors": {
+      "white": "Blanc",
+      "black": "Noir",
+      "brown": "Brun",
+      "gray": "Gris",
+      "natural": "Bois naturel"
+    },
+    "glassTypes": {
+      "clear": "Clair",
+      "frosted": "Givré",
+      "tinted": "Teinté",
+      "lowE": "Basse émissivité",
+      "tempered": "Trempé",
+      "laminated": "Laminé"
+    }
+  }
+}
