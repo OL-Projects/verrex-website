@@ -2,11 +2,14 @@
 import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import { WindowFrame, LeverHandle, LockPoint, Weatherstrip } from "../WindowParts"
+import { WindowFrame, LeverHandle, LockPoint, Weatherstrip, WindowScreen, springStep, type SpringState } from "../WindowParts"
 import { GlassPane } from "../GlassPane"
 
-// Double-Hung: Bottom sash slides UP, top sash fixed
-// Standard proportions: 2 equal sashes divided by meeting rail
+// Double-Hung Window
+// Two sashes that slide vertically. Bottom sash slides UP, top sash fixed.
+// Standard proportions: 2 equal sashes divided by meeting rail.
+// Spring-based animation for realistic sash weight/inertia.
+// Hardware: lever handle, dual lock points, sash balance channels.
 export function DoubleHungWindow({ width, height, frameColor, glassType, isOpen }: {
   width: number; height: number; frameColor: string; glassType: string; isOpen: boolean
 }) {
@@ -15,13 +18,13 @@ export function DoubleHungWindow({ width, height, frameColor, glassType, isOpen 
   const glassW = width - t * 2 - 0.02
   const glassH = sashH - t - 0.01
   const slideRef = useRef<THREE.Group>(null)
-  const openAmount = useRef(0)
 
-  // Animate bottom sash sliding up
-  useFrame(() => {
+  // Spring physics — heavier sash = lower stiffness, more damping
+  const spring = useRef<SpringState>({ pos: 0, vel: 0 })
+  useFrame((_, dt) => {
     const target = isOpen ? sashH * 0.85 : 0
-    openAmount.current += (target - openAmount.current) * 0.06
-    if (slideRef.current) slideRef.current.position.y = openAmount.current
+    const pos = springStep(spring.current, target, dt, 120, 18)
+    if (slideRef.current) slideRef.current.position.y = pos
   })
 
   return (
@@ -29,8 +32,9 @@ export function DoubleHungWindow({ width, height, frameColor, glassType, isOpen 
       {/* Outer frame */}
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
 
-      {/* Weatherstrip around inner edge */}
-      <Weatherstrip width={width - t * 1.8} height={0.004} position={[0, 0, d * 0.15]} />
+      {/* Weatherstrip gaskets around inner perimeter */}
+      <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, height / 2 - t * 0.5, d * 0.15]} />
+      <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, -height / 2 + t * 0.5, d * 0.15]} />
 
       {/* Top sash (fixed) */}
       <group position={[0, sashH / 2 + t * 0.15, 0]}>
@@ -38,33 +42,39 @@ export function DoubleHungWindow({ width, height, frameColor, glassType, isOpen 
         <GlassPane width={glassW} height={glassH} glassType={glassType} />
       </group>
 
-      {/* Bottom sash (slides up) */}
+      {/* Bottom sash (slides up — spring animated) */}
       <group ref={slideRef}>
         <group position={[0, -sashH / 2 + t * 0.05, 0.012]}>
           <WindowFrame width={width - t * 1.8} height={sashH} depth={d * 0.55} thickness={t * 0.65} color={frameColor} />
           <GlassPane width={glassW} height={glassH} glassType={glassType} />
-          {/* Meeting rail (attached to bottom sash top) */}
+
+          {/* Meeting rail (attached to bottom sash top edge) */}
           <mesh position={[0, sashH / 2, 0]}>
-            <boxGeometry args={[width - t * 1.5, 0.025, d * 0.45]} />
-            <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.15} />
+            <boxGeometry args={[width - t * 1.5, 0.028, d * 0.45]} />
+            <meshStandardMaterial color={frameColor} roughness={0.45} metalness={0.02} />
           </mesh>
-          {/* Handle on bottom sash */}
+
+          {/* Lever handle */}
           <LeverHandle position={[0, 0, d * 0.3]} />
-          {/* Lock points */}
+
+          {/* Dual lock points at meeting rail */}
           <LockPoint position={[width / 4, sashH / 2 - 0.01, d * 0.25]} />
           <LockPoint position={[-width / 4, sashH / 2 - 0.01, d * 0.25]} />
         </group>
       </group>
 
-      {/* Sash balances (hidden weight channels) */}
+      {/* Sash balance channels (hidden weight system in jambs) */}
       <mesh position={[-width / 2 + t * 0.3, 0, 0]}>
-        <boxGeometry args={[0.01, height - t * 2, d * 0.3]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.1} />
+        <boxGeometry args={[0.012, height - t * 2, d * 0.3]} />
+        <meshStandardMaterial color={frameColor} roughness={0.5} metalness={0.02} />
       </mesh>
       <mesh position={[width / 2 - t * 0.3, 0, 0]}>
-        <boxGeometry args={[0.01, height - t * 2, d * 0.3]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.1} />
+        <boxGeometry args={[0.012, height - t * 2, d * 0.3]} />
+        <meshStandardMaterial color={frameColor} roughness={0.5} metalness={0.02} />
       </mesh>
+
+      {/* Exterior screen (behind the window) */}
+      <WindowScreen width={width - t * 2.5} height={sashH - t} position={[0, -sashH / 2, -d * 0.6]} />
     </group>
   )
 }

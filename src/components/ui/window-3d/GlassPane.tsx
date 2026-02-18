@@ -1,69 +1,113 @@
 "use client"
-import * as THREE from "three"
+import { MeshTransmissionMaterial } from "@react-three/drei"
 
-// Physically-accurate glass configs (Context7: Three.js MeshPhysicalMaterial)
-// IOR: Float glass = 1.52 | All types use standard soda-lime glass IOR
+// ═══════════════════════════════════════════════════════════════
+// Physically-based glass configurations
+// IOR: Soda-lime float glass = 1.52 (ASTM C1036 / CSA A440)
+// Real-world glass thickness reference:
+//   Single pane: 3–6 mm | IGU double: 22 mm (4-14-4) | IGU triple: 36 mm
+// MeshTransmissionMaterial from Drei — real refraction, caustics,
+// chromatic aberration, anisotropic blur
+// ═══════════════════════════════════════════════════════════════
+
 export const GLASS_CONFIGS: Record<string, {
-  color: string; transmission: number; roughness: number;
-  ior: number; thickness: number;
-  attenuationColor: string; attenuationDistance: number;
-  specularIntensity: number; clearcoat: number; clearcoatRoughness: number;
+  color: string
+  transmission: number
+  thickness: number
+  roughness: number
+  chromaticAberration: number
+  anisotropicBlur: number
+  distortion: number
+  ior: number
 }> = {
+  // Standard clear float glass — maximum transparency, slight edge refraction
   clear: {
-    color: "#ffffff", transmission: 1.0, roughness: 0.0,
-    ior: 1.52, thickness: 0.5,
-    attenuationColor: "#ffffff", attenuationDistance: 0,
-    specularIntensity: 1.0, clearcoat: 0.1, clearcoatRoughness: 0.1,
+    color: "#ffffff",
+    transmission: 1,
+    thickness: 0.4,
+    roughness: 0,
+    chromaticAberration: 0.04,
+    anisotropicBlur: 0.06,
+    distortion: 0,
+    ior: 1.52,
   },
+  // Low-emissivity coating — slight green tint, reduced solar heat gain
   "low-e": {
-    color: "#e8f4e8", transmission: 0.92, roughness: 0.02,
-    ior: 1.52, thickness: 0.6,
-    attenuationColor: "#d4edda", attenuationDistance: 2.0,
-    specularIntensity: 0.9, clearcoat: 0.3, clearcoatRoughness: 0.05,
+    color: "#dceeda",
+    transmission: 0.92,
+    thickness: 0.5,
+    roughness: 0.02,
+    chromaticAberration: 0.02,
+    anisotropicBlur: 0.04,
+    distortion: 0,
+    ior: 1.52,
   },
+  // Solar tinted (grey-blue) — reduces glare and heat transmission
   tinted: {
-    color: "#8bb8d4", transmission: 0.75, roughness: 0.02,
-    ior: 1.52, thickness: 0.8,
-    attenuationColor: "#6aa3c7", attenuationDistance: 1.5,
-    specularIntensity: 0.8, clearcoat: 0.15, clearcoatRoughness: 0.1,
+    color: "#7aaec8",
+    transmission: 0.7,
+    thickness: 0.6,
+    roughness: 0.01,
+    chromaticAberration: 0.03,
+    anisotropicBlur: 0.05,
+    distortion: 0,
+    ior: 1.52,
   },
+  // Acid-etched / sandblasted frosted — privacy glass with diffused light
   frosted: {
-    color: "#e8eef2", transmission: 0.6, roughness: 0.65,
-    ior: 1.52, thickness: 0.5,
-    attenuationColor: "#dde5eb", attenuationDistance: 1.0,
-    specularIntensity: 0.5, clearcoat: 0.0, clearcoatRoughness: 0.4,
+    color: "#e4eaef",
+    transmission: 0.82,
+    thickness: 0.35,
+    roughness: 0.6,
+    chromaticAberration: 0.01,
+    anisotropicBlur: 0.9,
+    distortion: 0.08,
+    ior: 1.52,
   },
+  // Tempered safety glass (CSA certified) — optically clear, thicker for strength
   tempered: {
-    color: "#f0f8ff", transmission: 0.98, roughness: 0.0,
-    ior: 1.52, thickness: 1.0,
-    attenuationColor: "#f0f8ff", attenuationDistance: 0,
-    specularIntensity: 1.0, clearcoat: 0.2, clearcoatRoughness: 0.05,
+    color: "#f2f9ff",
+    transmission: 0.98,
+    thickness: 0.55,
+    roughness: 0,
+    chromaticAberration: 0.045,
+    anisotropicBlur: 0.05,
+    distortion: 0,
+    ior: 1.52,
   },
 }
 
 export function GlassPane({
-  width, height,
+  width,
+  height,
   position = [0, 0, 0],
   glassType = "clear",
   rotation = [0, 0, 0],
 }: {
-  width: number; height: number;
-  position?: [number, number, number];
-  glassType?: string;
-  rotation?: [number, number, number];
+  width: number
+  height: number
+  position?: [number, number, number]
+  glassType?: string
+  rotation?: [number, number, number]
 }) {
   const g = GLASS_CONFIGS[glassType] || GLASS_CONFIGS.clear
+
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[width, height, 0.012]} />
-      <meshPhysicalMaterial
-        color={g.color} transparent opacity={1.0}
-        roughness={g.roughness} metalness={0}
-        ior={g.ior} transmission={g.transmission} thickness={g.thickness}
-        attenuationColor={g.attenuationColor} attenuationDistance={g.attenuationDistance}
-        specularIntensity={g.specularIntensity} specularColor="#ffffff"
-        clearcoat={g.clearcoat} clearcoatRoughness={g.clearcoatRoughness}
-        envMapIntensity={1.5} side={THREE.DoubleSide}
+      <MeshTransmissionMaterial
+        transmissionSampler
+        color={g.color}
+        transmission={g.transmission}
+        thickness={g.thickness}
+        roughness={g.roughness}
+        chromaticAberration={g.chromaticAberration}
+        anisotropicBlur={g.anisotropicBlur}
+        distortion={g.distortion}
+        distortionScale={0.5}
+        temporalDistortion={0}
+        ior={g.ior}
+        envMapIntensity={1.5}
       />
     </mesh>
   )
