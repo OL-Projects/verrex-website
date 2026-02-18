@@ -48,13 +48,14 @@ export function AwningWindow({ width, height, frameColor, glassType, isOpen }: W
   return (
     <group>
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
+      {/* Sash assembly — pivots at top edge, entire sash (frame+glass) rotates */}
       <group position={[0, height / 2 - t, 0]}>
         <group ref={pivotRef} position={[0, -(height / 2 - t), 0]}>
-          <group position={[0, (height / 2 - t), 0]}>
-            <GlassPane width={glassW} height={glassH} position={[0, -(height / 2 - t), 0]} glassType={glassType} />
-          </group>
+          <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
+          <GlassPane width={glassW} height={glassH} glassType={glassType} />
         </group>
       </group>
+      {/* Hinge bar at top — FIXED on frame */}
       <mesh position={[0, height / 2 - t, d * 0.2]}>
         <boxGeometry args={[width - t * 3, 0.014, 0.028]} />
         <meshStandardMaterial color="#888" roughness={0.15} metalness={0.9} />
@@ -77,12 +78,17 @@ export function HopperWindow({ width, height, frameColor, glassType, isOpen }: W
   return (
     <group>
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
+      {/* Sash assembly — pivots at bottom edge, entire sash (frame+glass+handle) tilts inward */}
       <group position={[0, -height / 2 + t, 0]}>
         <group ref={pivotRef}>
-          <GlassPane width={glassW} height={glassH} position={[0, height / 2 - t, 0]} glassType={glassType} />
+          <group position={[0, height / 2 - t, 0]}>
+            <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
+            <GlassPane width={glassW} height={glassH} glassType={glassType} />
+            {/* Handle at top rail of sash — ON SASH, tilts with it */}
+            <LeverHandle position={[0, (height - t * 1.6) / 2 - 0.04, d * 0.3]} />
+          </group>
         </group>
       </group>
-      <LeverHandle position={[0, height / 4, d * 0.3]} />
       <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, height / 2 - t * 0.5, d * 0.12]} />
     </group>
   )
@@ -100,9 +106,13 @@ export function SkylightWindow({ width, height, frameColor, glassType, isOpen }:
   return (
     <group rotation={[Math.PI / 6, 0, 0]}>
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
+      {/* Sash assembly — pivots at top edge, entire sash (frame+glass) rotates */}
       <group position={[0, height / 2 - t, 0]}>
         <group ref={pivotRef} position={[0, -(height / 2 - t), 0]}>
-          <GlassPane width={glassW} height={glassH} position={[0, height / 2 - t, 0]} glassType={glassType} />
+          <group position={[0, height / 2 - t, 0]}>
+            <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
+            <GlassPane width={glassW} height={glassH} glassType={glassType} />
+          </group>
         </group>
       </group>
       <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, 0, d * 0.12]} />

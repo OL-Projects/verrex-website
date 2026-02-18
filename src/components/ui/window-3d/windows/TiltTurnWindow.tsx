@@ -39,12 +39,11 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, isOpen }:
             {/* Inner sash frame */}
             <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
             <GlassPane width={glassW} height={glassH} glassType={glassType} />
+            {/* Espagnolette handle — ON SASH, tilts with it */}
+            <TiltTurnHandle position={[width / 2 - t * 1.2, 0, d * 0.3]} rotation={isOpen ? -Math.PI / 2 : 0} />
           </group>
         </group>
       </group>
-
-      {/* Espagnolette tilt-turn handle (right side) */}
-      <TiltTurnHandle position={[width / 2 - t * 1.2, 0, d * 0.3]} rotation={isOpen ? -Math.PI / 2 : 0} />
 
       {/* Side hinges (left jamb) */}
       {[-height / 3, height / 3].map((y, i) => (
