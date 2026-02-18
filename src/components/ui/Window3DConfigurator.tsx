@@ -95,17 +95,17 @@ export function Window3DConfigurator({
           {width}&quot; W &times; {height}&quot; H
         </div>
 
-        {/* Open/Close action button */}
+        {/* Open/Close action button — bottom-right */}
         {canOperate && (
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`absolute top-3 right-3 px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-md transition-all ${
+            className={`absolute bottom-3 right-3 px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
               isOpen
-                ? "bg-green-500/80 text-white hover:bg-green-600/80"
-                : "bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700/80"
+                ? "bg-green-500/90 text-white hover:bg-green-600/90"
+                : "bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700/90 ring-1 ring-slate-200/50 dark:ring-slate-700/50"
             }`}
           >
-            {isOpen ? "▼ Close Window" : "▲ Open Window"}
+            {isOpen ? "✕ Close Window" : "↗ Open Window"}
           </button>
         )}
       </div>

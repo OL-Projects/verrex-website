@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { X, ArrowRight, ArrowLeft, Home, Building2, Factory, Ruler, Shield, Thermometer, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ArrowRight, ArrowLeft, Home, Building2, Factory, Ruler, Shield, Thermometer, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react"
 
 // Dynamically import 3D configurator (no SSR - WebGL needs browser)
 const Window3DConfigurator = dynamic(
