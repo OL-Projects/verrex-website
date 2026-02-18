@@ -17,7 +17,8 @@
 - ✅ **About page** — Mission, values, team bios, partners/affiliates section
 - ✅ **Projects page** — 8 completed projects portfolio with testimonials, category filters
 - ✅ **Search page** — Global site search across all pages
-- ✅ **Window Types page** — Product subcategory browsing
+- ✅ **Window Types page** — 15 types with 3D configurator, full-screen split view
+- ✅ **3D Window Configurator** — MeshTransmissionMaterial glass (real refraction, chromatic aberration), spring physics animations, 5 frame colors, 5 glass types, parametric sizing
 - ✅ Dark mode — Comprehensive with ThemeProvider, toggle button, all components styled
 - ✅ Animation system — FadeIn, FadeInLeft/Right, StaggerContainer, RevealSection, AnimatedCounter, HoverCard
 - ✅ B2B professional branding — "Windows & Doors", certification badges, institutional messaging
@@ -27,8 +28,8 @@
 ## Deployment Info
 - **GitHub**: `OL-Projects/verrex-website` (main branch)
 - **Hosting**: Vercel (auto-deploy on push to main)
-- **Latest commit**: `67438c2` — Hero split layout with glassmorphism quote form
-- **Build**: Compiles successfully (~2.7s)
+- **Latest commit**: `b483e89` — Realistic 3D renders with MeshTransmissionMaterial, spring physics
+- **Build**: Compiles successfully (~3.6s, 22 pages)
 
 ## What's Left to Build
 - 🔲 Higher-resolution hero background image

@@ -1,87 +1,80 @@
 # Active Context
 
 ## Current Status
-**Glassmorphism Header Upgrade COMPLETE** — Deployed on Vercel via GitHub.
+**Realistic 3D Render Upgrade COMPLETE** — Deployed on Vercel via GitHub.
 
-## Latest Session Work (Feb 16, 2026 — Evening)
+## Latest Session Work (Feb 17, 2026 — Evening)
 
-### Header Glassmorphism Redesign
-- **Top bar**: `bg-slate-900/70 dark:bg-black/50 backdrop-blur-xl` with `border-white/10`
-- **Main nav**: `bg-white/60 dark:bg-slate-950/40 backdrop-blur-xl` with `border-white/20 dark:border-white/10`
-- **Nav links**: Hover `bg-white/40 dark:bg-white/10` for frosted glass feel
-- **Dropdown menus**: `bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl` with glass borders
-- **Search button**: `bg-white/30 dark:bg-white/5 backdrop-blur-sm` with glass border treatment
-- **Mobile menu**: `bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl` matching glass aesthetic
-- **Mobile search**: Glass-styled search bar with frosted borders
-- **All interactive elements**: Smooth `transition-all duration-200` for polished hover states
-- **Commit**: `5299d73` — Header: Full glassmorphism design
+### 3D Window Configurator — Realistic Render Upgrade
 
-## Previous Session Work (Feb 16, 2026)
+#### Glass Material → MeshTransmissionMaterial (Drei)
+- **Replaced** `meshPhysicalMaterial` with `MeshTransmissionMaterial` from `@react-three/drei`
+- **Real refraction** with `transmissionSampler` for shared Three.js transmission buffer
+- **Chromatic aberration** per glass type (0.01–0.045 range)
+- **Anisotropic blur** for realistic light scattering
+- **5 glass types** with physically-based configs:
+  - Clear: IOR 1.52, full transmission, chromatic aberration 0.04
+  - Low-E: slight green tint, transmission 0.92, reduced aberration
+  - Tinted: blue-grey, transmission 0.7, solar heat reduction
+  - Frosted: roughness 0.6, heavy anisotropic blur 0.9, distortion 0.08
+  - Tempered: near-perfect clarity, thicker (0.55), highest aberration 0.045
 
-### 1. B2B Professional Rebrand (12 files updated)
-- **Global text replacement**: "Windows & Glass" → "Windows & Doors" across all pages, components, data, and meta tags
-- **Branding updated in**: layout.tsx, page.tsx, about, catalog, contact, products, projects, search, services, footer, header, data.ts
-- **SEO keywords updated**: Added fenestration, institutional, government buildings, storefront systems, curtain wall, Ontario
-- **Meta descriptions**: Now target developers, architects, facility managers
+#### Frame Profiles — Vinyl (uPVC) Realistic
+- **Enhanced bevels**: bevelThickness 0.018, bevelSize 0.01, bevelSegments 5
+- **Vinyl material**: roughness 0.45, metalness 0.02 (plastic, not metal)
+- **Environment map** intensity 0.6 for subtle reflections
 
-### 2. Homepage Hero Section — Complete Redesign
-- **Layout**: Split 2-column grid (left: content, right: glassmorphism quote form)
-- **Background**: Full-width photo from catalog page 3 (`/images/catalog/catalog-p3-img1.jpeg`)
-- **Overlay**: Dual gradient — left-to-right (slate-950/90 → slate-900/40) + bottom-to-top (black/50 → transparent)
-- **Headline**: "Engineered for Every Project" (universal for residential/commercial/industrial)
-- **CTAs**: "View Product Catalog" + "Book Consultation" (replaced "Get Free Quote" + "Browse Products")
-- **Certification badges**: AAMA Certified, NFRC Rated, Energy Star, WDMA Member
-- **Stats bar**: 500+ Projects Delivered | 2M+ Sq Ft Installed | 98% On-Time Completion | 15+ Years in Industry
+#### Spring Physics Animation System
+- **Damped harmonic oscillator** (`springStep` utility in WindowParts.tsx)
+- **Per-window-type tuning**: heavier sashes = lower stiffness, more damping
+  - Double-Hung: stiffness 120, damping 18 (heavy sash)
+  - Casement: stiffness 140, damping 16 (lighter panels)
+  - Sliding: stiffness 130, damping 18
+  - Tilt-Turn: stiffness 110, damping 20 (heavy panel)
+  - Jalousie: stiffness 160, damping 15 (light slats)
+- **Delta-time capped** at 0.033s for numerical stability
 
-### 3. Quick Quote Form (Glassmorphism, right side of hero)
-- **Styling**: `bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl`
-- **Fields**: Full Name, Email, Phone Number, City, Postal Code
-- **Product checkboxes**: Casement Windows, Sliding Doors, Double Hung, Storefront, Curtain Wall, Entry Doors
-- **Quantity/Units** input field
-- **Submit button**: "Submit Quote Request"
-- **Desktop only** (`hidden lg:block`) — mobile users use dedicated /quote page
+#### Hardware — Satin Nickel Finish
+- **Material**: roughness 0.15, metalness 0.9, envMapIntensity 1.2
+- **Lever handles**: base plate + rosette + arm + rounded tip
+- **Crank handles**: base + shaft + arm + knob (sphereGeometry)
+- **Tilt-turn handles**: espagnolette style with rosette
+- **Hinges**: barrel + knuckles + leaf plates (detailed geometry)
+- **Lock points**: box + bolt cylinder
 
-### 4. Category Cards — Image-Based Overlay Design
-- **3 cards**: Residential & Multi-Family, Commercial & Institutional, Industrial & Manufacturing
-- **Full background images** from `/images/hero/` (hero-residential.jpg, hero-commercial.jpg, hero-industrial.jpg)
-- **Hover effects**: Image zoom (scale 1.1, 700ms), shadow elevation, gradient lightening
-- **Frosted glass icon containers** with white border
-- **Height**: h-80 mobile, h-96 desktop
+#### New Components
+- **WindowScreen**: semi-transparent mesh for operable windows
+- **Weatherstrip gaskets**: EPDM rubber seals (dark, high roughness)
+- **Support brackets**: on garden windows
+- **Mortar joints**: on glass block windows
+- **Pressure plates**: on curtain wall mullions
+- **Thresholds**: on storefront door openings
+- **Seat boards**: on bay/bow windows
 
-### 5. "Why Choose VERREX" Section — B2B Upgrades
-- Fully Licensed & Bonded (WSIB compliant)
-- Code Compliant (Ontario Building Code, AAMA, NFRC)
-- On-Time, On-Budget (98% completion rate)
-- Volume & Contract Pricing (multi-unit, institutional, recurring)
-
-### 6. Other B2B Changes
-- Testimonials header: "Trusted by Industry Leaders"
-- CTA: "Let's Discuss Your Next Project" → "Request a Proposal" + "Schedule Consultation"
-- Company description updated for fenestration/institutional focus
-- New Lucide icons added: FileText, Landmark, HardHat, BadgeCheck, ShieldCheck, Truck
+#### Architecture Split (Large File Safety)
+- **Problem**: AllWindows.tsx was 400+ lines, caused `write_to_file` truncation failures
+- **Solution**: Split into 4 focused files + barrel re-export:
+  - `OperableWindows.tsx` — Sliding, Awning, Hopper, Skylight, Jalousie
+  - `TiltTurnWindow.tsx` — Tilt & Turn (complex, own file)
+  - `StaticWindows.tsx` — Bay/Bow, Picture, Garden, Transom, Glass Block
+  - `CommercialWindows.tsx` — Curtain Wall, Storefront, Generic
+  - `AllWindows.tsx` — barrel re-export only (~8 lines)
 
 ## Git History (Latest Commits)
-- `67438c2` — Hero: Split layout with glassmorphism quote form on right, text centered-left
-- `7355011` — Hero: Move text to far left edge with direct padding
-- `e67fbd7` — Hero: General headline - Engineered for Every Project
-- `a8948e8` — Hero: Remove zoom, show full natural image at best quality
-- `d614d3a` — Hero: Narrower text column, zoomed-in image, reveal more background
-- `f419b3f` — Hero: Use catalog page 3 image as hero background
-- `7be14ac` — Visual upgrade: Full-width hero photo background, image-based category cards
-- `92f7ed3` — B2B Professional Rebrand: Windows & Doors, institutional messaging, certifications
+- `b483e89` — feat: realistic 3D renders — MeshTransmissionMaterial glass, spring physics, enhanced hardware, split architecture
+- `0263f57` — wip: window-types page and configurator local updates
+- `dc992b9` — feat: complete 3D window configurator with 15 animated window types
 
 ## Known Issues / Pending Items
-- Hero background image (catalog-p3-img1.jpeg) is relatively low resolution — could benefit from a higher-quality replacement
 - Quick quote form is presentational only (no backend submission yet)
 - All forms are client-side only (no API routes)
 - Product images are AI-generated placeholders
+- Hero background image could benefit from higher resolution
 
-## Next Steps (For New Chat)
-- **Image quality**: Source higher-resolution hero image (from manufacturer or stock)
-- **Backend**: API routes for form submissions (quote, contact, appointments)
-- **Database**: PostgreSQL/Prisma or Supabase for data persistence
-- **Authentication**: Client/admin login system
-- **Performance**: Image optimization, lazy loading, Core Web Vitals
-- **Mobile**: Test and refine responsive experience
-- **SEO**: Add structured data, sitemap, robots.txt
-- **Analytics**: Google Analytics or Vercel Analytics integration
+## Next Steps
+- **Phase 2**: Backend API routes for form submissions (quote, contact, appointments)
+- **Phase 2**: Database setup (PostgreSQL/Prisma or Supabase)
+- **Phase 2**: Email notification system
+- **Phase 3**: Authentication and admin/client dashboards
+- **Phase 4**: Integrations (payments, chat, analytics)
+- **Phase 5**: SEO, performance, accessibility, testing
