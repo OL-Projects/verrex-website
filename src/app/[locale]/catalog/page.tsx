@@ -10,14 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
 import {
-  Search,
-  X,
-  ArrowRight,
-  LayoutGrid,
-  List,
-  Check,
-  Sparkles,
-  ChevronRight,
+  Search, X, ArrowRight, LayoutGrid, List, Check, Sparkles,
+  ChevronRight, ChevronDown, AppWindow, DoorOpen, Box,
 } from "lucide-react"
 
 type SortOption = "name-asc" | "name-desc"
@@ -25,30 +19,40 @@ type SortOption = "name-asc" | "name-desc"
 export default function CatalogPage() {
   const t = useTranslations('CatalogPage')
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeSubcategory, setActiveSubcategory] = useState<string | "all">("all")
+  const [activeFilter, setActiveFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<SortOption>("name-asc")
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["windows", "doors"]))
 
-  const subcategories = useMemo(() => {
-    const subs = [...new Set(products.map(p => p.subcategory))].sort()
-    return subs.map(s => ({ value: s, count: products.filter(p => p.subcategory === s).length }))
-  }, [])
+  const toggleNode = (id: string) => {
+    setExpandedNodes(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  }
+
+  const selectFilter = (filter: string) => setActiveFilter(filter)
 
   const filteredProducts = useMemo(() => {
     let result = products.filter((product) => {
-      const matchesSubcategory = activeSubcategory === "all" || product.subcategory === activeSubcategory
+      const matchesFilter = activeFilter === "all" ||
+        (activeFilter === "windows" && product.subcategory === "Windows") ||
+        (activeFilter === "doors" && (product.subcategory === "Doors" || product.subcategory === "Entry Systems")) ||
+        product.subcategory === activeFilter ||
+        product.tags.some(tag => tag === activeFilter)
       const matchesSearch = searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      return matchesSubcategory && matchesSearch
+      return matchesFilter && matchesSearch
     })
     result.sort((a, b) => sortBy === "name-desc" ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name))
     return result
-  }, [activeSubcategory, searchQuery, sortBy])
+  }, [activeFilter, searchQuery, sortBy])
 
-  const clearFilters = () => { setSearchQuery(""); setActiveSubcategory("all"); setSortBy("name-asc") }
+  const clearFilters = () => { setSearchQuery(""); setActiveFilter("all"); setSortBy("name-asc") }
+
+  const isActive = (id: string) => activeFilter === id
+  const btnCls = (id: string) => `w-full text-left flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors ${isActive(id) ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-medium" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`
+  const subCls = (id: string) => `w-full text-left px-3 py-1 rounded-md text-xs transition-colors ${isActive(id) ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-medium" : "text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-300"}`
 
   return (
     <div>
@@ -66,49 +70,84 @@ export default function CatalogPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8">
             {/* Sidebar */}
-            <aside className="w-60 shrink-0 hidden lg:block">
-              <div className="sticky top-24 space-y-6">
+            <aside className="w-64 shrink-0 hidden lg:block">
+              <div className="sticky top-24 space-y-5">
                 {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder={t('searchPlaceholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-10 text-sm"
-                  />
-                  {searchQuery && (
-                    <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  )}
+                  <Input placeholder={t('searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm" />
+                  {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>}
                 </div>
 
-                {/* Category Nav */}
+                {/* Tree Navigation */}
                 <nav>
                   <h3 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">{t('productTypes')}</h3>
-                  <ul className="space-y-0.5">
-                    <li>
-                      <button
-                        onClick={() => setActiveSubcategory("all")}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${activeSubcategory === "all" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-medium" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}
-                      >
-                        <span>{t('allTypes')}</span>
-                        <Badge variant="secondary" className="text-[10px] h-5 min-w-[20px] justify-center">{products.length}</Badge>
+
+                  {/* All Products */}
+                  <button onClick={() => selectFilter("all")} className={btnCls("all")}>
+                    <span>{t('allTypes')}</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 min-w-[20px] justify-center">{products.length}</Badge>
+                  </button>
+
+                  {/* ── WINDOWS ── */}
+                  <div className="mt-2">
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => toggleNode("windows")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                        {expandedNodes.has("windows") ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                       </button>
-                    </li>
-                    {subcategories.map((sub) => (
-                      <li key={sub.value}>
-                        <button
-                          onClick={() => setActiveSubcategory(sub.value)}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${activeSubcategory === sub.value ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-medium" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}
-                        >
-                          <span>{sub.value}</span>
-                          <Badge variant="secondary" className="text-[10px] h-5 min-w-[20px] justify-center">{sub.count}</Badge>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                      <button onClick={() => selectFilter("windows")} className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive("windows") ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}>
+                        <AppWindow className="h-4 w-4" /> {t('catWindows')}
+                      </button>
+                    </div>
+                    {expandedNodes.has("windows") && (
+                      <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
+                        <button onClick={() => selectFilter("top-hung")} className={subCls("top-hung")}>{t('topHung')}</button>
+                        <button onClick={() => selectFilter("sliding-window")} className={subCls("sliding-window")}>{t('slidingWindow')}</button>
+                        {/* Casement with sub-tree */}
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => toggleNode("casement")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                              {expandedNodes.has("casement") ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                            </button>
+                            <button onClick={() => selectFilter("casement")} className={`flex-1 text-left py-1 rounded-md text-xs transition-colors ${isActive("casement") ? "text-blue-700 dark:text-blue-400 font-medium" : "text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}>
+                              {t('casement')}
+                            </button>
+                          </div>
+                          {expandedNodes.has("casement") && (
+                            <div className="ml-5 mt-0.5 space-y-0.5 border-l border-slate-200 dark:border-slate-700 pl-2.5">
+                              <button onClick={() => selectFilter("tilt-turn")} className={subCls("tilt-turn")}>
+                                <span>{t('tiltTurn')}</span>
+                                <span className="ml-1 text-[10px] text-slate-400">({t('opensInside')})</span>
+                              </button>
+                              <button onClick={() => selectFilter("hand-cranked")} className={subCls("hand-cranked")}>
+                                <span>{t('handCranked')}</span>
+                                <span className="ml-1 text-[10px] text-slate-400">({t('opensOutside')})</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── DOORS ── */}
+                  <div className="mt-2">
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => toggleNode("doors")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                        {expandedNodes.has("doors") ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                      </button>
+                      <button onClick={() => selectFilter("doors")} className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive("doors") ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}>
+                        <DoorOpen className="h-4 w-4" /> {t('catDoors')}
+                      </button>
+                    </div>
+                    {expandedNodes.has("doors") && (
+                      <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
+                        <button onClick={() => selectFilter("sliding-door")} className={subCls("sliding-door")}>{t('slidingDoor')}</button>
+                        <button onClick={() => selectFilter("folding")} className={subCls("folding")}>{t('folding')}</button>
+                        <button onClick={() => selectFilter("swing")} className={subCls("swing")}>{t('swing')}</button>
+                      </div>
+                    )}
+                  </div>
                 </nav>
 
                 {/* Quick Links */}
@@ -117,7 +156,7 @@ export default function CatalogPage() {
                   <ul className="space-y-1.5">
                     <li><IntlLink href="/products/windows" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('windowsSection')}</IntlLink></li>
                     <li><IntlLink href="/products/doors" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('doorsSection')}</IntlLink></li>
-                    <li><IntlLink href="/products/window-types" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('configurator3d')}</IntlLink></li>
+                    <li><IntlLink href="/products/window-types" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Box className="h-3.5 w-3.5" />{t('configurator3d')}</IntlLink></li>
                   </ul>
                 </div>
               </div>
@@ -133,10 +172,9 @@ export default function CatalogPage() {
 
               {/* Mobile Filters */}
               <div className="lg:hidden flex gap-2 flex-wrap mb-4">
-                <Button variant={activeSubcategory === "all" ? "secondary" : "ghost"} size="sm" onClick={() => setActiveSubcategory("all")} className="text-xs">{t('allTypes')}</Button>
-                {subcategories.map((sub) => (
-                  <Button key={sub.value} variant={activeSubcategory === sub.value ? "secondary" : "ghost"} size="sm" onClick={() => setActiveSubcategory(sub.value)} className="text-xs">{sub.value}</Button>
-                ))}
+                <Button variant={activeFilter === "all" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("all")} className="text-xs">{t('allTypes')}</Button>
+                <Button variant={activeFilter === "windows" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("windows")} className="text-xs">{t('catWindows')}</Button>
+                <Button variant={activeFilter === "doors" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("doors")} className="text-xs">{t('catDoors')}</Button>
               </div>
 
               {/* Toolbar */}
