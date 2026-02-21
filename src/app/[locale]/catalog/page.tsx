@@ -11,10 +11,22 @@ import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
 import {
   Search, X, ArrowRight, LayoutGrid, List, Check, Sparkles,
-  ChevronRight, ChevronDown, AppWindow, DoorOpen, Box,
+  ChevronRight, ChevronDown, AppWindow, DoorOpen, Box, ArrowLeft, Info,
 } from "lucide-react"
 
 type SortOption = "name-asc" | "name-desc"
+
+const typeInfo: Record<string, { title: string; desc: string; features: string[]; use: string; frames: string }> = {
+  "top-hung": { title: "Top Hung Windows", desc: "Hinged at the top and opening outward from the bottom. Ideal for ventilation while preventing rain entry. Often used in basements and bathrooms.", features: ["Rain protection when open", "Excellent ventilation control", "Compact operation", "Easy to clean"], use: "Basements, Bathrooms, Kitchens", frames: "Aluminum, PVC, Hybrid" },
+  "sliding-window": { title: "Sliding Windows", desc: "Horizontal sliding sash windows that glide smoothly on tracks. Space-efficient and easy to operate. Available in 2-panel and 3-panel configurations.", features: ["Space-saving operation", "Smooth gliding tracks", "Multi-panel options", "Wide unobstructed views"], use: "Living rooms, Bedrooms, Offices", frames: "Aluminum, PVC, Wood-clad" },
+  "casement": { title: "Casement Windows", desc: "Side-hinged windows that open outward like a door. Provide maximum ventilation and an unobstructed view. Available in tilt & turn and hand-cranked variants.", features: ["Maximum ventilation", "Unobstructed views", "Multi-point locking", "Energy efficient seals"], use: "Residential, Light Commercial", frames: "Aluminum, PVC, Wood, Fiberglass" },
+  "tilt-turn": { title: "Tilt & Turn Windows", desc: "European-style casement windows that tilt inward from the top for ventilation or swing fully inward for cleaning and emergency egress. Dual-function hardware.", features: ["Tilt mode for secure ventilation", "Full inward opening for cleaning", "Emergency egress capable", "Child-safe tilt position"], use: "High-rise, Condos, Modern Homes", frames: "Aluminum, PVC, Wood-Aluminum" },
+  "hand-cranked": { title: "Hand Cranked Casement", desc: "Traditional casement windows operated by a hand crank mechanism that pushes the sash outward. Provides precise control over opening angle.", features: ["Precise opening control", "Outward projection for airflow", "Traditional crank mechanism", "Tight weatherseal when closed"], use: "Residential, Heritage Buildings", frames: "Aluminum, PVC, Wood" },
+  "awning": { title: "Awning Windows", desc: "Hinged at the top with the sash swinging outward from the bottom. Similar to top-hung but with a wider opening arc. Excellent for ventilation in rainy conditions.", features: ["Ventilation during rain", "Wide opening arc", "Stackable with fixed panels", "Energy efficient design"], use: "Bathrooms, Kitchens, Commercial", frames: "Aluminum, PVC, Fiberglass" },
+  "sliding-door": { title: "Sliding Doors", desc: "Large-panel doors that glide horizontally on precision tracks. Available in 2, 3, and 4-panel configurations. Ideal for connecting indoor and outdoor spaces.", features: ["Seamless indoor-outdoor flow", "Heavy-duty roller systems", "Multi-point security locks", "Thermal break frames"], use: "Patios, Balconies, Terraces", frames: "Aluminum, PVC, Wood-clad" },
+  "folding": { title: "Folding Doors", desc: "Multi-panel bi-fold door systems that fold and stack to create wide open passages. Transform entire walls into open-air spaces.", features: ["Full wall opening", "Bi-fold panel stacking", "Flush threshold options", "Weather-rated seals"], use: "Restaurants, Patios, Showrooms", frames: "Aluminum, Aluminum-Wood" },
+  "swing": { title: "Swing Doors", desc: "Traditional hinged doors that swing open on side-mounted hinges. Available as single or double-leaf, inward or outward opening.", features: ["Classic operation", "Single or double leaf", "ADA compliant options", "Panic hardware available"], use: "Entries, Commercial, Institutional", frames: "Aluminum, Steel, Glass" },
+}
 
 export default function CatalogPage() {
   const t = useTranslations('CatalogPage')
@@ -126,6 +138,7 @@ export default function CatalogPage() {
                             </div>
                           )}
                         </div>
+                        <button onClick={() => selectFilter("awning")} className={subCls("awning")}>{t('awning')}</button>
                       </div>
                     )}
                   </div>
@@ -192,8 +205,37 @@ export default function CatalogPage() {
                 </div>
               </div>
 
-              {/* Products */}
-              {filteredProducts.length > 0 ? (
+              {/* Type Info Panel or Products */}
+              {typeInfo[activeFilter] ? (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6 md:p-8">
+                  <button onClick={() => selectFilter(["top-hung","sliding-window","casement","tilt-turn","hand-cranked","awning"].includes(activeFilter) ? "windows" : "doors")} className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4">
+                    <ArrowLeft className="h-3.5 w-3.5" /> {t('backToList')}
+                  </button>
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0"><Info className="h-5 w-5 text-blue-600 dark:text-blue-400" /></div>
+                    <div><h2 className="text-xl font-bold text-slate-900 dark:text-white">{typeInfo[activeFilter].title}</h2>
+                    <p className="mt-1 text-slate-500 dark:text-slate-400">{typeInfo[activeFilter].desc}</p></div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                      <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{t('infoFeatures')}</h3>
+                      <ul className="space-y-2">{typeInfo[activeFilter].features.map((f, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400"><Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />{f}</li>
+                      ))}</ul>
+                    </div>
+                    <div className="space-y-4">
+                      <div><h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{t('infoApplications')}</h3>
+                      <p className="text-sm text-slate-700 dark:text-slate-300">{typeInfo[activeFilter].use}</p></div>
+                      <div><h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{t('infoFrames')}</h3>
+                      <p className="text-sm text-slate-700 dark:text-slate-300">{typeInfo[activeFilter].frames}</p></div>
+                    </div>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+                    <IntlLink href="/quote"><Button variant="primary" size="sm" className="gap-1">{t('getQuote')} <ArrowRight className="h-3.5 w-3.5" /></Button></IntlLink>
+                    <IntlLink href="/appointments"><Button variant="outline" size="sm">{t('bookConsultation')}</Button></IntlLink>
+                  </div>
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 viewMode === "grid" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {filteredProducts.map((product) => (
