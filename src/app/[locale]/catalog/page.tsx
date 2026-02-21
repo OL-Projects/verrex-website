@@ -5,260 +5,281 @@ import Image from "next/image"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { products } from "@/lib/data"
+import { formatCurrency } from "@/lib/utils"
+import { ProductCategory } from "@/types"
 import {
-  ArrowLeft,
-  ArrowRight,
+  Search,
   X,
-  ZoomIn,
-  ZoomOut,
-  Download,
-  Grid3X3,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  Maximize2,
+  ArrowRight,
+  ArrowUpDown,
+  LayoutGrid,
+  List,
+  SlidersHorizontal,
+  Home,
+  Building2,
+  Factory,
+  Check,
+  Sparkles,
 } from "lucide-react"
 
-// Generate catalog pages array (98 pages)
-const catalogPages = Array.from({ length: 98 }, (_, i) => ({
-  page: i + 1,
-  src: `/images/catalog/catalog-p${i + 1}-img1.jpeg`,
-}))
+type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc"
 
 export default function CatalogPage() {
   const t = useTranslations('CatalogPage')
-  const [viewMode, setViewMode] = useState<"grid" | "reader">("grid")
-  const [currentPage, setCurrentPage] = useState(0)
-  const [zoom, setZoom] = useState(1)
-  const [lightbox, setLightbox] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all")
+  const [activeSubcategory, setActiveSubcategory] = useState<string | "all">("all")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [sortBy, setSortBy] = useState<SortOption>("name-asc")
 
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(0, Math.min(catalogPages.length - 1, page)))
-    setZoom(1)
+  const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { value: "all", label: t('allCategories'), icon: SlidersHorizontal },
+    { value: "residential", label: t('residential'), icon: Home },
+    { value: "commercial", label: t('commercial'), icon: Building2 },
+    { value: "industrial", label: t('industrial'), icon: Factory },
+  ]
+
+  const subcategories = useMemo(() => {
+    const subs = [...new Set(products.map(p => p.subcategory))].sort()
+    return [{ value: "all", label: t('allTypes') }, ...subs.map(s => ({ value: s, label: s }))]
+  }, [t])
+
+  const filteredProducts = useMemo(() => {
+    let result = products.filter((product) => {
+      const matchesCategory = activeCategory === "all" || product.category === activeCategory
+      const matchesSubcategory = activeSubcategory === "all" || product.subcategory === activeSubcategory
+      const matchesSearch = searchQuery === "" ||
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      return matchesCategory && matchesSubcategory && matchesSearch
+    })
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case "name-asc": return a.name.localeCompare(b.name)
+        case "name-desc": return b.name.localeCompare(a.name)
+        case "price-asc": return a.priceRange.min - b.priceRange.min
+        case "price-desc": return b.priceRange.min - a.priceRange.min
+        default: return 0
+      }
+    })
+    return result
+  }, [activeCategory, activeSubcategory, searchQuery, sortBy])
+
+  const clearFilters = () => {
+    setSearchQuery("")
+    setActiveCategory("all")
+    setActiveSubcategory("all")
+    setSortBy("name-asc")
   }
 
   return (
     <div>
-      {/* Header */}
-      <section className="bg-slate-900 dark:bg-[#000000] py-12">
+      {/* Hero Header */}
+      <section className="bg-slate-900 dark:bg-[#000000] py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <Badge variant="primary" className="mb-3">{t('supplier')}</Badge>
-              <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
-              <p className="mt-3 text-slate-300 max-w-xl">
-                {t('description')}
-              </p>
-            </div>
-            <div className="hidden sm:flex items-center gap-2">
-              <Button
-                variant={viewMode === "grid" ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="gap-2 border-white/20 text-white hover:text-white"
-              >
-                <Grid3X3 className="h-4 w-4" /> {t('grid')}
-              </Button>
-              <Button
-                variant={viewMode === "reader" ? "primary" : "outline"}
-                size="sm"
-                onClick={() => { setViewMode("reader"); setCurrentPage(0) }}
-                className="gap-2 border-white/20 text-white hover:text-white"
-              >
-                <BookOpen className="h-4 w-4" /> {t('reader')}
-              </Button>
-            </div>
+          <Badge variant="primary" className="mb-3">{t('badge')}</Badge>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
+          <p className="mt-3 text-slate-300 max-w-2xl">{t('description')}</p>
+          <div className="mt-6 relative max-w-lg">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <Input
+              placeholder={t('searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 h-12 bg-white/10 border-white/20 text-white placeholder:text-slate-400 text-base focus:bg-white/15"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-      {/* View Mode Toggle - Mobile */}
-      <div className="sm:hidden py-3 px-4 border-b border-slate-200 dark:border-slate-800 dark:bg-[#030712] flex gap-2">
-        <Button
-          variant={viewMode === "grid" ? "primary" : "outline"}
-          size="sm"
-          onClick={() => setViewMode("grid")}
-          className="flex-1 gap-2"
-        >
-          <Grid3X3 className="h-4 w-4" /> {t('grid')}
-        </Button>
-        <Button
-          variant={viewMode === "reader" ? "primary" : "outline"}
-          size="sm"
-          onClick={() => { setViewMode("reader"); setCurrentPage(0) }}
-          className="flex-1 gap-2"
-        >
-          <BookOpen className="h-4 w-4" /> {t('reader')}
-        </Button>
-      </div>
-
-      {/* Grid View */}
-      {viewMode === "grid" && (
-        <section className="py-8 dark:bg-[#030712]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <p className="text-sm text-slate-500 mb-6">{t('pagesInfo', { count: catalogPages.length })}</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {catalogPages.map((item, idx) => (
-                <button
-                  key={item.page}
-                  onClick={() => { setLightbox(idx) }}
-                  className="group relative aspect-[3/4] rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all"
+      {/* Filters + Content */}
+      <section className="py-8 dark:bg-[#030712]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Filter Bar */}
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            {/* Category Filters */}
+            <div className="flex gap-2 flex-wrap">
+              {categories.map((cat) => (
+                <Button
+                  key={cat.value}
+                  variant={activeCategory === cat.value ? "primary" : "outline"}
+                  size="sm"
+                  onClick={() => { setActiveCategory(cat.value); setActiveSubcategory("all") }}
+                  className="gap-1.5"
                 >
-                  <Image
-                    src={item.src}
-                    alt={`Catalog page ${item.page}`}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <Maximize2 className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <span className="absolute bottom-1 right-2 text-[10px] font-medium text-white bg-black/50 px-1.5 py-0.5 rounded">
-                    {item.page}
-                  </span>
-                </button>
+                  <cat.icon className="h-4 w-4" />
+                  {cat.label}
+                </Button>
+              ))}
+            </div>
+            {/* Subcategory Filters */}
+            <div className="flex gap-2 flex-wrap">
+              {subcategories.map((sub) => (
+                <Button
+                  key={sub.value}
+                  variant={activeSubcategory === sub.value ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveSubcategory(sub.value)}
+                  className="text-xs"
+                >
+                  {sub.label}
+                </Button>
               ))}
             </div>
           </div>
-        </section>
-      )}
 
-      {/* Reader View */}
-      {viewMode === "reader" && (
-        <section className="dark:bg-[#030712] min-h-[80vh]">
-          <div className="mx-auto max-w-5xl px-4 py-6">
-            {/* Reader Controls */}
-            <div className="flex items-center justify-between mb-4 bg-white dark:bg-[#0a0f1a] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 0}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 min-w-[80px] text-center">
-                  Page {currentPage + 1} / {catalogPages.length}
-                </span>
-                <Button variant="outline" size="sm" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === catalogPages.length - 1}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}>
-                  <ZoomOut className="h-4 w-4" />
-                </Button>
-                <span className="text-xs text-slate-500 min-w-[40px] text-center">{Math.round(zoom * 100)}%</span>
-                <Button variant="outline" size="sm" onClick={() => setZoom(z => Math.min(3, z + 0.25))}>
-                  <ZoomIn className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setLightbox(currentPage)}>
-                  <Maximize2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Page Display */}
-            <div className="relative bg-slate-100 dark:bg-[#0a0f1a] rounded-xl overflow-auto border border-slate-200 dark:border-slate-800" style={{ maxHeight: "75vh" }}>
-              <div className="flex items-center justify-center p-4" style={{ transform: `scale(${zoom})`, transformOrigin: "top center", transition: "transform 0.2s ease" }}>
-                <Image
-                  src={catalogPages[currentPage].src}
-                  alt={`Catalog page ${currentPage + 1}`}
-                  width={1200}
-                  height={1600}
-                  className="rounded-lg shadow-xl max-w-full h-auto"
-                  priority
-                />
+          {/* Toolbar: Results count + Sort + View Toggle */}
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              {t('showing', { filtered: filteredProducts.length, total: products.length })}
+            </span>
+            <div className="flex items-center gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="text-xs h-8 px-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300"
+              >
+                <option value="name-asc">{t('sortNameAsc')}</option>
+                <option value="name-desc">{t('sortNameDesc')}</option>
+                <option value="price-asc">{t('sortPriceAsc')}</option>
+                <option value="price-desc">{t('sortPriceDesc')}</option>
+              </select>
+              <div className="flex border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 ${viewMode === "grid" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600" : "text-slate-400 hover:text-slate-600"}`}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-1.5 ${viewMode === "list" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600" : "text-slate-400 hover:text-slate-600"}`}
+                >
+                  <List className="h-4 w-4" />
+                </button>
               </div>
             </div>
+          </div>
 
-            {/* Page Thumbnails */}
-            <div className="mt-4 overflow-x-auto">
-              <div className="flex gap-2 pb-2">
-                {catalogPages.map((item, idx) => (
-                  <button
-                    key={item.page}
-                    onClick={() => goToPage(idx)}
-                    className={`shrink-0 w-16 h-20 rounded-md overflow-hidden border-2 transition-all ${
-                      idx === currentPage
-                        ? "border-blue-500 shadow-md"
-                        : "border-transparent hover:border-slate-300 dark:hover:border-slate-600"
-                    }`}
-                  >
-                    <Image
-                      src={item.src}
-                      alt={`Page ${item.page}`}
-                      width={64}
-                      height={80}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </button>
+          {/* Product Grid */}
+          {filteredProducts.length > 0 ? (
+            viewMode === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <Card key={product.id} className="group h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                    {/* Image */}
+                    <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden">
+                      <Image
+                        src={product.images[0]}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      />
+                      <div className="absolute top-3 left-3 flex gap-1.5">
+                        <Badge variant="primary" className="text-[10px] uppercase tracking-wider">{product.category}</Badge>
+                        <Badge variant="secondary" className="text-[10px]">{product.subcategory}</Badge>
+                      </div>
+                      {product.isFeatured && (
+                        <Badge variant="primary" className="absolute top-3 right-3 text-[10px] gap-1">
+                          <Sparkles className="h-3 w-3" /> {t('featured')}
+                        </Badge>
+                      )}
+                    </div>
+                    <CardContent className="p-5">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {product.shortDescription}
+                      </p>
+                      {/* Key Features */}
+                      <ul className="mt-3 space-y-1">
+                        {product.features.slice(0, 3).map((f, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                            <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                      {/* Price + Actions */}
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs text-slate-400">{t('from')}</span>
+                          <span className="ml-1 text-base font-bold text-blue-600 dark:text-blue-400">
+                            {formatCurrency(product.priceRange.min)}
+                          </span>
+                        </div>
+                        <IntlLink href={`/products/${product.id}`}>
+                          <Button variant="outline" size="sm" className="gap-1 text-xs">
+                            {t('viewDetails')} <ArrowRight className="h-3 w-3" />
+                          </Button>
+                        </IntlLink>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
+            ) : (
+              /* List View */
+              <div className="space-y-3">
+                {filteredProducts.map((product) => (
+                  <IntlLink key={product.id} href={`/products/${product.id}`}>
+                    <div className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all bg-white dark:bg-slate-900/50">
+                      <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
+                        <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="80px" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">{product.name}</h3>
+                          <Badge variant="secondary" className="text-[10px] shrink-0">{product.subcategory}</Badge>
+                          {product.isCustomizable && <Badge variant="outline" className="text-[10px] shrink-0">{t('customizable')}</Badge>}
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{product.shortDescription}</p>
+                      </div>
+                      <div className="text-right shrink-0 hidden sm:block">
+                        <span className="text-xs text-slate-400">{t('from')}</span>
+                        <p className="font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.priceRange.min)}</p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-blue-500 shrink-0 transition-colors" />
+                    </div>
+                  </IntlLink>
+                ))}
+              </div>
+            )
+          ) : (
+            /* Empty State */
+            <div className="text-center py-20">
+              <div className="h-16 w-16 mx-auto bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <Search className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('noProducts')}</h3>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">{t('noProductsDesc')}</p>
+              <Button variant="outline" className="mt-4" onClick={clearFilters}>{t('clearFilters')}</Button>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Lightbox */}
-      {lightbox !== null && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-          >
-            <X className="h-5 w-5" />
-          </button>
-
-          {/* Prev */}
-          {lightbox > 0 && (
-            <button
-              onClick={() => setLightbox(lightbox - 1)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
           )}
-
-          {/* Next */}
-          {lightbox < catalogPages.length - 1 && (
-            <button
-              onClick={() => setLightbox(lightbox + 1)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          )}
-
-          {/* Page indicator */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-sm px-4 py-2 rounded-full z-10">
-            Page {lightbox + 1} of {catalogPages.length}
-          </div>
-
-          {/* Image */}
-          <div className="max-w-[90vw] max-h-[90vh] overflow-auto">
-            <Image
-              src={catalogPages[lightbox].src}
-              alt={`Catalog page ${lightbox + 1}`}
-              width={1200}
-              height={1600}
-              className="max-h-[90vh] w-auto object-contain"
-              priority
-            />
-          </div>
         </div>
-      )}
+      </section>
 
       {/* CTA */}
       <section className="py-12 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('interestedTitle')}</h2>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">{t('interestedDesc')}</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('ctaTitle')}</h2>
+          <p className="mt-2 text-slate-600 dark:text-slate-400">{t('ctaDesc')}</p>
           <div className="mt-6 flex gap-3 justify-center flex-wrap">
             <IntlLink href="/quote">
-              <Button variant="primary" size="lg" className="gap-2">
-                {t('getQuote')} <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Button variant="primary" size="lg" className="gap-2">{t('getQuote')} <ArrowRight className="h-4 w-4" /></Button>
             </IntlLink>
             <IntlLink href="/contact">
               <Button variant="outline" size="lg">{t('contactUs')}</Button>
