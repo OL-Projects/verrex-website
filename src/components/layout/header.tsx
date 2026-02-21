@@ -35,8 +35,8 @@ export function Header() {
       name: t('products'),
       href: "/products",
       children: [
-        { name: t('windows'), href: "/products/window-types", icon: AppWindow },
-        { name: t('doors'), href: "/products?category=doors", icon: DoorOpen },
+        { name: t('windows'), href: "/products/windows", icon: AppWindow },
+        { name: t('doors'), href: "/products/doors", icon: DoorOpen },
       ],
     },
     { name: t('catalog'), href: "/catalog" },
