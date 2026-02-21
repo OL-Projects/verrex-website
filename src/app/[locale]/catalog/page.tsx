@@ -9,39 +9,24 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
-import { formatCurrency } from "@/lib/utils"
-import { ProductCategory } from "@/types"
 import {
   Search,
   X,
   ArrowRight,
-  ArrowUpDown,
   LayoutGrid,
   List,
-  SlidersHorizontal,
-  Home,
-  Building2,
-  Factory,
   Check,
   Sparkles,
 } from "lucide-react"
 
-type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc"
+type SortOption = "name-asc" | "name-desc"
 
 export default function CatalogPage() {
   const t = useTranslations('CatalogPage')
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all")
   const [activeSubcategory, setActiveSubcategory] = useState<string | "all">("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<SortOption>("name-asc")
-
-  const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { value: "all", label: t('allCategories'), icon: SlidersHorizontal },
-    { value: "residential", label: t('residential'), icon: Home },
-    { value: "commercial", label: t('commercial'), icon: Building2 },
-    { value: "industrial", label: t('industrial'), icon: Factory },
-  ]
 
   const subcategories = useMemo(() => {
     const subs = [...new Set(products.map(p => p.subcategory))].sort()
@@ -50,30 +35,26 @@ export default function CatalogPage() {
 
   const filteredProducts = useMemo(() => {
     let result = products.filter((product) => {
-      const matchesCategory = activeCategory === "all" || product.category === activeCategory
       const matchesSubcategory = activeSubcategory === "all" || product.subcategory === activeSubcategory
       const matchesSearch = searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      return matchesCategory && matchesSubcategory && matchesSearch
+      return matchesSubcategory && matchesSearch
     })
     result.sort((a, b) => {
       switch (sortBy) {
         case "name-asc": return a.name.localeCompare(b.name)
         case "name-desc": return b.name.localeCompare(a.name)
-        case "price-asc": return a.priceRange.min - b.priceRange.min
-        case "price-desc": return b.priceRange.min - a.priceRange.min
         default: return 0
       }
     })
     return result
-  }, [activeCategory, activeSubcategory, searchQuery, sortBy])
+  }, [activeSubcategory, searchQuery, sortBy])
 
   const clearFilters = () => {
     setSearchQuery("")
-    setActiveCategory("all")
     setActiveSubcategory("all")
     setSortBy("name-asc")
   }
@@ -106,37 +87,19 @@ export default function CatalogPage() {
       {/* Filters + Content */}
       <section className="py-8 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Filter Bar */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            {/* Category Filters */}
-            <div className="flex gap-2 flex-wrap">
-              {categories.map((cat) => (
-                <Button
-                  key={cat.value}
-                  variant={activeCategory === cat.value ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => { setActiveCategory(cat.value); setActiveSubcategory("all") }}
-                  className="gap-1.5"
-                >
-                  <cat.icon className="h-4 w-4" />
-                  {cat.label}
-                </Button>
-              ))}
-            </div>
-            {/* Subcategory Filters */}
-            <div className="flex gap-2 flex-wrap">
-              {subcategories.map((sub) => (
-                <Button
-                  key={sub.value}
-                  variant={activeSubcategory === sub.value ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveSubcategory(sub.value)}
-                  className="text-xs"
-                >
-                  {sub.label}
-                </Button>
-              ))}
-            </div>
+          {/* Type Filters */}
+          <div className="flex gap-2 flex-wrap mb-6">
+            {subcategories.map((sub) => (
+              <Button
+                key={sub.value}
+                variant={activeSubcategory === sub.value ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setActiveSubcategory(sub.value)}
+                className="text-xs"
+              >
+                {sub.label}
+              </Button>
+            ))}
           </div>
 
           {/* Toolbar: Results count + Sort + View Toggle */}
@@ -152,8 +115,6 @@ export default function CatalogPage() {
               >
                 <option value="name-asc">{t('sortNameAsc')}</option>
                 <option value="name-desc">{t('sortNameDesc')}</option>
-                <option value="price-asc">{t('sortPriceAsc')}</option>
-                <option value="price-desc">{t('sortPriceDesc')}</option>
               </select>
               <div className="flex border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
                 <button
@@ -178,7 +139,6 @@ export default function CatalogPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <Card key={product.id} className="group h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                    {/* Image */}
                     <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden">
                       <Image
                         src={product.images[0]}
@@ -204,7 +164,6 @@ export default function CatalogPage() {
                       <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
                         {product.shortDescription}
                       </p>
-                      {/* Key Features */}
                       <ul className="mt-3 space-y-1">
                         {product.features.slice(0, 3).map((f, i) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-400">
@@ -213,14 +172,7 @@ export default function CatalogPage() {
                           </li>
                         ))}
                       </ul>
-                      {/* Price + Actions */}
-                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                        <div>
-                          <span className="text-xs text-slate-400">{t('from')}</span>
-                          <span className="ml-1 text-base font-bold text-blue-600 dark:text-blue-400">
-                            {formatCurrency(product.priceRange.min)}
-                          </span>
-                        </div>
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end">
                         <IntlLink href={`/products/${product.id}`}>
                           <Button variant="outline" size="sm" className="gap-1 text-xs">
                             {t('viewDetails')} <ArrowRight className="h-3 w-3" />
@@ -232,7 +184,6 @@ export default function CatalogPage() {
                 ))}
               </div>
             ) : (
-              /* List View */
               <div className="space-y-3">
                 {filteredProducts.map((product) => (
                   <IntlLink key={product.id} href={`/products/${product.id}`}>
@@ -248,10 +199,6 @@ export default function CatalogPage() {
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{product.shortDescription}</p>
                       </div>
-                      <div className="text-right shrink-0 hidden sm:block">
-                        <span className="text-xs text-slate-400">{t('from')}</span>
-                        <p className="font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.priceRange.min)}</p>
-                      </div>
                       <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-blue-500 shrink-0 transition-colors" />
                     </div>
                   </IntlLink>
@@ -259,7 +206,6 @@ export default function CatalogPage() {
               </div>
             )
           ) : (
-            /* Empty State */
             <div className="text-center py-20">
               <div className="h-16 w-16 mx-auto bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-slate-400" />
