@@ -240,7 +240,8 @@
     "projectsSection": "Projects",
     "viewDetails": "View Details",
     "learnMore": "Learn More",
-    "viewProject": "View Project"
+    "viewProject": "View Project",
+    "resultsCount": "{count, plural, =1 {1 result} other {# results}} for \"{query}\""
   },
   "ProductsPage": {
     "title": "Our Products",
@@ -315,6 +316,7 @@
     "bookConsultation": "Book Consultation"
   },
   "QuotePage": {
+    "address": "Project Address",
     "title": "Request a Quote",
     "description": "Get a detailed quote for your window and door project. Fill out the form below and our team will respond within 24 hours.",
     "step1": "Contact Info",

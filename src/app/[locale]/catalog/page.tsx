@@ -45,11 +45,10 @@ export default function CatalogPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
-              <Badge variant="primary" className="mb-3">Enggia 2025</Badge>
-              <h1 className="text-3xl md:text-4xl font-bold text-white">Product Catalog</h1>
+              <Badge variant="primary" className="mb-3">{t('supplier')}</Badge>
+              <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
               <p className="mt-3 text-slate-300 max-w-xl">
-                Browse our complete supplier catalog featuring premium windows, doors, and fenestration systems.
-                98 pages of products and specifications.
+                {t('description')}
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-2">
@@ -59,7 +58,7 @@ export default function CatalogPage() {
                 onClick={() => setViewMode("grid")}
                 className="gap-2 border-white/20 text-white hover:text-white"
               >
-                <Grid3X3 className="h-4 w-4" /> Grid
+                <Grid3X3 className="h-4 w-4" /> {t('grid')}
               </Button>
               <Button
                 variant={viewMode === "reader" ? "primary" : "outline"}
@@ -67,7 +66,7 @@ export default function CatalogPage() {
                 onClick={() => { setViewMode("reader"); setCurrentPage(0) }}
                 className="gap-2 border-white/20 text-white hover:text-white"
               >
-                <BookOpen className="h-4 w-4" /> Reader
+                <BookOpen className="h-4 w-4" /> {t('reader')}
               </Button>
             </div>
           </div>
@@ -82,7 +81,7 @@ export default function CatalogPage() {
           onClick={() => setViewMode("grid")}
           className="flex-1 gap-2"
         >
-          <Grid3X3 className="h-4 w-4" /> Grid
+          <Grid3X3 className="h-4 w-4" /> {t('grid')}
         </Button>
         <Button
           variant={viewMode === "reader" ? "primary" : "outline"}
@@ -90,7 +89,7 @@ export default function CatalogPage() {
           onClick={() => { setViewMode("reader"); setCurrentPage(0) }}
           className="flex-1 gap-2"
         >
-          <BookOpen className="h-4 w-4" /> Reader
+          <BookOpen className="h-4 w-4" /> {t('reader')}
         </Button>
       </div>
 
@@ -98,7 +97,7 @@ export default function CatalogPage() {
       {viewMode === "grid" && (
         <section className="py-8 dark:bg-[#030712]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <p className="text-sm text-slate-500 mb-6">{catalogPages.length} pages • Click any page to view full size</p>
+            <p className="text-sm text-slate-500 mb-6">{t('pagesInfo', { count: catalogPages.length })}</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {catalogPages.map((item, idx) => (
                 <button
@@ -253,19 +252,19 @@ export default function CatalogPage() {
       {/* CTA */}
       <section className="py-12 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Interested in Something?</h2>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">Contact us to get a quote on any product from our catalog.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('interestedTitle')}</h2>
+          <p className="mt-2 text-slate-600 dark:text-slate-400">{t('interestedDesc')}</p>
           <div className="mt-6 flex gap-3 justify-center flex-wrap">
             <IntlLink href="/quote">
               <Button variant="primary" size="lg" className="gap-2">
-                Get a Quote <ArrowRight className="h-4 w-4" />
+                {t('getQuote')} <ArrowRight className="h-4 w-4" />
               </Button>
             </IntlLink>
             <IntlLink href="/contact">
-              <Button variant="outline" size="lg">Contact Us</Button>
+              <Button variant="outline" size="lg">{t('contactUs')}</Button>
             </IntlLink>
             <IntlLink href="/appointments">
-              <Button variant="outline" size="lg">Book Consultation</Button>
+              <Button variant="outline" size="lg">{t('bookConsultation')}</Button>
             </IntlLink>
           </div>
         </div>

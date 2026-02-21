@@ -1,5 +1,42 @@
 # Active Context
 
+## Latest Session — Feb 20, 2026
+
+### Completed: Full i18n Wiring (All Pages)
+Wired `t()` translation calls across ALL pages and layout components:
+
+**Layout Components:**
+- header.tsx (~20 Navigation keys)
+- footer.tsx (~18 Footer keys)
+- mobile-action-bar.tsx (~5 keys)
+
+**Pages (15 total):**
+- Home page (~64 HomePage keys)
+- About page (~26 AboutPage keys)
+- Appointments page (~34 keys)
+- Catalog page (~14 keys)
+- Contact page (~31 keys)
+- Search page (~13 keys + resultsCount ICU plural)
+- Products listing page (~16 keys)
+- Product detail page (~14 ProductDetail keys)
+- Window types page (~3 keys — rest in Window3DConfigurator component)
+- Projects page (~23 keys, refactored categories array)
+- Quote page (~25+ keys, moved steps array inside component)
+- Services page (~6 keys — page has fewer hardcoded strings)
+
+**Translation Files:**
+- en.json: ~350+ keys across 14 namespaces + Data namespace
+- fr.json: Full French translations matching all en.json keys
+- Added missing keys: QuotePage.address, SearchPage.resultsCount (ICU format)
+
+**Build Status:** ✅ Clean — 41 static pages, 0 errors
+
+### Next Steps
+- Git commit & push all i18n wiring changes
+- Clean up any remaining hardcoded strings (minor secondary text)
+- Consider data-level translations (product names/descriptions via Data namespace)
+
+
 ## Current Status
 **Realistic 3D Render Upgrade COMPLETE** — Deployed on Vercel via GitHub.
 

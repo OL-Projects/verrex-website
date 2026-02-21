@@ -29,11 +29,11 @@ import {
 
 type ViewMode = "grid" | "masonry" | "list"
 
-const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { value: "all", label: "All Projects", icon: SlidersHorizontal },
-  { value: "residential", label: "Residential", icon: Home },
-  { value: "commercial", label: "Commercial", icon: Building2 },
-  { value: "industrial", label: "Industrial", icon: Factory },
+const categories: { value: ProductCategory | "all"; labelKey: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: "all", labelKey: "allProjects", icon: SlidersHorizontal },
+  { value: "residential", labelKey: "residential", icon: Home },
+  { value: "commercial", labelKey: "commercial", icon: Building2 },
+  { value: "industrial", labelKey: "industrial", icon: Factory },
 ]
 
 const categoryColors: Record<string, string> = {
@@ -70,12 +70,12 @@ export default function ProjectsPage() {
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div>
-            <Badge variant="primary" className="mb-4 text-sm px-4 py-1">Our Portfolio</Badge>
+            <Badge variant="primary" className="mb-4 text-sm px-4 py-1">{t("title")}</Badge>
             <h1 className="text-4xl md:text-5xl font-bold text-white">
-              Completed <span className="text-blue-400">Projects</span>
+              {t("completedBold")}<span className="text-blue-400">{t("projects")}</span>
             </h1>
             <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-              Explore our portfolio of completed window and door installations across residential, commercial, and industrial sectors.
+              {t("description")}
             </p>
           </div>
 
@@ -84,10 +84,10 @@ export default function ProjectsPage() {
             className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {[
-              { value: `${projects.length}+`, label: "Projects Completed" },
-              { value: `${projects.filter(p => p.category === "residential").length}`, label: "Residential" },
-              { value: `${projects.filter(p => p.category === "commercial").length}`, label: "Commercial" },
-              { value: `${projects.filter(p => p.category === "industrial").length}`, label: "Industrial" },
+              { value: `${projects.length}+`, label: t("statsCompleted") },
+              { value: `${projects.filter(p => p.category === "residential").length}`, label: t("statsResidential") },
+              { value: `${projects.filter(p => p.category === "commercial").length}`, label: t("statsCommercial") },
+              { value: `${projects.filter(p => p.category === "industrial").length}`, label: t("statsIndustrial") },
             ].map((stat) => (
               <div key={stat.label} className="text-center p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
                 <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
@@ -103,7 +103,7 @@ export default function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-8">
             <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t("featuredProjects")}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -128,7 +128,7 @@ export default function ProjectsPage() {
                     </div>
                     <div className="absolute top-4 right-4">
                       <Badge className="bg-amber-500/90 text-white border-0 text-xs">
-                        <Star className="h-3 w-3 fill-white mr-1" /> Featured
+                        <Star className="h-3 w-3 fill-white mr-1" /> {t("featured")}
                       </Badge>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
@@ -156,7 +156,7 @@ export default function ProjectsPage() {
                       onClick={() => setExpandedProject(expandedProject === project.id ? null : project.id)}
                       className="mt-4 text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 hover:gap-2 transition-all"
                     >
-                      View Details <ArrowRight className="h-3.5 w-3.5" />
+                      {t("viewDetails")} <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </CardContent>
                 </Card>
@@ -172,9 +172,9 @@ export default function ProjectsPage() {
           {/* Filters & View Toggle */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Projects</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t("allProjectsSection")}</h2>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Showing {filteredProjects.length} of {projects.length} projects
+                {t("showing", { filtered: filteredProjects.length, total: projects.length })}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -189,7 +189,7 @@ export default function ProjectsPage() {
                     className="gap-1.5"
                   >
                     <cat.icon className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{cat.label}</span>
+                    <span className="hidden sm:inline">{t(cat.labelKey)}</span>
                   </Button>
                 ))}
               </div>
@@ -350,7 +350,7 @@ export default function ProjectsPage() {
                             </div>
                             {project.isFeatured && (
                               <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 shrink-0">
-                                <Star className="h-3 w-3 fill-current mr-1" /> Featured
+                                <Star className="h-3 w-3 fill-current mr-1" /> {t("featured")}
                               </Badge>
                             )}
                           </div>
@@ -361,7 +361,7 @@ export default function ProjectsPage() {
                                 <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
                               ))}
                             </div>
-                            <span className="text-sm text-slate-500 dark:text-slate-400">Client: {project.client}</span>
+                            <span className="text-sm text-slate-500 dark:text-slate-400">{t("client")}{project.client}</span>
                           </div>
                           {project.testimonial && (
                             <div className="mt-3 p-3 rounded-lg bg-slate-50 dark:bg-[#0a0f1a] border-l-2 border-blue-500">
@@ -383,11 +383,11 @@ export default function ProjectsPage() {
       {/* CTA */}
       <section className="py-16 dark:bg-[#020617]">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Want Your Project Featured Here?</h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Let&apos;s discuss your next window and door project. Get a free consultation today.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t("ctaTitle")}</h2>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t("ctaDesc")}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <IntlLink href="/quote"><Button variant="primary" size="lg">Get Free Quote <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/appointments"><Button variant="outline" size="lg">Book Consultation</Button></IntlLink>
+            <IntlLink href="/quote"><Button variant="primary" size="lg">{t("getFreeQuote")} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
+            <IntlLink href="/appointments"><Button variant="outline" size="lg">{t("bookConsultation")}</Button></IntlLink>
           </div>
         </div>
       </section>

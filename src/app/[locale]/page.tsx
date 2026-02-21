@@ -40,28 +40,28 @@ const iconMap: Record<string, LucideIcon> = {
   MessageSquare, Ruler, Wrench, Search, Sparkles, Settings,
 }
 
-const stats = [
-  { value: "500+", label: "Projects Delivered" },
-  { value: "2M+", label: "Sq Ft Installed" },
-  { value: "98%", label: "On-Time Completion" },
-  { value: "15+", label: "Years in Industry" },
-]
-
-const certifications = [
-  { name: "CSA A440 Certified", icon: BadgeCheck },
-  { name: "NAFS Rated", icon: ShieldCheck },
-  { name: "ENERGY STAR® Canada", icon: Award },
-  { name: "FenestrationCanada", icon: Shield },
-]
-
-const categoryCards = [
-  { title: "Residential & Multi-Family", description: "Energy-efficient window and door systems for homes, condominiums, and multi-unit developments.", icon: Home, href: "/products?category=residential", image: "/images/hero/hero-residential.jpg" },
-  { title: "Commercial & Institutional", description: "Storefront systems, curtain walls, and entry doors for offices, government buildings, and retail.", icon: Landmark, href: "/products?category=commercial", image: "/images/hero/hero-commercial.jpg" },
-  { title: "Industrial & Manufacturing", description: "Heavy-duty fire-rated doors, safety glazing, and high-performance systems for industrial facilities.", icon: Factory, href: "/products?category=industrial", image: "/images/hero/hero-industrial.jpg" },
-]
-
 export default function HomePage() {
   const t = useTranslations('HomePage')
+
+  const stats = [
+    { value: t('stat1Value'), label: t('stat1Label') },
+    { value: t('stat2Value'), label: t('stat2Label') },
+    { value: t('stat3Value'), label: t('stat3Label') },
+    { value: t('stat4Value'), label: t('stat4Label') },
+  ]
+
+  const certifications = [
+    { name: t('cert1'), icon: BadgeCheck },
+    { name: t('cert2'), icon: ShieldCheck },
+    { name: t('cert3'), icon: Award },
+    { name: t('cert4'), icon: Shield },
+  ]
+
+  const categoryCards = [
+    { title: t('categoryResidential'), description: t('categoryResidentialDesc'), icon: Home, href: "/products?category=residential", image: "/images/hero/hero-residential.jpg" },
+    { title: t('categoryCommercial'), description: t('categoryCommercialDesc'), icon: Landmark, href: "/products?category=commercial", image: "/images/hero/hero-commercial.jpg" },
+    { title: t('categoryIndustrial'), description: t('categoryIndustrialDesc'), icon: Factory, href: "/products?category=industrial", image: "/images/hero/hero-industrial.jpg" },
+  ]
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 4)
 
   return (
@@ -86,33 +86,31 @@ export default function HomePage() {
             <div className="max-w-xl">
               <FadeIn>
                 <Badge variant="primary" className="mb-4 text-sm px-4 py-1">
-                  Premium Windows & Doors
+                  {t('badge')}
                 </Badge>
               </FadeIn>
               <FadeIn delay={0.15}>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
-                  Engineered for
+                  {t('heroTitle')}
                   <br />
-                  <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">Every Project</span>
+                  <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">{t('heroTitleGradient')}</span>
                 </h1>
               </FadeIn>
               <FadeIn delay={0.3}>
                 <p className="mt-5 text-base md:text-lg text-slate-300 leading-relaxed">
-                  VERREX delivers high-performance window and door systems for
-                  residential, commercial, institutional, and industrial projects.
-                  Trusted by developers, architects, and facility managers across Canada.
+                  {t('heroDescription')}
                 </p>
               </FadeIn>
               <FadeIn delay={0.45}>
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
                   <IntlLink href="/catalog">
                     <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                      View Product Catalog
+                      {t('viewCatalog')}
                     </Button>
                   </IntlLink>
                   <IntlLink href="/appointments">
                     <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                      <Phone className="h-4 w-4" /> Book Consultation
+                      <Phone className="h-4 w-4" /> {t('bookConsultation')}
                     </Button>
                   </IntlLink>
                 </div>
@@ -133,15 +131,15 @@ export default function HomePage() {
             {/* Right: Quick Quote Form */}
             <FadeIn delay={0.3}>
               <div className="hidden lg:block bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 shadow-2xl hero-quote-form">
-                <h3 className="text-lg font-bold text-white mb-1">Request a Free Quote</h3>
-                <p className="text-xs text-white/60 mb-4">Get a personalized estimate for your project</p>
+                <h3 className="text-lg font-bold text-white mb-1">{t('quoteFormSubtitle')}</h3>
+                <p className="text-xs text-white/60 mb-4">{t('quickQuoteDesc')}</p>
                 <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="Full Name" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
-                    <input type="email" placeholder="Email" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input type="text" placeholder={t('fullName')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input type="email" placeholder={t('email')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="tel" placeholder="Phone Number" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input type="tel" placeholder={t('phone')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                     <input type="text" placeholder="City" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
                   <input type="text" placeholder="Postal Code" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
@@ -161,7 +159,7 @@ export default function HomePage() {
                     <input type="number" placeholder="e.g. 10" min="1" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
                   <Button variant="primary" size="lg" className="w-full hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                    Submit Quote Request <ArrowRight className="h-4 w-4" />
+                    {t('getEstimate')} <ArrowRight className="h-4 w-4" />
                   </Button>
                 </form>
               </div>
@@ -223,7 +221,7 @@ export default function HomePage() {
                         <h3 className="text-2xl font-bold text-white">{cat.title}</h3>
                         <p className="mt-2 text-white/70 text-sm leading-relaxed line-clamp-2">{cat.description}</p>
                         <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-blue-300 group-hover:text-blue-200 transition-colors">
-                          View Products
+                          {t('exploreProducts')}
                           <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
                         </div>
                       </div>
@@ -241,11 +239,11 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Featured Products</h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Our most popular window and door solutions.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('featuredProducts')}</h2>
+              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('featuredProductsDesc')}</p>
             </div>
             <IntlLink href="/products" className="hidden md:flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700 dark:hover:text-blue-300">
-              View All <ArrowRight className="h-4 w-4" />
+              {t('viewAllProducts')} <ArrowRight className="h-4 w-4" />
             </IntlLink>
           </FadeIn>
 
@@ -272,7 +270,7 @@ export default function HomePage() {
                         </h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{product.shortDescription}</p>
                         <div className="mt-3 text-sm font-medium text-blue-600 dark:text-blue-400">
-                          From {formatCurrency(product.priceRange.min)}
+                          {t('from')} {formatCurrency(product.priceRange.min)}
                         </div>
                       </CardContent>
                     </Card>
@@ -288,9 +286,9 @@ export default function HomePage() {
       <RevealSection className="py-20 bg-slate-50 dark:bg-[#020617]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Complete Service Solutions</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('ourServices')}</h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              From initial consultation to final installation, we provide end-to-end service for all your window and door needs.
+              {t('ourServicesDesc')}
             </p>
           </FadeIn>
 
@@ -321,7 +319,7 @@ export default function HomePage() {
           <FadeIn delay={0.3} className="mt-10 text-center">
             <IntlLink href="/services">
               <Button variant="primary" size="lg" className="hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                Learn More About Our Services <ArrowRight className="h-4 w-4" />
+                {t('viewAllServices')} <ArrowRight className="h-4 w-4" />
               </Button>
             </IntlLink>
           </FadeIn>
@@ -396,12 +394,12 @@ export default function HomePage() {
               <div className="mt-10 flex flex-col sm:flex-row gap-3">
                 <IntlLink href="/quote">
                   <Button variant="primary" size="lg" className="w-full sm:w-auto hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                    Get a Free Quote <ArrowRight className="h-4 w-4" />
+                    {t('getFreeQuote')} <ArrowRight className="h-4 w-4" />
                   </Button>
                 </IntlLink>
                 <IntlLink href="/about">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 text-white border-white/25 hover:bg-white/20 hover:text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                    Learn More About Us
+                    {t('learnMore')}
                   </Button>
                 </IntlLink>
               </div>
@@ -414,8 +412,8 @@ export default function HomePage() {
       <RevealSection className="py-20 bg-slate-50 dark:bg-[#020617]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Trusted by Industry Leaders</h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">What property managers, architects, and facility directors across Canada say about working with VERREX.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('whatClientsSay')}</h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('whatClientsSayDesc')}</p>
           </FadeIn>
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -449,11 +447,11 @@ export default function HomePage() {
           <FadeIn className="flex items-end justify-between mb-12">
             <div>
               <Badge variant="primary" className="mb-3 text-xs">Portfolio</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">Recent Projects</h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">See the quality of our work firsthand.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('recentProjects')}</h2>
+              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('recentProjectsDesc')}</p>
             </div>
             <IntlLink href="/projects" className="hidden md:flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700 dark:hover:text-blue-300">
-              View All Projects <ArrowRight className="h-4 w-4" />
+              {t('viewAllProjects')} <ArrowRight className="h-4 w-4" />
             </IntlLink>
           </FadeIn>
 
@@ -497,7 +495,7 @@ export default function HomePage() {
 
           <FadeIn delay={0.3} className="mt-8 text-center md:hidden">
             <IntlLink href="/projects">
-              <Button variant="outline" size="lg">View All Projects <ArrowRight className="h-4 w-4" /></Button>
+              <Button variant="outline" size="lg">{t('viewAllProjects')} <ArrowRight className="h-4 w-4" /></Button>
             </IntlLink>
           </FadeIn>
         </div>
@@ -511,20 +509,20 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-4xl px-4 text-center">
           <FadeIn>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Let&apos;s Discuss Your Next Project
+              {t('ctaTitle')}
             </h2>
             <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
-              Whether you&apos;re planning a multi-unit development, government facility upgrade, or industrial retrofit — our team is ready to deliver.
+              {t('ctaDesc')}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <IntlLink href="/quote">
                 <Button variant="primary" size="xl" className="w-full sm:w-auto hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                  Request a Proposal <ArrowRight className="h-5 w-5" />
+                  {t('getFreeQuote')} <ArrowRight className="h-5 w-5" />
                 </Button>
               </IntlLink>
               <IntlLink href="/appointments">
                 <Button variant="outline" size="xl" className="w-full sm:w-auto !border-white/30 !bg-transparent !text-white hover:!bg-white/10 hover:!text-white hover:scale-[1.03] active:scale-[0.97] transition-transform">
-                  <Phone className="h-5 w-5" /> Schedule Consultation
+                  <Phone className="h-5 w-5" /> {t('contactUs')}
                 </Button>
               </IntlLink>
             </div>

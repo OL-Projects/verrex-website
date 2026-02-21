@@ -6,17 +6,17 @@ import { Phone, FileText, Calendar, Search, Home } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { companyInfo } from "@/lib/data"
 
-const actions = [
-  { icon: Home, label: "Home", href: "/" },
-  { icon: Search, label: "Search", href: "/search" },
-  { icon: FileText, label: "Quote", href: "/quote" },
-  { icon: Calendar, label: "Book", href: "/appointments" },
-  { icon: Phone, label: "Call", href: `tel:${companyInfo?.phone || ""}`, isExternal: true },
-]
-
 export function MobileActionBar() {
   const pathname = usePathname()
   const t = useTranslations('MobileActionBar')
+
+  const actions = [
+    { icon: Home, label: t('home'), href: "/" },
+    { icon: Search, label: t('products'), href: "/search" },
+    { icon: FileText, label: t('quote'), href: "/quote" },
+    { icon: Calendar, label: t('menu'), href: "/appointments" },
+    { icon: Phone, label: t('call'), href: `tel:${companyInfo?.phone || ""}`, isExternal: true },
+  ]
 
   return (
     <div className="mobile-action-bar lg:hidden sticky-bottom-bar">

@@ -240,7 +240,8 @@
     "projectsSection": "Projets",
     "viewDetails": "Voir les détails",
     "learnMore": "En savoir plus",
-    "viewProject": "Voir le projet"
+    "viewProject": "Voir le projet",
+    "resultsCount": "{count, plural, =1 {1 résultat} other {# résultats}} pour \"{query}\""
   },
   "ProductsPage": {
     "title": "Nos produits",
@@ -315,6 +316,7 @@
     "bookConsultation": "Réserver une consultation"
   },
   "QuotePage": {
+    "address": "Adresse du projet",
     "title": "Demander une soumission",
     "description": "Obtenez une soumission détaillée pour votre projet de fenêtres et de portes. Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les 24 heures.",
     "step1": "Coordonnées",

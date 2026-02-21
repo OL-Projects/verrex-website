@@ -11,16 +11,14 @@ import { Label } from "@/components/ui/label"
 import { appointmentTimeSlots } from "@/lib/data"
 import { Calendar, MapPin, Video, Building2, Wrench, Search, CheckCircle2, Clock } from "lucide-react"
 
-const appointmentTypes = [
-  { id: "on-site-measurement", label: "On-Site Measurement", icon: MapPin, desc: "A technician visits your location for precise measurements" },
-  { id: "virtual-consultation", label: "Virtual Consultation", icon: Video, desc: "Video call with our experts from the comfort of your home" },
-  { id: "showroom-visit", label: "Showroom Visit", icon: Building2, desc: "Visit our showroom to see products in person" },
-  { id: "installation", label: "Installation", icon: Wrench, desc: "Schedule your window or glass installation" },
-  { id: "inspection", label: "Site Inspection", icon: Search, desc: "Comprehensive evaluation of existing windows/glass" },
-]
-
 export default function AppointmentsPage() {
   const t = useTranslations('AppointmentsPage')
+
+  const appointmentTypes = [
+    { id: "on-site-measurement", label: t('onSiteMeasurement'), icon: MapPin, desc: t('onSiteMeasurementDesc') },
+    { id: "virtual-consultation", label: t('virtualConsultation'), icon: Video, desc: t('virtualConsultationDesc') },
+    { id: "showroom-visit", label: t('showroomVisit'), icon: Building2, desc: t('showroomVisitDesc') },
+  ]
   const [submitted, setSubmitted] = useState(false)
   const [selectedType, setSelectedType] = useState("")
   const [selectedTime, setSelectedTime] = useState("")
@@ -32,12 +30,12 @@ export default function AppointmentsPage() {
           <div className="h-20 w-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6">
             <CheckCircle2 className="h-10 w-10 text-emerald-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Appointment Booked!</h1>
-          <p className="mt-4 text-slate-600">Your appointment has been scheduled. You&apos;ll receive a confirmation email shortly with all the details.</p>
-          <p className="mt-2 text-sm text-slate-500">We&apos;ll send you a reminder 24 hours before your appointment.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t('successTitle')}</h1>
+          <p className="mt-4 text-slate-600">{t('successDesc')}</p>
+          <p className="mt-2 text-sm text-slate-500"></p>
           <div className="mt-8 flex gap-4 justify-center">
-            <Button variant="primary" onClick={() => { setSubmitted(false); setSelectedType(""); setSelectedTime("") }}>Book Another</Button>
-            <IntlLink href="/"><Button variant="outline">Back to Home</Button></IntlLink>
+            <Button variant="primary" onClick={() => { setSubmitted(false); setSelectedType(""); setSelectedTime("") }}>{t('bookAnother')}</Button>
+            <IntlLink href="/"><Button variant="outline">{t('bookAnother')}</Button></IntlLink>
           </div>
         </div>
       </div>
@@ -48,8 +46,8 @@ export default function AppointmentsPage() {
     <div>
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Book an Appointment</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">Schedule a consultation, measurement, or installation at a time that works for you.</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
         </div>
       </section>
 
@@ -59,8 +57,8 @@ export default function AppointmentsPage() {
             {/* Appointment Type */}
             <Card>
               <CardHeader>
-                <CardTitle>1. Select Appointment Type</CardTitle>
-                <CardDescription>Choose the type of appointment you need.</CardDescription>
+                <CardTitle>1. {t('selectType')}</CardTitle>
+                <CardDescription></CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -79,16 +77,16 @@ export default function AppointmentsPage() {
             {/* Date & Time */}
             <Card>
               <CardHeader>
-                <CardTitle>2. Choose Date & Time</CardTitle>
-                <CardDescription>Select your preferred date and time slot.</CardDescription>
+                <CardTitle>2. {t('selectDateAndTime')}</CardTitle>
+                <CardDescription>{t('availableTimeSlots')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="date">Preferred Date *</Label>
+                  <Label htmlFor="date">{t('selectDateAndTime')} *</Label>
                   <Input id="date" type="date" required min={new Date().toISOString().split("T")[0]} />
                 </div>
                 <div>
-                  <Label>Preferred Time *</Label>
+                  <Label>{t('availableTimeSlots')} *</Label>
                   <div className="mt-2 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                     {appointmentTimeSlots.map((time) => (
                       <button key={time} type="button" onClick={() => setSelectedTime(time)}
@@ -104,24 +102,24 @@ export default function AppointmentsPage() {
             {/* Contact Info */}
             <Card>
               <CardHeader>
-                <CardTitle>3. Your Information</CardTitle>
-                <CardDescription>How can we reach you?</CardDescription>
+                <CardTitle>3. {t('yourInformation')}</CardTitle>
+                <CardDescription></CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><Label htmlFor="name">Full Name *</Label><Input id="name" placeholder="John Smith" required /></div>
-                  <div><Label htmlFor="email">Email *</Label><Input id="email" type="email" placeholder="john@example.com" required /></div>
+                  <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" placeholder={t('fullNamePlaceholder')} required /></div>
+                  <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><Label htmlFor="phone">Phone *</Label><Input id="phone" type="tel" placeholder="(416) 555-0199" required /></div>
+                  <div><Label htmlFor="phone">{t('phone')} *</Label><Input id="phone" type="tel" placeholder={t('phonePlaceholder')} required /></div>
                   <div><Label htmlFor="location">Location / Address</Label><Input id="location" placeholder="123 Main St, Toronto" /></div>
                 </div>
-                <div><Label htmlFor="notes">Additional Notes</Label><Textarea id="notes" placeholder="Any specific details about your appointment..." rows={3} /></div>
+                <div><Label htmlFor="notes">{t('notes')}</Label><Textarea id="notes" placeholder={t('notesPlaceholder')} rows={3} /></div>
               </CardContent>
             </Card>
 
             <Button type="submit" variant="primary" size="xl" className="w-full">
-              <Calendar className="h-5 w-5" /> Confirm Appointment
+              <Calendar className="h-5 w-5" /> {t('bookAppointment')}
             </Button>
           </form>
         </div>

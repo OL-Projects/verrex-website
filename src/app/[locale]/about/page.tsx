@@ -21,8 +21,8 @@ export default async function AboutPage() {
     <div>
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">About VERREX</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">A premier window and door corporation dedicated to transforming spaces with quality, precision, and innovation.</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
         </div>
       </section>
 
@@ -31,15 +31,15 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Our Mission</h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">At VERREX, we believe every space deserves the perfect window. Our mission is to provide premium glass and window solutions that combine beauty, energy efficiency, and security for residential, commercial, and industrial clients.</p>
-              <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">Founded with a commitment to excellence, we have grown into a trusted name in the industry, serving hundreds of satisfied clients across Canada.</p>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('missionTitle')}</h2>
+              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">{t('missionText1')}</p>
+              <p className="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">{t('missionText2')}</p>
               <div className="mt-8 grid grid-cols-2 gap-6">
                 {[
-                  { icon: Shield, label: "Licensed & Insured" },
-                  { icon: Award, label: "Quality Certified" },
-                  { icon: Users, label: "Expert Team" },
-                  { icon: Target, label: "Client Focused" },
+                  { icon: Shield, label: t('licensedInsured') },
+                  { icon: Award, label: t('qualityCertified') },
+                  { icon: Users, label: t('expertTeam') },
+                  { icon: Target, label: t('clientFocused') },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
@@ -66,13 +66,13 @@ export default async function AboutPage() {
       {/* Values */}
       <section className="py-16 bg-slate-50 dark:bg-[#020617]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">Our Core Values</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">{t('coreValues')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: "Quality", desc: "We use only premium materials and partner with top manufacturers to ensure lasting results." },
-              { title: "Integrity", desc: "Transparent pricing, honest communication, and keeping our promises on every project." },
-              { title: "Innovation", desc: "Staying ahead with the latest glass technologies and installation techniques." },
-              { title: "Service", desc: "Going above and beyond to exceed client expectations at every touchpoint." },
+              { title: t('qualityTitle'), desc: t('qualityDesc') },
+              { title: t('integrityTitle'), desc: t('integrityDesc') },
+              { title: t('innovationTitle'), desc: t('innovationDesc') },
+              { title: t('serviceTitle'), desc: t('serviceDesc') },
             ].map((value) => (
               <Card key={value.title} className="text-center">
                 <CardContent className="p-6">
@@ -91,7 +91,7 @@ export default async function AboutPage() {
       {/* Team */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">Our Team</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">{t('ourTeam')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((member) => (
               <Card key={member.name}>
@@ -113,8 +113,8 @@ export default async function AboutPage() {
       <section id="partners" className="py-16 bg-slate-50 dark:bg-[#020617]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Partners & Affiliates</h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">We work with industry-leading manufacturers and partners.</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('partnersTitle')}</h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('partnersDesc')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {partners.map((partner) => (
@@ -140,11 +140,11 @@ export default async function AboutPage() {
       {/* CTA */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Ready to Work With Us?</h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Let&apos;s discuss your project and find the perfect solution.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('ctaTitle')}</h2>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('ctaDesc')}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <IntlLink href="/contact"><Button variant="primary" size="lg">Contact Us <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/quote"><Button variant="outline" size="lg">Get a Quote</Button></IntlLink>
+            <IntlLink href="/contact"><Button variant="primary" size="lg">{t('contactUsBtn')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
+            <IntlLink href="/quote"><Button variant="outline" size="lg">{t('getQuoteBtn')}</Button></IntlLink>
           </div>
         </div>
       </section>

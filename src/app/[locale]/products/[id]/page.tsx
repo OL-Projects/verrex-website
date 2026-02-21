@@ -43,9 +43,9 @@ export default async function ProductDetailPage({
       <div className="bg-slate-50 dark:bg-[#020617] border-b border-slate-200 dark:border-[#1e293b]/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-            <IntlLink href="/" className="hover:text-blue-600 dark:hover:text-blue-400">Home</IntlLink>
+            <IntlLink href="/" className="hover:text-blue-600 dark:hover:text-blue-400">{t("home")}</IntlLink>
             <span>/</span>
-            <IntlLink href="/products" className="hover:text-blue-600 dark:hover:text-blue-400">Products</IntlLink>
+            <IntlLink href="/products" className="hover:text-blue-600 dark:hover:text-blue-400">{t("products")}</IntlLink>
             <span>/</span>
             <span className="text-slate-900 dark:text-white">{product.name}</span>
           </nav>
@@ -63,7 +63,7 @@ export default async function ProductDetailPage({
                   <div className="h-32 w-32 mx-auto bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
                     <span className="text-6xl">🪟</span>
                   </div>
-                  <span className="text-slate-500 dark:text-slate-400">Product Image</span>
+                  <span className="text-slate-500 dark:text-slate-400">{t("productImage")}</span>
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@ export default async function ProductDetailPage({
                 <Badge variant="secondary">{product.category}</Badge>
                 <Badge variant="outline">{product.subcategory}</Badge>
                 {product.isCustomizable && (
-                  <Badge variant="success">Customizable</Badge>
+                  <Badge variant="success">{t("customizable")}</Badge>
                 )}
               </div>
 
@@ -94,7 +94,7 @@ export default async function ProductDetailPage({
 
               {/* Features */}
               <div>
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Key Features</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{t("keyFeatures")}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {product.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -109,7 +109,7 @@ export default async function ProductDetailPage({
 
               {/* Specifications */}
               <div>
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Specifications</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{t("specifications")}</h3>
                 <div className="space-y-2">
                   {Object.entries(product.specifications).map(([key, value]) => (
                     <div key={key} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 text-sm">
@@ -125,13 +125,13 @@ export default async function ProductDetailPage({
                 <IntlLink href={`/quote?product=${product.id}`} className="flex-1">
                   <Button variant="primary" size="lg" className="w-full">
                     <FileText className="h-4 w-4" />
-                    Request Quote
+                    {t("requestQuote")}
                   </Button>
                 </IntlLink>
                 <IntlLink href="/appointments" className="flex-1">
                   <Button variant="outline" size="lg" className="w-full">
                     <Calendar className="h-4 w-4" />
-                    Book Consultation
+                    {t("bookConsultation")}
                   </Button>
                 </IntlLink>
               </div>
@@ -139,7 +139,7 @@ export default async function ProductDetailPage({
               <div className="mt-4 text-center">
                 <a href="tel:(416) 555-0199" className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400">
                   <Phone className="h-4 w-4" />
-                  Or call us at (416) 555-0199
+                  {t("callUs")}
                 </a>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default async function ProductDetailPage({
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="mt-20">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Related Products</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{t("relatedProducts")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {relatedProducts.map((rp) => (
                   <IntlLink key={rp.id} href={`/products/${rp.id}`}>
@@ -161,7 +161,7 @@ export default async function ProductDetailPage({
                         <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">{rp.name}</h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{rp.shortDescription}</p>
                         <div className="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-                          From {formatCurrency(rp.priceRange.min)}
+                          {t("from")} {formatCurrency(rp.priceRange.min)}
                         </div>
                       </CardContent>
                     </Card>

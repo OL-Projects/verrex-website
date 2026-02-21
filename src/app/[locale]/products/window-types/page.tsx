@@ -225,9 +225,9 @@ export default function WindowTypesPage() {
           <IntlLink href="/products" className="inline-flex items-center gap-2 text-blue-300 hover:text-blue-200 mb-4 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back to Products
           </IntlLink>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Types of Windows</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            Explore every window style available. Click on any type to see a real-time 3D preview with customizable dimensions.
+            {t('description')}
           </p>
         </div>
       </section>
@@ -418,7 +418,7 @@ export default function WindowTypesPage() {
                 <div className="flex gap-3 pt-2">
                   <IntlLink href="/quote" className="flex-1">
                     <Button variant="primary" size="lg" className="w-full gap-2">
-                      Get a Quote <ArrowRight className="h-4 w-4" />
+                      {t('getQuote')} <ArrowRight className="h-4 w-4" />
                     </Button>
                   </IntlLink>
                   <IntlLink href="/appointments">

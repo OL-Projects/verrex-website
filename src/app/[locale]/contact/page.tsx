@@ -23,9 +23,9 @@ export default function ContactPage() {
           <div className="h-20 w-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6">
             <CheckCircle2 className="h-10 w-10 text-emerald-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Message Sent!</h1>
-          <p className="mt-4 text-slate-600">Thank you for reaching out. Our team will get back to you within 24 hours.</p>
-          <Button variant="primary" className="mt-8" onClick={() => setSubmitted(false)}>Send Another Message</Button>
+          <h1 className="text-3xl font-bold text-slate-900">{t('successTitle')}</h1>
+          <p className="mt-4 text-slate-600">{t('successDesc')}</p>
+          <Button variant="primary" className="mt-8" onClick={() => setSubmitted(false)}>{t('sendAnother')}</Button>
         </div>
       </div>
     )
@@ -35,8 +35,8 @@ export default function ContactPage() {
     <div>
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Contact Us</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">Have questions? We&apos;d love to hear from you. Reach out through any of the methods below.</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
         </div>
       </section>
 
@@ -45,7 +45,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Contact Info */}
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-slate-900">Get in Touch</h2>
+              <h2 className="text-2xl font-bold text-slate-900">{t('getInTouch')}</h2>
               <p className="text-slate-600">Reach us by phone, email, or visit our office. We&apos;re here to help with all your window and door needs.</p>
 
               <div className="space-y-4">
@@ -70,12 +70,12 @@ export default function ContactPage() {
                 <CardContent className="p-5">
                   <div className="flex items-center gap-3 mb-3">
                     <Clock className="h-5 w-5 text-blue-600" />
-                    <h3 className="font-semibold text-slate-900">Business Hours</h3>
+                    <h3 className="font-semibold text-slate-900">{t('businessHours')}</h3>
                   </div>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between"><span className="text-slate-500">Monday - Friday</span><span className="font-medium">{companyInfo.hours.weekdays}</span></div>
-                    <div className="flex justify-between"><span className="text-slate-500">Saturday</span><span className="font-medium">{companyInfo.hours.saturday}</span></div>
-                    <div className="flex justify-between"><span className="text-slate-500">Sunday</span><span className="font-medium">{companyInfo.hours.sunday}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">{t('monFri').split(':')[0]}</span><span className="font-medium">{companyInfo.hours.weekdays}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">{t('saturday').split(':')[0]}</span><span className="font-medium">{companyInfo.hours.saturday}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">{t('sunday').split(':')[0]}</span><span className="font-medium">{companyInfo.hours.sunday}</span></div>
                   </div>
                 </CardContent>
               </Card>
@@ -102,16 +102,16 @@ export default function ContactPage() {
             <div className="lg:col-span-2">
               <Card>
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-6">Send Us a Message</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('sendMessage')}</h2>
                   <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="name">Full Name *</Label><Input id="name" placeholder="John Smith" required /></div>
-                      <div><Label htmlFor="email">Email *</Label><Input id="email" type="email" placeholder="john@example.com" required /></div>
+                      <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" placeholder={t('fullNamePlaceholder')} required /></div>
+                      <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="phone">Phone</Label><Input id="phone" type="tel" placeholder="(416) 555-0199" /></div>
+                      <div><Label htmlFor="phone">{t('phone')}</Label><Input id="phone" type="tel" placeholder={t('phonePlaceholder')} /></div>
                       <div>
-                        <Label htmlFor="subject">Subject *</Label>
+                        <Label htmlFor="subject">{t('subject')} *</Label>
                         <select id="subject" required className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                           <option value="">Select a subject</option>
                           <option value="general">General Inquiry</option>
@@ -123,8 +123,8 @@ export default function ContactPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea id="message" placeholder="How can we help you?" rows={5} required />
+                      <Label htmlFor="message">{t('message')} *</Label>
+                      <Textarea id="message" placeholder={t('messagePlaceholder')} rows={5} required />
                     </div>
                     <div>
                       <Label>Attachments</Label>
@@ -143,7 +143,7 @@ export default function ContactPage() {
                       </div>
                     </div>
                     <Button type="submit" variant="primary" size="lg" className="w-full">
-                      <Send className="h-4 w-4" /> Send Message
+                      <Send className="h-4 w-4" /> {t('submitBtn')}
                     </Button>
                   </form>
                 </CardContent>

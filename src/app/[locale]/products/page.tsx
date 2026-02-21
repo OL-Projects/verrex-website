@@ -20,15 +20,15 @@ import {
   X,
 } from "lucide-react"
 
-const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { value: "all", label: "All Products", icon: SlidersHorizontal },
-  { value: "residential", label: "Residential", icon: Home },
-  { value: "commercial", label: "Commercial", icon: Building2 },
-  { value: "industrial", label: "Industrial", icon: Factory },
-]
-
 export default function ProductsPage() {
   const t = useTranslations('ProductsPage')
+
+  const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { value: "all", label: t('allProducts'), icon: SlidersHorizontal },
+    { value: "residential", label: t('residential'), icon: Home },
+    { value: "commercial", label: t('commercial'), icon: Building2 },
+    { value: "industrial", label: t('industrial'), icon: Factory },
+  ]
   const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all")
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -51,10 +51,10 @@ export default function ProductsPage() {
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white">
-            Our Products
+            {t('title')}
           </h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            Browse our comprehensive catalog of premium windows, doors, and door systems for residential, commercial, and industrial projects.
+            {t('description')}
           </p>
         </div>
       </section>
@@ -67,7 +67,7 @@ export default function ProductsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
-                placeholder="Search products..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -99,7 +99,7 @@ export default function ProductsPage() {
 
           {/* Results count */}
           <div className="mb-6 text-sm text-slate-500 dark:text-slate-400">
-            Showing {filteredProducts.length} of {products.length} products
+            {t('showing', { filtered: filteredProducts.length, total: products.length })}
           </div>
 
           {/* Products Grid */}
@@ -111,14 +111,14 @@ export default function ProductsPage() {
                     <div className="aspect-[4/3] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-t-xl flex items-center justify-center relative overflow-hidden">
                       {product.isFeatured && (
                         <Badge variant="primary" className="absolute top-3 right-3 text-xs">
-                          Featured
+                          {t('featured')}
                         </Badge>
                       )}
                       <div className="text-center p-4">
                         <div className="h-16 w-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
                           <span className="text-2xl">🪟</span>
                         </div>
-                        <span className="text-xs text-slate-500">Product Image</span>
+                        <span className="text-xs text-slate-500">{t('productImage')}</span>
                       </div>
                     </div>
                     <CardContent className="p-5">
@@ -142,12 +142,12 @@ export default function ProductsPage() {
                         </span>
                         {product.isCustomizable && (
                           <Badge variant="success" className="text-[10px]">
-                            Customizable
+                          {t('customizable')}
                           </Badge>
                         )}
                       </div>
                       <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 font-medium">
-                        View Details <ArrowRight className="h-3 w-3" />
+                        {t('viewDetails')} <ArrowRight className="h-3 w-3" />
                       </div>
                     </CardContent>
                   </Card>
@@ -159,10 +159,10 @@ export default function ProductsPage() {
               <div className="h-16 w-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-slate-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">No products found</h3>
-              <p className="mt-2 text-slate-500">Try adjusting your search or filter criteria.</p>
+              <h3 className="text-lg font-semibold text-slate-900">{t('noProducts')}</h3>
+              <p className="mt-2 text-slate-500">{t('noProductsDesc')}</p>
               <Button variant="outline" className="mt-4" onClick={() => { setSearchQuery(""); setActiveCategory("all") }}>
-                Clear Filters
+                {t('clearFilters')}
               </Button>
             </div>
           )}

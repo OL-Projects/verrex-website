@@ -11,10 +11,9 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, FileText, Upload, ArrowRight, ArrowLeft, Phone } from "lucide-react"
 
-const steps = ["Contact Info", "Project Details", "Additional Info", "Review"]
-
 export default function QuotePage() {
   const t = useTranslations('QuotePage')
+  const steps = [t("step1"), t("step2"), t("step3"), t("step4")]
   const [currentStep, setCurrentStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -39,18 +38,18 @@ export default function QuotePage() {
           <div className="h-20 w-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6">
             <CheckCircle2 className="h-10 w-10 text-emerald-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Quote Request Submitted!</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{t("successTitle")}</h1>
           <p className="mt-4 text-slate-600">
-            Thank you for your interest! Our team will review your request and get back to you within 24 hours with a detailed estimate.
+            {t("successDesc")}
           </p>
           <p className="mt-2 text-sm text-slate-500">
             Quote Reference: VRX-2026-PENDING
           </p>
           <div className="mt-8 flex gap-4 justify-center">
             <Button variant="primary" onClick={() => { setSubmitted(false); setCurrentStep(0); setFormData({ name: "", email: "", phone: "", address: "", projectType: "", serviceType: "", description: "", preferredDate: "", preferredTime: "", budget: "" }) }}>
-              Submit Another Quote
+              {t("submitAnother")}
             </Button>
-            <IntlLink href="/"><Button variant="outline">Back to Home</Button></IntlLink>
+            <IntlLink href="/"><Button variant="outline">{t("backToHome")}</Button></IntlLink>
           </div>
         </div>
       </div>
@@ -61,9 +60,9 @@ export default function QuotePage() {
     <div>
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Request a Free Quote</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t("title")}</h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            Fill out the form below and our team will provide you with a detailed estimate for your project within 24 hours.
+            {t("description")}
           </p>
         </div>
       </section>
@@ -94,10 +93,10 @@ export default function QuotePage() {
               <CardHeader>
                 <CardTitle>{steps[currentStep]}</CardTitle>
                 <CardDescription>
-                  {currentStep === 0 && "Please provide your contact information."}
-                  {currentStep === 1 && "Tell us about your project."}
-                  {currentStep === 2 && "Any additional details that would help us."}
-                  {currentStep === 3 && "Review your information before submitting."}
+                  {currentStep === 0 && t("contactInfo")}
+                  {currentStep === 1 && t("projectDetails")}
+                  {currentStep === 2 && t("additionalInfo")}
+                  {currentStep === 3 && t("reviewTitle")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -105,12 +104,12 @@ export default function QuotePage() {
                 {currentStep === 0 && (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="name">Full Name *</Label><Input id="name" value={formData.name} onChange={(e) => updateField("name", e.target.value)} placeholder="John Smith" required /></div>
-                      <div><Label htmlFor="email">Email *</Label><Input id="email" type="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)} placeholder="john@example.com" required /></div>
+                      <div><Label htmlFor="name">{t("firstName")} *</Label><Input id="name" value={formData.name} onChange={(e) => updateField("name", e.target.value)} placeholder="John Smith" required /></div>
+                      <div><Label htmlFor="email">{t("email")} *</Label><Input id="email" type="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)} placeholder="john@example.com" required /></div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="phone">Phone *</Label><Input id="phone" type="tel" value={formData.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="(416) 555-0199" required /></div>
-                      <div><Label htmlFor="address">Project Address</Label><Input id="address" value={formData.address} onChange={(e) => updateField("address", e.target.value)} placeholder="123 Main St, Toronto" /></div>
+                      <div><Label htmlFor="phone">{t("phone")} *</Label><Input id="phone" type="tel" value={formData.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="(416) 555-0199" required /></div>
+                      <div><Label htmlFor="address">{t("address")}</Label><Input id="address" value={formData.address} onChange={(e) => updateField("address", e.target.value)} placeholder="123 Main St, Toronto" /></div>
                     </div>
                   </>
                 )}
@@ -119,7 +118,7 @@ export default function QuotePage() {
                 {currentStep === 1 && (
                   <>
                     <div>
-                      <Label>Project Type *</Label>
+                      <Label>{t("projectType")} *</Label>
                       <div className="mt-2 grid grid-cols-3 gap-3">
                         {["residential", "commercial", "industrial"].map((type) => (
                           <button key={type} type="button" onClick={() => updateField("projectType", type)}
@@ -130,7 +129,7 @@ export default function QuotePage() {
                       </div>
                     </div>
                     <div>
-                      <Label>Service Needed *</Label>
+                      <Label>{t("projectScope")} *</Label>
                       <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {["installation", "measurement", "inspection", "consultation", "repair", "custom"].map((type) => (
                           <button key={type} type="button" onClick={() => updateField("serviceType", type)}
@@ -140,7 +139,7 @@ export default function QuotePage() {
                         ))}
                       </div>
                     </div>
-                    <div><Label htmlFor="description">Project Description *</Label><Textarea id="description" value={formData.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Describe your project, including the number of windows/doors, sizes if known, and any special requirements..." rows={4} required /></div>
+                    <div><Label htmlFor="description">{t("additionalDetails")} *</Label><Textarea id="description" value={formData.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Describe your project, including the number of windows/doors, sizes if known, and any special requirements..." rows={4} required /></div>
                   </>
                 )}
 
@@ -160,7 +159,7 @@ export default function QuotePage() {
                       </div>
                     </div>
                     <div>
-                      <Label>Budget Range</Label>
+                      <Label>{t("budget")}</Label>
                       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {["Under $1,000", "$1,000-$5,000", "$5,000-$15,000", "$15,000+"].map((budget) => (
                           <button key={budget} type="button" onClick={() => updateField("budget", budget)}
@@ -201,15 +200,15 @@ export default function QuotePage() {
                 {/* Navigation */}
                 <div className="flex justify-between pt-4">
                   <Button type="button" variant="outline" onClick={() => setCurrentStep(Math.max(0, currentStep - 1))} disabled={currentStep === 0}>
-                    <ArrowLeft className="h-4 w-4" /> Previous
+                    <ArrowLeft className="h-4 w-4" /> {t("back")}
                   </Button>
                   {currentStep < steps.length - 1 ? (
                     <Button type="button" variant="primary" onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}>
-                      Next <ArrowRight className="h-4 w-4" />
+                      {t("next")} <ArrowRight className="h-4 w-4" />
                     </Button>
                   ) : (
                     <Button type="submit" variant="primary">
-                      <FileText className="h-4 w-4" /> Submit Quote Request
+                      <FileText className="h-4 w-4" /> {t("submitRequest")}
                     </Button>
                   )}
                 </div>

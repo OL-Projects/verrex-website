@@ -14,29 +14,29 @@ import {
   Twitter,
 } from "lucide-react"
 
-const footerLinks = {
-  products: [
-    { name: "Residential Windows", href: "/products?category=residential" },
-    { name: "Commercial Glass", href: "/products?category=commercial" },
-    { name: "Industrial Solutions", href: "/products?category=industrial" },
-    { name: "All Products", href: "/products" },
-  ],
-  services: [
-    { name: "Free Consultation", href: "/services" },
-    { name: "On-Site Measurement", href: "/services" },
-    { name: "Professional Installation", href: "/services" },
-    { name: "Repair & Maintenance", href: "/services" },
-  ],
-  company: [
-    { name: "About Us", href: "/about" },
-    { name: "Contact", href: "/contact" },
-    { name: "Partners", href: "/about#partners" },
-    { name: "Careers", href: "/contact" },
-  ],
-}
-
 export function Footer() {
   const t = useTranslations('Footer')
+
+  const footerLinks = {
+    products: [
+      { name: t('residentialWindows'), href: "/products?category=residential" },
+      { name: t('commercialGlass'), href: "/products?category=commercial" },
+      { name: t('industrialSolutions'), href: "/products?category=industrial" },
+      { name: t('allProducts'), href: "/products" },
+    ],
+    services: [
+      { name: t('freeConsultation'), href: "/services" },
+      { name: t('onSiteMeasurement'), href: "/services" },
+      { name: t('professionalInstallation'), href: "/services" },
+      { name: t('repairMaintenance'), href: "/services" },
+    ],
+    company: [
+      { name: t('aboutUs'), href: "/about" },
+      { name: t('contactLink'), href: "/contact" },
+      { name: t('partners'), href: "/about#partners" },
+      { name: t('careers'), href: "/contact" },
+    ],
+  }
   return (
     <footer className="bg-slate-900 dark:bg-[#000000] text-white">
       {/* Main Footer */}
@@ -53,12 +53,12 @@ export function Footer() {
                   VERREX
                 </span>
                 <span className="block text-[10px] text-slate-400 -mt-1 tracking-widest uppercase">
-                  Windows & Doors
+                  {t('premiumWindows')}
                 </span>
               </div>
             </IntlLink>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-md">
-              {companyInfo.description}
+              {t('description')}
             </p>
 
             {/* Contact Info */}
@@ -83,7 +83,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-300">
                 <Clock className="h-4 w-4 text-blue-400" />
-                Mon-Fri: {companyInfo.hours.weekdays}
+                {t('products') === 'Produits' ? 'Lun-Ven: ' : 'Mon-Fri: '}{companyInfo.hours.weekdays}
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function Footer() {
             {/* Products Links */}
             <div>
               <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">
-                Products
+                {t('products')}
               </h3>
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.products.map((link) => (
@@ -112,7 +112,7 @@ export function Footer() {
             {/* Services Links */}
             <div>
               <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">
-                Services
+                {t('services')}
               </h3>
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.services.map((link) => (
@@ -131,7 +131,7 @@ export function Footer() {
             {/* Company Links */}
             <div>
               <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">
-                Company
+                {t('company')}
               </h3>
               <ul className="space-y-1.5 sm:space-y-2.5">
                 {footerLinks.company.map((link) => (
@@ -155,7 +155,7 @@ export function Footer() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-400">
-              © {new Date().getFullYear()} VERREX. All rights reserved.
+              © {new Date().getFullYear()} VERREX. {t('allRightsReserved')}
             </p>
             <div className="flex items-center gap-4">
               <a

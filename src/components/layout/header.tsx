@@ -25,30 +25,30 @@ import {
   Layers,
 } from "lucide-react"
 
-const navigation = [
-  { name: "Home", href: "/" },
-  {
-    name: "Products",
-    href: "/products",
-    children: [
-      { name: "Residential", href: "/products?category=residential", icon: Home },
-      { name: "Commercial", href: "/products?category=commercial", icon: Building2 },
-      { name: "Industrial", href: "/products?category=industrial", icon: Factory },
-      { name: "Window Types", href: "/products/window-types", icon: Layers },
-    ],
-  },
-  { name: "Catalog", href: "/catalog" },
-  { name: "Projects", href: "/projects" },
-  { name: "Services", href: "/services" },
-  { name: "About", href: "/about" },
-  { name: "Contact", href: "/contact" },
-]
-
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const router = useRouter()
   const t = useTranslations('Navigation')
+
+  const navigation = [
+    { name: t('home'), href: "/" },
+    {
+      name: t('products'),
+      href: "/products",
+      children: [
+        { name: t('residential'), href: "/products?category=residential", icon: Home },
+        { name: t('commercial'), href: "/products?category=commercial", icon: Building2 },
+        { name: t('industrial'), href: "/products?category=industrial", icon: Factory },
+        { name: t('windowTypes'), href: "/products/window-types", icon: Layers },
+      ],
+    },
+    { name: t('catalog'), href: "/catalog" },
+    { name: t('projects'), href: "/projects" },
+    { name: t('services'), href: "/services" },
+    { name: t('about'), href: "/about" },
+    { name: t('contact'), href: "/contact" },
+  ]
 
   // Keyboard shortcut: Ctrl/Cmd + K to open search
   useEffect(() => {
@@ -86,7 +86,7 @@ export function Header() {
             </div>
             <div className="flex items-center gap-4">
               <span className="hidden md:inline text-slate-300/80">
-                Mon-Fri: {companyInfo.hours.weekdays}
+                {t('monFri')}{companyInfo.hours.weekdays}
               </span>
             </div>
           </div>
@@ -111,7 +111,7 @@ export function Header() {
                   VERREX
                 </span>
                 <span className="hidden sm:block text-[8px] text-slate-600 dark:text-slate-300 tracking-[0.18em] uppercase leading-tight mt-0.5 font-medium whitespace-nowrap">
-                  Windows & Doors
+                  {t('windowsAndDoors')}
                 </span>
               </div>
             </IntlLink>
@@ -178,7 +178,7 @@ export function Header() {
               >
                 <Search className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
                 <span className="text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
-                  Search...
+                  {t('searchPlaceholder')}
                 </span>
                 <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/50 dark:bg-white/10 border border-white/30 dark:border-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400">
                   <Command className="h-2.5 w-2.5" />K
@@ -205,12 +205,12 @@ export function Header() {
               <div className="hidden lg:flex items-center gap-2 ml-2">
                 <IntlLink href="/quote">
                   <Button variant="outline" size="sm">
-                    Get a Quote
+                    {t('getQuote')}
                   </Button>
                 </IntlLink>
                 <IntlLink href="/appointments">
                   <Button variant="primary" size="sm">
-                    Book Appointment
+                    {t('bookAppointment')}
                   </Button>
                 </IntlLink>
               </div>
@@ -247,7 +247,7 @@ export function Header() {
                 <IntlLink href="/search" onClick={() => setMobileMenuOpen(false)}>
                   <div className="flex items-center gap-3 px-4 py-3 mb-3 rounded-lg bg-white/40 dark:bg-white/5 border border-white/30 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/10 hover:border-blue-400/30 transition-all duration-200">
                     <Search className="h-5 w-5 text-blue-500" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Search products, services, team...</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{t('searchFullPlaceholder')}</span>
                   </div>
                 </IntlLink>
 
@@ -280,7 +280,7 @@ export function Header() {
                 <div className="pt-4 space-y-2 border-t border-white/20 dark:border-white/10 mt-4">
                   <IntlLink href="/quote" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full">
-                      Get a Quote
+                      {t('getQuote')}
                     </Button>
                   </IntlLink>
                   <IntlLink
@@ -288,7 +288,7 @@ export function Header() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Button variant="primary" className="w-full">
-                      Book Appointment
+                      {t('bookAppointment')}
                     </Button>
                   </IntlLink>
                 </div>

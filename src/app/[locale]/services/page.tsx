@@ -27,9 +27,9 @@ export default async function ServicesPage() {
     <div>
       <section className="bg-slate-900 dark:bg-[#000000] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Our Services</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            From initial consultation to final installation, we provide comprehensive window and door solutions tailored to your needs.
+            {t('description')}
           </p>
         </div>
       </section>
@@ -90,11 +90,11 @@ export default async function ServicesPage() {
       {/* CTA */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Ready to Get Started?</h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Book a free consultation or request a quote today.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('ctaTitle')}</h2>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('ctaDesc')}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <IntlLink href="/quote"><Button variant="primary" size="lg">Request a Quote <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/appointments"><Button variant="outline" size="lg">Book Consultation</Button></IntlLink>
+            <IntlLink href="/quote"><Button variant="primary" size="lg">{t('getFreeQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
+            <IntlLink href="/appointments"><Button variant="outline" size="lg">{t('bookConsultation')}</Button></IntlLink>
           </div>
         </div>
       </section>

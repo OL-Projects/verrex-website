@@ -188,7 +188,7 @@ export default function SearchPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Search VERREX</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{t('title')}</h1>
               <p className="text-slate-400">Find products, services, team members, and more.</p>
             </div>
           </FadeIn>
@@ -201,7 +201,7 @@ export default function SearchPage() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products, services, team, pages..."
+                placeholder={t('placeholder')}
                 className="w-full h-14 pl-12 pr-12 rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all"
               />
               {query && (
@@ -284,7 +284,7 @@ export default function SearchPage() {
 
               {/* Results count */}
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                {filteredResults.length} result{filteredResults.length !== 1 ? "s" : ""} for &quot;{query}&quot;
+                {t('resultsCount', { count: filteredResults.length, query })}
               </p>
 
               {/* Results list */}
@@ -340,16 +340,16 @@ export default function SearchPage() {
                     <div className="h-16 w-16 mx-auto bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
                       <Search className="h-8 w-8 text-slate-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">No results found</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('noResults')}</h3>
                     <p className="mt-2 text-slate-500 dark:text-slate-400">
-                      Try different keywords or browse our popular searches above.
+                      {t('noResultsDesc')}
                     </p>
                     <div className="mt-6 flex gap-3 justify-center">
                       <IntlLink href="/products">
-                        <Button variant="outline" size="sm">Browse Products</Button>
+                        <Button variant="outline" size="sm">{t('browseProducts')}</Button>
                       </IntlLink>
                       <IntlLink href="/services">
-                        <Button variant="outline" size="sm">View Services</Button>
+                        <Button variant="outline" size="sm">{t('browseServices')}</Button>
                       </IntlLink>
                     </div>
                   </div>
