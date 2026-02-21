@@ -6,6 +6,8 @@
     "commercial": "Commercial",
     "industrial": "Industrial",
     "windowTypes": "Window Types",
+    "windows": "Windows",
+    "doors": "Doors",
     "catalog": "Catalog",
     "projects": "Projects",
     "services": "Services",

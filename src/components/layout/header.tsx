@@ -17,12 +17,10 @@ import {
   Menu,
   X,
   ChevronDown,
-  Building2,
-  Home,
-  Factory,
   Search,
   Command,
-  Layers,
+  DoorOpen,
+  AppWindow,
 } from "lucide-react"
 
 export function Header() {
@@ -37,10 +35,8 @@ export function Header() {
       name: t('products'),
       href: "/products",
       children: [
-        { name: t('residential'), href: "/products?category=residential", icon: Home },
-        { name: t('commercial'), href: "/products?category=commercial", icon: Building2 },
-        { name: t('industrial'), href: "/products?category=industrial", icon: Factory },
-        { name: t('windowTypes'), href: "/products/window-types", icon: Layers },
+        { name: t('windows'), href: "/products/window-types", icon: AppWindow },
+        { name: t('doors'), href: "/products?category=doors", icon: DoorOpen },
       ],
     },
     { name: t('catalog'), href: "/catalog" },
