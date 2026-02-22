@@ -28,19 +28,24 @@ export default async function ServicesPage() {
   const t = await getTranslations('ServicesPage')
   return (
     <div>
-      {/* Hero with Custom Blueprint Background */}
-      <section className="relative bg-slate-900 dark:bg-[#000000] py-20 overflow-hidden">
-        <div className="absolute inset-0">
+      {/* Hero with Custom Blueprint Background — Light/Dark */}
+      <section className="relative bg-slate-50 dark:bg-[#000000] py-20 overflow-hidden">
+        {/* Light mode SVG */}
+        <div className="absolute inset-0 dark:hidden">
+          <Image src="/images/hero/hero-services-light.svg" alt="" fill className="object-cover" sizes="100vw" priority />
+        </div>
+        {/* Dark mode SVG */}
+        <div className="absolute inset-0 hidden dark:block">
           <Image src="/images/hero/hero-services.svg" alt="" fill className="object-cover" sizes="100vw" priority />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent dark:from-black/80 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-transparent to-transparent dark:from-black/80 z-10" />
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Badge variant="primary" className="mb-3">VERREX Services</Badge>
-          <h1 className="text-3xl md:text-5xl font-bold text-white">{t('title')}</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-6 flex gap-3 flex-wrap">
             <IntlLink href="/quote"><Button variant="primary" size="lg" className="gap-2">{t('getFreeQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="text-white border-white/30 hover:bg-white/10">{t('bookConsultation')}</Button></IntlLink>
+            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="text-slate-700 border-slate-300 hover:bg-slate-100 dark:text-white dark:border-white/30 dark:hover:bg-white/10">{t('bookConsultation')}</Button></IntlLink>
           </div>
         </div>
       </section>
