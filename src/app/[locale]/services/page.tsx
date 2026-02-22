@@ -28,12 +28,12 @@ export default async function ServicesPage() {
   const t = await getTranslations('ServicesPage')
   return (
     <div>
-      {/* Hero with Background Image */}
+      {/* Hero with Custom Blueprint Background */}
       <section className="relative bg-slate-900 dark:bg-[#000000] py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/70 dark:from-black/95 dark:to-black/70 z-10" />
         <div className="absolute inset-0">
-          <Image src="/images/hero/hero-commercial.jpg" alt="" fill className="object-cover opacity-40" sizes="100vw" priority />
+          <Image src="/images/hero/hero-services.svg" alt="" fill className="object-cover" sizes="100vw" priority />
         </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent dark:from-black/80 z-10" />
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Badge variant="primary" className="mb-3">VERREX Services</Badge>
           <h1 className="text-3xl md:text-5xl font-bold text-white">{t('title')}</h1>

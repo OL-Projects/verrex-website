@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" fill="none">
+  <rect width="1920" height="600" fill="#0f172a"/>
+  <!-- Gradient overlay -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1920" y2="600" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.5" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="600" fill="url(#bg)"/>
+
+  <!-- Blueprint grid -->
+  <g stroke="#334155" stroke-width="0.5" opacity="0.3">
+    <line x1="0" y1="100" x2="1920" y2="100"/>
+    <line x1="0" y1="200" x2="1920" y2="200"/>
+    <line x1="0" y1="300" x2="1920" y2="300"/>
+    <line x1="0" y1="400" x2="1920" y2="400"/>
+    <line x1="0" y1="500" x2="1920" y2="500"/>
+    <line x1="320" y1="0" x2="320" y2="600"/>
+    <line x1="640" y1="0" x2="640" y2="600"/>
+    <line x1="960" y1="0" x2="960" y2="600"/>
+    <line x1="1280" y1="0" x2="1280" y2="600"/>
+    <line x1="1600" y1="0" x2="1600" y2="600"/>
+  </g>
+
+  <!-- Fine grid -->
+  <g stroke="#334155" stroke-width="0.25" opacity="0.15">
+    <line x1="0" y1="50" x2="1920" y2="50"/>
+    <line x1="0" y1="150" x2="1920" y2="150"/>
+    <line x1="0" y1="250" x2="1920" y2="250"/>
+    <line x1="0" y1="350" x2="1920" y2="350"/>
+    <line x1="0" y1="450" x2="1920" y2="450"/>
+    <line x1="0" y1="550" x2="1920" y2="550"/>
+    <line x1="160" y1="0" x2="160" y2="600"/>
+    <line x1="480" y1="0" x2="480" y2="600"/>
+    <line x1="800" y1="0" x2="800" y2="600"/>
+    <line x1="1120" y1="0" x2="1120" y2="600"/>
+    <line x1="1440" y1="0" x2="1440" y2="600"/>
+    <line x1="1760" y1="0" x2="1760" y2="600"/>
+  </g>
+
+  <!-- Window frame 1 (right side) -->
+  <g transform="translate(1350, 80)" stroke="#3b82f6" stroke-width="1.5" opacity="0.2">
+    <rect x="0" y="0" width="200" height="300" rx="3"/>
+    <line x1="100" y1="0" x2="100" y2="300"/>
+    <line x1="0" y1="150" x2="200" y2="150"/>
+    <rect x="6" y="6" width="88" height="138" rx="2"/>
+    <rect x="106" y="6" width="88" height="138" rx="2"/>
+    <rect x="6" y="156" width="88" height="138" rx="2"/>
+    <rect x="106" y="156" width="88" height="138" rx="2"/>
+  </g>
+
+  <!-- Window frame 2 (far right) -->
+  <g transform="translate(1620, 150)" stroke="#3b82f6" stroke-width="1" opacity="0.12">
+    <rect x="0" y="0" width="160" height="240" rx="3"/>
+    <line x1="80" y1="0" x2="80" y2="240"/>
+    <rect x="4" y="4" width="72" height="232" rx="2"/>
+    <rect x="84" y="4" width="72" height="232" rx="2"/>
+  </g>
+
+  <!-- Casement window (right middle) -->
+  <g transform="translate(1200, 300)" stroke="#3b82f6" stroke-width="1" opacity="0.15">
+    <rect x="0" y="0" width="120" height="200" rx="2"/>
+    <line x1="60" y1="0" x2="60" y2="200"/>
+    <!-- Open sash indicator -->
+    <line x1="4" y1="100" x2="56" y2="4" stroke-dasharray="4 3"/>
+    <circle cx="52" cy="100" r="3" fill="#3b82f6" opacity="0.3"/>
+    <circle cx="68" cy="100" r="3" fill="#3b82f6" opacity="0.3"/>
+  </g>
+
+  <!-- Door frame (far right bottom) -->
+  <g transform="translate(1500, 280)" stroke="#3b82f6" stroke-width="1.2" opacity="0.15">
+    <rect x="0" y="0" width="100" height="250" rx="2"/>
+    <rect x="6" y="6" width="88" height="160" rx="2"/>
+    <rect x="6" y="172" width="88" height="72" rx="2"/>
+    <circle cx="80" cy="140" r="4"/>
+    <line x1="0" y1="250" x2="100" y2="250" stroke-width="2"/>
+  </g>
+
+  <!-- Measurement lines (blueprint detail) -->
+  <g stroke="#60a5fa" stroke-width="0.8" opacity="0.12">
+    <!-- Horizontal dimension -->
+    <line x1="1350" y1="50" x2="1550" y2="50"/>
+    <line x1="1350" y1="45" x2="1350" y2="55"/>
+    <line x1="1550" y1="45" x2="1550" y2="55"/>
+    <!-- Vertical dimension -->
+    <line x1="1330" y1="80" x2="1330" y2="380"/>
+    <line x1="1325" y1="80" x2="1335" y2="80"/>
+    <line x1="1325" y1="380" x2="1335" y2="380"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="1450" cy="50" r="2" fill="#3b82f6" opacity="0.25"/>
+  <circle cx="1330" cy="230" r="2" fill="#3b82f6" opacity="0.2"/>
+
+  <!-- Tool icons (wrench outline - top right) -->
+  <g transform="translate(1700, 60)" stroke="#3b82f6" stroke-width="1" opacity="0.1" fill="none">
+    <circle cx="15" cy="15" r="12"/>
+    <line x1="24" y1="24" x2="40" y2="40"/>
+    <rect x="36" y="36" width="8" height="8" rx="1" transform="rotate(45, 40, 40)"/>
+  </g>
+
+  <!-- Radial glow left -->
+  <circle cx="200" cy="300" r="400" fill="url(#accent)"/>
+
+  <!-- Floating dots pattern -->
+  <g fill="#3b82f6" opacity="0.06">
+    <circle cx="100" cy="100" r="2"/>
+    <circle cx="300" cy="200" r="2"/>
+    <circle cx="500" cy="100" r="1.5"/>
+    <circle cx="700" cy="300" r="2"/>
+    <circle cx="900" cy="150" r="1.5"/>
+    <circle cx="1100" cy="450" r="2"/>
+    <circle cx="200" cy="500" r="1.5"/>
+    <circle cx="400" cy="400" r="2"/>
+    <circle cx="600" cy="500" r="1.5"/>
+    <circle cx="800" cy="50" r="2"/>
+    <circle cx="1000" cy="550" r="1.5"/>
+  </g>
+
+  <!-- Diagonal accent lines -->
+  <g stroke="#3b82f6" stroke-width="0.5" opacity="0.06">
+    <line x1="0" y1="0" x2="600" y2="600"/>
+    <line x1="200" y1="0" x2="800" y2="600"/>
+    <line x1="1920" y1="0" x2="1320" y2="600"/>
+    <line x1="1720" y1="0" x2="1120" y2="600"/>
+  </g>
+</svg>
