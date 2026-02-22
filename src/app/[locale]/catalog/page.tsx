@@ -115,15 +115,14 @@ export default function CatalogPage() {
                       <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
                         <button onClick={() => selectFilter("top-hung")} className={subCls("top-hung")}>{t('topHung')}</button>
                         <button onClick={() => selectFilter("sliding-window")} className={subCls("sliding-window")}>{t('slidingWindow')}</button>
+                        <button onClick={() => selectFilter("awning")} className={subCls("awning")}>{t('awning')}</button>
                         {/* Casement with sub-tree */}
                         <div>
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => toggleNode("casement")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                          <div className="flex items-center gap-0.5">
+                            <button onClick={() => toggleNode("casement")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 shrink-0">
                               {expandedNodes.has("casement") ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                             </button>
-                            <button onClick={() => selectFilter("casement")} className={`flex-1 text-left py-1 rounded-md text-xs transition-colors ${isActive("casement") ? "text-blue-700 dark:text-blue-400 font-medium" : "text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}>
-                              {t('casement')}
-                            </button>
+                            <button onClick={() => selectFilter("casement")} className={subCls("casement")}>{t('casement')}</button>
                           </div>
                           {expandedNodes.has("casement") && (
                             <div className="ml-5 mt-0.5 space-y-0.5 border-l border-slate-200 dark:border-slate-700 pl-2.5">
@@ -138,7 +137,6 @@ export default function CatalogPage() {
                             </div>
                           )}
                         </div>
-                        <button onClick={() => selectFilter("awning")} className={subCls("awning")}>{t('awning')}</button>
                       </div>
                     )}
                   </div>
@@ -267,16 +265,25 @@ export default function CatalogPage() {
                   <div className="space-y-3">
                     {filteredProducts.map((product) => (
                       <IntlLink key={product.id} href={`/products/${product.id}`}>
-                        <div className="group flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all bg-white dark:bg-slate-900/50">
-                          <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800"><Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="80px" /></div>
+                        <div className="group flex gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all bg-white dark:bg-slate-900/50">
+                          <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800"><Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="96px" /></div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">{product.name}</h3>
+                              <Badge variant="primary" className="text-[10px] shrink-0">{product.category}</Badge>
                               <Badge variant="secondary" className="text-[10px] shrink-0">{product.subcategory}</Badge>
+                              {product.isFeatured && <Badge variant="primary" className="text-[10px] shrink-0 gap-0.5"><Sparkles className="h-2.5 w-2.5" />{t('featured')}</Badge>}
                             </div>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{product.shortDescription}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mb-2">{product.shortDescription}</p>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1">
+                              {product.features.slice(0, 3).map((f, i) => (
+                                <span key={i} className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400"><Check className="h-3 w-3 text-emerald-500 shrink-0" />{f}</span>
+                              ))}
+                            </div>
                           </div>
-                          <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-blue-500 shrink-0 transition-colors" />
+                          <div className="flex flex-col items-end justify-between shrink-0">
+                            <Button variant="outline" size="sm" className="gap-1 text-xs">{t('viewDetails')} <ArrowRight className="h-3 w-3" /></Button>
+                          </div>
                         </div>
                       </IntlLink>
                     ))}

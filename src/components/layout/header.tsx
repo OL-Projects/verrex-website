@@ -33,7 +33,7 @@ export function Header() {
     { name: t('home'), href: "/" },
     {
       name: t('products'),
-      href: "/products",
+      href: "#",
       children: [
         { name: t('windows'), href: "/products/windows", icon: AppWindow },
         { name: t('doors'), href: "/products/doors", icon: DoorOpen },

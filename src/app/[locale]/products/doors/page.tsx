@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { products } from "@/lib/data"
-import { ArrowRight, Check, Sparkles, DoorOpen } from "lucide-react"
+import { ArrowRight, Check, Sparkles, DoorOpen, Shield, Lock, Gauge, Accessibility } from "lucide-react"
 
 const doorProducts = products.filter(p =>
   p.subcategory === "Doors" || p.subcategory === "Entry Systems"
@@ -37,6 +37,30 @@ export default function DoorsPage() {
                 {t('viewFullCatalog')}
               </Button>
             </IntlLink>
+          </div>
+        </div>
+      </section>
+
+      {/* Highlights Bar */}
+      <section className="py-8 bg-white dark:bg-[#0a0f1a] border-b border-slate-200 dark:border-slate-800">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: Shield, label: t('hlSecurity'), value: t('hlSecurityVal') },
+              { icon: Lock, label: t('hlLocking'), value: t('hlLockingVal') },
+              { icon: Gauge, label: t('hlPerformance'), value: t('hlPerformanceVal') },
+              { icon: Accessibility, label: t('hlAccessible'), value: t('hlAccessibleVal') },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                  <item.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.value}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
