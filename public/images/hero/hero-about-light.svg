@@ -2,174 +2,69 @@
   <defs>
     <linearGradient id="bgL" x1="0" y1="0" x2="1920" y2="600" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#f8fafc"/>
-      <stop offset="0.35" stop-color="#f1f5f9"/>
-      <stop offset="0.65" stop-color="#e2e8f0"/>
-      <stop offset="1" stop-color="#f1f5f9"/>
+      <stop offset="0.5" stop-color="#f1f5f9"/>
+      <stop offset="1" stop-color="#e2e8f0"/>
     </linearGradient>
-    <radialGradient id="glowL1" cx="200" cy="300" r="500" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#6366f1" stop-opacity="0.06"/>
-      <stop offset="0.5" stop-color="#4f46e5" stop-opacity="0.02"/>
-      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowL2" cx="1600" cy="200" r="600" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3b82f6" stop-opacity="0.06"/>
-      <stop offset="0.4" stop-color="#2563eb" stop-opacity="0.02"/>
+    <radialGradient id="glL1" cx="1400" cy="300" r="700" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity="0.07"/>
+      <stop offset="0.5" stop-color="#2563eb" stop-opacity="0.02"/>
       <stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glowL3" cx="960" cy="500" r="400" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0ea5e9" stop-opacity="0.04"/>
-      <stop offset="1" stop-color="#0ea5e9" stop-opacity="0"/>
+    <radialGradient id="glL2" cx="200" cy="300" r="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="glassFillL" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3b82f6" stop-opacity="0.06"/>
-      <stop offset="1" stop-color="#1d4ed8" stop-opacity="0.02"/>
+    <linearGradient id="hexFadeL" x1="400" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity="0"/>
+      <stop offset="0.25" stop-color="#3b82f6" stop-opacity="0.08"/>
+      <stop offset="0.6" stop-color="#3b82f6" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#3b82f6" stop-opacity="0.22"/>
     </linearGradient>
+    <linearGradient id="hexFillL" x1="400" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity="0"/>
+      <stop offset="0.3" stop-color="#3b82f6" stop-opacity="0.01"/>
+      <stop offset="0.7" stop-color="#3b82f6" stop-opacity="0.025"/>
+      <stop offset="1" stop-color="#3b82f6" stop-opacity="0.04"/>
+    </linearGradient>
+    <pattern id="hexL" width="69.28" height="120" patternUnits="userSpaceOnUse">
+      <polygon points="34.64,0 69.28,20 69.28,60 34.64,80 0,60 0,20" stroke="url(#hexFadeL)" stroke-width="1" fill="url(#hexFillL)"/>
+      <polygon points="0,60 34.64,80 34.64,120 0,140 -34.64,120 -34.64,80" stroke="url(#hexFadeL)" stroke-width="1" fill="url(#hexFillL)"/>
+      <polygon points="69.28,60 103.92,80 103.92,120 69.28,140 34.64,120 34.64,80" stroke="url(#hexFadeL)" stroke-width="1" fill="url(#hexFillL)"/>
+    </pattern>
   </defs>
 
-  <!-- Base -->
+  <!-- Background -->
   <rect width="1920" height="600" fill="url(#bgL)"/>
-  <rect width="1920" height="600" fill="url(#glowL1)"/>
-  <rect width="1920" height="600" fill="url(#glowL2)"/>
-  <rect width="1920" height="600" fill="url(#glowL3)"/>
+  <rect width="1920" height="600" fill="url(#glL1)"/>
+  <rect width="1920" height="600" fill="url(#glL2)"/>
 
-  <!-- Fine dot grid -->
-  <g fill="#94a3b8" opacity="0.2">
-    <circle cx="80" cy="40" r="0.8"/><circle cx="160" cy="40" r="0.8"/><circle cx="240" cy="40" r="0.8"/><circle cx="320" cy="40" r="0.8"/><circle cx="400" cy="40" r="0.8"/><circle cx="480" cy="40" r="0.8"/><circle cx="560" cy="40" r="0.8"/><circle cx="640" cy="40" r="0.8"/><circle cx="720" cy="40" r="0.8"/><circle cx="800" cy="40" r="0.8"/><circle cx="880" cy="40" r="0.8"/><circle cx="960" cy="40" r="0.8"/><circle cx="1040" cy="40" r="0.8"/><circle cx="1120" cy="40" r="0.8"/><circle cx="1200" cy="40" r="0.8"/><circle cx="1280" cy="40" r="0.8"/><circle cx="1360" cy="40" r="0.8"/><circle cx="1440" cy="40" r="0.8"/><circle cx="1520" cy="40" r="0.8"/><circle cx="1600" cy="40" r="0.8"/><circle cx="1680" cy="40" r="0.8"/><circle cx="1760" cy="40" r="0.8"/><circle cx="1840" cy="40" r="0.8"/>
-    <circle cx="80" cy="120" r="0.8"/><circle cx="160" cy="120" r="0.8"/><circle cx="240" cy="120" r="0.8"/><circle cx="320" cy="120" r="0.8"/><circle cx="400" cy="120" r="0.8"/><circle cx="480" cy="120" r="0.8"/><circle cx="560" cy="120" r="0.8"/><circle cx="640" cy="120" r="0.8"/><circle cx="720" cy="120" r="0.8"/><circle cx="800" cy="120" r="0.8"/><circle cx="880" cy="120" r="0.8"/><circle cx="960" cy="120" r="0.8"/><circle cx="1040" cy="120" r="0.8"/><circle cx="1120" cy="120" r="0.8"/><circle cx="1200" cy="120" r="0.8"/><circle cx="1280" cy="120" r="0.8"/><circle cx="1360" cy="120" r="0.8"/><circle cx="1440" cy="120" r="0.8"/><circle cx="1520" cy="120" r="0.8"/><circle cx="1600" cy="120" r="0.8"/><circle cx="1680" cy="120" r="0.8"/><circle cx="1760" cy="120" r="0.8"/><circle cx="1840" cy="120" r="0.8"/>
-    <circle cx="80" cy="200" r="0.8"/><circle cx="160" cy="200" r="0.8"/><circle cx="240" cy="200" r="0.8"/><circle cx="320" cy="200" r="0.8"/><circle cx="400" cy="200" r="0.8"/><circle cx="480" cy="200" r="0.8"/><circle cx="560" cy="200" r="0.8"/><circle cx="640" cy="200" r="0.8"/><circle cx="720" cy="200" r="0.8"/><circle cx="800" cy="200" r="0.8"/><circle cx="880" cy="200" r="0.8"/><circle cx="960" cy="200" r="0.8"/><circle cx="1040" cy="200" r="0.8"/><circle cx="1120" cy="200" r="0.8"/><circle cx="1200" cy="200" r="0.8"/><circle cx="1280" cy="200" r="0.8"/><circle cx="1360" cy="200" r="0.8"/><circle cx="1440" cy="200" r="0.8"/><circle cx="1520" cy="200" r="0.8"/><circle cx="1600" cy="200" r="0.8"/><circle cx="1680" cy="200" r="0.8"/><circle cx="1760" cy="200" r="0.8"/><circle cx="1840" cy="200" r="0.8"/>
-    <circle cx="80" cy="280" r="0.8"/><circle cx="160" cy="280" r="0.8"/><circle cx="240" cy="280" r="0.8"/><circle cx="320" cy="280" r="0.8"/><circle cx="400" cy="280" r="0.8"/><circle cx="480" cy="280" r="0.8"/><circle cx="560" cy="280" r="0.8"/><circle cx="640" cy="280" r="0.8"/><circle cx="720" cy="280" r="0.8"/><circle cx="800" cy="280" r="0.8"/><circle cx="880" cy="280" r="0.8"/><circle cx="960" cy="280" r="0.8"/><circle cx="1040" cy="280" r="0.8"/><circle cx="1120" cy="280" r="0.8"/><circle cx="1200" cy="280" r="0.8"/><circle cx="1280" cy="280" r="0.8"/><circle cx="1360" cy="280" r="0.8"/><circle cx="1440" cy="280" r="0.8"/><circle cx="1520" cy="280" r="0.8"/><circle cx="1600" cy="280" r="0.8"/><circle cx="1680" cy="280" r="0.8"/><circle cx="1760" cy="280" r="0.8"/><circle cx="1840" cy="280" r="0.8"/>
-    <circle cx="80" cy="360" r="0.8"/><circle cx="160" cy="360" r="0.8"/><circle cx="240" cy="360" r="0.8"/><circle cx="320" cy="360" r="0.8"/><circle cx="400" cy="360" r="0.8"/><circle cx="480" cy="360" r="0.8"/><circle cx="560" cy="360" r="0.8"/><circle cx="640" cy="360" r="0.8"/><circle cx="720" cy="360" r="0.8"/><circle cx="800" cy="360" r="0.8"/><circle cx="880" cy="360" r="0.8"/><circle cx="960" cy="360" r="0.8"/><circle cx="1040" cy="360" r="0.8"/><circle cx="1120" cy="360" r="0.8"/><circle cx="1200" cy="360" r="0.8"/><circle cx="1280" cy="360" r="0.8"/><circle cx="1360" cy="360" r="0.8"/><circle cx="1440" cy="360" r="0.8"/><circle cx="1520" cy="360" r="0.8"/><circle cx="1600" cy="360" r="0.8"/><circle cx="1680" cy="360" r="0.8"/><circle cx="1760" cy="360" r="0.8"/><circle cx="1840" cy="360" r="0.8"/>
-    <circle cx="80" cy="440" r="0.8"/><circle cx="160" cy="440" r="0.8"/><circle cx="240" cy="440" r="0.8"/><circle cx="320" cy="440" r="0.8"/><circle cx="400" cy="440" r="0.8"/><circle cx="480" cy="440" r="0.8"/><circle cx="560" cy="440" r="0.8"/><circle cx="640" cy="440" r="0.8"/><circle cx="720" cy="440" r="0.8"/><circle cx="800" cy="440" r="0.8"/><circle cx="880" cy="440" r="0.8"/><circle cx="960" cy="440" r="0.8"/><circle cx="1040" cy="440" r="0.8"/><circle cx="1120" cy="440" r="0.8"/><circle cx="1200" cy="440" r="0.8"/><circle cx="1280" cy="440" r="0.8"/><circle cx="1360" cy="440" r="0.8"/><circle cx="1440" cy="440" r="0.8"/><circle cx="1520" cy="440" r="0.8"/><circle cx="1600" cy="440" r="0.8"/><circle cx="1680" cy="440" r="0.8"/><circle cx="1760" cy="440" r="0.8"/><circle cx="1840" cy="440" r="0.8"/>
-    <circle cx="80" cy="520" r="0.8"/><circle cx="160" cy="520" r="0.8"/><circle cx="240" cy="520" r="0.8"/><circle cx="320" cy="520" r="0.8"/><circle cx="400" cy="520" r="0.8"/><circle cx="480" cy="520" r="0.8"/><circle cx="560" cy="520" r="0.8"/><circle cx="640" cy="520" r="0.8"/><circle cx="720" cy="520" r="0.8"/><circle cx="800" cy="520" r="0.8"/><circle cx="880" cy="520" r="0.8"/><circle cx="960" cy="520" r="0.8"/><circle cx="1040" cy="520" r="0.8"/><circle cx="1120" cy="520" r="0.8"/><circle cx="1200" cy="520" r="0.8"/><circle cx="1280" cy="520" r="0.8"/><circle cx="1360" cy="520" r="0.8"/><circle cx="1440" cy="520" r="0.8"/><circle cx="1520" cy="520" r="0.8"/><circle cx="1600" cy="520" r="0.8"/><circle cx="1680" cy="520" r="0.8"/><circle cx="1760" cy="520" r="0.8"/><circle cx="1840" cy="520" r="0.8"/>
+  <!-- Full honeycomb pattern layer -->
+  <rect x="300" y="-20" width="1640" height="640" fill="url(#hexL)"/>
+
+  <!-- Fade overlay left side -->
+  <rect x="0" y="0" width="700" height="600" fill="url(#bgL)" opacity="0.85"/>
+
+  <!-- "Lit" hexagon cells -->
+  <g fill="#3b82f6" opacity="0.06">
+    <polygon points="934.64,200 969.28,220 969.28,260 934.64,280 900,260 900,220" />
+    <polygon points="1142.56,80 1177.2,100 1177.2,140 1142.56,160 1107.92,140 1107.92,100" />
+    <polygon points="1350.48,320 1385.12,340 1385.12,380 1350.48,400 1315.84,380 1315.84,340" />
+    <polygon points="1558.4,140 1593.04,160 1593.04,200 1558.4,220 1523.76,200 1523.76,160" />
+    <polygon points="1696.96,380 1731.6,400 1731.6,440 1696.96,460 1662.32,440 1662.32,400" />
+    <polygon points="1073.28,440 1107.92,460 1107.92,500 1073.28,520 1038.64,500 1038.64,460" />
+    <polygon points="1489.12,500 1523.76,520 1523.76,560 1489.12,580 1454.48,560 1454.48,520" />
+    <polygon points="1835.6,260 1870.24,280 1870.24,320 1835.6,340 1800.96,320 1800.96,280" />
   </g>
 
-  <!-- Perspective radial lines -->
-  <g stroke="#cbd5e1" stroke-width="0.6" opacity="0.25">
-    <line x1="1750" y1="250" x2="0" y2="-50"/>
-    <line x1="1750" y1="250" x2="0" y2="100"/>
-    <line x1="1750" y1="250" x2="0" y2="250"/>
-    <line x1="1750" y1="250" x2="0" y2="400"/>
-    <line x1="1750" y1="250" x2="0" y2="550"/>
-    <line x1="1750" y1="250" x2="0" y2="700"/>
-    <line x1="1750" y1="250" x2="500" y2="-100"/>
-    <line x1="1750" y1="250" x2="500" y2="700"/>
-  </g>
-  <g stroke="#cbd5e1" stroke-width="0.4" opacity="0.15" fill="none">
-    <circle cx="1750" cy="250" r="300"/>
-    <circle cx="1750" cy="250" r="550"/>
-    <circle cx="1750" cy="250" r="800"/>
-    <circle cx="1750" cy="250" r="1050"/>
-    <circle cx="1750" cy="250" r="1300"/>
-    <circle cx="1750" cy="250" r="1550"/>
+  <!-- Accent cells -->
+  <g fill="#60a5fa" opacity="0.05">
+    <polygon points="1211.84,260 1246.48,280 1246.48,320 1211.84,340 1177.2,320 1177.2,280" />
+    <polygon points="1627.68,20 1662.32,40 1662.32,80 1627.68,100 1593.04,80 1593.04,40" />
+    <polygon points="1766.32,500 1800.96,520 1800.96,560 1766.32,580 1731.68,560 1731.68,520" />
   </g>
 
-  <!-- LARGE CURTAIN WALL BUILDING -->
-  <g transform="translate(1050, 40)">
-    <rect x="0" y="0" width="620" height="520" rx="4" stroke="#3b82f6" stroke-width="2.5" fill="none" opacity="0.2"/>
-    <rect x="-10" y="-6" width="640" height="12" rx="3" fill="#3b82f6" opacity="0.06"/>
-    <rect x="-20" y="518" width="660" height="8" rx="2" fill="#3b82f6" opacity="0.05"/>
-
-    <g stroke="#3b82f6" stroke-width="1.5" opacity="0.15">
-      <line x1="0" y1="86" x2="620" y2="86"/>
-      <line x1="0" y1="172" x2="620" y2="172"/>
-      <line x1="0" y1="258" x2="620" y2="258"/>
-      <line x1="0" y1="344" x2="620" y2="344"/>
-      <line x1="0" y1="430" x2="620" y2="430"/>
-    </g>
-    <g stroke="#3b82f6" stroke-width="1" opacity="0.12">
-      <line x1="155" y1="0" x2="155" y2="520"/>
-      <line x1="310" y1="0" x2="310" y2="520"/>
-      <line x1="465" y1="0" x2="465" y2="520"/>
-    </g>
-
-    <g fill="url(#glassFillL)">
-      <rect x="8" y="8" width="139" height="70" rx="2"/><rect x="163" y="8" width="139" height="70" rx="2"/><rect x="318" y="8" width="139" height="70" rx="2"/><rect x="473" y="8" width="139" height="70" rx="2"/>
-      <rect x="8" y="94" width="139" height="70" rx="2"/><rect x="163" y="94" width="139" height="70" rx="2"/><rect x="318" y="94" width="139" height="70" rx="2"/><rect x="473" y="94" width="139" height="70" rx="2"/>
-      <rect x="8" y="180" width="139" height="70" rx="2"/><rect x="163" y="180" width="139" height="70" rx="2"/><rect x="318" y="180" width="139" height="70" rx="2"/><rect x="473" y="180" width="139" height="70" rx="2"/>
-      <rect x="8" y="266" width="139" height="70" rx="2"/><rect x="163" y="266" width="139" height="70" rx="2"/><rect x="318" y="266" width="139" height="70" rx="2"/><rect x="473" y="266" width="139" height="70" rx="2"/>
-      <rect x="8" y="352" width="139" height="70" rx="2"/><rect x="163" y="352" width="139" height="70" rx="2"/><rect x="318" y="352" width="139" height="70" rx="2"/><rect x="473" y="352" width="139" height="70" rx="2"/>
-      <rect x="8" y="438" width="139" height="74" rx="2"/><rect x="163" y="438" width="139" height="74" rx="2"/><rect x="318" y="438" width="139" height="74" rx="2"/><rect x="473" y="438" width="139" height="74" rx="2"/>
-    </g>
-
-    <g fill="#3b82f6" opacity="0.04">
-      <rect x="163" y="8" width="139" height="70" rx="2"/>
-      <rect x="473" y="94" width="139" height="70" rx="2"/>
-      <rect x="8" y="266" width="139" height="70" rx="2"/>
-      <rect x="318" y="352" width="139" height="70" rx="2"/>
-      <rect x="163" y="438" width="139" height="74" rx="2"/>
-      <rect x="473" y="266" width="139" height="70" rx="2"/>
-    </g>
-
-    <g fill="#e2e8f0" opacity="0.4">
-      <rect x="0" y="78" width="620" height="16" rx="1"/>
-      <rect x="0" y="164" width="620" height="16" rx="1"/>
-      <rect x="0" y="250" width="620" height="16" rx="1"/>
-      <rect x="0" y="336" width="620" height="16" rx="1"/>
-      <rect x="0" y="422" width="620" height="16" rx="1"/>
-    </g>
-
-    <rect x="200" y="490" width="220" height="30" rx="3" stroke="#60a5fa" stroke-width="1.5" fill="#3b82f6" fill-opacity="0.03" opacity="0.25"/>
-    <rect x="250" y="470" width="50" height="48" rx="2" stroke="#60a5fa" stroke-width="1" fill="none" opacity="0.15"/>
-    <rect x="310" y="470" width="50" height="48" rx="2" stroke="#60a5fa" stroke-width="1" fill="none" opacity="0.15"/>
-    <circle cx="295" cy="494" r="2" fill="#60a5fa" opacity="0.15"/>
-    <circle cx="315" cy="494" r="2" fill="#60a5fa" opacity="0.15"/>
-  </g>
-
-  <!-- FLOATING GLASS PANELS -->
-  <g opacity="0.06">
-    <rect x="850" y="100" width="120" height="80" rx="4" stroke="#3b82f6" stroke-width="1.5" fill="#3b82f6" fill-opacity="0.2" transform="rotate(-8 910 140)"/>
-    <rect x="920" y="380" width="100" height="65" rx="3" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity="0.15" transform="rotate(12 970 412)"/>
-    <rect x="780" y="450" width="80" height="55" rx="3" stroke="#60a5fa" stroke-width="1" fill="#60a5fa" fill-opacity="0.1" transform="rotate(-5 820 477)"/>
-    <rect x="1700" y="20" width="90" height="60" rx="3" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity="0.15" transform="rotate(6 1745 50)"/>
-  </g>
-
-  <!-- NODE NETWORK -->
-  <g stroke="#6366f1" stroke-width="0.8" opacity="0.08">
-    <line x1="120" y1="150" x2="280" y2="220"/>
-    <line x1="280" y1="220" x2="450" y2="180"/>
-    <line x1="450" y1="180" x2="600" y2="280"/>
-    <line x1="600" y1="280" x2="750" y2="200"/>
-    <line x1="120" y1="150" x2="200" y2="350"/>
-    <line x1="200" y1="350" x2="380" y2="400"/>
-    <line x1="380" y1="400" x2="600" y2="280"/>
-    <line x1="280" y1="220" x2="380" y2="400"/>
-    <line x1="450" y1="180" x2="350" y2="100"/>
-    <line x1="750" y1="200" x2="850" y2="300"/>
-    <line x1="200" y1="350" x2="100" y2="450"/>
-    <line x1="380" y1="400" x2="500" y2="500"/>
-    <line x1="600" y1="280" x2="700" y2="420"/>
-  </g>
-  <g>
-    <circle cx="120" cy="150" r="6" fill="#6366f1" opacity="0.08"/><circle cx="120" cy="150" r="3" fill="#6366f1" opacity="0.2"/>
-    <circle cx="280" cy="220" r="8" fill="#3b82f6" opacity="0.06"/><circle cx="280" cy="220" r="4" fill="#3b82f6" opacity="0.18"/>
-    <circle cx="450" cy="180" r="6" fill="#6366f1" opacity="0.08"/><circle cx="450" cy="180" r="3" fill="#6366f1" opacity="0.2"/>
-    <circle cx="600" cy="280" r="10" fill="#3b82f6" opacity="0.05"/><circle cx="600" cy="280" r="5" fill="#3b82f6" opacity="0.18"/>
-    <circle cx="750" cy="200" r="7" fill="#6366f1" opacity="0.06"/><circle cx="750" cy="200" r="3.5" fill="#6366f1" opacity="0.18"/>
-    <circle cx="200" cy="350" r="5" fill="#3b82f6" opacity="0.08"/><circle cx="200" cy="350" r="2.5" fill="#3b82f6" opacity="0.2"/>
-    <circle cx="380" cy="400" r="7" fill="#6366f1" opacity="0.06"/><circle cx="380" cy="400" r="3.5" fill="#6366f1" opacity="0.18"/>
-    <circle cx="350" cy="100" r="4" fill="#3b82f6" opacity="0.08"/><circle cx="350" cy="100" r="2" fill="#3b82f6" opacity="0.2"/>
-    <circle cx="850" cy="300" r="5" fill="#6366f1" opacity="0.06"/><circle cx="850" cy="300" r="2.5" fill="#6366f1" opacity="0.18"/>
-    <circle cx="100" cy="450" r="4" fill="#3b82f6" opacity="0.08"/><circle cx="100" cy="450" r="2" fill="#3b82f6" opacity="0.2"/>
-    <circle cx="500" cy="500" r="5" fill="#6366f1" opacity="0.06"/><circle cx="500" cy="500" r="2.5" fill="#6366f1" opacity="0.18"/>
-    <circle cx="700" cy="420" r="4" fill="#3b82f6" opacity="0.08"/><circle cx="700" cy="420" r="2" fill="#3b82f6" opacity="0.2"/>
-  </g>
-
-  <!-- V WATERMARK -->
-  <g stroke="#3b82f6" fill="none" opacity="0.04" stroke-width="3">
-    <path d="M 700 60 L 850 450 L 1000 60"/>
-    <path d="M 730 60 L 850 400 L 970 60"/>
-    <path d="M 760 60 L 850 350 L 940 60"/>
-  </g>
-
-  <!-- DIAGONAL SLASHES -->
-  <g stroke="#cbd5e1" stroke-width="0.5" opacity="0.12">
-    <line x1="0" y1="0" x2="300" y2="600"/>
-    <line x1="60" y1="0" x2="360" y2="600"/>
-    <line x1="1920" y1="0" x2="1620" y2="600"/>
-    <line x1="1860" y1="0" x2="1560" y2="600"/>
-    <line x1="960" y1="0" x2="1260" y2="600"/>
-  </g>
-
-  <!-- Text-area readability gradient -->
-  <rect width="800" height="600" fill="url(#bgL)" opacity="0.4"/>
+  <!-- Subtle glow behind hex clusters -->
+  <circle cx="1350" cy="300" r="200" fill="#3b82f6" opacity="0.02"/>
+  <circle cx="1650" cy="200" r="150" fill="#6366f1" opacity="0.015"/>
+  <circle cx="1100" cy="450" r="180" fill="#3b82f6" opacity="0.015"/>
 </svg>
