@@ -457,6 +457,10 @@
     "hlAir": "Infiltration d'air",
     "hlVision": "Vues dégagées",
     "hlVisionVal": "Lumière maximale",
+    "windowTypes": "Types de fenêtres",
+    "allWindows": "Toutes les fenêtres",
+    "backToAll": "Retour à toutes les fenêtres",
+    "bookConsult": "Réserver une consultation",
     "ctaTitle": "Essayez notre configurateur de fenêtres 3D",
     "ctaDesc": "Visualisez différents styles de fenêtres, couleurs de cadre et types de verre dans notre outil 3D interactif."
   },
@@ -480,6 +484,10 @@
     "hlPerformanceVal": "Jusqu'à 200 km/h",
     "hlAccessible": "Accessibilité",
     "hlAccessibleVal": "Conforme ADA",
+    "doorTypes": "Types de portes",
+    "allDoors": "Toutes les portes",
+    "backToAll": "Retour à toutes les portes",
+    "bookConsult": "Réserver une consultation",
     "ctaTitle": "Trouvez la bonne solution de portes",
     "ctaDesc": "Nos experts peuvent vous aider à choisir le système de portes parfait pour les exigences de votre projet.",
     "bookConsultation": "Réserver une consultation"

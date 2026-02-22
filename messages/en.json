@@ -457,6 +457,10 @@
     "hlAir": "Air Infiltration",
     "hlVision": "Unobstructed Views",
     "hlVisionVal": "Maximum Light",
+    "windowTypes": "Window Types",
+    "allWindows": "All Windows",
+    "backToAll": "Back to all windows",
+    "bookConsult": "Book Consultation",
     "ctaTitle": "Try Our 3D Window Configurator",
     "ctaDesc": "Visualize different window styles, frame colors, and glass types in our interactive 3D tool."
   },
@@ -480,6 +484,10 @@
     "hlPerformanceVal": "Up to 200 km/h",
     "hlAccessible": "Accessibility",
     "hlAccessibleVal": "ADA Compliant",
+    "doorTypes": "Door Types",
+    "allDoors": "All Doors",
+    "backToAll": "Back to all doors",
+    "bookConsult": "Book Consultation",
     "ctaTitle": "Find the Right Door Solution",
     "ctaDesc": "Our experts can help you choose the perfect door system for your project requirements.",
     "bookConsultation": "Book Consultation"
