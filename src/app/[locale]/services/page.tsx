@@ -2,7 +2,6 @@ import Image from "next/image"
 import { getTranslations } from 'next-intl/server'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { services } from "@/lib/data"
 import {
@@ -15,15 +14,6 @@ import type { Metadata } from "next"
 export const metadata: Metadata = { title: "Services" }
 
 const iconMap: Record<string, LucideIcon> = { MessageSquare, Ruler, Wrench, Search, Sparkles, Settings }
-
-const serviceImages: Record<string, string> = {
-  "Professional Installation": "/images/hero/hero-factory.jpg",
-  "On-Site Measurement": "/images/hero/hero-residential.jpg",
-  "Window & Door Inspection": "/images/products/storefront-1.jpg",
-  "Free Consultation": "/images/hero/hero-commercial.jpg",
-  "Repair & Maintenance": "/images/products/casement-1.jpg",
-  "Custom Design": "/images/products/curtainwall-1.jpg",
-}
 
 const process_steps = [
   { step: "01", title: "Initial Consultation", description: "Free consultation to understand your needs, budget, and timeline. Available in-person or via video call." },
@@ -79,55 +69,68 @@ export default async function ServicesPage() {
         </div>
       </section>
 
-      {/* Services Grid with Images */}
+      {/* Services — Horizontal Numbered Rows */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('title')}</h2>
             <p className="mt-2 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{t('description')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => {
+          <div className="space-y-0">
+            {services.map((service, idx) => {
               const IconComp = iconMap[service.icon] ?? Settings
-              const bgImage = serviceImages[service.name] ?? "/images/hero/hero-commercial.jpg"
+              const num = String(idx + 1).padStart(2, '0')
+              const isEven = idx % 2 === 0
               return (
-                <Card key={service.id} className="group h-full overflow-hidden hover:shadow-2xl transition-all duration-300 border-slate-200 dark:border-slate-800">
-                  {/* Image with Icon Overlay */}
-                  <div className="relative aspect-[16/9] overflow-hidden">
-                    <Image src={bgImage} alt={service.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                    <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                      <div className="h-10 w-10 bg-white/15 backdrop-blur-md rounded-lg flex items-center justify-center">
-                        <IconComp className="h-5 w-5 text-white" />
-                      </div>
-                      <h3 className="text-lg font-bold text-white drop-shadow-lg">{service.name}</h3>
-                    </div>
-                    <Badge variant="secondary" className="absolute top-3 right-3 text-[10px] backdrop-blur-sm bg-white/70 dark:bg-black/50">
-                      <Clock className="h-3 w-3 mr-1" />{service.estimatedDuration}
-                    </Badge>
-                  </div>
+                <div
+                  key={service.id}
+                  className={`group relative border-t border-slate-200 dark:border-slate-800 transition-all duration-300 hover:bg-slate-50 dark:hover:bg-[#0a0f1a] ${isEven ? '' : 'bg-slate-50/50 dark:bg-[#060b14]'}`}
+                >
+                  {/* Hover accent bar */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-blue-600 transition-colors duration-300 rounded-r" />
 
-                  {/* Content */}
-                  <CardContent className="p-5">
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{service.description}</p>
-                    <ul className="mt-4 space-y-2">
-                      {service.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                          {feature}
-                        </li>
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-8 py-8 px-4 lg:px-8">
+                    {/* Number */}
+                    <span className="text-4xl lg:text-5xl font-black text-blue-100 dark:text-blue-900/60 shrink-0 leading-none select-none group-hover:text-blue-200 dark:group-hover:text-blue-800/70 transition-colors">{num}</span>
+
+                    {/* Icon */}
+                    <div className="h-12 w-12 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform duration-300">
+                      <IconComp className="h-6 w-6 text-white" />
+                    </div>
+
+                    {/* Title + Description */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{service.name}</h3>
+                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                          <Clock className="h-3 w-3" />{service.estimatedDuration}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">{service.description}</p>
+                    </div>
+
+                    {/* Features as chips */}
+                    <div className="flex flex-wrap gap-1.5 lg:max-w-xs shrink-0">
+                      {service.features.slice(0, 3).map((feature) => (
+                        <span key={feature} className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 className="h-3 w-3" />{feature}
+                        </span>
                       ))}
-                    </ul>
-                    <div className="mt-5">
+                    </div>
+
+                    {/* CTA */}
+                    <div className="shrink-0">
                       <IntlLink href="/quote">
-                        <Button variant="primary" size="sm" className="w-full gap-1 text-xs">{t('getStarted')} <ArrowRight className="h-3 w-3" /></Button>
+                        <Button variant="ghost" size="sm" className="gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20">{t('getStarted')} <ArrowRight className="h-3 w-3" /></Button>
                       </IntlLink>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )
             })}
+            {/* Bottom border */}
+            <div className="border-t border-slate-200 dark:border-slate-800" />
           </div>
         </div>
       </section>
