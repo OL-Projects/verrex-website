@@ -6,17 +6,37 @@ import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { products } from "@/lib/data"
 import {
-  ArrowRight, Check, Sparkles, DoorOpen, Shield, Lock, Gauge, Accessibility,
+  ArrowRight, Check, DoorOpen, Shield, Lock, Gauge, Accessibility,
 } from "lucide-react"
-
-const doorProducts = products.filter(p =>
-  p.subcategory === "Doors" || p.subcategory === "Entry Systems"
-)
 
 export default function DoorsPage() {
   const t = useTranslations('DoorsPage')
+  const tc = useTranslations('CatalogPage')
+
+  const doorTypes = [
+    {
+      name: tc('slidingDoor'),
+      image: "/images/products/sliding-door-1.jpg",
+      desc: t('typeSlidingDesc'),
+      features: [t('typeSlidingF1'), t('typeSlidingF2'), t('typeSlidingF3'), t('typeSlidingF4')],
+      specs: { [t('specFrame')]: t('specAlPvcWood'), [t('specGlass')]: t('specDoubleTriple'), [t('specPanels')]: "2, 3, 4", [t('specThreshold')]: t('specFlush') },
+    },
+    {
+      name: tc('folding'),
+      image: "/images/products/sliding-door-2.jpg",
+      desc: t('typeFoldingDesc'),
+      features: [t('typeFoldingF1'), t('typeFoldingF2'), t('typeFoldingF3'), t('typeFoldingF4')],
+      specs: { [t('specFrame')]: t('specAlWoodAl'), [t('specGlass')]: t('specDoubleTriple'), [t('specPanels')]: "3–7", [t('specOpening')]: t('specFullWall') },
+    },
+    {
+      name: tc('swing'),
+      image: "/images/products/commercial-entry-1.jpg",
+      desc: t('typeSwingDesc'),
+      features: [t('typeSwingF1'), t('typeSwingF2'), t('typeSwingF3'), t('typeSwingF4')],
+      specs: { [t('specFrame')]: t('specAlSteelGlass'), [t('specLeaf')]: t('specSingleDouble'), [t('specCompliance')]: "ADA", [t('specHardware')]: t('specPanicAvail') },
+    },
+  ]
 
   return (
     <div>
@@ -61,7 +81,7 @@ export default function DoorsPage() {
         </div>
       </section>
 
-      {/* Product Showcase */}
+      {/* Door Types Showcase */}
       <section className="py-14 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
@@ -72,65 +92,43 @@ export default function DoorsPage() {
             <IntlLink href="/catalog"><Button variant="ghost" size="sm" className="gap-1 text-xs">{t('viewFullCatalog')} <ArrowRight className="h-3 w-3" /></Button></IntlLink>
           </div>
 
-          <div className="space-y-8">
-            {doorProducts.map((product) => (
-              <Card key={product.id} className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-slate-200 dark:border-slate-800">
-                <div className="flex flex-col lg:flex-row">
-                  {/* Wide Image */}
-                  <div className="relative w-full lg:w-[420px] aspect-[4/3] lg:aspect-auto shrink-0 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden">
-                    <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 1024px) 100vw, 420px" />
-                    <div className="absolute top-3 left-3 flex gap-1.5">
-                      <Badge variant="primary" className="text-[10px] uppercase tracking-wider backdrop-blur-sm">{product.category}</Badge>
-                      <Badge variant="secondary" className="text-[10px] backdrop-blur-sm bg-white/70 dark:bg-black/50">{product.subcategory}</Badge>
-                    </div>
-                    {product.isFeatured && (
-                      <Badge variant="primary" className="absolute top-3 right-3 text-[10px] gap-1">
-                        <Sparkles className="h-3 w-3" /> {t('featured')}
-                      </Badge>
-                    )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {doorTypes.map((dt, idx) => (
+              <Card key={idx} className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-slate-200 dark:border-slate-800">
+                {/* Image */}
+                <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden">
+                  <Image src={dt.image} alt={dt.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
+
+                {/* Content */}
+                <CardContent className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{dt.name}</h3>
+                  <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{dt.desc}</p>
+
+                  {/* Features */}
+                  <ul className="mt-3 space-y-1.5">
+                    {dt.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />{f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Spec Chips */}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {Object.entries(dt.specs).map(([key, val]) => (
+                      <span key={key} className="inline-flex text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        <span className="font-medium text-slate-800 dark:text-slate-200 mr-1">{key}:</span>{val}
+                      </span>
+                    ))}
                   </div>
 
-                  {/* Content */}
-                  <CardContent className="p-6 lg:p-8 flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{product.shortDescription}</p>
-
-                    <div className="mt-5 flex flex-col md:flex-row gap-6">
-                      {/* Features Column */}
-                      <div className="flex-1">
-                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{t('keyFeatures')}</h4>
-                        <ul className="space-y-2">
-                          {product.features.slice(0, 4).map((f, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
-                              <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />{f}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Specs Column */}
-                      <div className="flex-1">
-                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{t('specifications')}</h4>
-                        <div className="grid grid-cols-2 gap-3">
-                          {Object.entries(product.specifications).slice(0, 4).map(([key, val]) => (
-                            <div key={key} className="text-xs">
-                              <span className="text-slate-400">{key}</span>
-                              <p className="font-medium text-slate-700 dark:text-slate-300">{val}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="mt-6 flex gap-3">
-                      <IntlLink href={`/products/${product.id}`}><Button variant="primary" size="sm" className="gap-1">{t('viewDetails')} <ArrowRight className="h-3.5 w-3.5" /></Button></IntlLink>
-                      <IntlLink href="/quote"><Button variant="outline" size="sm">{t('getQuote')}</Button></IntlLink>
-                    </div>
-                  </CardContent>
-                </div>
+                  {/* Actions */}
+                  <div className="mt-4 flex gap-2">
+                    <IntlLink href="/quote"><Button variant="primary" size="sm" className="gap-1 text-xs">{t('getQuote')} <ArrowRight className="h-3 w-3" /></Button></IntlLink>
+                    <IntlLink href="/catalog"><Button variant="outline" size="sm" className="text-xs">{t('viewInCatalog')}</Button></IntlLink>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>
