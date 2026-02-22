@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import Image from "next/image"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
@@ -63,35 +64,39 @@ export default function ProjectsPage() {
 
   return (
     <div>
-      {/* Hero Banner */}
-      <section className="relative bg-slate-900 dark:bg-[#000000] py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent" />
-        <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Hero Banner — Blueprint Schematic */}
+      <section className="relative bg-slate-50 dark:bg-[#071428] py-20 overflow-hidden">
+        {/* Light mode SVG */}
+        <div className="absolute inset-0 dark:hidden">
+          <Image src="/images/hero/hero-projects-light.svg" alt="" fill className="object-cover" sizes="100vw" priority />
+        </div>
+        {/* Dark mode SVG */}
+        <div className="absolute inset-0 hidden dark:block">
+          <Image src="/images/hero/hero-projects-dark.svg" alt="" fill className="object-cover" sizes="100vw" priority />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-transparent to-transparent dark:from-[#071428]/60 z-10" />
+        <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div>
             <Badge variant="primary" className="mb-4 text-sm px-4 py-1">{t("title")}</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white">
-              {t("completedBold")}<span className="text-blue-400">{t("projects")}</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
+              {t("completedBold")}<span className="text-blue-600 dark:text-blue-400">{t("projects")}</span>
             </h1>
-            <p className="mt-4 text-lg text-slate-300 max-w-2xl">
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">
               {t("description")}
             </p>
           </div>
 
           {/* Stats */}
-          <div
-            className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6"
-          >
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { value: `${projects.length}+`, label: t("statsCompleted") },
               { value: `${projects.filter(p => p.category === "residential").length}`, label: t("statsResidential") },
               { value: `${projects.filter(p => p.category === "commercial").length}`, label: t("statsCommercial") },
               { value: `${projects.filter(p => p.category === "industrial").length}`, label: t("statsIndustrial") },
             ].map((stat) => (
-              <div key={stat.label} className="text-center p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-sm text-slate-400 mt-1">{stat.label}</div>
+              <div key={stat.label} className="text-center p-4 rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10">
+                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
