@@ -494,13 +494,13 @@ export default function HomePage() {
                 accent: "from-blue-500 to-blue-700",
               },
             ].map((cert) => (
-              <StaggerItem key={cert.name}>
-                <HoverCard>
+              <StaggerItem key={cert.name} className="h-full">
+                <HoverCard className="h-full">
                   <div className="group relative h-full rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-black/30 transition-all duration-500 overflow-hidden">
                     {/* Top accent gradient bar */}
                     <div className={`h-1 w-full bg-gradient-to-r ${cert.accent}`} />
 
-                    <div className="p-7 flex flex-col items-center text-center">
+                    <div className="p-7 flex flex-col items-center text-center h-full">
                       {/* Logo container with subtle background */}
                       <div className="w-full h-28 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/30 mb-6 group-hover:scale-[1.02] transition-transform duration-500">
                         {cert.darkSrc ? (
@@ -514,7 +514,7 @@ export default function HomePage() {
                       </div>
 
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{cert.name}</h3>
-                      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{cert.desc}</p>
+                      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 leading-relaxed flex-grow">{cert.desc}</p>
 
                       {/* Verified badge */}
                       <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/30">
