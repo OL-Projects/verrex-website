@@ -118,8 +118,17 @@ export default function HomePage() {
               </FadeIn>
               {/* Certification badges */}
               <FadeIn delay={0.6}>
-                <div className="mt-8">
-                  <CertificationsBar variant="compact" className="justify-start brightness-0 invert opacity-70" />
+                <div className="mt-8 flex flex-wrap items-center justify-start gap-8 brightness-0 invert opacity-70">
+                  {/* ENERGY STAR — always light SVG */}
+                  <Image src="/images/certifications/energy-star.svg" alt="ENERGY STAR" width={96} height={64} className="h-16 w-auto" />
+                  {/* NFRC — always light SVG */}
+                  <Image src="/images/certifications/nfrc.svg" alt="NFRC" width={96} height={64} className="h-16 w-auto" />
+                  {/* CSA — light/dark switching */}
+                  <Image src="/images/certifications/csa-light.svg" alt="CSA" width={96} height={64} className="h-16 w-auto block dark:hidden" />
+                  <Image src="/images/certifications/csa-dark.svg" alt="CSA" width={96} height={64} className="h-16 w-auto hidden dark:block" />
+                  {/* CE — light/dark switching */}
+                  <Image src="/images/certifications/ce-light.svg" alt="CE" width={96} height={64} className="h-16 w-auto block dark:hidden" />
+                  <Image src="/images/certifications/ce-dark.svg" alt="CE" width={96} height={64} className="h-16 w-auto hidden dark:block" />
                 </div>
               </FadeIn>
             </div>
