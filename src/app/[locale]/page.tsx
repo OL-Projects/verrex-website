@@ -471,15 +471,13 @@ export default function HomePage() {
                 darkSrc: "/images/certifications/energy-star-dark.svg",
                 desc: t('certEnergyStarDesc'),
                 accent: "from-green-500 to-emerald-600",
-                iconBg: "bg-green-50 dark:bg-green-900/20",
               },
               {
                 name: "NFRC",
                 src: "/images/certifications/nfrc.svg",
                 darkSrc: "/images/certifications/nfrc-dark.svg",
                 desc: t('certNfrcDesc'),
-                accent: "from-blue-500 to-indigo-600",
-                iconBg: "bg-blue-50 dark:bg-blue-900/20",
+                accent: "from-violet-500 to-purple-600",
               },
               {
                 name: "CSA",
@@ -487,15 +485,13 @@ export default function HomePage() {
                 darkSrc: "/images/certifications/csa-dark.svg",
                 desc: t('certCsaDesc'),
                 accent: "from-red-500 to-rose-600",
-                iconBg: "bg-red-50 dark:bg-red-900/20",
               },
               {
                 name: "CE",
                 src: "/images/certifications/ce-light.svg",
                 darkSrc: "/images/certifications/ce-dark.svg",
                 desc: t('certCeDesc'),
-                accent: "from-blue-600 to-blue-800",
-                iconBg: "bg-blue-50 dark:bg-blue-900/20",
+                accent: "from-blue-500 to-blue-700",
               },
             ].map((cert) => (
               <StaggerItem key={cert.name}>
@@ -506,14 +502,14 @@ export default function HomePage() {
 
                     <div className="p-7 flex flex-col items-center text-center">
                       {/* Logo container with subtle background */}
-                      <div className={`w-full h-28 flex items-center justify-center rounded-xl ${cert.iconBg} border border-slate-100 dark:border-slate-700/30 mb-6 group-hover:scale-[1.02] transition-transform duration-500`}>
+                      <div className="w-full h-28 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/30 mb-6 group-hover:scale-[1.02] transition-transform duration-500">
                         {cert.darkSrc ? (
                           <>
-                            <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto block dark:hidden" unoptimized />
-                            <Image src={cert.darkSrc} alt={cert.name} width={140} height={96} className="h-20 w-auto hidden dark:block" unoptimized />
+                            <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto max-w-[130px] object-contain block dark:hidden" unoptimized />
+                            <Image src={cert.darkSrc} alt={cert.name} width={140} height={96} className="h-20 w-auto max-w-[130px] object-contain hidden dark:block" unoptimized />
                           </>
                         ) : (
-                          <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto" unoptimized />
+                          <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto max-w-[130px] object-contain" unoptimized />
                         )}
                       </div>
 
