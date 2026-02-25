@@ -30,13 +30,6 @@ export default function WindowsPage() {
       specs: { [t('specFrame')]: t('specAlPvcWood'), [t('specGlass')]: t('specDoubleTriple'), [t('specPanels')]: "2, 3, 4", [t('specEnergy')]: "ENERGY STAR®" },
     },
     {
-      name: tc('awning'),
-      image: "/images/products/double-hung-3.jpg",
-      desc: t('typeAwningDesc'),
-      features: [t('typeAwningF1'), t('typeAwningF2'), t('typeAwningF3'), t('typeAwningF4')],
-      specs: { [t('specFrame')]: t('specAlPvcFiber'), [t('specGlass')]: t('specDoubleTriple'), [t('specRating')]: "CSA A440", [t('specEnergy')]: "ENERGY STAR®" },
-    },
-    {
       name: tc('casement'),
       image: "/images/products/casement-1.jpg",
       desc: t('typeCasementDesc'),

@@ -22,7 +22,6 @@ const typeInfo: Record<string, { title: string; desc: string; features: string[]
   "casement": { title: "Casement Windows", desc: "Side-hinged windows that open outward like a door. Provide maximum ventilation and an unobstructed view. Available in tilt & turn and hand-cranked variants.", features: ["Maximum ventilation", "Unobstructed views", "Multi-point locking", "Energy efficient seals"], use: "Residential, Light Commercial", frames: "Aluminum, PVC, Wood, Fiberglass" },
   "tilt-turn": { title: "Tilt & Turn Windows", desc: "European-style casement windows that tilt inward from the top for ventilation or swing fully inward for cleaning and emergency egress. Dual-function hardware.", features: ["Tilt mode for secure ventilation", "Full inward opening for cleaning", "Emergency egress capable", "Child-safe tilt position"], use: "High-rise, Condos, Modern Homes", frames: "Aluminum, PVC, Wood-Aluminum" },
   "hand-cranked": { title: "Hand Cranked Casement", desc: "Traditional casement windows operated by a hand crank mechanism that pushes the sash outward. Provides precise control over opening angle.", features: ["Precise opening control", "Outward projection for airflow", "Traditional crank mechanism", "Tight weatherseal when closed"], use: "Residential, Heritage Buildings", frames: "Aluminum, PVC, Wood" },
-  "awning": { title: "Awning Windows", desc: "Hinged at the top with the sash swinging outward from the bottom. Similar to top-hung but with a wider opening arc. Excellent for ventilation in rainy conditions.", features: ["Ventilation during rain", "Wide opening arc", "Stackable with fixed panels", "Energy efficient design"], use: "Bathrooms, Kitchens, Commercial", frames: "Aluminum, PVC, Fiberglass" },
   "sliding-door": { title: "Sliding Doors", desc: "Large-panel doors that glide horizontally on precision tracks. Available in 2, 3, and 4-panel configurations. Ideal for connecting indoor and outdoor spaces.", features: ["Seamless indoor-outdoor flow", "Heavy-duty roller systems", "Multi-point security locks", "Thermal break frames"], use: "Patios, Balconies, Terraces", frames: "Aluminum, PVC, Wood-clad" },
   "folding": { title: "Folding Doors", desc: "Multi-panel bi-fold door systems that fold and stack to create wide open passages. Transform entire walls into open-air spaces.", features: ["Full wall opening", "Bi-fold panel stacking", "Flush threshold options", "Weather-rated seals"], use: "Restaurants, Patios, Showrooms", frames: "Aluminum, Aluminum-Wood" },
   "swing": { title: "Swing Doors", desc: "Traditional hinged doors that swing open on side-mounted hinges. Available as single or double-leaf, inward or outward opening.", features: ["Classic operation", "Single or double leaf", "ADA compliant options", "Panic hardware available"], use: "Entries, Commercial, Institutional", frames: "Aluminum, Steel, Glass" },
@@ -115,7 +114,6 @@ export default function CatalogPage() {
                       <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
                         <button onClick={() => selectFilter("top-hung")} className={subCls("top-hung")}>{t('topHung')}</button>
                         <button onClick={() => selectFilter("sliding-window")} className={subCls("sliding-window")}>{t('slidingWindow')}</button>
-                        <button onClick={() => selectFilter("awning")} className={subCls("awning")}>{t('awning')}</button>
                         {/* Casement with sub-tree */}
                         <div>
                           <div className="flex items-center gap-0.5">
@@ -206,7 +204,7 @@ export default function CatalogPage() {
               {/* Type Info Panel or Products */}
               {typeInfo[activeFilter] ? (
                 <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6 md:p-8">
-                  <button onClick={() => selectFilter(["top-hung","sliding-window","casement","tilt-turn","hand-cranked","awning"].includes(activeFilter) ? "windows" : "doors")} className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4">
+                  <button onClick={() => selectFilter(["top-hung","sliding-window","casement","tilt-turn","hand-cranked"].includes(activeFilter) ? "windows" : "doors")} className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4">
                     <ArrowLeft className="h-3.5 w-3.5" /> {t('backToList')}
                   </button>
                   <div className="flex items-start gap-3 mb-4">

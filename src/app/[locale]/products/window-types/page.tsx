@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
+import { useState } from "react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import Image from "next/image"
@@ -9,7 +8,7 @@ import dynamic from "next/dynamic"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { X, ArrowRight, ArrowLeft, Home, Building2, Factory, Ruler, Shield, Thermometer, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react"
+import { X, ArrowRight, ArrowLeft, Ruler, Shield, Thermometer, ChevronLeft, ChevronRight, AppWindow, DoorOpen } from "lucide-react"
 
 // Dynamically import 3D configurator (no SSR - WebGL needs browser)
 const Window3DConfigurator = dynamic(
@@ -31,191 +30,113 @@ interface WindowType {
   description: string
   bestFor: string[]
   benefits: string[]
-  categories: ("residential" | "commercial" | "industrial")[]
+  type: "window" | "door"
   defaultWidth: number
   defaultHeight: number
 }
 
 const windowTypes: WindowType[] = [
+  // ── WINDOWS ──
   {
     id: "double-hung",
-    name: "Double-Hung",
+    name: "Top Hung",
     image: "/images/window-types/double-hung.png",
-    description: "Two sashes that slide vertically within the frame. Both the upper and lower sash can be opened, allowing for versatile ventilation and easy cleaning.",
-    bestFor: ["Living rooms", "Bedrooms", "Kitchens", "Traditional homes"],
-    benefits: ["Easy to clean from inside", "Excellent ventilation control", "Classic aesthetic", "Compatible with most architectures"],
-    categories: ["residential"],
+    description: "Hinged at the top and opening outward from the bottom. Ideal for ventilation while preventing rain entry. Commonly used in bathrooms, basements, and kitchens where space-efficient ventilation is needed.",
+    bestFor: ["Basements", "Bathrooms", "Kitchens", "Utility rooms"],
+    benefits: ["Rain protection when open", "Excellent ventilation control", "Compact operation", "Easy to clean"],
+    type: "window",
     defaultWidth: 36,
     defaultHeight: 60,
+  },
+  {
+    id: "sliding",
+    name: "Sliding Window",
+    image: "/images/window-types/sliding.png",
+    description: "Horizontal sliding sash windows that glide smoothly on precision tracks. Space-efficient and easy to operate. Available in 2-panel and 3-panel configurations for wide, unobstructed views.",
+    bestFor: ["Living rooms", "Bedrooms", "Offices", "Contemporary designs"],
+    benefits: ["Space-saving operation", "Smooth gliding tracks", "Multi-panel options", "Wide unobstructed views"],
+    type: "window",
+    defaultWidth: 60,
+    defaultHeight: 36,
   },
   {
     id: "casement",
     name: "Casement",
     image: "/images/window-types/casement.png",
-    description: "Hinged at the side and opens outward like a door using a crank mechanism. Provides maximum airflow and an unobstructed view when open.",
-    bestFor: ["Above kitchen sinks", "Hard-to-reach areas", "Modern homes"],
-    benefits: ["Maximum ventilation", "Excellent energy efficiency", "Tight seal when closed", "Unobstructed views"],
-    categories: ["residential", "commercial"],
+    description: "Side-hinged windows that open outward like a door. Provide maximum ventilation and unobstructed views. Available in tilt & turn and hand-cranked variants for different applications.",
+    bestFor: ["Residential homes", "Light commercial", "Modern buildings"],
+    benefits: ["Maximum ventilation", "Unobstructed views", "Multi-point locking", "Energy efficient seals"],
+    type: "window",
     defaultWidth: 30,
     defaultHeight: 48,
-  },
-  {
-    id: "sliding",
-    name: "Sliding",
-    image: "/images/window-types/sliding.png",
-    description: "Operates horizontally along a track. One or both sashes slide left or right. Low maintenance and space-efficient since they don't protrude outward.",
-    bestFor: ["Patios", "Decks", "Wide openings", "Contemporary designs"],
-    benefits: ["Easy to operate", "Space-saving design", "Low maintenance", "Wide views"],
-    categories: ["residential", "commercial"],
-    defaultWidth: 60,
-    defaultHeight: 36,
-  },
-  {
-    id: "bay-bow",
-    name: "Bay & Bow",
-    image: "/images/window-types/bay-bow.png",
-    description: "Bay windows project outward in an angled shape (typically 3 panels), while bow windows use 4-6 panels in a gentle curve. Both add space and light to rooms.",
-    bestFor: ["Living rooms", "Master bedrooms", "Dining areas", "Reading nooks"],
-    benefits: ["Adds interior space", "Panoramic views", "Dramatic architectural element", "Increased natural light"],
-    categories: ["residential"],
-    defaultWidth: 72,
-    defaultHeight: 48,
-  },
-  {
-    id: "awning",
-    name: "Awning",
-    image: "/images/window-types/awning.png",
-    description: "Hinged at the top and opens outward from the bottom. Can remain open during light rain without letting water in, making them ideal for ventilation in various weather.",
-    bestFor: ["Basements", "Bathrooms", "Above doors", "Rainy climates"],
-    benefits: ["Ventilation in rain", "Good security", "Energy efficient", "Weather resistant"],
-    categories: ["residential", "commercial"],
-    defaultWidth: 36,
-    defaultHeight: 24,
-  },
-  {
-    id: "picture",
-    name: "Picture / Fixed",
-    image: "/images/window-types/picture-fixed.png",
-    description: "Large, non-opening windows designed to frame a view and maximize natural light. Often combined with operable windows on either side.",
-    bestFor: ["Scenic views", "High walls", "Accent windows", "Storefronts"],
-    benefits: ["Maximum light", "Best energy efficiency", "Unobstructed views", "No moving parts"],
-    categories: ["residential", "commercial", "industrial"],
-    defaultWidth: 48,
-    defaultHeight: 60,
-  },
-  {
-    id: "garden",
-    name: "Garden",
-    image: "/images/window-types/garden.jpg",
-    description: "Extends outward from the wall creating a small shelf. Originally designed for growing herbs, now used for plants, decor, or additional kitchen space.",
-    bestFor: ["Kitchens", "Plant lovers", "Small spaces"],
-    benefits: ["Additional shelf space", "Brings nature inside", "Unique design element", "Extra light"],
-    categories: ["residential"],
-    defaultWidth: 36,
-    defaultHeight: 36,
-  },
-  {
-    id: "skylight",
-    name: "Skylight",
-    image: "/images/window-types/skylight.jpg",
-    description: "Installed in the roof or ceiling to bring natural light from above. Available in fixed, vented, and tubular styles for various applications.",
-    bestFor: ["Dark rooms", "Hallways", "Bathrooms", "Attics"],
-    benefits: ["Natural overhead light", "Reduces energy costs", "Ventilation option", "Star gazing"],
-    categories: ["residential", "commercial"],
-    defaultWidth: 30,
-    defaultHeight: 48,
-  },
-  {
-    id: "transom",
-    name: "Transom",
-    image: "/images/window-types/transom.jpg",
-    description: "Narrow windows placed above doors or other windows. Can be fixed or operable. Add architectural interest and extra light to entryways.",
-    bestFor: ["Above front doors", "Above other windows", "Hallways", "Decorative accents"],
-    benefits: ["Additional natural light", "Architectural detail", "Privacy maintained", "Classic elegance"],
-    categories: ["residential", "commercial"],
-    defaultWidth: 48,
-    defaultHeight: 18,
-  },
-  {
-    id: "hopper",
-    name: "Hopper",
-    image: "/images/window-types/hopper.jpg",
-    description: "Hinged at the bottom and opens inward from the top. Commonly used in basements and bathrooms for ventilation while maintaining security.",
-    bestFor: ["Basements", "Bathrooms", "Small spaces", "Utility rooms"],
-    benefits: ["Good ventilation", "Compact design", "Security", "Water deflection"],
-    categories: ["residential"],
-    defaultWidth: 32,
-    defaultHeight: 18,
   },
   {
     id: "tilt-turn",
     name: "Tilt & Turn",
     image: "/images/window-types/tilt-turn.jpg",
-    description: "European-style window that can tilt inward from the top for ventilation or swing open from the side like a door. Offers maximum flexibility.",
-    bestFor: ["Modern buildings", "High-rise apartments", "European-style homes"],
-    benefits: ["Dual opening modes", "Easy to clean", "Excellent seal", "Multi-function"],
-    categories: ["residential", "commercial"],
+    description: "European-style casement that tilts inward from the top for secure ventilation or swings fully inward for cleaning and emergency egress. Dual-function hardware offers maximum flexibility.",
+    bestFor: ["High-rise condos", "Modern homes", "European-style buildings"],
+    benefits: ["Tilt mode for secure ventilation", "Full inward opening for cleaning", "Emergency egress capable", "Child-safe tilt position"],
+    type: "window",
     defaultWidth: 30,
     defaultHeight: 48,
   },
   {
-    id: "glass-block",
-    name: "Glass Block",
-    image: "/images/window-types/glass-block.jpg",
-    description: "Constructed from thick glass blocks that let light through while providing privacy and security. Ideal for areas where light is wanted without visibility.",
-    bestFor: ["Bathrooms", "Basements", "Stairwells", "Privacy areas"],
-    benefits: ["Maximum privacy", "Natural light", "Sound insulation", "Security"],
-    categories: ["residential", "commercial", "industrial"],
-    defaultWidth: 32,
-    defaultHeight: 32,
-  },
-  {
-    id: "jalousie",
-    name: "Jalousie / Louvre",
-    image: "/images/window-types/jalousie.jpg",
-    description: "Features horizontal glass slats that open and close like blinds. Provides excellent ventilation control. Common in tropical and warm climates.",
-    bestFor: ["Porches", "Sunrooms", "Tropical climates", "Ventilation zones"],
-    benefits: ["Maximum airflow", "Adjustable ventilation", "Light control", "Tropical style"],
-    categories: ["residential", "commercial"],
-    defaultWidth: 24,
+    id: "hand-cranked",
+    name: "Hand Cranked Casement",
+    image: "/images/window-types/casement.png",
+    description: "Traditional casement operated by a hand crank mechanism that pushes the sash outward. Provides precise control over the opening angle and excellent weatherseal when closed.",
+    bestFor: ["Residential homes", "Heritage buildings", "Hard-to-reach areas"],
+    benefits: ["Precise opening control", "Outward projection for airflow", "Traditional crank mechanism", "Tight weatherseal when closed"],
+    type: "window",
+    defaultWidth: 30,
     defaultHeight: 48,
   },
+  // ── DOORS ──
   {
-    id: "curtain-wall",
-    name: "Curtain Wall",
-    image: "/images/window-types/curtain-wall.jpg",
-    description: "Non-structural glass facade system that hangs from the building structure. Creates seamless glass exteriors for modern commercial and industrial buildings.",
-    bestFor: ["Office buildings", "Skyscrapers", "Showrooms", "Atriums"],
-    benefits: ["Stunning aesthetics", "Energy efficient systems", "Natural daylight", "Modern appearance"],
-    categories: ["commercial", "industrial"],
-    defaultWidth: 60,
-    defaultHeight: 96,
+    id: "sliding-door",
+    name: "Sliding Door",
+    image: "/images/products/sliding-door-1.jpg",
+    description: "Large-panel doors that glide horizontally on precision tracks. Available in 2, 3, and 4-panel configurations. Ideal for connecting indoor and outdoor spaces with seamless transitions.",
+    bestFor: ["Patios", "Balconies", "Terraces", "Open-plan living"],
+    benefits: ["Seamless indoor-outdoor flow", "Heavy-duty roller systems", "Multi-point security locks", "Thermal break frames"],
+    type: "door",
+    defaultWidth: 72,
+    defaultHeight: 84,
   },
   {
-    id: "storefront",
-    name: "Storefront",
-    image: "/images/window-types/storefront.png",
-    description: "Large glass panels framed in aluminum, designed for commercial ground-floor applications. Provides maximum product visibility and curb appeal.",
-    bestFor: ["Retail stores", "Restaurants", "Lobbies", "Ground-floor commercial"],
-    benefits: ["Maximum visibility", "Curb appeal", "Durable framing", "Custom sizing"],
-    categories: ["commercial"],
-    defaultWidth: 72,
+    id: "folding-door",
+    name: "Folding Door",
+    image: "/images/products/commercial-entry-1.jpg",
+    description: "Multi-panel bi-fold door systems that fold and stack to create wide open passages. Transform entire walls into open-air spaces. Available in 3 to 7-panel configurations.",
+    bestFor: ["Restaurants", "Patios", "Showrooms", "Open-concept spaces"],
+    benefits: ["Full wall opening capability", "Bi-fold panel stacking", "Flush threshold options", "Weather-rated seals"],
+    type: "door",
+    defaultWidth: 96,
+    defaultHeight: 84,
+  },
+  {
+    id: "swing-door",
+    name: "Swing Door",
+    image: "/images/products/commercial-entry-2.jpg",
+    description: "Traditional hinged doors that swing open on side-mounted hinges. Available as single or double-leaf, inward or outward opening. ADA compliant options with panic hardware available.",
+    bestFor: ["Main entries", "Commercial buildings", "Institutional facilities"],
+    benefits: ["Classic reliable operation", "Single or double leaf options", "ADA compliant options", "Panic hardware available"],
+    type: "door",
+    defaultWidth: 36,
     defaultHeight: 84,
   },
 ]
 
-const categoryIcons = {
-  residential: Home,
-  commercial: Building2,
-  industrial: Factory,
-}
+const windows = windowTypes.filter(t => t.type === "window")
+const doors = windowTypes.filter(t => t.type === "door")
 
 export default function WindowTypesPage() {
   const t = useTranslations('WindowTypes')
   const [selectedType, setSelectedType] = useState<WindowType | null>(null)
-  const [filter, setFilter] = useState<"all" | "residential" | "commercial" | "industrial">("all")
+  const [filter, setFilter] = useState<"all" | "windows" | "doors">("all")
 
-  const filtered = filter === "all" ? windowTypes : windowTypes.filter(w => w.categories.includes(filter))
+  const filtered = filter === "all" ? windowTypes : filter === "windows" ? windows : doors
 
   return (
     <div>
@@ -236,7 +157,7 @@ export default function WindowTypesPage() {
       <section className="py-8 border-b border-slate-200 dark:border-slate-800 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex gap-2 flex-wrap">
-            {(["all", "residential", "commercial", "industrial"] as const).map((cat) => (
+            {(["all", "windows", "doors"] as const).map((cat) => (
               <Button
                 key={cat}
                 variant={filter === cat ? "primary" : "outline"}
@@ -244,12 +165,11 @@ export default function WindowTypesPage() {
                 onClick={() => setFilter(cat)}
                 className="gap-2"
               >
-                {cat !== "all" && (() => { const Icon = categoryIcons[cat]; return <Icon className="h-4 w-4" /> })()}
-                {cat === "all" ? "All Types" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat === "all" ? "All Types" : cat === "windows" ? "Windows" : "Doors"}
               </Button>
             ))}
           </div>
-          <p className="mt-3 text-sm text-slate-500">Showing {filtered.length} window types</p>
+          <p className="mt-3 text-sm text-slate-500">Showing {filtered.length} of {windowTypes.length} types</p>
         </div>
       </section>
 
@@ -259,7 +179,7 @@ export default function WindowTypesPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filtered.map((type) => (
               <button
-                key={type.id}
+                key={type.name}
                 onClick={() => setSelectedType(type)}
                 className="group text-left"
               >
@@ -279,11 +199,7 @@ export default function WindowTypesPage() {
                       {type.name}
                     </h3>
                     <div className="flex gap-1 mt-1.5 flex-wrap justify-center">
-                      {type.categories.map((cat) => (
-                        <Badge key={cat} variant="secondary" className="text-[9px] px-1.5">
-                          {cat}
-                        </Badge>
-                      ))}
+                      <Badge variant="secondary" className="text-[9px] px-1.5">{type.type === "window" ? "Window" : "Door"}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -306,29 +222,27 @@ export default function WindowTypesPage() {
             </button>
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-slate-900 dark:text-white">{selectedType.name}</span>
-              {selectedType.categories.map((cat) => (
-                <Badge key={cat} variant="secondary" className="text-[10px]">{cat}</Badge>
-              ))}
+              <Badge variant="secondary" className="text-[10px]">{selectedType.type === "window" ? "Window" : "Door"}</Badge>
             </div>
             {/* Prev / Next navigation */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => {
-                  const idx = windowTypes.findIndex(w => w.id === selectedType.id)
+                  const idx = windowTypes.findIndex(w => w.name === selectedType.name)
                   if (idx > 0) setSelectedType(windowTypes[idx - 1])
                 }}
                 className="h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors disabled:opacity-30"
-                disabled={windowTypes.findIndex(w => w.id === selectedType.id) === 0}
+                disabled={windowTypes.findIndex(w => w.name === selectedType.name) === 0}
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={() => {
-                  const idx = windowTypes.findIndex(w => w.id === selectedType.id)
+                  const idx = windowTypes.findIndex(w => w.name === selectedType.name)
                   if (idx < windowTypes.length - 1) setSelectedType(windowTypes[idx + 1])
                 }}
                 className="h-8 w-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors disabled:opacity-30"
-                disabled={windowTypes.findIndex(w => w.id === selectedType.id) === windowTypes.length - 1}
+                disabled={windowTypes.findIndex(w => w.name === selectedType.name) === windowTypes.length - 1}
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -360,9 +274,7 @@ export default function WindowTypesPage() {
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{selectedType.name}</h2>
                   <div className="flex gap-2 mt-2">
-                    {selectedType.categories.map((cat) => (
-                      <Badge key={cat} variant="secondary">{cat}</Badge>
-                    ))}
+                    <Badge variant="secondary">{selectedType.type === "window" ? "Window" : "Door"}</Badge>
                   </div>
                 </div>
 
