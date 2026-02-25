@@ -2,7 +2,7 @@
 import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import { WindowFrame, TrackRail, LeverHandle, LockPoint, springStep, type SpringState } from "../WindowParts"
+import { WindowFrame, TrackRail, LockPoint, springStep, type SpringState } from "../WindowParts"
 import { GlassPane } from "../GlassPane"
 
 // Sliding Glass Door
@@ -51,9 +51,6 @@ export function SlidingDoor({ width, height, frameColor, glassType, isOpen }: {
         <group position={[panelW / 2 + t * 0.2, 0, 0.01]}>
           <WindowFrame width={panelW} height={height - t * 2} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
           <GlassPane width={glassW} height={glassH} glassType={glassType} />
-
-          {/* Vertical handle bar on active panel */}
-          <LeverHandle position={[-panelW / 2 + t * 0.8, 0, d * 0.3]} />
 
           {/* Lock points */}
           <LockPoint position={[-panelW / 2 + t * 0.5, height / 4, d * 0.2]} />

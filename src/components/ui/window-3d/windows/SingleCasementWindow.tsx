@@ -26,7 +26,9 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
   const glassH = sashH - t * 1.4
   const sashRef = useRef<THREE.Group>(null)
   const handleRef = useRef<THREE.Group>(null)
+  const leverRef = useRef<THREE.Group>(null)   // standard lever: 6:00↔9:00
   const crankAngle = useRef(0)  // accumulated crank rotation
+  const leverSpring = useRef<SpringState>({ pos: 0, vel: 0 })
 
   // Hand-cranked opens wider ~85° vs manual ~45°
   // Positive Y = outward (away from viewer/interior), handle stays on interior
@@ -41,10 +43,16 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
 
     if (showCrank && handleRef.current) {
       // Crank spins proportional to sash spring velocity
-      // Fast while sash is moving, slows and stops as spring settles
       const velocity = Math.abs(spring.current.vel)
-      crankAngle.current += velocity * dt * 12  // gear ratio multiplier
+      crankAngle.current += velocity * dt * 12
       handleRef.current.rotation.z = crankAngle.current
+    }
+
+    // Standard lever: 6:00=0 (closed) → 9:00=-π/2 (open)
+    if (!showCrank && leverRef.current) {
+      const leverTarget = isOpen ? -Math.PI / 2 : 0
+      const leverAngle = springStep(leverSpring.current, leverTarget, dt, 180, 16)
+      leverRef.current.rotation.z = leverAngle
     }
   })
 
@@ -102,20 +110,29 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
             <GlassPane width={glassW} height={glassH} glassType={glassType} />
 
             {!showCrank && (
-              /* STANDARD: lever handle on right stile */
-              <group position={[sashW / 2 - t * 0.35, 0, d * 0.27]}>
+              /* STANDARD: rotating lever — 6:00↓ closed, 9:00← open */
+              <group position={[sashW / 2 - t * 0.2, 0, d * 0.30]}>
+                {/* Escutcheon plate (fixed on stile) */}
                 <mesh>
-                  <boxGeometry args={[0.02, 0.05, 0.01]} />
-                  <meshStandardMaterial color="#999" roughness={0.25} metalness={0.5} />
+                  <boxGeometry args={[0.022, 0.08, 0.008]} />
+                  <meshStandardMaterial color="#c0b89a" roughness={0.18} metalness={0.5} />
                 </mesh>
-                <mesh position={[0, 0, 0.02]}>
-                  <boxGeometry args={[0.015, 0.07, 0.015]} />
-                  <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
+                {/* Lock cylinder center */}
+                <mesh position={[0, 0, 0.006]} rotation={[Math.PI / 2, 0, 0]}>
+                  <cylinderGeometry args={[0.005, 0.005, 0.005, 10]} />
+                  <meshStandardMaterial color="#a09880" roughness={0.25} metalness={0.55} />
                 </mesh>
-                <mesh position={[0, -0.04, 0.02]}>
-                  <boxGeometry args={[0.02, 0.012, 0.02]} />
-                  <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
-                </mesh>
+                {/* LEVER — rotates around Z. Default: pointing DOWN (6:00) */}
+                <group ref={leverRef} position={[0, 0, 0.009]}>
+                  <mesh position={[0, -0.05, 0]}>
+                    <boxGeometry args={[0.014, 0.08, 0.013]} />
+                    <meshStandardMaterial color="#d0c8ad" roughness={0.12} metalness={0.55} />
+                  </mesh>
+                  <mesh position={[0, -0.09, 0]}>
+                    <boxGeometry args={[0.018, 0.016, 0.015]} />
+                    <meshStandardMaterial color="#e0d8c0" roughness={0.10} metalness={0.5} />
+                  </mesh>
+                </group>
               </group>
             )}
 
