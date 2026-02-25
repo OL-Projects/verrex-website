@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { products, services, testimonials, companyInfo } from "@/lib/data"
@@ -117,13 +118,8 @@ export default function HomePage() {
               </FadeIn>
               {/* Certification badges */}
               <FadeIn delay={0.6}>
-                <div className="mt-8 flex flex-wrap items-center gap-5">
-                  {certifications.map((cert) => (
-                    <div key={cert.name} className="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
-                      <cert.icon className="h-4 w-4" />
-                      <span className="text-xs font-medium tracking-wide uppercase">{cert.name}</span>
-                    </div>
-                  ))}
+                <div className="mt-8">
+                  <CertificationsBar variant="compact" className="justify-start brightness-0 invert opacity-70" />
                 </div>
               </FadeIn>
             </div>

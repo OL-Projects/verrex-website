@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
+import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {

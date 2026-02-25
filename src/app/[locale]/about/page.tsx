@@ -2,6 +2,7 @@ import Image from "next/image"
 import { getTranslations } from 'next-intl/server'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
+import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Badge } from "@/components/ui/badge"
 import { partners } from "@/lib/data"
 import {
@@ -151,6 +152,18 @@ export default async function AboutPage() {
               </a>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Certifications & Standards */}
+      <section className="py-16 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <Badge variant="secondary" className="mb-3">Industry Standards</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Certifications &amp; Compliance</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">All VERREX products meet or exceed the highest industry standards</p>
+          </div>
+          <CertificationsBar variant="full" />
         </div>
       </section>
 

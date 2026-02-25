@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
+import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -151,6 +152,13 @@ export default function WindowsPage() {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Certifications Strip */}
+      <section className="py-6 bg-white dark:bg-[#0a0f1a] border-y border-slate-200 dark:border-slate-800">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <CertificationsBar variant="compact" />
         </div>
       </section>
 
