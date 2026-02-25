@@ -165,9 +165,19 @@ export default function CatalogPage() {
                   <ul className="space-y-1.5">
                     <li><IntlLink href="/products/windows" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('windowsSection')}</IntlLink></li>
                     <li><IntlLink href="/products/doors" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('doorsSection')}</IntlLink></li>
-                    <li><IntlLink href="/products/window-types" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Box className="h-3.5 w-3.5" />{t('configurator3d')}</IntlLink></li>
+                    <li><IntlLink href="/products/window-types" className="flex items-center gap-2 text-sm font-semibold transition-colors text-violet-600 dark:text-violet-400 hover:text-blue-600 dark:hover:text-blue-400"><Box className="h-3.5 w-3.5" />✦ {t('configurator3d')}</IntlLink></li>
                   </ul>
                 </div>
+
+                {/* 3D Configurator Promo Card */}
+                <IntlLink href="/products/window-types">
+                  <div className="rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 p-4 text-white shadow-lg shadow-violet-500/20 hover:shadow-xl hover:shadow-violet-500/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                    <Box className="h-6 w-6 mb-2 opacity-90" />
+                    <p className="text-sm font-bold">3D Configurator</p>
+                    <p className="text-[11px] text-white/75 mt-0.5">Visualize windows & doors interactively</p>
+                    <div className="mt-3 flex items-center gap-1 text-xs font-medium text-white/90">Try it now <ArrowRight className="h-3 w-3" /></div>
+                  </div>
+                </IntlLink>
               </div>
             </aside>
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
-  ArrowRight, Check, DoorOpen, Shield, Lock, Gauge, Accessibility,
+  ArrowRight, Check, DoorOpen, Shield, Lock, Gauge, Accessibility, Box,
 } from "lucide-react"
 
 export default function DoorsPage() {
@@ -51,6 +51,7 @@ export default function DoorsPage() {
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-6 flex gap-3 flex-wrap">
+            <IntlLink href="/products/window-types"><Button size="lg" className="gap-2 bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.03] transition-all duration-300 border-0"><Box className="h-4 w-4" /> {t('configure3d')}</Button></IntlLink>
             <IntlLink href="/quote"><Button variant="primary" size="lg" className="gap-2">{t('getQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
             <IntlLink href="/catalog"><Button variant="outline" size="lg" className="text-slate-700 border-slate-300 hover:bg-slate-100 dark:text-white dark:border-white/30 dark:hover:bg-white/10">{t('viewFullCatalog')}</Button></IntlLink>
           </div>
@@ -126,7 +127,7 @@ export default function DoorsPage() {
                   {/* Actions */}
                   <div className="mt-4 flex gap-2">
                     <IntlLink href="/quote"><Button variant="primary" size="sm" className="gap-1 text-xs">{t('getQuote')} <ArrowRight className="h-3 w-3" /></Button></IntlLink>
-                    <IntlLink href="/catalog"><Button variant="outline" size="sm" className="text-xs">{t('viewInCatalog')}</Button></IntlLink>
+                    <IntlLink href="/products/window-types"><Button size="sm" className="text-xs gap-1 bg-gradient-to-r from-blue-600 to-violet-600 text-white border-0 shadow-sm shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.03] transition-all"><Box className="h-3 w-3" /> {t('view3d')}</Button></IntlLink>
                   </div>
                 </CardContent>
               </Card>
@@ -142,6 +143,7 @@ export default function DoorsPage() {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('ctaTitle')}</h2>
           <p className="mt-2 text-slate-600 dark:text-slate-400">{t('ctaDesc')}</p>
           <div className="mt-6 flex gap-3 justify-center flex-wrap">
+            <IntlLink href="/products/window-types"><Button size="lg" className="gap-2 bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40 hover:scale-[1.03] transition-all duration-300 border-0"><Box className="h-4 w-4" /> {t('configure3d')}</Button></IntlLink>
             <IntlLink href="/quote"><Button variant="primary" size="lg" className="gap-2">{t('getQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
             <IntlLink href="/appointments"><Button variant="outline" size="lg">{t('bookConsultation')}</Button></IntlLink>
           </div>
