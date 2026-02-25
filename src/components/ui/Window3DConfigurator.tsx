@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useState, useCallback, useRef } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei"
 import * as THREE from "three"
@@ -51,6 +51,24 @@ export function Window3DConfigurator({
   const [tiltTurnMode, setTiltTurnMode] = useState<TiltTurnMode>("closed")
 
   const isTiltTurn = windowType === "tilt-turn"
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Mutual exclusion: close current mode first, then open new mode after delay
+  const switchTiltTurn = useCallback((target: TiltTurnMode) => {
+    if (transitionTimer.current) clearTimeout(transitionTimer.current)
+    if (tiltTurnMode === target) {
+      // Toggle off — just close
+      setTiltTurnMode("closed")
+    } else if (tiltTurnMode === "closed") {
+      // Nothing open — directly open target
+      setTiltTurnMode(target)
+    } else {
+      // Different mode active — close first, then open after spring settles
+      setTiltTurnMode("closed")
+      transitionTimer.current = setTimeout(() => setTiltTurnMode(target), 450)
+    }
+  }, [tiltTurnMode])
+
   const MIN_SIZE = 12, MAX_SIZE = 120
   const isValidWidth = width >= MIN_SIZE && width <= MAX_SIZE
   const isValidHeight = height >= MIN_SIZE && height <= MAX_SIZE
@@ -116,7 +134,7 @@ export function Window3DConfigurator({
         {isTiltTurn && (
           <div className="absolute bottom-3 right-3 flex gap-2">
             <button
-              onClick={() => setTiltTurnMode(tiltTurnMode === "tilt" ? "closed" : "tilt")}
+              onClick={() => switchTiltTurn("tilt")}
               className={`px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
                 tiltTurnMode === "tilt"
                   ? "bg-blue-500/90 text-white hover:bg-blue-600/90"
@@ -126,7 +144,7 @@ export function Window3DConfigurator({
               {tiltTurnMode === "tilt" ? "✕ Close" : "↕ Tilt"}
             </button>
             <button
-              onClick={() => setTiltTurnMode(tiltTurnMode === "turn" ? "closed" : "turn")}
+              onClick={() => switchTiltTurn("turn")}
               className={`px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
                 tiltTurnMode === "turn"
                   ? "bg-green-500/90 text-white hover:bg-green-600/90"

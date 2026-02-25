@@ -64,7 +64,6 @@ export function AwningWindow({ width, height, frameColor, glassType, isOpen }: W
         <boxGeometry args={[width - t * 3, 0.014, 0.028]} />
         <meshStandardMaterial color="#888" roughness={0.15} metalness={0.9} />
       </mesh>
-      <CrankHandle position={[0, -height / 3, d * 0.3]} />
       <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, -height / 2 + t * 0.5, d * 0.12]} />
     </group>
   )

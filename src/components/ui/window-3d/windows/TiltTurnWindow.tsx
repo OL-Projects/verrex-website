@@ -53,8 +53,8 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
     const tiltTarget = openMode === "tilt" ? 0.22 : 0
     const tiltAngle = springStep(tiltSpring.current, tiltTarget, dt, 100, 14)
 
-    // TURN: pivot at LEFT edge, swings inward like a door (positive Y rotation ~85°)
-    const turnTarget = openMode === "turn" ? Math.PI * 0.47 : 0
+    // TURN: pivot at LEFT edge, swings INWARD toward viewer (negative Y rotation ~85°)
+    const turnTarget = openMode === "turn" ? -Math.PI * 0.47 : 0
     const turnAngle = springStep(turnSpring.current, turnTarget, dt, 70, 14)
 
     if (turnRef.current) turnRef.current.rotation.y = turnAngle
