@@ -437,6 +437,73 @@ export default function HomePage() {
         </div>
       </RevealSection>
 
+      {/* Certifications Section */}
+      <RevealSection className="py-20 dark:bg-[#030712]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <FadeIn className="text-center mb-12">
+            <Badge variant="secondary" className="mb-3">Industry Certified</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
+              {t('certsTitle')}
+            </h2>
+            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              {t('certsDesc')}
+            </p>
+          </FadeIn>
+
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                name: "ENERGY STAR®",
+                src: "/images/certifications/energy-star.svg",
+                desc: t('certEnergyStarDesc'),
+                bg: "bg-white dark:bg-slate-900",
+              },
+              {
+                name: "NFRC",
+                src: "/images/certifications/nfrc.svg",
+                desc: t('certNfrcDesc'),
+                bg: "bg-white dark:bg-slate-900",
+              },
+              {
+                name: "CSA",
+                src: "/images/certifications/csa-light.svg",
+                darkSrc: "/images/certifications/csa-dark.svg",
+                desc: t('certCsaDesc'),
+                bg: "bg-white dark:bg-slate-900",
+              },
+              {
+                name: "CE",
+                src: "/images/certifications/ce-light.svg",
+                darkSrc: "/images/certifications/ce-dark.svg",
+                desc: t('certCeDesc'),
+                bg: "bg-white dark:bg-slate-900",
+              },
+            ].map((cert) => (
+              <StaggerItem key={cert.name}>
+                <HoverCard>
+                  <Card className="h-full text-center">
+                    <CardContent className="p-6 flex flex-col items-center">
+                      <div className={`w-full h-24 flex items-center justify-center rounded-lg ${cert.bg} mb-4`}>
+                        {cert.darkSrc ? (
+                          <>
+                            <Image src={cert.src} alt={cert.name} width={120} height={80} className="h-16 w-auto block dark:hidden" />
+                            <Image src={cert.darkSrc} alt={cert.name} width={120} height={80} className="h-16 w-auto hidden dark:block" />
+                          </>
+                        ) : (
+                          <Image src={cert.src} alt={cert.name} width={120} height={80} className="h-16 w-auto" />
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{cert.name}</h3>
+                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{cert.desc}</p>
+                    </CardContent>
+                  </Card>
+                </HoverCard>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </RevealSection>
+
       {/* CTA Section */}
       <section className="relative py-20 bg-slate-900 dark:bg-[#000000] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent" />
