@@ -35,8 +35,8 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
   width: number; height: number; frameColor: string; glassType: string; openMode?: TiltTurnMode
 }) {
   // European proportions: thicker frame depth, wider profile
-  const t = 0.085       // frame thickness — chunkier European profile
-  const d = 0.12        // frame depth — ~80-90mm European style
+  const t = 0.062       // frame thickness — slim European profile (visible handle)
+  const d = 0.10        // frame depth — ~70mm European style
   const sashW = width - t * 2
   const sashH = height - t * 2
   const glassW = sashW - t * 1.2
@@ -197,28 +197,29 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
 
             {/* ── LEVER HANDLE — RIGHT stile, 3-position clock rotation ── */}
             {/* 6:00↓ = locked, 9:00← = turn, 12:00↑ = tilt */}
-            <group position={[sashW / 2 - t * 0.35, 0, d * 0.3]}>
-              {/* Escutcheon plate (fixed on stile face) */}
+            {/* Warm satin nickel finish — distinguishable from white frame */}
+            <group position={[sashW / 2 - t * 0.2, 0, d * 0.35]}>
+              {/* Escutcheon plate (fixed on stile face — larger) */}
               <mesh>
-                <boxGeometry args={[0.018, 0.058, 0.007]} />
-                <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
+                <boxGeometry args={[0.024, 0.09, 0.009]} />
+                <meshStandardMaterial color="#c0b89a" roughness={0.18} metalness={0.5} />
               </mesh>
               {/* Lock cylinder center (fixed pivot point) */}
-              <mesh position={[0, 0, 0.005]} rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.005, 0.005, 0.005, 10]} />
-                <meshStandardMaterial color="#888" roughness={0.3} metalness={0.6} />
+              <mesh position={[0, 0, 0.006]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.006, 0.006, 0.006, 12]} />
+                <meshStandardMaterial color="#a09880" roughness={0.25} metalness={0.55} />
               </mesh>
               {/* LEVER — rotates around Z. Default: pointing DOWN (6:00) */}
-              <group ref={leverRef} position={[0, 0, 0.008]}>
-                {/* Lever arm — extends downward from center */}
-                <mesh position={[0, -0.045, 0]}>
-                  <boxGeometry args={[0.01, 0.065, 0.01]} />
-                  <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.6} />
+              <group ref={leverRef} position={[0, 0, 0.010]}>
+                {/* Lever arm — extends downward from center (longer + thicker) */}
+                <mesh position={[0, -0.055, 0]}>
+                  <boxGeometry args={[0.015, 0.09, 0.014]} />
+                  <meshStandardMaterial color="#d0c8ad" roughness={0.12} metalness={0.55} />
                 </mesh>
-                {/* Grip tip (wider end for ergonomic grip) */}
-                <mesh position={[0, -0.078, 0]}>
-                  <boxGeometry args={[0.014, 0.012, 0.012]} />
-                  <meshStandardMaterial color="#ccc" roughness={0.12} metalness={0.55} />
+                {/* Grip tip (wider ergonomic end) */}
+                <mesh position={[0, -0.10, 0]}>
+                  <boxGeometry args={[0.020, 0.018, 0.016]} />
+                  <meshStandardMaterial color="#e0d8c0" roughness={0.10} metalness={0.5} />
                 </mesh>
               </group>
             </group>
