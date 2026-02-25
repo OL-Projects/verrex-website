@@ -41,9 +41,10 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
   const sashH = height - t * 2
   const glassW = sashW - t * 1.2
   const glassH = sashH - t * 1.2
-  const sashRef = useRef<THREE.Group>(null)
+  const turnRef = useRef<THREE.Group>(null)  // Y-axis: left-edge hinge
+  const tiltRef = useRef<THREE.Group>(null)  // X-axis: bottom-edge hinge
 
-  // Two spring states — one for tilt (X-axis), one for turn (Y-axis)
+  // Two independent spring states
   const tiltSpring = useRef<SpringState>({ pos: 0, vel: 0 })
   const turnSpring = useRef<SpringState>({ pos: 0, vel: 0 })
 
@@ -52,14 +53,12 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
     const tiltTarget = openMode === "tilt" ? 0.22 : 0
     const tiltAngle = springStep(tiltSpring.current, tiltTarget, dt, 100, 14)
 
-    // TURN: pivot at left edge, swings inward (positive Y rotation ~85°)
+    // TURN: pivot at LEFT edge, swings inward like a door (positive Y rotation ~85°)
     const turnTarget = openMode === "turn" ? Math.PI * 0.47 : 0
     const turnAngle = springStep(turnSpring.current, turnTarget, dt, 70, 14)
 
-    if (sashRef.current) {
-      sashRef.current.rotation.x = tiltAngle
-      sashRef.current.rotation.y = turnAngle
-    }
+    if (turnRef.current) turnRef.current.rotation.y = turnAngle
+    if (tiltRef.current) tiltRef.current.rotation.x = tiltAngle
   })
 
   const isOpen = openMode !== "closed"
@@ -137,10 +136,14 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
         </mesh>
       ))}
 
-      {/* ── SASH — pivots at BOTTOM edge, top tilts inward ── */}
-      <group position={[0, -height / 2 + t, 0]}>
-        <group ref={sashRef}>
-          <group position={[0, sashH / 2, 0]}>
+      {/* ── SASH — dual pivot: TURN at left edge, TILT at bottom edge ── */}
+      {/* TURN pivot: left edge of sash area, center height */}
+      <group position={[-sashW / 2, 0, 0]}>
+        <group ref={turnRef}>
+          {/* TILT pivot: bottom edge of sash (relative to turn origin) */}
+          <group position={[sashW / 2, -sashH / 2, 0]}>
+            <group ref={tiltRef}>
+              <group position={[0, sashH / 2, 0]}>
             {/* Sash frame (inset from outer frame) */}
             <WindowFrame width={sashW} height={sashH} depth={d * 0.55} thickness={t * 0.65} color={frameColor} />
 
@@ -232,9 +235,11 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
                 <meshStandardMaterial color="#999" roughness={0.25} metalness={0.6} />
               </mesh>
             ))}
-          </group>
-        </group>
-      </group>
+              </group>{/* close content position */}
+            </group>{/* close tiltRef */}
+          </group>{/* close tilt position */}
+        </group>{/* close turnRef */}
+      </group>{/* close turn position */}
 
       {/* ── SHADOW LINE — subtle reveal gap between sash and frame (3-5mm) ── */}
       {/* This is achieved by the slight inset of the sash from the outer frame */}
