@@ -437,72 +437,102 @@ export default function HomePage() {
         </div>
       </RevealSection>
 
-      {/* Certifications Section */}
-      <RevealSection className="py-20 dark:bg-[#030712]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center mb-12">
-            <Badge variant="secondary" className="mb-3">Industry Certified</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
+      {/* Certifications Section — Premium Showcase */}
+      <section className="relative py-24 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0a0f1a] dark:via-[#060b16] dark:to-[#0a0f1a] overflow-hidden">
+        {/* Subtle decorative background elements */}
+        <div className="absolute top-0 left-1/3 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/3 rounded-full blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <FadeIn className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/80 dark:bg-blue-900/30 border border-blue-200/50 dark:border-blue-800/30 mb-5">
+              <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 tracking-wide uppercase">Industry Certified</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
               {t('certsTitle')}
             </h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            <p className="mt-5 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
               {t('certsDesc')}
             </p>
+            {/* Decorative line */}
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400/60" />
+              <div className="h-1.5 w-1.5 rounded-full bg-blue-500/60" />
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-blue-400/60" />
+            </div>
           </FadeIn>
 
-          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {[
               {
                 name: "ENERGY STAR®",
                 src: "/images/certifications/energy-star.svg",
+                darkSrc: "/images/certifications/energy-star-dark.svg",
                 desc: t('certEnergyStarDesc'),
-                bg: "bg-white dark:bg-slate-900",
+                accent: "from-green-500 to-emerald-600",
+                iconBg: "bg-green-50 dark:bg-green-900/20",
               },
               {
                 name: "NFRC",
                 src: "/images/certifications/nfrc.svg",
+                darkSrc: "/images/certifications/nfrc-dark.svg",
                 desc: t('certNfrcDesc'),
-                bg: "bg-white dark:bg-slate-900",
+                accent: "from-blue-500 to-indigo-600",
+                iconBg: "bg-blue-50 dark:bg-blue-900/20",
               },
               {
                 name: "CSA",
                 src: "/images/certifications/csa-light.svg",
                 darkSrc: "/images/certifications/csa-dark.svg",
                 desc: t('certCsaDesc'),
-                bg: "bg-white dark:bg-slate-900",
+                accent: "from-red-500 to-rose-600",
+                iconBg: "bg-red-50 dark:bg-red-900/20",
               },
               {
                 name: "CE",
                 src: "/images/certifications/ce-light.svg",
                 darkSrc: "/images/certifications/ce-dark.svg",
                 desc: t('certCeDesc'),
-                bg: "bg-white dark:bg-slate-900",
+                accent: "from-blue-600 to-blue-800",
+                iconBg: "bg-blue-50 dark:bg-blue-900/20",
               },
             ].map((cert) => (
               <StaggerItem key={cert.name}>
                 <HoverCard>
-                  <Card className="h-full text-center">
-                    <CardContent className="p-6 flex flex-col items-center">
-                      <div className={`w-full h-24 flex items-center justify-center rounded-lg ${cert.bg} mb-4`}>
+                  <div className="group relative h-full rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-xl hover:shadow-slate-300/50 dark:hover:shadow-black/30 transition-all duration-500 overflow-hidden">
+                    {/* Top accent gradient bar */}
+                    <div className={`h-1 w-full bg-gradient-to-r ${cert.accent}`} />
+
+                    <div className="p-7 flex flex-col items-center text-center">
+                      {/* Logo container with subtle background */}
+                      <div className={`w-full h-28 flex items-center justify-center rounded-xl ${cert.iconBg} border border-slate-100 dark:border-slate-700/30 mb-6 group-hover:scale-[1.02] transition-transform duration-500`}>
                         {cert.darkSrc ? (
                           <>
-                            <Image src={cert.src} alt={cert.name} width={120} height={80} className="h-16 w-auto block dark:hidden" />
-                            <Image src={cert.darkSrc} alt={cert.name} width={120} height={80} className="h-16 w-auto hidden dark:block" />
+                            <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto block dark:hidden" unoptimized />
+                            <Image src={cert.darkSrc} alt={cert.name} width={140} height={96} className="h-20 w-auto hidden dark:block" unoptimized />
                           </>
                         ) : (
-                          <Image src={cert.src} alt={cert.name} width={120} height={80} className="h-16 w-auto" />
+                          <Image src={cert.src} alt={cert.name} width={140} height={96} className="h-20 w-auto" unoptimized />
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{cert.name}</h3>
-                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{cert.desc}</p>
-                    </CardContent>
-                  </Card>
+
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{cert.name}</h3>
+                      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{cert.desc}</p>
+
+                      {/* Verified badge */}
+                      <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/30">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Verified</span>
+                      </div>
+                    </div>
+                  </div>
                 </HoverCard>
               </StaggerItem>
             ))}
           </StaggerContainer>
         </div>
-      </RevealSection>
+      </section>
 
       {/* CTA Section */}
       <section className="relative py-20 bg-slate-900 dark:bg-[#000000] overflow-hidden">

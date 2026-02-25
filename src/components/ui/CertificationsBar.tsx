@@ -9,8 +9,8 @@ interface CertItem {
 }
 
 const certs: CertItem[] = [
-  { name: "ENERGY STAR", src: "/images/certifications/energy-star.svg" },
-  { name: "NFRC", src: "/images/certifications/nfrc.svg" },
+  { name: "ENERGY STAR", src: "/images/certifications/energy-star.svg", darkSrc: "/images/certifications/energy-star-dark.svg" },
+  { name: "NFRC", src: "/images/certifications/nfrc.svg", darkSrc: "/images/certifications/nfrc-dark.svg" },
   { name: "CSA", src: "/images/certifications/csa-light.svg", darkSrc: "/images/certifications/csa-dark.svg" },
   { name: "CE", src: "/images/certifications/ce-light.svg", darkSrc: "/images/certifications/ce-dark.svg" },
 ]
