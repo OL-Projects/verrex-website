@@ -37,7 +37,7 @@ function TopHungDiagram() {
       {/* Top hinge indicators */}
       <rect x="70" y="18" width="16" height="6" rx="2" className="fill-slate-500 dark:fill-slate-400" />
       <rect x="114" y="18" width="16" height="6" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Opening arc - bottom swings outward */}
+      {/* Opening arc — bottom swings outward */}
       <path d="M 42 155 Q 100 175 158 155" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
       {/* Arrow at bottom center */}
       <path d="M 100 158 L 100 172 M 95 167 L 100 172 L 105 167" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
@@ -72,165 +72,229 @@ function SlidingWindowDiagram() {
   )
 }
 
-/* ── CASEMENT ── side-hinged, opens outward */
+/* ── CASEMENT ── side-hinged, opens outward — standard elevation schematic */
 function CasementDiagram() {
   return (
-    <svg viewBox="0 0 180 200" className="w-full h-full max-w-[160px] max-h-[180px]">
-      {/* Frame */}
-      <rect x="25" y="15" width="130" height="170" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
-      {/* Glass */}
-      <rect x="33" y="23" width="114" height="154" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      {/* Horizontal glazing bar */}
-      <line x1="33" y1="100" x2="147" y2="100" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1.5" />
-      {/* Left hinge indicators */}
-      <rect x="22" y="55" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      <rect x="22" y="130" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Handle on right */}
-      <rect x="140" y="92" width="5" height="16" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Opening arc - right side swings outward */}
-      <path d="M 155 30 Q 185 100 155 170" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
-      {/* Arrow outward */}
-      <path d="M 152 100 L 168 100 M 163 95 L 168 100 L 163 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
+    <svg viewBox="0 0 160 200" className="w-full h-full max-w-[140px] max-h-[180px]">
+      {/* Outer frame */}
+      <rect x="20" y="15" width="120" height="170" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
+      {/* Sash / glass area */}
+      <rect x="28" y="23" width="104" height="154" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      {/* Architectural diagonal indicator — hinge-top-left to handle-bottom-right */}
+      <line x1="28" y1="23" x2="132" y2="177" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* Second diagonal — hinge-bottom-left to handle-top-right (forms X at sash center) */}
+      <line x1="28" y1="177" x2="132" y2="23" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* 3 hinges on left stile */}
+      <rect x="17" y="40" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="93" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="146" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* Handle bar on right stile */}
+      <rect x="128" y="92" width="6" height="18" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* Label */}
+      <text x="80" y="8" textAnchor="middle" className="fill-slate-400 dark:fill-slate-500" fontSize="7" fontFamily="sans-serif">OPENS OUT →</text>
     </svg>
   )
 }
 
-/* ── TILT & TURN ── dual mode: tilt from top + swing from side */
+/* ── TILT & TURN ── ISO diamond symbol: 4 triangles from center point to frame midpoints */
 function TiltTurnDiagram() {
   return (
-    <svg viewBox="0 0 200 200" className="w-full h-full max-w-[180px] max-h-[180px]">
-      {/* Frame */}
-      <rect x="30" y="15" width="130" height="170" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
-      {/* Glass */}
-      <rect x="38" y="23" width="114" height="154" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      {/* Diagonal cross showing tilt-turn dual mode */}
-      <line x1="38" y1="23" x2="152" y2="177" stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="1" strokeDasharray="3 3" />
-      <line x1="152" y1="23" x2="38" y2="177" stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="1" strokeDasharray="3 3" />
-      {/* Left hinge */}
-      <rect x="27" y="60" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      <rect x="27" y="130" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Handle */}
-      <rect x="145" y="92" width="5" height="16" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* TILT arc - top tilts inward */}
-      <path d="M 45 18 Q 95 -5 145 18" fill="none" stroke="currentColor" className="text-emerald-500 dark:text-emerald-400" strokeWidth="1.5" strokeDasharray="4 3" />
-      <path d="M 95 18 L 95 4 M 90 9 L 95 4 L 100 9" fill="none" stroke="currentColor" className="text-emerald-500 dark:text-emerald-400" strokeWidth="1.5" />
-      {/* TURN arc - side swings inward */}
-      <path d="M 160 30 Q 185 100 160 170" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
-      <path d="M 157 100 L 172 100 M 167 95 L 172 100 L 167 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
+    <svg viewBox="0 0 160 200" className="w-full h-full max-w-[140px] max-h-[180px]">
+      {/* Outer frame */}
+      <rect x="20" y="15" width="120" height="170" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
+      {/* Sash / glass area */}
+      <rect x="28" y="23" width="104" height="154" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      {/* Diamond/rhombus connecting midpoints of sash sides (ISO tilt-turn symbol) */}
+      {/* Midpoints: top=80,23  right=132,100  bottom=80,177  left=28,100 */}
+      <polygon
+        points="80,23 132,100 80,177 28,100"
+        fill="none"
+        stroke="currentColor"
+        className="text-blue-500 dark:text-blue-400"
+        strokeWidth="1.5"
+        strokeDasharray="5 3"
+      />
+      {/* Center point where diagonals of diamond cross */}
+      <circle cx="80" cy="100" r="3" className="fill-blue-500 dark:fill-blue-400" />
+      {/* TILT indicator — top triangle colored */}
+      <polygon points="80,23 132,100 28,100" fill="currentColor" className="text-emerald-500/15 dark:text-emerald-400/15" />
+      {/* TURN indicator — right triangle colored */}
+      <polygon points="132,100 80,23 80,177" fill="currentColor" className="text-blue-500/15 dark:text-blue-400/15" />
+      {/* Handle on right stile */}
+      <rect x="128" y="92" width="6" height="18" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* 3 hinges on left stile */}
+      <rect x="17" y="40" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="93" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="146" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
       {/* Labels */}
-      <text x="95" y="210" textAnchor="middle" className="fill-emerald-500 dark:fill-emerald-400" fontSize="7" fontFamily="sans-serif">TILT</text>
-      <text x="180" y="102" textAnchor="start" className="fill-blue-400 dark:fill-blue-500" fontSize="7" fontFamily="sans-serif">TURN</text>
+      <text x="80" y="70" textAnchor="middle" className="fill-emerald-600 dark:fill-emerald-400" fontSize="8" fontWeight="600" fontFamily="sans-serif">TILT</text>
+      <text x="115" y="104" textAnchor="middle" className="fill-blue-600 dark:fill-blue-400" fontSize="8" fontWeight="600" fontFamily="sans-serif">TURN</text>
     </svg>
   )
 }
 
-/* ── HAND CRANKED ── casement with crank mechanism */
+/* ── HAND CRANKED ── casement with worm-gear crank mechanism at bottom */
 function HandCrankedDiagram() {
   return (
-    <svg viewBox="0 0 180 210" className="w-full h-full max-w-[160px] max-h-[190px]">
-      {/* Frame */}
-      <rect x="25" y="15" width="130" height="160" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
-      {/* Glass */}
-      <rect x="33" y="23" width="114" height="144" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      {/* Left hinge indicators */}
-      <rect x="22" y="50" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      <rect x="22" y="120" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Opening arc */}
-      <path d="M 155 25 Q 180 95 155 165" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
-      {/* Crank mechanism at bottom */}
-      <circle cx="90" cy="190" r="4" className="fill-slate-500 dark:fill-slate-400" />
-      <line x1="90" y1="175" x2="90" y2="186" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2" />
-      <line x1="90" y1="190" x2="108" y2="196" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2.5" />
-      <circle cx="108" cy="196" r="3" className="fill-slate-400 dark:fill-slate-500" />
-      {/* Crank label */}
-      <text x="90" y="207" textAnchor="middle" className="fill-slate-400 dark:fill-slate-500" fontSize="7" fontFamily="sans-serif">CRANK</text>
+    <svg viewBox="0 0 160 210" className="w-full h-full max-w-[140px] max-h-[190px]">
+      {/* Outer frame */}
+      <rect x="20" y="15" width="120" height="155" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
+      {/* Sash / glass area */}
+      <rect x="28" y="23" width="104" height="139" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      {/* Architectural diagonal X indicator — casement opens outward */}
+      <line x1="28" y1="23" x2="132" y2="162" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
+      <line x1="28" y1="162" x2="132" y2="23" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* 3 hinges on left */}
+      <rect x="17" y="38" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="84" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="17" y="130" width="6" height="12" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* Crank mechanism below window */}
+      {/* Mounting plate */}
+      <rect x="68" y="176" width="24" height="6" rx="2" className="fill-slate-400 dark:fill-slate-500" />
+      {/* Worm gear housing (circle) */}
+      <circle cx="80" cy="192" r="7" fill="none" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2" />
+      <circle cx="80" cy="192" r="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* Crank arm + handle */}
+      <line x1="87" y1="192" x2="110" y2="192" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2.5" />
+      <circle cx="110" cy="192" r="4" fill="none" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2" />
+      {/* Connecting rod from gear to window bottom */}
+      <line x1="80" y1="185" x2="80" y2="170" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="1.5" strokeDasharray="3 2" />
+      {/* Label */}
+      <text x="80" y="208" textAnchor="middle" className="fill-slate-400 dark:fill-slate-500" fontSize="7" fontFamily="sans-serif">CRANK</text>
     </svg>
   )
 }
 
-/* ── SLIDING DOOR ── tall panels on floor track */
+/* ── SLIDING GLASS DOOR ── floor-to-ceiling glass panels on heavy track */
 function SlidingDoorDiagram() {
   return (
-    <svg viewBox="0 0 220 180" className="w-full h-full max-w-[200px] max-h-[160px]">
-      {/* Floor line */}
-      <line x1="10" y1="165" x2="210" y2="165" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
-      {/* Frame */}
-      <rect x="25" y="15" width="170" height="150" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="6" />
-      {/* Left panel (fixed) */}
-      <rect x="33" y="23" width="76" height="134" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      {/* Right panel (slides) */}
-      <rect x="113" y="23" width="76" height="134" rx="1" className="fill-sky-200/70 dark:fill-sky-800/40" />
-      {/* Center rail */}
-      <line x1="110" y1="15" x2="110" y2="165" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="4" />
-      {/* Floor track detail */}
-      <rect x="30" y="160" width="160" height="4" rx="1" className="fill-slate-300 dark:fill-slate-600" />
-      {/* Handle on right panel */}
-      <rect x="118" y="82" width="5" height="20" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Sliding arrow */}
-      <path d="M 165 90 L 135 90 M 142 85 L 135 90 L 142 95" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="2" />
-      {/* Glazing bars */}
-      <line x1="33" y1="90" x2="109" y2="90" stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="1" />
-      <line x1="113" y1="90" x2="189" y2="90" stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="1" />
+    <svg viewBox="0 0 200 220" className="w-full h-full max-w-[180px] max-h-[200px]">
+      {/* Floor */}
+      <line x1="5" y1="205" x2="195" y2="205" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
+      {/* Header track */}
+      <rect x="18" y="10" width="164" height="6" rx="1" className="fill-slate-300 dark:fill-slate-600" />
+      {/* Heavy outer frame */}
+      <rect x="20" y="12" width="160" height="192" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="5" />
+      {/* Left panel — FIXED (larger glass area with thin frame) */}
+      <rect x="27" y="19" width="72" height="178" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      {/* Left panel inner frame lines */}
+      <rect x="27" y="19" width="72" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Right panel — SLIDES (slightly overlapping center rail) */}
+      <rect x="103" y="19" width="72" height="178" rx="1" className="fill-sky-200/60 dark:fill-sky-800/30" />
+      <rect x="103" y="19" width="72" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Center meeting stile (overlapping rail — thicker to show overlap) */}
+      <rect x="96" y="12" width="10" height="192" className="fill-slate-400 dark:fill-slate-500" />
+      {/* Horizontal handle bar on active panel */}
+      <rect x="108" y="110" width="4" height="28" rx="2" className="fill-slate-600 dark:fill-slate-300" />
+      {/* Floor track detail (recessed channel) */}
+      <rect x="25" y="198" width="150" height="5" rx="1" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="1.5" />
+      <line x1="30" y1="200" x2="170" y2="200" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Slide direction arrow */}
+      <path d="M 155 124 L 125 124 M 132 119 L 125 124 L 132 129" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="2" />
+      {/* Label */}
+      <text x="140" y="142" textAnchor="middle" className="fill-blue-400 dark:fill-blue-500" fontSize="7" fontFamily="sans-serif">SLIDES</text>
+      {/* Fixed label on left panel */}
+      <text x="63" y="112" textAnchor="middle" className="fill-slate-300 dark:fill-slate-600" fontSize="7" fontFamily="sans-serif">FIXED</text>
     </svg>
   )
 }
 
-/* ── FOLDING DOOR ── multi-panel bi-fold */
+/* ── FOLDING DOOR ── 4-panel bi-fold with alternating diagonal fold indicators */
 function FoldingDoorDiagram() {
   return (
-    <svg viewBox="0 0 240 180" className="w-full h-full max-w-[220px] max-h-[160px]">
-      {/* Floor line */}
-      <line x1="5" y1="165" x2="235" y2="165" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
-      {/* Frame */}
-      <rect x="15" y="15" width="210" height="150" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="5" />
-      {/* 4 panels */}
-      <rect x="22" y="22" width="48" height="136" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      <rect x="73" y="22" width="48" height="136" rx="1" className="fill-sky-200/60 dark:fill-sky-800/30" />
-      <rect x="124" y="22" width="48" height="136" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      <rect x="175" y="22" width="48" height="136" rx="1" className="fill-sky-200/60 dark:fill-sky-800/30" />
-      {/* Panel dividers */}
-      <line x1="70" y1="15" x2="70" y2="165" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
-      <line x1="121" y1="15" x2="121" y2="165" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
-      <line x1="172" y1="15" x2="172" y2="165" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
-      {/* Floor track */}
-      <rect x="20" y="160" width="200" height="4" rx="1" className="fill-slate-300 dark:fill-slate-600" />
-      {/* Fold direction arrows */}
-      <path d="M 46 90 L 26 75 M 46 90 L 26 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
-      <path d="M 97 90 L 117 75 M 97 90 L 117 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
-      <path d="M 148 90 L 128 75 M 148 90 L 128 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
-      <path d="M 199 90 L 219 75 M 199 90 L 219 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
-      {/* Fold label */}
-      <text x="120" y="12" textAnchor="middle" className="fill-blue-400 dark:fill-blue-500" fontSize="7" fontFamily="sans-serif">BI-FOLD</text>
+    <svg viewBox="0 0 240 220" className="w-full h-full max-w-[220px] max-h-[200px]">
+      {/* Floor */}
+      <line x1="5" y1="205" x2="235" y2="205" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
+      {/* Top pivot track */}
+      <rect x="13" y="10" width="214" height="5" rx="1" className="fill-slate-300 dark:fill-slate-600" />
+      {/* Outer frame */}
+      <rect x="15" y="12" width="210" height="192" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="5" />
+      {/* Bottom guide track */}
+      <rect x="20" y="198" width="200" height="5" rx="1" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="1.5" />
+
+      {/* Panel 1 (left) — folds LEFT */}
+      <rect x="22" y="19" width="48" height="178" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      <rect x="22" y="19" width="48" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Diagonal: folds left — line from top-right to bottom-left */}
+      <line x1="70" y1="19" x2="22" y2="197" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
+
+      {/* Panel 2 — folds RIGHT */}
+      <rect x="73" y="19" width="48" height="178" rx="1" className="fill-sky-200/50 dark:fill-sky-800/20" />
+      <rect x="73" y="19" width="48" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Diagonal: folds right — line from top-left to bottom-right */}
+      <line x1="73" y1="19" x2="121" y2="197" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
+
+      {/* Panel 3 — folds LEFT */}
+      <rect x="124" y="19" width="48" height="178" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      <rect x="124" y="19" width="48" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Diagonal: folds left */}
+      <line x1="172" y1="19" x2="124" y2="197" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
+
+      {/* Panel 4 (right) — folds RIGHT */}
+      <rect x="175" y="19" width="48" height="178" rx="1" className="fill-sky-200/50 dark:fill-sky-800/20" />
+      <rect x="175" y="19" width="48" height="178" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+      {/* Diagonal: folds right */}
+      <line x1="175" y1="19" x2="223" y2="197" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="4 3" />
+
+      {/* Hinge points between panels (pivot hardware) */}
+      <circle cx="71" cy="108" r="3" className="fill-slate-500 dark:fill-slate-400" />
+      <circle cx="122" cy="108" r="3" className="fill-slate-500 dark:fill-slate-400" />
+      <circle cx="174" cy="108" r="3" className="fill-slate-500 dark:fill-slate-400" />
+
+      {/* Panel divider stiles */}
+      <line x1="70" y1="12" x2="70" y2="204" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
+      <line x1="121" y1="12" x2="121" y2="204" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
+      <line x1="174" y1="12" x2="174" y2="204" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="2.5" />
+
+      {/* Label */}
+      <text x="120" y="7" textAnchor="middle" className="fill-blue-400 dark:fill-blue-500" fontSize="7" fontFamily="sans-serif">BI-FOLD — 4 PANELS</text>
     </svg>
   )
 }
 
-/* ── SWING DOOR ── traditional hinged door */
+/* ── SWING DOOR ── commercial glass door with push bar, bottom rail, 90° arc */
 function SwingDoorDiagram() {
   return (
-    <svg viewBox="0 0 200 200" className="w-full h-full max-w-[180px] max-h-[180px]">
-      {/* Wall lines */}
-      <line x1="10" y1="20" x2="40" y2="20" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="6" />
-      <line x1="160" y1="20" x2="190" y2="20" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="6" />
-      {/* Floor line */}
-      <line x1="10" y1="180" x2="190" y2="180" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
-      {/* Frame */}
-      <rect x="40" y="18" width="120" height="162" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="5" />
-      {/* Glass panel */}
-      <rect x="48" y="30" width="104" height="90" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
-      {/* Lower panel (solid) */}
-      <rect x="48" y="124" width="104" height="48" rx="1" className="fill-slate-100 dark:fill-slate-800/50" />
-      <line x1="48" y1="124" x2="152" y2="124" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1.5" />
-      {/* Left hinges */}
-      <rect x="37" y="50" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      <rect x="37" y="140" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* Handle */}
-      <circle cx="142" cy="105" r="5" fill="none" stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth="2" />
-      <circle cx="142" cy="105" r="2" className="fill-slate-500 dark:fill-slate-400" />
-      {/* 90° swing arc */}
-      <path d="M 160 20 Q 200 100 160 180" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
-      {/* Arrow */}
-      <path d="M 158 100 L 178 100 M 173 95 L 178 100 L 173 105" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
+    <svg viewBox="0 0 200 220" className="w-full h-full max-w-[180px] max-h-[200px]">
+      {/* Wall on each side */}
+      <rect x="5" y="10" width="35" height="14" className="fill-slate-300 dark:fill-slate-600" />
+      <rect x="160" y="10" width="35" height="14" className="fill-slate-300 dark:fill-slate-600" />
+      {/* Floor */}
+      <line x1="5" y1="205" x2="195" y2="205" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="2" />
+
+      {/* Door frame */}
+      <rect x="40" y="12" width="120" height="192" rx="2" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500" strokeWidth="5" />
+
+      {/* Large glass vision panel (top 75% of door) */}
+      <rect x="48" y="20" width="104" height="144" rx="1" className="fill-sky-100 dark:fill-sky-900/30" />
+      <rect x="48" y="20" width="104" height="144" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+
+      {/* Bottom solid rail (kick plate) */}
+      <rect x="48" y="168" width="104" height="28" rx="1" className="fill-slate-200 dark:fill-slate-700" />
+      <rect x="48" y="168" width="104" height="28" rx="1" fill="none" stroke="currentColor" className="text-slate-300 dark:text-slate-600" strokeWidth="1" />
+
+      {/* Horizontal push/panic bar across glass */}
+      <rect x="52" y="110" width="96" height="5" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      {/* Push bar mounting brackets */}
+      <rect x="56" y="106" width="6" height="13" rx="1" className="fill-slate-400 dark:fill-slate-500" />
+      <rect x="138" y="106" width="6" height="13" rx="1" className="fill-slate-400 dark:fill-slate-500" />
+
+      {/* 3 hinges on left stile */}
+      <rect x="37" y="40" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="37" y="95" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+      <rect x="37" y="170" width="6" height="14" rx="2" className="fill-slate-500 dark:fill-slate-400" />
+
+      {/* 90° swing arc — from door edge outward */}
+      <path d="M 160 17 Q 210 110 160 200" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* Swing arrow */}
+      <path d="M 158 108 L 178 108 M 173 103 L 178 108 L 173 113" fill="none" stroke="currentColor" className="text-blue-500 dark:text-blue-400" strokeWidth="1.5" />
+
+      {/* Threshold at bottom */}
+      <rect x="42" y="200" width="116" height="4" rx="1" className="fill-slate-400 dark:fill-slate-500" />
+
+      {/* Labels */}
+      <text x="100" y="90" textAnchor="middle" className="fill-slate-300 dark:fill-slate-600" fontSize="8" fontFamily="sans-serif">GLASS</text>
+      <text x="100" y="186" textAnchor="middle" className="fill-slate-400 dark:fill-slate-500" fontSize="7" fontFamily="sans-serif">KICK PLATE</text>
     </svg>
   )
 }
