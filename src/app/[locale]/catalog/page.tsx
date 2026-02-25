@@ -69,11 +69,11 @@ export default function CatalogPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-slate-900 dark:bg-[#000000] py-12">
+      <section className="bg-slate-50 dark:bg-[#000000] py-12 border-b border-slate-200 dark:border-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Badge variant="primary" className="mb-3">{t('badge')}</Badge>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
-          <p className="mt-3 text-slate-300 max-w-2xl">{t('description')}</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+          <p className="mt-3 text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
         </div>
       </section>
 

@@ -64,18 +64,18 @@ export default function WindowsPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative bg-slate-900 dark:bg-[#000000] py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/70 dark:from-black/95 dark:to-black/70 z-10" />
+      <section className="relative bg-slate-50 dark:bg-[#000000] py-16 overflow-hidden border-b border-slate-200 dark:border-transparent">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 to-white/70 dark:from-black/95 dark:to-black/70 z-10" />
         <div className="absolute inset-0">
-          <Image src="/images/products/casement-featured.png" alt="" fill className="object-cover opacity-30" sizes="100vw" />
+          <Image src="/images/products/casement-featured.png" alt="" fill className="object-cover opacity-15 dark:opacity-30" sizes="100vw" />
         </div>
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Badge variant="primary" className="mb-3">{t('badge')}</Badge>
-          <h1 className="text-3xl md:text-5xl font-bold text-white">{t('title')}</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-6 flex gap-3 flex-wrap">
             <IntlLink href="/products/window-types"><Button variant="primary" size="lg" className="gap-2"><Box className="h-4 w-4" /> {t('configure3d')}</Button></IntlLink>
-            <IntlLink href="/quote"><Button variant="outline" size="lg" className="text-white border-white/30 hover:bg-white/10">{t('getQuote')}</Button></IntlLink>
+            <IntlLink href="/quote"><Button variant="outline" size="lg" className="text-slate-700 border-slate-300 hover:bg-slate-100 dark:text-white dark:border-white/30 dark:hover:bg-white/10">{t('getQuote')}</Button></IntlLink>
           </div>
         </div>
       </section>
