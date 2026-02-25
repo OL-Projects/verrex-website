@@ -204,7 +204,7 @@ export default async function ServicesPage() {
           <p className="mt-3 text-lg text-blue-100">{t('ctaDesc')}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <IntlLink href="/quote"><Button variant="primary" size="lg" className="bg-white text-blue-700 hover:bg-blue-50 gap-2">{t('getFreeQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="!text-white !border-white/60 hover:!bg-white/10 gap-2"><Phone className="h-4 w-4" /> {t('bookConsultation')}</Button></IntlLink>
+            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="!bg-transparent !text-white !border-white/60 hover:!bg-white/10 gap-2"><Phone className="h-4 w-4" /> {t('bookConsultation')}</Button></IntlLink>
           </div>
         </div>
       </section>
