@@ -702,29 +702,13 @@
       }
     },
     "partners": {
-      "premiumglass-pro": {
-        "name": "PremiumGlass Pro",
-        "description": "Fabricant de premier plan de systèmes de vitrage haute performance"
+      "home-depot": {
+        "name": "Home Depot",
+        "description": "Détaillant de premier plan en rénovation et partenaire de confiance"
       },
-      "thermalframe-systems": {
-        "name": "ThermalFrame Systems",
-        "description": "Technologie innovante de cadres à rupture thermique"
-      },
-      "securevision-glass": {
-        "name": "SecureVision Glass",
-        "description": "Produits spécialisés de verre de sécurité et de sûreté"
-      },
-      "buildright-contractors": {
-        "name": "BuildRight Contractors",
-        "description": "Partenaire entrepreneur général de premier plan"
-      },
-      "archvision-design": {
-        "name": "ArchVision Design Studio",
-        "description": "Firme de design architectural primée"
-      },
-      "greenbuild-consulting": {
-        "name": "GreenBuild Consulting",
-        "description": "Consultants en construction durable"
+      "home-depot-pro": {
+        "name": "Home Depot Pro",
+        "description": "Solutions professionnelles pour entrepreneurs et constructeurs"
       }
     },
     "testimonials": {

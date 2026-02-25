@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { partners } from "@/lib/data"
 import {
   Shield, Award, Users, Target, ArrowRight, CheckCircle2,
-  Handshake, Globe, Phone, Rocket,
+  Phone, Rocket,
 } from "lucide-react"
 import type { Metadata } from "next"
 
@@ -94,13 +94,12 @@ export default async function AboutPage() {
                 ))}
               </div>
             </div>
-            {/* Photo */}
+            {/* HQ Image */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/hero/hero-factory.jpg" alt="VERREX facility" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              <Image src="/images/hero/hero-hq.svg" alt="VERREX headquarters" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2">
-                <p className="text-sm font-bold text-slate-900 dark:text-white">VERREX HQ</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Toronto, Ontario</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">VERREX</p>
               </div>
             </div>
           </div>
@@ -142,18 +141,14 @@ export default async function AboutPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('partnersTitle')}</h2>
             <p className="mt-2 text-slate-600 dark:text-slate-400">{t('partnersDesc')}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="flex flex-wrap justify-center gap-8">
             {partners.map((partner) => (
-              <div key={partner.id} className="flex items-start gap-4 p-5 rounded-xl bg-slate-50 dark:bg-[#0a0f1a] border border-slate-200 dark:border-slate-800">
-                <div className="h-11 w-11 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0 shadow-sm">
-                  {partner.type === "manufacturer" ? <Globe className="h-5 w-5 text-blue-500" /> : <Handshake className="h-5 w-5 text-emerald-500" />}
+              <a key={partner.id} href={partner.website} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3 p-6 rounded-xl bg-slate-50 dark:bg-[#0a0f1a] border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow duration-300 w-52">
+                <div className="h-16 w-40 flex items-center justify-center">
+                  <Image src={partner.logo} alt={partner.name} width={160} height={64} className="object-contain" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-white text-sm">{partner.name}</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{partner.type}</p>
-                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{partner.description}</p>
-                </div>
-              </div>
+                <h3 className="font-semibold text-slate-900 dark:text-white text-sm text-center">{partner.name}</h3>
+              </a>
             ))}
           </div>
         </div>

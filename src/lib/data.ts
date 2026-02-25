@@ -391,27 +391,19 @@ export const testimonials: Testimonial[] = [
 export const partners: Partner[] = [
   {
     id: "1",
-    name: "PremiumGlass Inc.",
-    logo: "/images/partners/partner-1.svg",
-    description: "Leading manufacturer of high-performance glass products.",
-    website: "#",
-    type: "manufacturer",
+    name: "Home Depot",
+    logo: "/images/partners/hd-a.svg",
+    description: "Leading home improvement retailer and trusted partner.",
+    website: "https://www.homedepot.ca",
+    type: "affiliate",
   },
   {
     id: "2",
-    name: "AlumTech Systems",
-    logo: "/images/partners/partner-2.svg",
-    description: "Premium aluminum framing and extrusion specialists.",
-    website: "#",
-    type: "supplier",
-  },
-  {
-    id: "3",
-    name: "EcoFrame Solutions",
-    logo: "/images/partners/partner-3.svg",
-    description: "Sustainable window frame manufacturing.",
-    website: "#",
-    type: "manufacturer",
+    name: "Home Depot Pro",
+    logo: "/images/partners/hd-b.svg",
+    description: "Professional-grade solutions for contractors and builders.",
+    website: "https://www.homedepot.ca/pro",
+    type: "affiliate",
   },
 ]
 
