@@ -5,6 +5,9 @@ import { Center } from "@react-three/drei"
 import * as THREE from "three"
 import { DoubleHungWindow } from "./windows/DoubleHungWindow"
 import { CasementWindow } from "./windows/CasementWindow"
+import { SlidingDoor } from "./windows/SlidingDoor"
+import { FoldingDoor } from "./windows/FoldingDoor"
+import { SwingDoor } from "./windows/SwingDoor"
 import {
   SlidingWindow, AwningWindow, TiltTurnWindow, HopperWindow,
   BayBowWindow, PictureWindow, GardenWindow, SkylightWindow,
@@ -15,7 +18,8 @@ import {
 // Which types support open/close animation
 export const OPERABLE_TYPES = new Set([
   "double-hung", "casement", "sliding", "awning",
-  "tilt-turn", "hopper", "skylight", "jalousie",
+  "tilt-turn", "hand-cranked", "hopper", "skylight", "jalousie",
+  "sliding-door", "folding-door", "swing-door",
 ])
 
 // Subtle auto-rotation wrapper
@@ -44,6 +48,10 @@ export function WindowModel({
     case "sliding": win = <SlidingWindow {...p} />; break
     case "awning": win = <AwningWindow {...p} />; break
     case "tilt-turn": win = <TiltTurnWindow {...p} />; break
+    case "hand-cranked": win = <CasementWindow {...p} />; break
+    case "sliding-door": win = <SlidingDoor {...p} />; break
+    case "folding-door": win = <FoldingDoor {...p} />; break
+    case "swing-door": win = <SwingDoor {...p} />; break
     case "hopper": win = <HopperWindow {...p} />; break
     case "bay-bow": win = <BayBowWindow {...sp} />; break
     case "picture": win = <PictureWindow {...sp} />; break
