@@ -18,6 +18,7 @@ import {
   X,
   Search,
   Command,
+  LogIn,
 } from "lucide-react"
 
 export function Header() {
@@ -149,6 +150,12 @@ export function Header() {
 
               {/* CTA Buttons */}
               <div className="hidden lg:flex items-center gap-2 ml-2">
+                <IntlLink href="/portal">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <LogIn className="h-3.5 w-3.5" />
+                    Portal
+                  </Button>
+                </IntlLink>
                 <IntlLink href="/quote">
                   <Button variant="outline" size="sm">
                     {t('getQuote')}
@@ -208,6 +215,12 @@ export function Header() {
                   </IntlLink>
                 ))}
                 <div className="pt-4 space-y-2 border-t border-white/20 dark:border-white/10 mt-4">
+                  <IntlLink href="/portal" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full gap-2">
+                      <LogIn className="h-4 w-4" />
+                      Portal Login
+                    </Button>
+                  </IntlLink>
                   <IntlLink href="/quote" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full">
                       {t('getQuote')}

@@ -1,6 +1,73 @@
 # Active Context
 
-## Latest Session — Feb 20, 2026
+## Latest Session — Feb 25, 2026
+
+### Completed: Full Portal System (Phase 1 MVP)
+
+**Portal Architecture Delivered:**
+- NextAuth v5 (credentials provider) with 6 demo users (admin, client, contractor, supplier, partner, inspector)
+- Role-based dashboard redirect after login
+- Session provider wrapping entire app
+- Protected `/portal/dashboard/*` routes via proxy.ts auth check
+
+**Pages Created:**
+- `/portal` — Welcome/landing page (glassmorphism design, role cards)
+- `/portal/login` — Login page with demo quick-login buttons, Suspense-wrapped
+- `/portal/signup` — Signup page with role selection (client self-signup, others invite-only)
+- `/portal/dashboard` — Role-redirect page (auto-routes to correct dashboard)
+- `/portal/dashboard/admin` — Admin dashboard (KPIs, leads, pipeline, appointments)
+- `/portal/dashboard/client` — Client dashboard (projects, pipeline progress, financials)
+- `/portal/dashboard/contractor` — Contractor dashboard (schedule, assigned projects)
+- `/portal/dashboard/supplier` — Supplier dashboard (purchase orders, production status)
+- `/portal/dashboard/partner` — Partner dashboard (leads, commissions, project tracking)
+- `/portal/dashboard/leads` — Leads management (search, filter by source, priority badges)
+- `/portal/dashboard/projects` — Projects with full pipeline visualization
+- `/portal/dashboard/appointments` — Appointments by type with upcoming/past sections
+- `/portal/dashboard/measurements` — Measurement records with rough/exact dimensions
+- `/portal/dashboard/orders` — Order management with item details and tracking
+- `/portal/dashboard/messages` — Per-project messaging with internal notes support
+- `/portal/dashboard/settings` — Profile, notifications, security settings
+
+**Components Created:**
+- `components/portal/sidebar.tsx` — Collapsible sidebar with role-filtered navigation
+- `components/portal/portal-topbar.tsx` — Top bar with notifications, user dropdown, sign-out
+- `components/portal/stats-card.tsx` — Animated KPI cards with trend indicators
+- `components/portal/pipeline-status.tsx` — 15-stage pipeline visualizer (compact + full)
+- `components/providers/session-provider.tsx` — NextAuth SessionProvider wrapper
+
+**Data Layer:**
+- `lib/portal-data.ts` — Comprehensive mock data system with:
+  - 6 demo users across all roles
+  - Mock leads, projects, appointments, measurements, orders, messages, notifications
+  - Role-scoped query functions (getProjectsByRole, getOrdersByRole, etc.)
+  - 15-stage pipeline constants with color coding
+- `types/portal.ts` — Full TypeScript interfaces for all portal data models
+- `types/auth.ts` — NextAuth session/JWT type extensions
+
+**Header Updated:**
+- Portal login button added (desktop + mobile) with LogIn icon
+
+**Technical Notes:**
+- Next.js 16 requires `proxy.ts` instead of `middleware.ts` — merged i18n + auth protection
+- `useSearchParams()` requires Suspense boundary for static prerendering
+- Dashboard layout hides site header/footer, uses its own sidebar + topbar
+- All portal pages are client components ("use client") for interactivity
+- Build passes clean: ✅ Compiled successfully
+
+**Build Status:** ✅ Clean — 0 errors, all routes prerendered
+
+### Next Steps (Phase 2)
+- Real database backend (Supabase/Prisma) replacing mock data
+- Invoicing/payments/receipts + commission calculation
+- Contractor acceptance workflow + stronger permissions
+- Partner lead import (CSV/API)
+- File upload system for attachments/photos
+- Email notifications (Resend/SendGrid)
+- Real authentication with password hashing
+
+---
+
+## Previous Session — Feb 20, 2026
 
 ### Completed: Full i18n Wiring (All Pages)
 Wired `t()` translation calls across ALL pages and layout components:

@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { MobileActionBar } from "@/components/layout/mobile-action-bar"
 import { ThemeProvider } from "@/components/providers/theme-provider"
+import { SessionProvider } from "@/components/providers/session-provider"
 import { NextIntlClientProvider, hasLocale } from "next-intl"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
@@ -116,19 +117,21 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-white dark:bg-[#030712] text-slate-900 dark:text-slate-100 antialiased">
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange={false}
-          >
-            <Header />
-            <main className="min-h-[calc(100vh-4rem)] pb-16 lg:pb-0">{children}</main>
-            <Footer />
-            <MobileActionBar />
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <SessionProvider>
+          <NextIntlClientProvider messages={messages} locale={locale}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange={false}
+            >
+              <Header />
+              <main className="min-h-[calc(100vh-4rem)] pb-16 lg:pb-0">{children}</main>
+              <Footer />
+              <MobileActionBar />
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </SessionProvider>
       </body>
     </html>
   );
