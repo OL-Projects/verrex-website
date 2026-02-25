@@ -40,7 +40,6 @@ export function Header() {
       ],
     },
     { name: t('catalog'), href: "/catalog" },
-    { name: t('projects'), href: "/projects" },
     { name: t('services'), href: "/services" },
     { name: t('about'), href: "/about" },
     { name: t('contact'), href: "/contact" },

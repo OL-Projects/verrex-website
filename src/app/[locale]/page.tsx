@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { products, services, testimonials, companyInfo, projects } from "@/lib/data"
+import { products, services, testimonials, companyInfo } from "@/lib/data"
 import { formatCurrency } from "@/lib/utils"
 import { FadeIn, FadeInLeft, FadeInRight, StaggerContainer, StaggerItem, ScaleIn, RevealSection, AnimatedCounter, HoverCard } from "@/components/ui/motion"
 import {
@@ -438,66 +438,6 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </StaggerContainer>
-        </div>
-      </RevealSection>
-
-      {/* Featured Projects Showcase */}
-      <RevealSection className="py-20 dark:bg-[#030712]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <FadeIn className="flex items-end justify-between mb-12">
-            <div>
-              <Badge variant="primary" className="mb-3 text-xs">Portfolio</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('recentProjects')}</h2>
-              <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{t('recentProjectsDesc')}</p>
-            </div>
-            <IntlLink href="/projects" className="hidden md:flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700 dark:hover:text-blue-300">
-              {t('viewAllProjects')} <ArrowRight className="h-4 w-4" />
-            </IntlLink>
-          </FadeIn>
-
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {projects.filter(p => p.isFeatured).slice(0, 3).map((project) => (
-              <StaggerItem key={project.id}>
-                <HoverCard>
-                  <Card className="group overflow-hidden h-full">
-                    <div className="relative h-52 bg-slate-200 dark:bg-[#0a0f1a]">
-                      <Image
-                        src={project.images[0]}
-                        alt={project.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-5">
-                        <h3 className="text-lg font-bold text-white">{project.title}</h3>
-                        <p className="text-sm text-white/70 mt-1">{project.location}</p>
-                      </div>
-                    </div>
-                    <CardContent className="p-5">
-                      <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{project.shortDescription}</p>
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {project.productsUsed.slice(0, 2).map((p) => (
-                          <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
-                        ))}
-                      </div>
-                      {project.testimonial && (
-                        <div className="mt-3 p-2.5 rounded-lg bg-slate-50 dark:bg-[#0a0f1a] border-l-2 border-blue-500">
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 italic line-clamp-2">&ldquo;{project.testimonial.quote}&rdquo;</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </HoverCard>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-
-          <FadeIn delay={0.3} className="mt-8 text-center md:hidden">
-            <IntlLink href="/projects">
-              <Button variant="outline" size="lg">{t('viewAllProjects')} <ArrowRight className="h-4 w-4" /></Button>
-            </IntlLink>
-          </FadeIn>
         </div>
       </RevealSection>
 
