@@ -136,6 +136,7 @@ export function getAllUsers() {
 
 // ── NextAuth configuration ─────────────────────────────────
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'verrex-portal-demo-secret-2026-change-in-production',
   providers: [
     Credentials({
       name: 'Credentials',
