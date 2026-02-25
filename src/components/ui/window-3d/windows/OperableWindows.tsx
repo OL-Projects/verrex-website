@@ -36,23 +36,27 @@ export function SlidingWindow({ width, height, frameColor, glassType, isOpen }: 
   )
 }
 
-// ── AWNING: Hinges outward from top ──
+// ── AWNING / TOP HUNG: Hinged at TOP edge, bottom swings outward ──
 export function AwningWindow({ width, height, frameColor, glassType, isOpen }: WP) {
   const t = 0.06, d = 0.08, glassW = width - t * 2 - 0.02, glassH = height - t * 2 - 0.02
+  const sashH = height - t * 1.6
   const pivotRef = useRef<THREE.Group>(null)
   const spring = useRef<SpringState>({ pos: 0, vel: 0 })
   useFrame((_, dt) => {
+    // Negative X rotation = bottom swings outward (toward viewer) from top hinge
     const v = springStep(spring.current, isOpen ? -Math.PI / 6 : 0, dt, 150, 17)
     if (pivotRef.current) pivotRef.current.rotation.x = v
   })
   return (
     <group>
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
-      {/* Sash assembly — pivots at top edge, entire sash (frame+glass) rotates */}
+      {/* Sash — pivot at TOP edge of frame, sash hangs below */}
       <group position={[0, height / 2 - t, 0]}>
-        <group ref={pivotRef} position={[0, -(height / 2 - t), 0]}>
-          <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
-          <GlassPane width={glassW} height={glassH} glassType={glassType} />
+        <group ref={pivotRef}>
+          <group position={[0, -sashH / 2, 0]}>
+            <WindowFrame width={width - t * 1.6} height={sashH} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
+            <GlassPane width={glassW} height={glassH} glassType={glassType} />
+          </group>
         </group>
       </group>
       {/* Hinge bar at top — FIXED on frame */}
