@@ -6,25 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { partners } from "@/lib/data"
 import {
   Shield, Award, Users, Target, ArrowRight, CheckCircle2,
-  Handshake, Globe, Phone, Calendar, Building2, Landmark, Rocket,
+  Handshake, Globe, Phone, Rocket,
 } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = { title: "About Us" }
-
-const team = [
-  { name: "Alexandra Dumont", role: "CEO & Founder", desc: "15+ years in the window and door industry.", initials: "AD", color: "from-blue-500 to-blue-700" },
-  { name: "Marcus Chen", role: "Head of Operations", desc: "Expert in project management and logistics.", initials: "MC", color: "from-emerald-500 to-emerald-700" },
-  { name: "Sarah Williams", role: "Lead Designer", desc: "Specializing in custom door systems.", initials: "SW", color: "from-violet-500 to-violet-700" },
-  { name: "David Petrov", role: "Installation Director", desc: "Master craftsman with 20+ years experience.", initials: "DP", color: "from-amber-500 to-amber-700" },
-]
-
-const milestones = [
-  { year: "2009", title: "Company Founded", desc: "VERREX established in Toronto with a focus on residential windows.", icon: Building2 },
-  { year: "2013", title: "Commercial Expansion", desc: "Entered the commercial market with curtain wall and storefront systems.", icon: Landmark },
-  { year: "2018", title: "Industrial Division", desc: "Launched industrial solutions — safety glass, overhead doors, fire-rated systems.", icon: Shield },
-  { year: "2024", title: "500+ Projects Milestone", desc: "Surpassed 500 completed projects across Canada with 98% on-time delivery.", icon: Rocket },
-]
 
 const valueColors = [
   { bg: "bg-blue-50 dark:bg-blue-900/20", border: "border-l-blue-500", icon: "text-blue-600 dark:text-blue-400" },
@@ -65,7 +51,7 @@ export default async function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: "500+", label: "Projects Completed" },
-              { value: "15+", label: "Years of Experience" },
+              { value: "50+", label: "Expert Team Members" },
               { value: "2M+", label: "Sq Ft Installed" },
               { value: "98%", label: "On-Time Delivery" },
             ].map((stat, i) => (
@@ -86,7 +72,7 @@ export default async function AboutPage() {
               {/* Pull quote */}
               <div className="border-l-4 border-blue-600 pl-6 mb-8">
                 <p className="text-xl md:text-2xl font-semibold text-slate-800 dark:text-white italic leading-relaxed">
-                  &ldquo;Excellence in every pane — delivering quality fenestration solutions since 2009.&rdquo;
+                  &ldquo;Excellence in every pane &mdash; delivering quality fenestration solutions you can trust.&rdquo;
                 </p>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('missionTitle')}</h2>
@@ -143,64 +129,6 @@ export default async function AboutPage() {
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">{value.title}</h3>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{value.desc}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Company Timeline */}
-      <section className="py-16 dark:bg-[#030712]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-3">Our Journey</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Company Milestones</h2>
-          </div>
-          <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-blue-200 dark:bg-blue-800 -translate-x-1/2" />
-            <div className="space-y-12">
-              {milestones.map((m, idx) => {
-                const isLeft = idx % 2 === 0
-                return (
-                  <div key={m.year} className={`relative flex items-start gap-6 md:gap-0 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                    {/* Content */}
-                    <div className={`flex-1 md:w-1/2 ${isLeft ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
-                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">{m.year}</span>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">{m.title}</h3>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{m.desc}</p>
-                    </div>
-                    {/* Center dot */}
-                    <div className="absolute left-6 md:left-1/2 -translate-x-1/2 h-12 w-12 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-600/25 z-10">
-                      <m.icon className="h-5 w-5 text-white" />
-                    </div>
-                    {/* Spacer for other side */}
-                    <div className="hidden md:block flex-1 md:w-1/2" />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-16 bg-slate-50 dark:bg-[#020617]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-3">The People</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('ourTeam')}</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">{t('teamDesc')}</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((member) => (
-              <div key={member.name} className="group text-center p-6 rounded-2xl bg-white dark:bg-[#0a0f1a] border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow duration-300">
-                <div className={`h-20 w-20 mx-auto bg-gradient-to-br ${member.color} rounded-full flex items-center justify-center mb-4 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
-                  <span className="text-white font-bold text-xl">{member.initials}</span>
-                </div>
-                <h3 className="font-bold text-slate-900 dark:text-white">{member.name}</h3>
-                <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{member.role}</p>
-                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{member.desc}</p>
               </div>
             ))}
           </div>
