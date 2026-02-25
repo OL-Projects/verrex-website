@@ -29,7 +29,8 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
   const crankAngle = useRef(0)  // accumulated crank rotation
 
   // Hand-cranked opens wider ~85° vs manual ~45°
-  const maxAngle = showCrank ? -Math.PI * 0.47 : -Math.PI / 4
+  // Positive Y = outward (away from viewer/interior), handle stays on interior
+  const maxAngle = showCrank ? Math.PI * 0.47 : Math.PI / 4
   const spring = useRef<SpringState>({ pos: 0, vel: 0 })
 
   useFrame((_, dt) => {
