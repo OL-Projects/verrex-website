@@ -184,12 +184,12 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen">
       {/* Search Header */}
-      <section className="bg-slate-900 dark:bg-[#000000] py-12">
+      <section className="bg-slate-50 dark:bg-[#000000] py-12 border-b border-slate-200 dark:border-transparent">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{t('title')}</h1>
-              <p className="text-slate-400">Find products, services, team members, and more.</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">{t('title')}</h1>
+              <p className="text-slate-500 dark:text-slate-400">Find products, services, team members, and more.</p>
             </div>
           </FadeIn>
 

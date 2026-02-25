@@ -48,12 +48,12 @@ export default function ProductsPage() {
   return (
     <div>
       {/* Page Header */}
-      <section className="bg-slate-900 dark:bg-[#000000] py-16">
+      <section className="bg-slate-50 dark:bg-[#000000] py-16 border-b border-slate-200 dark:border-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
             {t('title')}
           </h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">
             {t('description')}
           </p>
         </div>
