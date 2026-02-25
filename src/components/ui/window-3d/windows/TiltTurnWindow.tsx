@@ -43,10 +43,12 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
   const glassH = sashH - t * 1.2
   const turnRef = useRef<THREE.Group>(null)  // Y-axis: left-edge hinge
   const tiltRef = useRef<THREE.Group>(null)  // X-axis: bottom-edge hinge
+  const leverRef = useRef<THREE.Group>(null) // Z-axis: handle rotation (clock positions)
 
-  // Two independent spring states
+  // Three independent spring states
   const tiltSpring = useRef<SpringState>({ pos: 0, vel: 0 })
   const turnSpring = useRef<SpringState>({ pos: 0, vel: 0 })
+  const leverSpring = useRef<SpringState>({ pos: 0, vel: 0 })
 
   useFrame((_, dt) => {
     // TILT: pivot at bottom edge, top comes toward viewer (positive X rotation ~12°)
@@ -57,11 +59,14 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
     const turnTarget = openMode === "turn" ? -Math.PI * 0.47 : 0
     const turnAngle = springStep(turnSpring.current, turnTarget, dt, 70, 14)
 
+    // LEVER: 6:00=0, 9:00=-π/2, 12:00=-π
+    const leverTarget = openMode === "closed" ? 0 : openMode === "turn" ? -Math.PI / 2 : -Math.PI
+    const leverAngle = springStep(leverSpring.current, leverTarget, dt, 180, 16)
+
     if (turnRef.current) turnRef.current.rotation.y = turnAngle
     if (tiltRef.current) tiltRef.current.rotation.x = tiltAngle
+    if (leverRef.current) leverRef.current.rotation.z = leverAngle
   })
-
-  const isOpen = openMode !== "closed"
 
   return (
     <group>
@@ -190,29 +195,32 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
               <meshStandardMaterial color="#444" roughness={0.4} metalness={0.2} />
             </mesh>
 
-            {/* ── SINGLE LEVER HANDLE — RIGHT stile ── */}
-            {/* European lever handle, NOT T-bar, NOT crank */}
+            {/* ── LEVER HANDLE — RIGHT stile, 3-position clock rotation ── */}
+            {/* 6:00↓ = locked, 9:00← = turn, 12:00↑ = tilt */}
             <group position={[sashW / 2 - t * 0.35, 0, d * 0.3]}>
-              {/* Escutcheon plate (backing plate) */}
+              {/* Escutcheon plate (fixed on stile face) */}
               <mesh>
-                <boxGeometry args={[0.016, 0.055, 0.006]} />
+                <boxGeometry args={[0.018, 0.058, 0.007]} />
                 <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
               </mesh>
-              {/* Handle lever — pointing DOWN (locked) or UP (tilt open) */}
-              <mesh position={[0, isOpen ? 0.045 : -0.045, 0.008]}>
-                <boxGeometry args={[0.01, 0.065, 0.01]} />
-                <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.6} />
-              </mesh>
-              {/* Handle tip (slight widening at end for grip) */}
-              <mesh position={[0, isOpen ? 0.078 : -0.078, 0.008]}>
-                <boxGeometry args={[0.014, 0.01, 0.012]} />
-                <meshStandardMaterial color="#ccc" roughness={0.12} metalness={0.55} />
-              </mesh>
-              {/* Lock cylinder (round dot on escutcheon) */}
+              {/* Lock cylinder center (fixed pivot point) */}
               <mesh position={[0, 0, 0.005]} rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.004, 0.004, 0.004, 8]} />
+                <cylinderGeometry args={[0.005, 0.005, 0.005, 10]} />
                 <meshStandardMaterial color="#888" roughness={0.3} metalness={0.6} />
               </mesh>
+              {/* LEVER — rotates around Z. Default: pointing DOWN (6:00) */}
+              <group ref={leverRef} position={[0, 0, 0.008]}>
+                {/* Lever arm — extends downward from center */}
+                <mesh position={[0, -0.045, 0]}>
+                  <boxGeometry args={[0.01, 0.065, 0.01]} />
+                  <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.6} />
+                </mesh>
+                {/* Grip tip (wider end for ergonomic grip) */}
+                <mesh position={[0, -0.078, 0]}>
+                  <boxGeometry args={[0.014, 0.012, 0.012]} />
+                  <meshStandardMaterial color="#ccc" roughness={0.12} metalness={0.55} />
+                </mesh>
+              </group>
             </group>
 
             {/* ── MULTI-POINT LOCK CAMS on sash (mushroom cams) ── */}
