@@ -4,7 +4,7 @@ import { Suspense, useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei"
 import * as THREE from "three"
-import { WindowModel, OPERABLE_TYPES } from "./window-3d/WindowModel"
+import { WindowModel, OPERABLE_TYPES, type TiltTurnMode } from "./window-3d/WindowModel"
 
 // ═══════════════════════════════════════════
 // Configuration constants
@@ -48,7 +48,9 @@ export function Window3DConfigurator({
   const [frameColor, setFrameColor] = useState("#f5f5f5")
   const [glassType, setGlassType] = useState("clear")
   const [isOpen, setIsOpen] = useState(false)
+  const [tiltTurnMode, setTiltTurnMode] = useState<TiltTurnMode>("closed")
 
+  const isTiltTurn = windowType === "tilt-turn"
   const MIN_SIZE = 12, MAX_SIZE = 120
   const isValidWidth = width >= MIN_SIZE && width <= MAX_SIZE
   const isValidHeight = height >= MIN_SIZE && height <= MAX_SIZE
@@ -77,6 +79,7 @@ export function Window3DConfigurator({
             <WindowModel
               type={windowType} width={width} height={height}
               frameColor={frameColor} glassType={glassType} isOpen={isOpen}
+              tiltTurnMode={tiltTurnMode}
             />
 
             <ContactShadows position={[0, -1.2, 0]} opacity={0.3} scale={5} blur={2.5} far={4} resolution={256} />
@@ -95,8 +98,8 @@ export function Window3DConfigurator({
           {width}&quot; W &times; {height}&quot; H
         </div>
 
-        {/* Open/Close action button — bottom-right */}
-        {canOperate && (
+        {/* Action buttons — bottom-right */}
+        {canOperate && !isTiltTurn && (
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={`absolute bottom-3 right-3 px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
@@ -107,6 +110,32 @@ export function Window3DConfigurator({
           >
             {isOpen ? "✕ Close Window" : "↗ Open Window"}
           </button>
+        )}
+
+        {/* Tilt & Turn — dual mode buttons */}
+        {isTiltTurn && (
+          <div className="absolute bottom-3 right-3 flex gap-2">
+            <button
+              onClick={() => setTiltTurnMode(tiltTurnMode === "tilt" ? "closed" : "tilt")}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
+                tiltTurnMode === "tilt"
+                  ? "bg-blue-500/90 text-white hover:bg-blue-600/90"
+                  : "bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700/90 ring-1 ring-slate-200/50 dark:ring-slate-700/50"
+              }`}
+            >
+              {tiltTurnMode === "tilt" ? "✕ Close" : "↕ Tilt"}
+            </button>
+            <button
+              onClick={() => setTiltTurnMode(tiltTurnMode === "turn" ? "closed" : "turn")}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-md transition-all shadow-lg ${
+                tiltTurnMode === "turn"
+                  ? "bg-green-500/90 text-white hover:bg-green-600/90"
+                  : "bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700/90 ring-1 ring-slate-200/50 dark:ring-slate-700/50"
+              }`}
+            >
+              {tiltTurnMode === "turn" ? "✕ Close" : "↗ Turn"}
+            </button>
+          </div>
         )}
       </div>
 

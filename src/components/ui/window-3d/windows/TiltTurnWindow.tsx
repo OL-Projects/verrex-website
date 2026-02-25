@@ -29,8 +29,10 @@ import { GlassPane } from "../GlassPane"
 // Glass: Triple-pane IGU with visible warm-edge spacer
 // Seals: Dark grey/black compression gaskets around perimeter
 
-export function TiltTurnWindow({ width, height, frameColor, glassType, isOpen }: {
-  width: number; height: number; frameColor: string; glassType: string; isOpen: boolean
+export type TiltTurnMode = "closed" | "tilt" | "turn"
+
+export function TiltTurnWindow({ width, height, frameColor, glassType, openMode = "closed" }: {
+  width: number; height: number; frameColor: string; glassType: string; openMode?: TiltTurnMode
 }) {
   // European proportions: thicker frame depth, wider profile
   const t = 0.085       // frame thickness — chunkier European profile
@@ -41,13 +43,26 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, isOpen }:
   const glassH = sashH - t * 1.2
   const sashRef = useRef<THREE.Group>(null)
 
-  // Tilt mode: pivot at BOTTOM edge, top comes toward viewer (positive X rotation)
-  const spring = useRef<SpringState>({ pos: 0, vel: 0 })
+  // Two spring states — one for tilt (X-axis), one for turn (Y-axis)
+  const tiltSpring = useRef<SpringState>({ pos: 0, vel: 0 })
+  const turnSpring = useRef<SpringState>({ pos: 0, vel: 0 })
+
   useFrame((_, dt) => {
-    const target = isOpen ? 0.22 : 0  // ~12-13° tilt = ~10-15cm gap on standard window
-    const angle = springStep(spring.current, target, dt, 100, 14)
-    if (sashRef.current) sashRef.current.rotation.x = angle
+    // TILT: pivot at bottom edge, top comes toward viewer (positive X rotation ~12°)
+    const tiltTarget = openMode === "tilt" ? 0.22 : 0
+    const tiltAngle = springStep(tiltSpring.current, tiltTarget, dt, 100, 14)
+
+    // TURN: pivot at left edge, swings inward (positive Y rotation ~85°)
+    const turnTarget = openMode === "turn" ? Math.PI * 0.47 : 0
+    const turnAngle = springStep(turnSpring.current, turnTarget, dt, 70, 14)
+
+    if (sashRef.current) {
+      sashRef.current.rotation.x = tiltAngle
+      sashRef.current.rotation.y = turnAngle
+    }
   })
+
+  const isOpen = openMode !== "closed"
 
   return (
     <group>

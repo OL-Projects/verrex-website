@@ -9,8 +9,9 @@ import { SingleCasementWindow } from "./windows/SingleCasementWindow"
 import { SlidingDoor } from "./windows/SlidingDoor"
 import { FoldingDoor } from "./windows/FoldingDoor"
 import { SwingDoor } from "./windows/SwingDoor"
+import { TiltTurnWindow, type TiltTurnMode } from "./windows/TiltTurnWindow"
 import {
-  SlidingWindow, AwningWindow, TiltTurnWindow, HopperWindow,
+  SlidingWindow, AwningWindow, HopperWindow,
   BayBowWindow, PictureWindow, GardenWindow, SkylightWindow,
   TransomWindow, JalousieWindow, GlassBlockWindow,
   CurtainWallWindow, StorefrontWindow, GenericWindow,
@@ -32,11 +33,13 @@ function WindowScene({ children }: { children: React.ReactNode }) {
   return <group ref={groupRef}><Center>{children}</Center></group>
 }
 
+export { type TiltTurnMode } from "./windows/TiltTurnWindow"
+
 export function WindowModel({
-  type, width, height, frameColor, glassType, isOpen,
+  type, width, height, frameColor, glassType, isOpen, tiltTurnMode = "closed",
 }: {
   type: string; width: number; height: number;
-  frameColor: string; glassType: string; isOpen: boolean
+  frameColor: string; glassType: string; isOpen: boolean; tiltTurnMode?: TiltTurnMode
 }) {
   const w = width / 40, h = height / 40
   const p = { width: w, height: h, frameColor, glassType, isOpen }
@@ -48,7 +51,7 @@ export function WindowModel({
     case "casement": win = <SingleCasementWindow {...p} />; break  // Single panel, left-hinged, swings right
     case "sliding": win = <SlidingWindow {...p} />; break
     case "awning": win = <AwningWindow {...p} />; break
-    case "tilt-turn": win = <TiltTurnWindow {...p} />; break
+    case "tilt-turn": win = <TiltTurnWindow width={w} height={h} frameColor={frameColor} glassType={glassType} openMode={tiltTurnMode} />; break
     case "hand-cranked": win = <SingleCasementWindow {...p} showCrank />; break  // Casement + crank handle
     case "sliding-door": win = <SlidingDoor {...p} />; break
     case "folding-door": win = <FoldingDoor {...p} />; break
