@@ -16,29 +16,17 @@ import {
   Mail,
   Menu,
   X,
-  ChevronDown,
   Search,
   Command,
-  DoorOpen,
-  AppWindow,
 } from "lucide-react"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const router = useRouter()
   const t = useTranslations('Navigation')
 
   const navigation = [
     { name: t('home'), href: "/" },
-    {
-      name: t('products'),
-      href: "#",
-      children: [
-        { name: t('windows'), href: "/products/windows", icon: AppWindow },
-        { name: t('doors'), href: "/products/doors", icon: DoorOpen },
-      ],
-    },
     { name: t('catalog'), href: "/catalog" },
     { name: t('services'), href: "/services" },
     { name: t('about'), href: "/about" },
@@ -114,50 +102,13 @@ export function Header() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
               {navigation.map((item) => (
-                <div
+                <IntlLink
                   key={item.name}
-                  className="relative"
-                  onMouseEnter={() =>
-                    item.children && setActiveDropdown(item.name)
-                  }
-                  onMouseLeave={() => setActiveDropdown(null)}
+                  href={item.href}
+                  className="px-4 py-2 text-sm font-medium text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-white/40 dark:hover:bg-white/10 transition-all duration-200"
                 >
-                  <IntlLink
-                    href={item.href}
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-white/40 dark:hover:bg-white/10 transition-all duration-200"
-                  >
-                    {item.name}
-                    {item.children && (
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    )}
-                  </IntlLink>
-
-                  {/* Dropdown */}
-                  <AnimatePresence>
-                    {item.children && activeDropdown === item.name && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute left-0 top-full pt-1 w-56 z-50"
-                      >
-                        <div className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl shadow-xl shadow-black/10 dark:shadow-black/40 border border-white/30 dark:border-white/10 py-2 overflow-hidden">
-                          {item.children.map((child) => (
-                            <IntlLink
-                              key={child.name}
-                              href={child.href}
-                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200"
-                            >
-                              <child.icon className="h-4 w-4" />
-                              {child.name}
-                            </IntlLink>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                  {item.name}
+                </IntlLink>
               ))}
             </nav>
 
@@ -247,30 +198,14 @@ export function Header() {
                 </IntlLink>
 
                 {navigation.map((item) => (
-                  <div key={item.name}>
-                    <IntlLink
-                      href={item.href}
-                      className="block px-4 py-2.5 text-base font-medium text-slate-800 dark:text-slate-200 hover:bg-white/40 dark:hover:bg-white/10 rounded-md transition-all duration-200"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </IntlLink>
-                    {item.children && (
-                      <div className="ml-4 space-y-1">
-                        {item.children.map((child) => (
-                          <IntlLink
-                            key={child.name}
-                            href={child.href}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-white/10 rounded-md transition-all duration-200"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <child.icon className="h-4 w-4" />
-                            {child.name}
-                          </IntlLink>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <IntlLink
+                    key={item.name}
+                    href={item.href}
+                    className="block px-4 py-2.5 text-base font-medium text-slate-800 dark:text-slate-200 hover:bg-white/40 dark:hover:bg-white/10 rounded-md transition-all duration-200"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </IntlLink>
                 ))}
                 <div className="pt-4 space-y-2 border-t border-white/20 dark:border-white/10 mt-4">
                   <IntlLink href="/quote" onClick={() => setMobileMenuOpen(false)}>
