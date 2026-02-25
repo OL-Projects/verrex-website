@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -33,10 +34,19 @@ export default function ContactPage() {
 
   return (
     <div>
-      <section className="bg-slate-900 dark:bg-[#000000] py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">{t('title')}</h1>
-          <p className="mt-4 text-lg text-slate-300 max-w-2xl">{t('description')}</p>
+      <section className="relative bg-slate-50 dark:bg-[#000000] py-20 overflow-hidden">
+        {/* Light mode SVG */}
+        <div className="absolute inset-0 dark:hidden">
+          <Image src="/images/hero/hero-services-light.svg" alt="" fill className="object-cover" sizes="100vw" priority />
+        </div>
+        {/* Dark mode SVG */}
+        <div className="absolute inset-0 hidden dark:block">
+          <Image src="/images/hero/hero-services.svg" alt="" fill className="object-cover" sizes="100vw" priority />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-transparent to-transparent dark:from-black/70 z-10" />
+        <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
         </div>
       </section>
 
