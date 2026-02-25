@@ -250,13 +250,6 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, openMode 
         </group>{/* close turnRef */}
       </group>{/* close turn position */}
 
-      {/* ── SHADOW LINE — subtle reveal gap between sash and frame (3-5mm) ── */}
-      {/* This is achieved by the slight inset of the sash from the outer frame */}
-      {/* Visible as a thin dark line around the sash perimeter */}
-      <mesh position={[0, 0, d * 0.03]}>
-        <boxGeometry args={[sashW + 0.003, sashH + 0.003, 0.002]} />
-        <meshStandardMaterial color="#222" roughness={0.9} transparent opacity={0.3} />
-      </mesh>
     </group>
   )
 }
