@@ -12,8 +12,8 @@ const intlMiddleware = createMiddleware(routing);
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip auth API routes entirely
-  if (pathname.startsWith('/api/auth')) {
+  // Skip ALL API routes entirely (auth, portal register, etc.)
+  if (pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 
@@ -46,6 +46,6 @@ export const config = {
     // - /api/auth (NextAuth routes)
     // - /_next (Next.js internals)
     // - /images, /favicon.ico, etc. (static files)
-    '/((?!api/auth|_next|.*\\..*).*)',
+    '/((?!api|_next|.*\\..*).*)',
   ],
 };
