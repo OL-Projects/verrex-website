@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
-import Image from "next/image"
 import dynamic from "next/dynamic"
+import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -184,15 +184,8 @@ export default function WindowTypesPage() {
                 className="group text-left"
               >
                 <Card className="h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-600 overflow-hidden">
-                  <div className="aspect-[4/3] relative bg-slate-100 dark:bg-slate-800">
-                    <Image
-                      src={type.image}
-                      alt={type.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="aspect-[4/3] relative overflow-hidden">
+                    <WindowTypeDiagram id={type.id} className="p-4 group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <CardContent className="p-3 text-center">
                     <h3 className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
