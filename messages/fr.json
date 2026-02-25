@@ -313,6 +313,7 @@
   },
   "WindowTypes": {
     "title": "Types de fenêtres",
+    "backToWindows": "Retour aux fenêtres",
     "description": "Explorez nos types de fenêtres avec une visualisation 3D interactive. Choisissez votre style préféré, la couleur du cadre et le type de verre.",
     "configure3d": "Configurer en 3D",
     "configure3dDesc": "Utilisez notre configurateur 3D interactif pour visualiser différents styles de fenêtres, couleurs et types de verre.",

@@ -313,6 +313,7 @@
   },
   "WindowTypes": {
     "title": "Window Types",
+    "backToWindows": "Back to Windows",
     "description": "Explore our window types with interactive 3D visualization. Choose your preferred style, frame color, and glass type.",
     "configure3d": "Configure in 3D",
     "configure3dDesc": "Use our interactive 3D configurator to visualize different window styles, colors, and glass types.",

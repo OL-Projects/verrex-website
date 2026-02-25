@@ -95,8 +95,8 @@ export default function WindowTypesPage() {
       {/* Header */}
       <section className="bg-slate-50 dark:bg-[#000000] py-10 border-b border-slate-200 dark:border-transparent">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <IntlLink href="/products" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200 mb-3 text-sm">
-            <ArrowLeft className="h-4 w-4" /> Back to Products
+          <IntlLink href="/products/windows" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200 mb-3 text-sm">
+            <ArrowLeft className="h-4 w-4" /> {t('backToWindows')}
           </IntlLink>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Windows & Doors</h1>
           <p className="mt-2 text-slate-600 dark:text-slate-300 max-w-xl text-sm">
