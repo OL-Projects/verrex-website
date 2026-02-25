@@ -5,21 +5,16 @@ import * as THREE from "three"
 import { WindowFrame, Hinge, LockPoint, Weatherstrip, WindowScreen, springStep, type SpringState } from "../WindowParts"
 import { GlassPane } from "../GlassPane"
 
-// Single Casement Window
-// ONE sash, hinged on LEFT stile, swings OUTWARD to the right.
+// ═══════════════════════════════════════════════════════════════
+// SINGLE CASEMENT WINDOW — North American Style
+// ═══════════════════════════════════════════════════════════════
+//
+// ONE sash, hinged on LEFT stile, swings OUTWARD.
 //
 // TWO VARIANTS:
-//   Standard Casement (showCrank=false):
-//     - Prominent LEVER HANDLE on right stile (user grabs and pushes)
-//     - Opens ~45° by hand
-//     - Multi-point lock on right stile
-//
-//   Hand Cranked (showCrank=true):
-//     - NO side handle — just a small sash latch
-//     - Prominent WORM GEAR CRANK at bottom of outer frame
-//     - VISIBLE OPERATOR ARM (folding extension arm) connecting crank to sash bottom rail
-//     - Opens wider ~60° (crank mechanism provides more travel)
-//     - Used for hard-to-reach, high-mounted windows
+//   Standard (showCrank=false): lever handle, ~45° open by hand
+//   Hand Cranked (showCrank=true): worm gear crank, scissor arm,
+//     opens ~85° outward. Full mechanical linkage visible.
 
 export function SingleCasementWindow({ width, height, frameColor, glassType, isOpen, showCrank = false }: {
   width: number; height: number; frameColor: string; glassType: string; isOpen: boolean; showCrank?: boolean
@@ -30,69 +25,97 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
   const glassW = sashW - t * 1.4
   const glassH = sashH - t * 1.4
   const sashRef = useRef<THREE.Group>(null)
-  const armRef = useRef<THREE.Group>(null)
+  const arm1Ref = useRef<THREE.Group>(null)
+  const arm2Ref = useRef<THREE.Group>(null)
+  const handleRef = useRef<THREE.Group>(null)
 
-  // Spring physics — hand-cranked opens wider than manual casement
-  const maxAngle = showCrank ? -Math.PI / 3 : -Math.PI / 4  // 60° vs 45°
+  // Hand-cranked opens wider ~85° vs manual ~45°
+  const maxAngle = showCrank ? -Math.PI * 0.47 : -Math.PI / 4
   const spring = useRef<SpringState>({ pos: 0, vel: 0 })
 
   useFrame((_, dt) => {
     const target = isOpen ? maxAngle : 0
-    const angle = springStep(spring.current, target, dt, showCrank ? 80 : 120, 15)
+    // Compression effect: stiffer spring at end of travel for seal engagement
+    const stiffness = showCrank ? 65 : 120
+    const angle = springStep(spring.current, target, dt, stiffness, 14)
     if (sashRef.current) sashRef.current.rotation.y = angle
-    // Operator arm follows sash angle (simplified: rotates proportionally)
-    if (armRef.current) {
-      const armAngle = (angle / maxAngle) * (Math.PI * 0.4)
-      armRef.current.rotation.z = isOpen ? -armAngle : 0
+
+    if (showCrank) {
+      const progress = Math.abs(angle / maxAngle)  // 0 = closed, 1 = fully open
+
+      // Scissor arm 1: pivots outward from gearbox mount
+      if (arm1Ref.current) arm1Ref.current.rotation.z = -progress * Math.PI * 0.35
+      // Scissor arm 2: counter-rotates at mid-joint
+      if (arm2Ref.current) arm2Ref.current.rotation.z = progress * Math.PI * 0.25
+      // Crank handle: fold out + spin proportionally
+      if (handleRef.current) handleRef.current.rotation.z = -progress * Math.PI * 2
     }
   })
 
   return (
     <group>
-      {/* Outer frame */}
+      {/* ── OUTER FRAME ── */}
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
 
-      {/* Weatherstrip gaskets */}
-      <Weatherstrip width={sashW - 0.01} height={0.005} position={[0, height / 2 - t * 0.6, d * 0.15]} />
-      <Weatherstrip width={sashW - 0.01} height={0.005} position={[0, -height / 2 + t * 0.6, d * 0.15]} />
-      <Weatherstrip width={0.005} height={sashH - 0.01} position={[-width / 2 + t * 0.6, 0, d * 0.15]} />
-      <Weatherstrip width={0.005} height={sashH - 0.01} position={[width / 2 - t * 0.6, 0, d * 0.15]} />
+      {/* Exterior sloped sill (angled bottom rail for water drainage) */}
+      <mesh position={[0, -height / 2 + t * 0.15, -d * 0.35]} rotation={[0.15, 0, 0]}>
+        <boxGeometry args={[width - t, 0.008, d * 0.4]} />
+        <meshStandardMaterial color={frameColor} roughness={0.5} />
+      </mesh>
 
-      {/* 3 hinges on LEFT stile */}
+      {/* Weep holes on exterior bottom frame */}
+      {[-width / 5, width / 5].map((x, i) => (
+        <mesh key={`weep${i}`} position={[x, -height / 2 + t * 0.15, -d * 0.45]}>
+          <boxGeometry args={[0.018, 0.005, 0.012]} />
+          <meshStandardMaterial color="#444" roughness={0.6} />
+        </mesh>
+      ))}
+
+      {/* Bulb-style weatherstrip gaskets (rounded, dark grey) around perimeter */}
+      {/* Top */}
+      <mesh position={[0, height / 2 - t * 0.55, d * 0.12]}>
+        <boxGeometry args={[sashW - 0.01, 0.007, 0.012]} />
+        <meshStandardMaterial color="#333" roughness={0.85} />
+      </mesh>
+      {/* Bottom */}
+      <mesh position={[0, -height / 2 + t * 0.55, d * 0.12]}>
+        <boxGeometry args={[sashW - 0.01, 0.007, 0.012]} />
+        <meshStandardMaterial color="#333" roughness={0.85} />
+      </mesh>
+      {/* Left */}
+      <mesh position={[-width / 2 + t * 0.55, 0, d * 0.12]}>
+        <boxGeometry args={[0.007, sashH - 0.01, 0.012]} />
+        <meshStandardMaterial color="#333" roughness={0.85} />
+      </mesh>
+      {/* Right */}
+      <mesh position={[width / 2 - t * 0.55, 0, d * 0.12]}>
+        <boxGeometry args={[0.007, sashH - 0.01, 0.012]} />
+        <meshStandardMaterial color="#333" roughness={0.85} />
+      </mesh>
+
+      {/* 3 brushed steel hinges on LEFT stile */}
       <Hinge position={[-width / 2 + t * 0.35, sashH / 3, d * 0.25]} />
       <Hinge position={[-width / 2 + t * 0.35, 0, d * 0.25]} />
       <Hinge position={[-width / 2 + t * 0.35, -sashH / 3, d * 0.25]} />
 
-      {/* Sash panel — pivots from LEFT edge, swings outward to right */}
+      {/* ── SASH — pivots from LEFT edge, swings outward ── */}
       <group position={[-width / 2 + t, 0, 0]}>
         <group ref={sashRef}>
           <group position={[sashW / 2, 0, 0]}>
-            {/* Sash frame */}
             <WindowFrame width={sashW} height={sashH} depth={d * 0.5} thickness={t * 0.65} color={frameColor} />
-
-            {/* Glass pane */}
             <GlassPane width={glassW} height={glassH} glassType={glassType} />
 
-            {showCrank ? (
-              /* HAND CRANKED: just a small latch on right stile (no lever handle) */
-              <mesh position={[sashW / 2 - t * 0.45, 0, d * 0.2]}>
-                <boxGeometry args={[0.01, 0.025, 0.008]} />
-                <meshStandardMaterial color="#999" roughness={0.3} metalness={0.4} />
-              </mesh>
-            ) : (
-              /* STANDARD CASEMENT: prominent LEVER HANDLE on right stile */
+            {!showCrank && (
+              /* STANDARD: lever handle on right stile */
               <group position={[sashW / 2 - t * 0.35, 0, d * 0.27]}>
-                {/* Handle base plate */}
                 <mesh>
                   <boxGeometry args={[0.02, 0.05, 0.01]} />
                   <meshStandardMaterial color="#999" roughness={0.25} metalness={0.5} />
                 </mesh>
-                {/* Handle lever (grippable, extends outward) */}
                 <mesh position={[0, 0, 0.02]}>
                   <boxGeometry args={[0.015, 0.07, 0.015]} />
                   <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
                 </mesh>
-                {/* Handle grip end */}
                 <mesh position={[0, -0.04, 0.02]}>
                   <boxGeometry args={[0.02, 0.012, 0.02]} />
                   <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
@@ -103,114 +126,125 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
             {/* Multi-point lock on right stile */}
             <LockPoint position={[sashW / 2 - t * 0.3, sashH / 4, d * 0.2]} />
             <LockPoint position={[sashW / 2 - t * 0.3, -sashH / 4, d * 0.2]} />
+
+            {/* Sash bottom rail track (for scissor arm shoe to slide in) */}
+            {showCrank && (
+              <mesh position={[0, -sashH / 2 + t * 0.25, d * 0.18]}>
+                <boxGeometry args={[sashW * 0.6, 0.006, 0.012]} />
+                <meshStandardMaterial color="#777" roughness={0.3} metalness={0.5} />
+              </mesh>
+            )}
           </group>
         </group>
       </group>
 
-      {/* === HAND CRANKED: Full Worm Gear Operator Mechanism === */}
+      {/* ═══ HAND CRANKED: Full Scissor Arm Operator ═══ */}
       {showCrank && (
         <group>
-          {/* ── GEARBOX HOUSING ── rectangular box mounted flush to frame sill */}
-          <group position={[0, -height / 2 + t * 0.2, d * 0.3]}>
-            {/* Main gearbox body */}
+          {/* ── GEARBOX HOUSING ── bottom center, interior face */}
+          <group position={[0, -height / 2 + t * 0.2, d * 0.32]}>
+            {/* Gearbox body */}
             <mesh>
-              <boxGeometry args={[0.045, 0.025, 0.025]} />
+              <boxGeometry args={[0.048, 0.028, 0.028]} />
               <meshStandardMaterial color="#777" roughness={0.25} metalness={0.6} />
             </mesh>
-            {/* Gearbox face plate (front detail) */}
-            <mesh position={[0, 0, 0.013]}>
-              <boxGeometry args={[0.04, 0.02, 0.002]} />
+            {/* Face plate */}
+            <mesh position={[0, 0, 0.015]}>
+              <boxGeometry args={[0.042, 0.022, 0.003]} />
               <meshStandardMaterial color="#888" roughness={0.2} metalness={0.65} />
             </mesh>
-            {/* Worm gear axle hole (visible circle) */}
-            <mesh position={[0, 0, 0.015]}>
-              <cylinderGeometry args={[0.005, 0.005, 0.004, 12]} />
+            {/* Worm gear axle */}
+            <mesh position={[0, 0, 0.018]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.005, 0.005, 0.006, 10]} />
               <meshStandardMaterial color="#555" roughness={0.3} metalness={0.7} />
             </mesh>
 
-            {/* ── FOLD-DOWN CRANK HANDLE ── L-shaped, extends from gearbox */}
-            {/* Handle shaft (extends forward from gearbox) */}
-            <mesh position={[0, 0, 0.035]}>
-              <cylinderGeometry args={[0.004, 0.004, 0.03, 8]} />
-              <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
-            </mesh>
-            {/* Handle crank arm (extends downward, L-shape) */}
-            <mesh position={[0, -0.02, 0.048]}>
-              <boxGeometry args={[0.008, 0.035, 0.008]} />
-              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
-            </mesh>
-            {/* Handle grip knob (you grab this to turn) */}
-            <mesh position={[0, -0.038, 0.048]}>
-              <sphereGeometry args={[0.008, 8, 8]} />
-              <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.5} />
-            </mesh>
-          </group>
-
-          {/* ── DRIVE SHAFT ── from gearbox up to operator arm pivot */}
-          <mesh position={[0, -height / 2 + t * 0.55, d * 0.25]}>
-            <boxGeometry args={[0.006, t * 0.8, 0.006]} />
-            <meshStandardMaterial color="#999" roughness={0.2} metalness={0.55} />
-          </mesh>
-
-          {/* ── OPERATOR ARM ASSEMBLY ── the metal arm that pushes the sash */}
-          <group position={[0, -height / 2 + t * 0.95, d * 0.22]}>
-            {/* Arm pivot bracket on frame sill (fixed mount) */}
-            <mesh>
-              <boxGeometry args={[0.025, 0.018, 0.018]} />
-              <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
-            </mesh>
-            {/* Pivot pin */}
-            <mesh position={[0, 0, 0.01]}>
-              <cylinderGeometry args={[0.004, 0.004, 0.02, 8]} />
-              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.6} />
-            </mesh>
-
-            {/* MAIN OPERATOR ARM — thick metal bar that extends and pushes sash */}
-            <group ref={armRef}>
-              {/* Primary arm segment */}
-              <mesh position={[sashW * 0.22, 0, 0]}>
-                <boxGeometry args={[sashW * 0.44, 0.012, 0.006]} />
+            {/* ── FOLD-DOWN CRANK HANDLE — rotates as window opens ── */}
+            <group ref={handleRef} position={[0, 0, 0.022]}>
+              {/* Handle shaft */}
+              <mesh position={[0, 0, 0.015]}>
+                <cylinderGeometry args={[0.004, 0.004, 0.028, 8]} />
                 <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
               </mesh>
-              {/* Arm reinforcement rib (visible detail along center) */}
-              <mesh position={[sashW * 0.22, 0, 0.005]}>
-                <boxGeometry args={[sashW * 0.38, 0.005, 0.004]} />
+              {/* Crank arm (L-shape offset) */}
+              <mesh position={[0, -0.022, 0.028]}>
+                <boxGeometry args={[0.008, 0.038, 0.008]} />
                 <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
               </mesh>
-
-              {/* Mid-joint knuckle (where arm bends/articulates) */}
-              <mesh position={[sashW * 0.44, 0, 0]}>
-                <cylinderGeometry args={[0.006, 0.006, 0.016, 8]} />
-                <meshStandardMaterial color="#888" roughness={0.25} metalness={0.6} />
+              {/* Grip knob */}
+              <mesh position={[0, -0.042, 0.028]}>
+                <sphereGeometry args={[0.008, 8, 8]} />
+                <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.5} />
               </mesh>
-
-              {/* ── SWIVEL BRACKET ── pivoting shoe at arm end */}
-              {/* This is the "swivel" that attaches to the sash bottom rail */}
-              <group position={[sashW * 0.44, 0, 0]}>
-                {/* Bracket housing (wider piece that slides on sash track) */}
-                <mesh position={[0.015, 0, 0]}>
-                  <boxGeometry args={[0.025, 0.015, 0.015]} />
-                  <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
-                </mesh>
-                {/* Swivel pin (allows free rotation) */}
-                <mesh position={[0.015, 0, 0.009]}>
-                  <cylinderGeometry args={[0.004, 0.004, 0.018, 8]} />
-                  <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.65} />
-                </mesh>
-                {/* Sash stud (connects into sash bottom rail slot) */}
-                <mesh position={[0.015, 0.012, 0]}>
-                  <cylinderGeometry args={[0.003, 0.003, 0.012, 6]} />
-                  <meshStandardMaterial color="#999" roughness={0.3} metalness={0.5} />
-                </mesh>
-              </group>
             </group>
           </group>
 
-          {/* ── SASH TRACK CHANNEL ── slot on sash bottom rail where bracket slides */}
-          <mesh position={[0, -sashH / 2 + t * 0.15, d * 0.22]}>
-            <boxGeometry args={[sashW * 0.5, 0.005, 0.01]} />
-            <meshStandardMaterial color="#777" roughness={0.3} metalness={0.5} />
+          {/* ── DRIVE SHAFT — from gearbox to scissor arm pivot ── */}
+          <mesh position={[0, -height / 2 + t * 0.58, d * 0.26]}>
+            <boxGeometry args={[0.006, t * 0.85, 0.006]} />
+            <meshStandardMaterial color="#999" roughness={0.2} metalness={0.55} />
           </mesh>
+
+          {/* ── SCISSOR ARM MECHANISM ── 2-segment linkage ── */}
+          <group position={[0, -height / 2 + t * 1.0, d * 0.22]}>
+            {/* Frame-side pivot bracket (fixed to sill) */}
+            <mesh>
+              <boxGeometry args={[0.028, 0.02, 0.02]} />
+              <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
+            </mesh>
+            {/* Pivot pin 1 */}
+            <mesh position={[0, 0, 0.012]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.004, 0.004, 0.022, 8]} />
+              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.6} />
+            </mesh>
+
+            {/* ARM SEGMENT 1 — pivots from frame bracket outward */}
+            <group ref={arm1Ref}>
+              <mesh position={[sashW * 0.18, 0, 0]}>
+                <boxGeometry args={[sashW * 0.36, 0.013, 0.007]} />
+                <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
+              </mesh>
+              {/* Reinforcement rib */}
+              <mesh position={[sashW * 0.18, 0, 0.006]}>
+                <boxGeometry args={[sashW * 0.3, 0.006, 0.004]} />
+                <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
+              </mesh>
+
+              {/* ── MID-JOINT KNUCKLE (scissor connection) ── */}
+              <group position={[sashW * 0.36, 0, 0]}>
+                <mesh rotation={[Math.PI / 2, 0, 0]}>
+                  <cylinderGeometry args={[0.007, 0.007, 0.018, 8]} />
+                  <meshStandardMaterial color="#888" roughness={0.25} metalness={0.6} />
+                </mesh>
+
+                {/* ARM SEGMENT 2 — extends from knuckle to sash track */}
+                <group ref={arm2Ref}>
+                  <mesh position={[sashW * 0.14, 0, 0]}>
+                    <boxGeometry args={[sashW * 0.28, 0.011, 0.006]} />
+                    <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
+                  </mesh>
+
+                  {/* ── SWIVEL SHOE — slides in sash bottom rail track ── */}
+                  <group position={[sashW * 0.28, 0, 0]}>
+                    <mesh>
+                      <boxGeometry args={[0.028, 0.016, 0.016]} />
+                      <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
+                    </mesh>
+                    {/* Swivel pin */}
+                    <mesh position={[0, 0, 0.01]} rotation={[Math.PI / 2, 0, 0]}>
+                      <cylinderGeometry args={[0.004, 0.004, 0.02, 8]} />
+                      <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.65} />
+                    </mesh>
+                    {/* Stud into sash rail */}
+                    <mesh position={[0, 0.012, 0]}>
+                      <cylinderGeometry args={[0.003, 0.003, 0.012, 6]} />
+                      <meshStandardMaterial color="#999" roughness={0.3} metalness={0.5} />
+                    </mesh>
+                  </group>
+                </group>
+              </group>
+            </group>
+          </group>
         </group>
       )}
 
