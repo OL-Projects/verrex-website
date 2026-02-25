@@ -1,21 +1,16 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Link as IntlLink } from "@/i18n/navigation"
 import { VerrexLogo } from "@/components/ui/verrex-logo"
 import { Button } from "@/components/ui/button"
 import {
-  LogIn,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  ArrowLeft,
-  Loader2,
+  LogIn, Mail, Lock, Eye, EyeOff, AlertCircle,
+  ArrowLeft, Loader2, CheckCircle2, Info,
 } from "lucide-react"
 
 export default function LoginPage() {
@@ -32,181 +27,168 @@ export default function LoginPage() {
 
 function LoginContent() {
   const router = useRouter()
+  const params = useParams()
+  const locale = (params?.locale as string) || "en"
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/portal/dashboard"
 
-  const [email, setEmail] = useState("")
+  // Check for post-signup redirect
+  const justRegistered = searchParams.get("registered") === "true"
+  const prefillEmail = searchParams.get("email") || ""
+
+  const [email, setEmail] = useState(prefillEmail)
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [errorType, setErrorType] = useState<"auth" | "network" | "">("")
   const [loading, setLoading] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(justRegistered)
+
+  // Auto-hide success banner after 8 seconds
+  useEffect(() => {
+    if (showSuccess) {
+      const t = setTimeout(() => setShowSuccess(false), 8000)
+      return () => clearTimeout(t)
+    }
+  }, [showSuccess])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setErrorType("")
     setLoading(true)
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password.")
+      setErrorType("auth")
+      setLoading(false)
+      return
+    }
 
     try {
       const result = await signIn("credentials", {
-        email,
+        email: email.trim(),
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError("Invalid email or password. Please try again.")
+        setError("Invalid email or password. Please double-check your credentials.")
+        setErrorType("auth")
         setLoading(false)
         return
       }
 
-      // Redirect to dashboard (role redirect happens there)
-      router.push(callbackUrl)
+      // Success — redirect with locale
+      router.push(`/${locale}/portal/dashboard`)
       router.refresh()
     } catch {
-      setError("An unexpected error occurred. Please try again.")
+      setError("Unable to connect. Please check your internet and try again.")
+      setErrorType("network")
       setLoading(false)
     }
   }
 
+  const fillDemo = (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail)
+    setPassword(demoPass)
+    setError("")
+    setErrorType("")
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-950 dark:via-blue-950/20 dark:to-indigo-950/30" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.08),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.12),transparent_60%)]" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        {/* Back link */}
-        <IntlLink
-          href="/portal"
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Portal
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative z-10 w-full max-w-md">
+        <IntlLink href="/portal" className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-8">
+          <ArrowLeft className="h-4 w-4" /> Back to Portal
         </IntlLink>
+
+        {/* Post-Signup Success Banner */}
+        {showSuccess && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-4 mb-4 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400">
+            <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium">Account created successfully!</p>
+              <p className="text-xs mt-0.5 opacity-80">Sign in below with your new credentials.</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Login Card */}
         <div className="p-8 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 dark:shadow-black/20">
-          {/* Logo + Title */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <VerrexLogo variant="icon" size={48} />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Welcome Back
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Sign in to your Verrex Portal account
-            </p>
+            <div className="flex justify-center mb-4"><VerrexLogo variant="icon" size={48} /></div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sign in to your Verrex Portal account</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-2 p-3 mb-6 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm"
-            >
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              {error}
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+              className="p-3 mb-6 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-sm">
+              <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                <AlertCircle className="h-4 w-4 shrink-0" /> {error}
+              </div>
+              {errorType === "auth" && (
+                <p className="text-xs text-red-600/70 dark:text-red-400/60 mt-2 ml-6">
+                  Tip: Use the Quick Demo buttons below to test each role instantly.
+                </p>
+              )}
             </motion.div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Email Address
-              </label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all" />
               </div>
             </div>
-
-            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                >
+                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required
+                  className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-60"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <LogIn className="h-4 w-4" />
-              )}
+            <Button type="submit" disabled={loading}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-60 cursor-pointer">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
             <span className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
           </div>
 
-          {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-slate-600 dark:text-slate-400">
               Don&apos;t have an account?{" "}
-              <IntlLink
-                href="/portal/signup"
-                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-              >
-                Sign Up
-              </IntlLink>
+              <IntlLink href="/portal/signup" className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">Sign Up</IntlLink>
             </p>
           </div>
         </div>
 
-        {/* Quick Demo Login Buttons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6 p-4 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10"
-        >
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 text-center font-medium uppercase tracking-wider">
-            Quick Demo Login
-          </p>
+        {/* Quick Demo Login */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+          className="mt-6 p-4 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Info className="h-3 w-3 text-slate-400" />
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Quick Demo Login</p>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {[
               { label: "Admin", email: "admin@verrex.com", pass: "admin123" },
@@ -216,19 +198,13 @@ function LoginContent() {
               { label: "Partner", email: "partner@homedepot.com", pass: "partner123" },
               { label: "Inspector", email: "inspector@demo.com", pass: "inspector123" },
             ].map((demo) => (
-              <button
-                key={demo.label}
-                type="button"
-                onClick={() => {
-                  setEmail(demo.email)
-                  setPassword(demo.pass)
-                }}
-                className="px-3 py-2 text-xs font-medium rounded-lg bg-slate-100/80 dark:bg-white/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 border border-slate-200/60 dark:border-white/10 transition-all cursor-pointer"
-              >
+              <button key={demo.label} type="button" onClick={() => fillDemo(demo.email, demo.pass)}
+                className="px-3 py-2 text-xs font-medium rounded-lg bg-slate-100/80 dark:bg-white/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 border border-slate-200/60 dark:border-white/10 transition-all cursor-pointer">
                 {demo.label}
               </button>
             ))}
           </div>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2">Click a role → then press Sign In</p>
         </motion.div>
       </motion.div>
     </div>

@@ -1,12 +1,13 @@
 // ============================================================
 // VERREX PORTAL — NextAuth v5 Configuration
+// Phase 1: Demo users + in-memory registration
 // ============================================================
 
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import type { UserRole } from '@/types/portal';
 
-// Phase 1: Demo users (replace with database in Phase 2)
+// ── Demo users (always available) ──────────────────────────
 const DEMO_USERS = [
   {
     id: 'usr_admin_001',
@@ -52,6 +53,88 @@ const DEMO_USERS = [
   },
 ];
 
+// ── In-memory registered users (Phase 1 — resets on restart) ─
+export interface RegisteredUser {
+  id: string;
+  email: string;
+  password: string;
+  name: string;
+  phone?: string;
+  role: UserRole;
+  createdAt: string;
+}
+
+// Module-level store — persists across requests in same server process
+export const registeredUsers: Map<string, RegisteredUser> = new Map();
+
+// ── Helper: find user across both stores ───────────────────
+function findUser(email: string, password: string) {
+  // Check demo users first
+  const demo = DEMO_USERS.find(
+    (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+  );
+  if (demo) return demo;
+
+  // Check registered users
+  const registered = registeredUsers.get(email.toLowerCase());
+  if (registered && registered.password === password) {
+    return registered;
+  }
+
+  return null;
+}
+
+// ── Helper: check if email is taken ────────────────────────
+export function isEmailTaken(email: string): boolean {
+  const lower = email.toLowerCase();
+  if (DEMO_USERS.some((u) => u.email.toLowerCase() === lower)) return true;
+  if (registeredUsers.has(lower)) return true;
+  return false;
+}
+
+// ── Helper: register a new user ────────────────────────────
+export function registerUser(data: {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}): RegisteredUser {
+  const id = `usr_reg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const user: RegisteredUser = {
+    id,
+    email: data.email.toLowerCase(),
+    password: data.password,
+    name: data.name,
+    phone: data.phone,
+    role: 'client', // self-signup always = client
+    createdAt: new Date().toISOString(),
+  };
+  registeredUsers.set(user.email, user);
+  return user;
+}
+
+// ── Helper: get all users (for admin) ──────────────────────
+export function getAllUsers() {
+  const demoList = DEMO_USERS.map((u) => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    source: 'demo' as const,
+    createdAt: '2026-01-01T00:00:00Z',
+  }));
+  const regList = Array.from(registeredUsers.values()).map((u) => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    source: 'registered' as const,
+    createdAt: u.createdAt,
+  }));
+  return [...demoList, ...regList];
+}
+
+// ── NextAuth configuration ─────────────────────────────────
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -65,10 +148,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const user = DEMO_USERS.find(
-          (u) =>
-            u.email === credentials.email &&
-            u.password === credentials.password
+        const user = findUser(
+          credentials.email as string,
+          credentials.password as string
         );
 
         if (!user) {
