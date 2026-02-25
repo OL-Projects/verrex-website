@@ -13,7 +13,6 @@ const certs: CertItem[] = [
   { name: "NFRC", src: "/images/certifications/nfrc.svg" },
   { name: "CSA", src: "/images/certifications/csa-light.svg", darkSrc: "/images/certifications/csa-dark.svg" },
   { name: "CE", src: "/images/certifications/ce-light.svg", darkSrc: "/images/certifications/ce-dark.svg" },
-  { name: "Quality", src: "/images/certifications/quality.svg" },
 ]
 
 interface CertificationsBarProps {
