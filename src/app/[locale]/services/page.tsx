@@ -194,18 +194,17 @@ export default async function ServicesPage() {
         </div>
       </section>
 
-      {/* CTA with Background */}
+      {/* CTA with Pattern Background */}
       <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-900 dark:to-slate-900" />
-        <div className="absolute inset-0 opacity-10">
-          <Image src="/images/hero/hero-factory.jpg" alt="" fill className="object-cover" sizes="100vw" />
-        </div>
+        {/* Geometric pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white">{t('ctaTitle')}</h2>
           <p className="mt-3 text-lg text-blue-100">{t('ctaDesc')}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <IntlLink href="/quote"><Button variant="primary" size="lg" className="bg-white text-blue-700 hover:bg-blue-50 gap-2">{t('getFreeQuote')} <ArrowRight className="h-4 w-4" /></Button></IntlLink>
-            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="text-white border-white/40 hover:bg-white/10 gap-2"><Phone className="h-4 w-4" /> {t('bookConsultation')}</Button></IntlLink>
+            <IntlLink href="/appointments"><Button variant="outline" size="lg" className="!text-white !border-white/60 hover:!bg-white/10 gap-2"><Phone className="h-4 w-4" /> {t('bookConsultation')}</Button></IntlLink>
           </div>
         </div>
       </section>
