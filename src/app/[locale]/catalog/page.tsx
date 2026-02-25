@@ -171,7 +171,7 @@ export default function CatalogPage() {
 
                 {/* 3D Configurator Promo Card */}
                 <IntlLink href="/products/window-types">
-                  <div className="rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 p-4 text-white shadow-lg shadow-violet-500/20 hover:shadow-xl hover:shadow-violet-500/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                  <div className="rounded-xl bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700 p-4 text-white ring-1 ring-white/15 shadow-[0_4px_20px_rgba(99,102,241,0.35)] hover:shadow-[0_6px_30px_rgba(99,102,241,0.45)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                     <Box className="h-6 w-6 mb-2 opacity-90" />
                     <p className="text-sm font-bold">3D Configurator</p>
                     <p className="text-[11px] text-white/75 mt-0.5">Visualize windows & doors interactively</p>
