@@ -22,8 +22,8 @@ interface CertificationsBarProps {
 
 export function CertificationsBar({ variant = "compact", className = "" }: CertificationsBarProps) {
   const isCompact = variant === "compact"
-  const imgH = isCompact ? "h-8 w-auto" : "h-12 w-auto"
-  const gap = isCompact ? "gap-6" : "gap-10"
+  const imgH = isCompact ? "h-16 w-auto" : "h-24 w-auto"
+  const gap = isCompact ? "gap-8" : "gap-12"
 
   return (
     <div className={`flex flex-wrap items-center justify-center ${gap} ${className}`}>
@@ -31,11 +31,11 @@ export function CertificationsBar({ variant = "compact", className = "" }: Certi
         <div key={cert.name} className={`flex flex-col items-center ${isCompact ? "gap-1" : "gap-2"} opacity-80 hover:opacity-100 transition-opacity`}>
           {cert.darkSrc ? (
             <>
-              <Image src={cert.src} alt={cert.name} width={isCompact ? 48 : 64} height={isCompact ? 32 : 48} className={`${imgH} block dark:hidden`} />
-              <Image src={cert.darkSrc} alt={cert.name} width={isCompact ? 48 : 64} height={isCompact ? 32 : 48} className={`${imgH} hidden dark:block`} />
+              <Image src={cert.src} alt={cert.name} width={isCompact ? 96 : 128} height={isCompact ? 64 : 96} className={`${imgH} block dark:hidden`} />
+              <Image src={cert.darkSrc} alt={cert.name} width={isCompact ? 96 : 128} height={isCompact ? 64 : 96} className={`${imgH} hidden dark:block`} />
             </>
           ) : (
-            <Image src={cert.src} alt={cert.name} width={isCompact ? 48 : 64} height={isCompact ? 32 : 48} className={imgH} />
+            <Image src={cert.src} alt={cert.name} width={isCompact ? 96 : 128} height={isCompact ? 64 : 96} className={imgH} />
           )}
           {!isCompact && (
             <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{cert.name}</span>
