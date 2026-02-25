@@ -2,7 +2,7 @@
 import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import { WindowFrame, CrankHandle, Hinge, LockPoint, Weatherstrip, WindowScreen, springStep, type SpringState } from "../WindowParts"
+import { WindowFrame, Hinge, LockPoint, Weatherstrip, WindowScreen, springStep, type SpringState } from "../WindowParts"
 import { GlassPane } from "../GlassPane"
 
 // Single Casement Window
@@ -107,37 +107,109 @@ export function SingleCasementWindow({ width, height, frameColor, glassType, isO
         </group>
       </group>
 
-      {/* === HAND CRANKED VARIANT: Crank + Operator Arm === */}
+      {/* === HAND CRANKED: Full Worm Gear Operator Mechanism === */}
       {showCrank && (
         <group>
-          {/* Crank handle at bottom center of OUTER frame (not sash) */}
-          <CrankHandle position={[0, -height / 2 + t * 0.15, d * 0.35]} />
-
-          {/* Operator arm assembly — visible folding arm from crank to sash bottom */}
-          <group position={[0, -height / 2 + t * 0.8, d * 0.2]}>
-            {/* Arm pivot mount on frame */}
+          {/* ── GEARBOX HOUSING ── rectangular box mounted flush to frame sill */}
+          <group position={[0, -height / 2 + t * 0.2, d * 0.3]}>
+            {/* Main gearbox body */}
             <mesh>
-              <boxGeometry args={[0.02, 0.02, 0.015]} />
-              <meshStandardMaterial color="#888" roughness={0.3} metalness={0.5} />
+              <boxGeometry args={[0.045, 0.025, 0.025]} />
+              <meshStandardMaterial color="#777" roughness={0.25} metalness={0.6} />
             </mesh>
-            {/* Folding operator arm (extends when sash opens) */}
+            {/* Gearbox face plate (front detail) */}
+            <mesh position={[0, 0, 0.013]}>
+              <boxGeometry args={[0.04, 0.02, 0.002]} />
+              <meshStandardMaterial color="#888" roughness={0.2} metalness={0.65} />
+            </mesh>
+            {/* Worm gear axle hole (visible circle) */}
+            <mesh position={[0, 0, 0.015]}>
+              <cylinderGeometry args={[0.005, 0.005, 0.004, 12]} />
+              <meshStandardMaterial color="#555" roughness={0.3} metalness={0.7} />
+            </mesh>
+
+            {/* ── FOLD-DOWN CRANK HANDLE ── L-shaped, extends from gearbox */}
+            {/* Handle shaft (extends forward from gearbox) */}
+            <mesh position={[0, 0, 0.035]}>
+              <cylinderGeometry args={[0.004, 0.004, 0.03, 8]} />
+              <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
+            </mesh>
+            {/* Handle crank arm (extends downward, L-shape) */}
+            <mesh position={[0, -0.02, 0.048]}>
+              <boxGeometry args={[0.008, 0.035, 0.008]} />
+              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
+            </mesh>
+            {/* Handle grip knob (you grab this to turn) */}
+            <mesh position={[0, -0.038, 0.048]}>
+              <sphereGeometry args={[0.008, 8, 8]} />
+              <meshStandardMaterial color="#bbb" roughness={0.15} metalness={0.5} />
+            </mesh>
+          </group>
+
+          {/* ── DRIVE SHAFT ── from gearbox up to operator arm pivot */}
+          <mesh position={[0, -height / 2 + t * 0.55, d * 0.25]}>
+            <boxGeometry args={[0.006, t * 0.8, 0.006]} />
+            <meshStandardMaterial color="#999" roughness={0.2} metalness={0.55} />
+          </mesh>
+
+          {/* ── OPERATOR ARM ASSEMBLY ── the metal arm that pushes the sash */}
+          <group position={[0, -height / 2 + t * 0.95, d * 0.22]}>
+            {/* Arm pivot bracket on frame sill (fixed mount) */}
+            <mesh>
+              <boxGeometry args={[0.025, 0.018, 0.018]} />
+              <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
+            </mesh>
+            {/* Pivot pin */}
+            <mesh position={[0, 0, 0.01]}>
+              <cylinderGeometry args={[0.004, 0.004, 0.02, 8]} />
+              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.6} />
+            </mesh>
+
+            {/* MAIN OPERATOR ARM — thick metal bar that extends and pushes sash */}
             <group ref={armRef}>
-              <mesh position={[sashW * 0.2, 0, 0]}>
-                <boxGeometry args={[sashW * 0.4, 0.008, 0.008]} />
-                <meshStandardMaterial color="#999" roughness={0.25} metalness={0.55} />
+              {/* Primary arm segment */}
+              <mesh position={[sashW * 0.22, 0, 0]}>
+                <boxGeometry args={[sashW * 0.44, 0.012, 0.006]} />
+                <meshStandardMaterial color="#999" roughness={0.2} metalness={0.6} />
               </mesh>
-              {/* Arm end connector (attaches to sash bottom rail) */}
-              <mesh position={[sashW * 0.4, 0, 0]}>
-                <cylinderGeometry args={[0.006, 0.006, 0.015, 6]} />
-                <meshStandardMaterial color="#888" roughness={0.3} metalness={0.5} />
+              {/* Arm reinforcement rib (visible detail along center) */}
+              <mesh position={[sashW * 0.22, 0, 0.005]}>
+                <boxGeometry args={[sashW * 0.38, 0.005, 0.004]} />
+                <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.55} />
               </mesh>
+
+              {/* Mid-joint knuckle (where arm bends/articulates) */}
+              <mesh position={[sashW * 0.44, 0, 0]}>
+                <cylinderGeometry args={[0.006, 0.006, 0.016, 8]} />
+                <meshStandardMaterial color="#888" roughness={0.25} metalness={0.6} />
+              </mesh>
+
+              {/* ── SWIVEL BRACKET ── pivoting shoe at arm end */}
+              {/* This is the "swivel" that attaches to the sash bottom rail */}
+              <group position={[sashW * 0.44, 0, 0]}>
+                {/* Bracket housing (wider piece that slides on sash track) */}
+                <mesh position={[0.015, 0, 0]}>
+                  <boxGeometry args={[0.025, 0.015, 0.015]} />
+                  <meshStandardMaterial color="#888" roughness={0.25} metalness={0.55} />
+                </mesh>
+                {/* Swivel pin (allows free rotation) */}
+                <mesh position={[0.015, 0, 0.009]}>
+                  <cylinderGeometry args={[0.004, 0.004, 0.018, 8]} />
+                  <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.65} />
+                </mesh>
+                {/* Sash stud (connects into sash bottom rail slot) */}
+                <mesh position={[0.015, 0.012, 0]}>
+                  <cylinderGeometry args={[0.003, 0.003, 0.012, 6]} />
+                  <meshStandardMaterial color="#999" roughness={0.3} metalness={0.5} />
+                </mesh>
+              </group>
             </group>
           </group>
 
-          {/* Vertical drive rod from crank to operator arm (visible linkage) */}
-          <mesh position={[0, -height / 2 + t * 0.5, d * 0.28]}>
-            <boxGeometry args={[0.006, t * 0.6, 0.006]} />
-            <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.5} />
+          {/* ── SASH TRACK CHANNEL ── slot on sash bottom rail where bracket slides */}
+          <mesh position={[0, -sashH / 2 + t * 0.15, d * 0.22]}>
+            <boxGeometry args={[sashW * 0.5, 0.005, 0.01]} />
+            <meshStandardMaterial color="#777" roughness={0.3} metalness={0.5} />
           </mesh>
         </group>
       )}
