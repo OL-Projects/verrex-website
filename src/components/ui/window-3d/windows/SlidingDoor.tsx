@@ -61,10 +61,16 @@ export function SlidingDoor({ width, height, frameColor, glassType, isOpen }: {
         </group>
       </group>
 
-      {/* Floor threshold */}
-      <mesh position={[0, -height / 2 - 0.015, 0]}>
-        <boxGeometry args={[width, 0.025, d * 1.2]} />
-        <meshStandardMaterial color={frameColor} roughness={0.5} metalness={0.03} />
+      {/* Floor threshold (flush sill) */}
+      <mesh position={[0, -height / 2 - 0.012, 0]}>
+        <boxGeometry args={[width + 0.02, 0.02, d * 1.3]} />
+        <meshStandardMaterial color={frameColor} roughness={0.45} metalness={0.05} />
+      </mesh>
+
+      {/* Small floor plane for context */}
+      <mesh position={[0, -height / 2 - 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[width * 2, d * 4]} />
+        <meshStandardMaterial color="#e5e7eb" roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
     </group>
   )

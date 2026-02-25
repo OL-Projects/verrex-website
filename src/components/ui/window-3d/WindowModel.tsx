@@ -5,6 +5,7 @@ import { Center } from "@react-three/drei"
 import * as THREE from "three"
 import { DoubleHungWindow } from "./windows/DoubleHungWindow"
 import { CasementWindow } from "./windows/CasementWindow"
+import { SingleCasementWindow } from "./windows/SingleCasementWindow"
 import { SlidingDoor } from "./windows/SlidingDoor"
 import { FoldingDoor } from "./windows/FoldingDoor"
 import { SwingDoor } from "./windows/SwingDoor"
@@ -43,12 +44,12 @@ export function WindowModel({
 
   let win: React.ReactNode
   switch (type) {
-    case "double-hung": win = <DoubleHungWindow {...p} />; break
-    case "casement": win = <CasementWindow {...p} />; break
+    case "double-hung": win = <AwningWindow {...p} />; break  // Top Hung = hinged at top, bottom swings outward
+    case "casement": win = <SingleCasementWindow {...p} />; break  // Single panel, left-hinged, swings right
     case "sliding": win = <SlidingWindow {...p} />; break
     case "awning": win = <AwningWindow {...p} />; break
     case "tilt-turn": win = <TiltTurnWindow {...p} />; break
-    case "hand-cranked": win = <CasementWindow {...p} />; break
+    case "hand-cranked": win = <SingleCasementWindow {...p} showCrank />; break  // Casement + crank handle
     case "sliding-door": win = <SlidingDoor {...p} />; break
     case "folding-door": win = <FoldingDoor {...p} />; break
     case "swing-door": win = <SwingDoor {...p} />; break
