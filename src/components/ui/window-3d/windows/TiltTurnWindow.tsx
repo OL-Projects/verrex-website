@@ -2,25 +2,41 @@
 import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import { WindowFrame, TiltTurnHandle, Hinge, LockPoint, Weatherstrip, springStep, type SpringState } from "../WindowParts"
+import { WindowFrame, Hinge, Weatherstrip, WindowScreen, springStep, type SpringState } from "../WindowParts"
 import { GlassPane } from "../GlassPane"
 
-// Tilt & Turn Window
-// European-style dual-mode: handle UP = tilt inward from bottom,
-// handle horizontal = swing open like a door.
-// Spring-based tilt animation. Hardware: espagnolette handle, hinges, multi-point locks.
+// Tilt & Turn Window (European-style)
+// ONE sash with a DUAL-FUNCTION 3-position handle:
+//   Handle DOWN  → LOCKED
+//   Handle HORIZONTAL → TURN mode (sash swings fully INWARD, like an inward casement)
+//   Handle UP → TILT mode (top tilts INWARD ~15°, bottom stays fixed)
+//
+// Key hardware:
+//   - Espagnolette lock bars: long rods along right stile + bottom rail
+//   - T-bar tilt-turn handle on right stile center
+//   - Bottom pivot points for tilt mode
+//   - Left side hinges for turn mode
+//   - Top friction stays (prevent sash slamming in tilt)
+//
+// When "Open" is pressed → shows TILT mode (most recognizable):
+//   Sash rotates ~15° around bottom X-axis, top comes toward viewer.
+
 export function TiltTurnWindow({ width, height, frameColor, glassType, isOpen }: {
   width: number; height: number; frameColor: string; glassType: string; isOpen: boolean
 }) {
   const t = 0.06, d = 0.08
-  const glassW = width - t * 2 - 0.02, glassH = height - t * 2 - 0.02
-  const tiltRef = useRef<THREE.Group>(null)
-  const spring = useRef<SpringState>({ pos: 0, vel: 0 })
+  const sashW = width - t * 2
+  const sashH = height - t * 2
+  const glassW = sashW - t * 1.4
+  const glassH = sashH - t * 1.4
+  const sashRef = useRef<THREE.Group>(null)
 
-  // Tilt inward from bottom — heavier panel, slower spring
+  // Spring: TILT mode — rotate around bottom X-axis, top comes toward viewer
+  const spring = useRef<SpringState>({ pos: 0, vel: 0 })
   useFrame((_, dt) => {
-    const v = springStep(spring.current, isOpen ? Math.PI / 8 : 0, dt, 110, 20)
-    if (tiltRef.current) tiltRef.current.rotation.x = v
+    const target = isOpen ? 0.28 : 0  // ~16° tilt inward from top
+    const angle = springStep(spring.current, target, dt, 100, 14)
+    if (sashRef.current) sashRef.current.rotation.x = angle
   })
 
   return (
@@ -28,32 +44,91 @@ export function TiltTurnWindow({ width, height, frameColor, glassType, isOpen }:
       {/* Outer frame */}
       <WindowFrame width={width} height={height} depth={d} thickness={t} color={frameColor} />
 
-      {/* Weatherstrip perimeter */}
-      <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, height / 2 - t * 0.5, d * 0.12]} />
-      <Weatherstrip width={width - t * 1.8} height={0.005} position={[0, -height / 2 + t * 0.5, d * 0.12]} />
+      {/* Weatherstrip gaskets */}
+      <Weatherstrip width={sashW - 0.01} height={0.005} position={[0, height / 2 - t * 0.6, d * 0.15]} />
+      <Weatherstrip width={sashW - 0.01} height={0.005} position={[0, -height / 2 + t * 0.6, d * 0.15]} />
+      <Weatherstrip width={0.005} height={sashH - 0.01} position={[-width / 2 + t * 0.6, 0, d * 0.15]} />
+      <Weatherstrip width={0.005} height={sashH - 0.01} position={[width / 2 - t * 0.6, 0, d * 0.15]} />
 
-      {/* Tilt pivot at bottom edge */}
+      {/* Bottom pivot points for tilt mode (left and right) */}
+      <mesh position={[-sashW / 2 + 0.03, -height / 2 + t * 0.5, 0]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.018, 8]} />
+        <meshStandardMaterial color="#888" roughness={0.3} metalness={0.5} />
+      </mesh>
+      <mesh position={[sashW / 2 - 0.03, -height / 2 + t * 0.5, 0]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.018, 8]} />
+        <meshStandardMaterial color="#888" roughness={0.3} metalness={0.5} />
+      </mesh>
+
+      {/* Left side hinges for turn mode (3 hinges) */}
+      <Hinge position={[-width / 2 + t * 0.35, sashH / 3, d * 0.25]} />
+      <Hinge position={[-width / 2 + t * 0.35, 0, d * 0.25]} />
+      <Hinge position={[-width / 2 + t * 0.35, -sashH / 3, d * 0.25]} />
+
+      {/* Top friction stays (both sides — prevent slam in tilt) */}
+      <mesh position={[-sashW / 3, height / 2 - t * 0.5, d * 0.2]}>
+        <boxGeometry args={[0.05, 0.008, 0.01]} />
+        <meshStandardMaterial color="#999" roughness={0.3} metalness={0.4} />
+      </mesh>
+      <mesh position={[sashW / 3, height / 2 - t * 0.5, d * 0.2]}>
+        <boxGeometry args={[0.05, 0.008, 0.01]} />
+        <meshStandardMaterial color="#999" roughness={0.3} metalness={0.4} />
+      </mesh>
+
+      {/* Sash — pivots around BOTTOM edge (tilt mode: X-axis rotation) */}
       <group position={[0, -height / 2 + t, 0]}>
-        <group ref={tiltRef} position={[0, height / 2 - t, 0]}>
-          <group position={[0, -(height / 2 - t), 0]}>
-            {/* Inner sash frame */}
-            <WindowFrame width={width - t * 1.6} height={height - t * 1.6} depth={d * 0.5} thickness={t * 0.6} color={frameColor} />
+        <group ref={sashRef}>
+          <group position={[0, sashH / 2, 0]}>
+            {/* Sash frame */}
+            <WindowFrame width={sashW} height={sashH} depth={d * 0.5} thickness={t * 0.65} color={frameColor} />
+
+            {/* Glass pane */}
             <GlassPane width={glassW} height={glassH} glassType={glassType} />
-            {/* Espagnolette handle — ON SASH, tilts with it */}
-            <TiltTurnHandle position={[width / 2 - t * 1.2, 0, d * 0.3]} rotation={isOpen ? -Math.PI / 2 : 0} />
+
+            {/* Espagnolette lock bar — RIGHT stile (long vertical rod) */}
+            <mesh position={[sashW / 2 - t * 0.35, 0, d * 0.15]}>
+              <boxGeometry args={[0.008, sashH * 0.7, 0.008]} />
+              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.6} />
+            </mesh>
+
+            {/* Espagnolette lock bar — BOTTOM rail (horizontal rod) */}
+            <mesh position={[0, -sashH / 2 + t * 0.35, d * 0.15]}>
+              <boxGeometry args={[sashW * 0.6, 0.008, 0.008]} />
+              <meshStandardMaterial color="#aaa" roughness={0.2} metalness={0.6} />
+            </mesh>
+
+            {/* T-BAR TILT-TURN HANDLE on right stile center */}
+            {/* Handle base plate */}
+            <mesh position={[sashW / 2 - t * 0.3, 0, d * 0.27]}>
+              <boxGeometry args={[0.018, 0.04, 0.008]} />
+              <meshStandardMaterial color="#999" roughness={0.25} metalness={0.5} />
+            </mesh>
+            {/* Handle lever (T-bar) — points DOWN when locked, horizontal when tilt */}
+            <mesh position={[sashW / 2 - t * 0.3, isOpen ? 0.04 : -0.04, d * 0.3]}>
+              <boxGeometry args={[0.012, 0.06, 0.012]} />
+              <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
+            </mesh>
+            {/* Handle T-bar cross piece */}
+            <mesh position={[sashW / 2 - t * 0.3, isOpen ? 0.068 : -0.068, d * 0.3]}>
+              <boxGeometry args={[0.035, 0.008, 0.008]} />
+              <meshStandardMaterial color="#bbb" roughness={0.2} metalness={0.55} />
+            </mesh>
+
+            {/* Multi-point lock cams (visible on right stile) */}
+            <mesh position={[sashW / 2 - t * 0.35, sashH / 4, d * 0.2]}>
+              <cylinderGeometry args={[0.006, 0.006, 0.012, 6]} />
+              <meshStandardMaterial color="#999" roughness={0.3} metalness={0.5} />
+            </mesh>
+            <mesh position={[sashW / 2 - t * 0.35, -sashH / 4, d * 0.2]}>
+              <cylinderGeometry args={[0.006, 0.006, 0.012, 6]} />
+              <meshStandardMaterial color="#999" roughness={0.3} metalness={0.5} />
+            </mesh>
           </group>
         </group>
       </group>
 
-      {/* Side hinges (left jamb) */}
-      {[-height / 3, height / 3].map((y, i) => (
-        <Hinge key={i} position={[-width / 2 + t * 0.4, y, d * 0.2]} />
-      ))}
-
-      {/* Multi-point locks (right side, top & bottom) */}
-      <LockPoint position={[width / 2 - t * 0.8, height / 3, d * 0.25]} />
-      <LockPoint position={[width / 2 - t * 0.8, -height / 3, d * 0.25]} />
-      <LockPoint position={[0, height / 2 - t * 0.8, d * 0.25]} />
+      {/* Exterior screen */}
+      <WindowScreen width={sashW - t} height={sashH - t} position={[0, 0, -d * 0.6]} />
     </group>
   )
 }
