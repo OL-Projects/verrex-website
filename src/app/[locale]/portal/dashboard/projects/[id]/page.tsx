@@ -114,7 +114,7 @@ export default function ProjectDetailPage() {
         {activeTab === "overview" && <OverviewTab project={project} contractor={contractor} inspector={inspector} appointments={appointments} measurements={measurements} />}
         {activeTab === "products" && <ProductsTab products={project.products} />}
         {activeTab === "orders" && <OrdersTab orders={orders} />}
-        {activeTab === "timeline" && <TimelineTab timeline={timeline} />}
+        {activeTab === "timeline" && <TimelineTab timeline={timeline} userRole={role as import("@/types/portal").UserRole} />}
         {activeTab === "messages" && <MessagesTab messages={messages} userId={userId} />}
         {activeTab === "financials" && <FinancialsTab project={project} invoices={invoices} />}
       </motion.div>
@@ -220,8 +220,8 @@ function OrdersTab({ orders }: { orders: ReturnType<typeof getOrdersByProject> }
   )
 }
 
-function TimelineTab({ timeline }: { timeline: ReturnType<typeof getTimelineByProject> }) {
-  return <ProjectTimeline events={timeline} />
+function TimelineTab({ timeline, userRole }: { timeline: ReturnType<typeof getTimelineByProject>; userRole: import("@/types/portal").UserRole }) {
+  return <ProjectTimeline events={timeline} userRole={userRole} />
 }
 
 function MessagesTab({ messages, userId }: { messages: ReturnType<typeof getMessagesByProject>; userId: string }) {

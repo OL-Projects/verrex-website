@@ -37,6 +37,13 @@ export type GlassType = 'double' | 'triple' | 'low_e' | 'argon' | 'tempered' | '
 
 export type OpeningDirection = 'left' | 'right' | 'inswing' | 'outswing';
 
+export type TimelineVisibility =
+  | 'all'              // Every logged-in user sees this
+  | 'client_hidden'    // Everyone except client (admin, contractor, inspector, supplier, partner)
+  | 'internal'         // Admin + contractor + inspector only
+  | 'admin_contractor' // Admin + contractor only
+  | 'admin_only';      // Admin only (audit, cost, overrides)
+
 export type TimelineEventType =
   | 'lead_created'
   | 'contact_attempt'
@@ -65,7 +72,23 @@ export type TimelineEventType =
   | 'stage_changed'
   | 'note_added'
   | 'document_uploaded'
+  | 'photo_uploaded'
+  | 'issue_flagged'
+  | 'partner_verified'
   | 'system_event';
+
+export type AttachmentType = 'photo' | 'video' | 'audio' | 'pdf' | 'document' | 'receipt' | 'signature';
+
+export interface TimelineAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: AttachmentType;
+  size?: number;
+  visibility: TimelineVisibility;
+  uploadedBy: string;
+  uploadedAt: string;
+}
 
 // --- Interfaces ---
 
@@ -278,11 +301,50 @@ export interface TimelineEvent {
   actorRole: UserRole | 'system';
   eventType: TimelineEventType;
   title: string;
+  visibility: TimelineVisibility;
   notes?: string;
-  attachments?: string[];
-  isInternal: boolean;
+  expandedNotes?: string;
+  attachments?: TimelineAttachment[];
+  previousStage?: PipelineStage;
+  newStage?: PipelineStage;
+  linkedRecordType?: 'appointment' | 'order' | 'measurement' | 'invoice';
+  linkedRecordId?: string;
+  flagged?: boolean;
+  flagReason?: string;
   metadata?: Record<string, string>;
+  /** @deprecated Use visibility instead */
+  isInternal?: boolean;
 }
+
+// Visibility check helper — which roles can see which visibility level
+export const VISIBILITY_RULES: Record<TimelineVisibility, UserRole[]> = {
+  all: ['admin', 'client', 'contractor', 'inspector', 'supplier', 'partner'],
+  client_hidden: ['admin', 'contractor', 'inspector', 'supplier', 'partner'],
+  internal: ['admin', 'contractor', 'inspector'],
+  admin_contractor: ['admin', 'contractor'],
+  admin_only: ['admin'],
+};
+
+// Client-friendly event labels (used when rendering for clients)
+export const CLIENT_EVENT_LABELS: Partial<Record<TimelineEventType, string>> = {
+  appointment_scheduled: 'Visit Scheduled',
+  appointment_completed: 'Visit Completed',
+  measurement_completed: 'Measurements Taken',
+  quote_created: 'Your Quote is Ready',
+  quote_sent: 'Quote Sent to You',
+  client_approved: 'You Approved the Quote',
+  production_started: 'Your Windows Are Being Made',
+  production_update: 'Production Update',
+  shipped: 'Your Order Has Shipped',
+  delivered: 'Delivery Completed',
+  install_scheduled: 'Installation Date Set',
+  install_started: 'Installation In Progress',
+  install_completed: 'Installation Complete',
+  verification_completed: 'Quality Verified',
+  invoice_issued: 'Invoice Available',
+  payment_received: 'Payment Confirmed',
+  client_closeout: 'Project Complete — Thank You!',
+};
 
 export interface Notification {
   id: string;
