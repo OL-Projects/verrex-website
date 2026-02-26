@@ -76,21 +76,16 @@ export function HybridTimelineView({ events, viewMode, onViewModeChange }: Hybri
       )}
 
       {/* Vertical event list */}
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-blue-400/40 via-slate-300/30 to-transparent dark:from-blue-400/20 dark:via-white/5" />
-
-        <div className="space-y-2">
-          {filteredEvents.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 text-sm">
-              {selectedMilestone ? "No events in this milestone window. Click another milestone or clear selection." : "No timeline events to display."}
-            </div>
-          ) : (
-            filteredEvents.map((event, idx) => (
-              <TimelineEventCard key={event.id} event={event} userRole="admin" index={idx} />
-            ))
-          )}
-        </div>
+      <div className="space-y-0">
+        {filteredEvents.length === 0 ? (
+          <div className="text-center py-12 text-slate-400 text-sm">
+            {selectedMilestone ? "No events in this milestone window. Click another milestone or clear selection." : "No timeline events to display."}
+          </div>
+        ) : (
+          filteredEvents.map((event, idx) => (
+            <TimelineEventCard key={event.id} event={event} userRole="admin" index={idx} isLast={idx === filteredEvents.length - 1} />
+          ))
+        )}
       </div>
     </div>
   )

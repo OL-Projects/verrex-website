@@ -95,19 +95,17 @@ export function ProjectTimeline({ events, userRole }: ProjectTimelineProps) {
       )}
 
       {/* Timeline feed */}
-      <div className="relative pl-8">
-        <div className="absolute left-3.5 top-2 bottom-2 w-px bg-slate-200 dark:bg-white/10" />
-        <div className="space-y-4">
-          {filteredEvents.map((event, i) => (
-            <TimelineEventCard
-              key={event.id}
-              event={event}
-              index={i}
-              userRole={userRole}
-              showVisibility={isAdmin}
-            />
-          ))}
-        </div>
+      <div className="space-y-0">
+        {filteredEvents.map((event, i) => (
+          <TimelineEventCard
+            key={event.id}
+            event={event}
+            index={i}
+            userRole={userRole}
+            isLast={i === filteredEvents.length - 1}
+            showVisibility={isAdmin}
+          />
+        ))}
       </div>
 
       {/* Empty state for filtered */}
