@@ -301,5 +301,7 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Messages', href: '/portal/dashboard/messages', icon: 'MessageSquare', roles: ['admin', 'client', 'contractor'] },
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
   { label: 'Commissions', href: '/portal/dashboard/commissions', icon: 'BadgeDollarSign', roles: ['admin', 'partner'] },
+  { label: 'Analytics', href: '/portal/dashboard/analytics', icon: 'BarChart3', roles: ['admin'] },
+  { label: 'Activity', href: '/portal/dashboard/activity', icon: 'Activity', roles: ['admin'] },
   { label: 'Settings', href: '/portal/dashboard/settings', icon: 'Settings', roles: ['admin', 'client', 'contractor', 'supplier', 'partner', 'inspector'] },
 ];
