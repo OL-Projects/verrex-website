@@ -3,15 +3,14 @@
 import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
 import { PipelineStatus } from "@/components/portal/pipeline-status"
-import { getProjectsByRole } from "@/lib/portal-data"
+import { usePortalStore } from "@/lib/portal-store"
 import { Link as IntlLink } from "@/i18n/navigation"
 import { MapPin, DollarSign, Package, FileText, ArrowRight } from "lucide-react"
 
 export default function ProjectsPage() {
   const { data: session } = useSession()
-  const userId = session?.user?.id || ""
-  const role = session?.user?.role || "client"
-  const projects = getProjectsByRole(userId, role)
+  const store = usePortalStore()
+  const projects = store.projects
 
   return (
     <div className="space-y-6">

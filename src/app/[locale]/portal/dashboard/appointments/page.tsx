@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
-import { getAppointmentsByRole } from "@/lib/portal-data"
-import { CalendarDays, MapPin, Clock, User, Wrench, Ruler, Search as SearchIcon, Eye } from "lucide-react"
+import { usePortalStore } from "@/lib/portal-store"
+import { CalendarDays, MapPin, Clock, User, Wrench, Ruler, Search as SearchIcon, Eye, XCircle, CheckCircle2 } from "lucide-react"
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   consultation: CalendarDays, measurement: Ruler, inspection: Eye,
@@ -26,12 +26,11 @@ const statusColors: Record<string, string> = {
 
 export default function AppointmentsPage() {
   const { data: session } = useSession()
-  const userId = session?.user?.id || ""
-  const role = session?.user?.role || "client"
-  const appointments = getAppointmentsByRole(userId, role)
+  const store = usePortalStore()
+  const userId = session?.user?.id || "usr_admin_001"
 
-  const upcoming = appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
-  const past = appointments.filter(a => a.status === "completed" || a.status === "cancelled")
+  const upcoming = store.appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
+  const past = store.appointments.filter(a => a.status === "completed" || a.status === "cancelled")
 
   return (
     <div className="space-y-6">
@@ -66,6 +65,17 @@ export default function AppointmentsPage() {
                         <span className="flex items-center gap-1"><User className="h-3 w-3" />{apt.assignedName}</span>
                       </div>
                       {apt.notes && <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 italic">{apt.notes}</p>}
+                    </div>
+                    {/* Action buttons */}
+                    <div className="flex flex-col gap-1.5 shrink-0">
+                      <button onClick={() => store.completeAppointment(apt.id, userId)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/20 transition-colors">
+                        <CheckCircle2 className="h-3 w-3" /> Complete
+                      </button>
+                      <button onClick={() => store.cancelAppointment(apt.id, userId)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors">
+                        <XCircle className="h-3 w-3" /> Cancel
+                      </button>
                     </div>
                   </div>
                 </motion.div>
