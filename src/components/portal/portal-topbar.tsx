@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react"
 import { motion } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { getNotificationsByUser } from "@/lib/portal-data"
+import { Link as IntlLink } from "@/i18n/navigation"
 import {
   Menu,
   Bell,
@@ -142,10 +143,14 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{session?.user?.email}</p>
               </div>
               <div className="py-1">
-                <button className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                <IntlLink
+                  href="/portal/dashboard/settings"
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                >
                   <User className="h-4 w-4" />
                   Profile Settings
-                </button>
+                </IntlLink>
                 <button
                   onClick={() => signOut({ callbackUrl: "/portal" })}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/5 transition-colors"
