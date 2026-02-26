@@ -18,8 +18,8 @@ export default function DashboardLayout({
         onMobileClose={() => setMobileMenuOpen(false)}
       />
 
-      {/* Main content area — offset by sidebar width */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      {/* Main content area — offset by sidebar width (sidebar manages its own collapse) */}
+      <div className="lg:pl-64 flex flex-col min-h-screen transition-all duration-300">
         <PortalTopbar onMenuClick={() => setMobileMenuOpen(true)} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
