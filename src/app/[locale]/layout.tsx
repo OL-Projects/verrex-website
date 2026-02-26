@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "../globals.css"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
-import { MobileActionBar } from "@/components/layout/mobile-action-bar"
+import { SiteChrome } from "@/components/layout/site-chrome"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { SessionProvider } from "@/components/providers/session-provider"
 import { NextIntlClientProvider, hasLocale } from "next-intl"
@@ -125,10 +123,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               enableSystem
               disableTransitionOnChange={false}
             >
-              <Header />
-              <main className="min-h-[calc(100vh-4rem)] pb-16 lg:pb-0">{children}</main>
-              <Footer />
-              <MobileActionBar />
+              <SiteChrome>{children}</SiteChrome>
             </ThemeProvider>
           </NextIntlClientProvider>
         </SessionProvider>
