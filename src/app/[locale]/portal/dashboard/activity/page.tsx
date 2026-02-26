@@ -1,172 +1,311 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useState, useMemo, useCallback } from "react"
+import { useSession } from "next-auth/react"
+import type { TimelineContextType, TimelineEventType, TimelineEvent } from "@/types/portal"
 import {
-  Activity,
-  UserPlus,
-  FolderKanban,
-  CalendarDays,
-  Ruler,
-  Package,
-  Truck,
-  Receipt,
-  CheckCircle2,
-  MessageSquare,
-  FileText,
-  Settings,
-  Shield,
-  Clock,
-  Filter,
+  getUniversalTimeline,
+  getTimelineByLead,
+  getTimelineByClient,
+  getTimelineByProject,
+} from "@/lib/portal-data"
+import { TimelineContextSelector } from "@/components/portal/timeline-context-selector"
+import { HybridTimelineView } from "@/components/portal/hybrid-timeline-view"
+import {
+  Clock, Filter, X, Calendar, User, Tag, Paperclip,
+  Eye, ArrowUpDown, AlertTriangle,
 } from "lucide-react"
-import { useState } from "react"
 
-/* ── icon map ──────────────────────────────────────────────── */
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  lead: UserPlus,
-  project: FolderKanban,
-  appointment: CalendarDays,
-  measurement: Ruler,
-  order: Package,
-  shipping: Truck,
-  invoice: Receipt,
-  completion: CheckCircle2,
-  message: MessageSquare,
-  document: FileText,
-  settings: Settings,
-  security: Shield,
-}
-
-/* ── color map ─────────────────────────────────────────────── */
-const colorMap: Record<string, string> = {
-  lead: "bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400",
-  project: "bg-indigo-100 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400",
-  appointment: "bg-purple-100 dark:bg-purple-500/15 text-purple-600 dark:text-purple-400",
-  measurement: "bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600 dark:text-cyan-400",
-  order: "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400",
-  shipping: "bg-teal-100 dark:bg-teal-500/15 text-teal-600 dark:text-teal-400",
-  invoice: "bg-green-100 dark:bg-green-500/15 text-green-600 dark:text-green-400",
-  completion: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  message: "bg-violet-100 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400",
-  document: "bg-slate-100 dark:bg-slate-500/15 text-slate-600 dark:text-slate-400",
-  settings: "bg-gray-100 dark:bg-gray-500/15 text-gray-600 dark:text-gray-400",
-  security: "bg-red-100 dark:bg-red-500/15 text-red-600 dark:text-red-400",
-}
-
-/* ── mock activity data ────────────────────────────────────── */
-const activities = [
-  { id: 1, type: "lead", user: "Sarah Mitchell", action: "Created new lead", detail: "Sophie Martin — 89 Avenue du Parc, Montreal", time: "2 min ago", date: "Today" },
-  { id: 2, type: "appointment", user: "Sarah Mitchell", action: "Scheduled measurement visit", detail: "Sophie Martin — Feb 28, 2026 at 10:00 AM", time: "15 min ago", date: "Today" },
-  { id: 3, type: "order", user: "System", action: "Order status updated", detail: "ORD-002 → Production (Verrex Factory)", time: "1 hr ago", date: "Today" },
-  { id: 4, type: "message", user: "Jean-Pierre Tremblay", action: "Sent a message", detail: "\"When can I expect the delivery for my kitchen windows?\"", time: "2 hrs ago", date: "Today" },
-  { id: 5, type: "invoice", user: "Sarah Mitchell", action: "Generated invoice", detail: "INV-001 — Jean-Pierre Tremblay — $27,025", time: "3 hrs ago", date: "Today" },
-  { id: 6, type: "shipping", user: "Verrex Factory", action: "Shipment tracking updated", detail: "ORD-001 — Tracking: VRX-2026-0315, ETA: Mar 10", time: "5 hrs ago", date: "Today" },
-  { id: 7, type: "measurement", user: "Marc Bouchard", action: "Uploaded measurement data", detail: "4 rooms measured — Jean-Pierre project", time: "Yesterday", date: "Yesterday" },
-  { id: 8, type: "project", user: "Sarah Mitchell", action: "Converted lead to project", detail: "Jean-Pierre Tremblay → Project #PRJ-001", time: "Yesterday", date: "Yesterday" },
-  { id: 9, type: "lead", user: "Home Depot API", action: "Lead imported from partner", detail: "Jean-Pierre Tremblay — Source: Home Depot Laval", time: "Yesterday", date: "Yesterday" },
-  { id: 10, type: "completion", user: "Sarah Mitchell", action: "Marked project verified", detail: "Marie Dubois — Final inspection passed", time: "2 days ago", date: "Feb 23" },
-  { id: 11, type: "security", user: "System", action: "Login from new device", detail: "Sarah Mitchell — Chrome on Windows, Montreal IP", time: "2 days ago", date: "Feb 23" },
-  { id: 12, type: "document", user: "Marc Bouchard", action: "Uploaded attachment", detail: "measurement_kitchen_photos.zip — Jean-Pierre project", time: "3 days ago", date: "Feb 22" },
-  { id: 13, type: "settings", user: "Sarah Mitchell", action: "Updated notification preferences", detail: "Email notifications enabled for order updates", time: "3 days ago", date: "Feb 22" },
-  { id: 14, type: "lead", user: "Sarah Mitchell", action: "Created new lead", detail: "Robert Lavoie — 456 Chemin du Lac, Sherbrooke", time: "4 days ago", date: "Feb 21" },
-  { id: 15, type: "appointment", user: "Sarah Mitchell", action: "Scheduled consultation", detail: "Marie Dubois — Mar 1, 2026 at 2:00 PM", time: "5 days ago", date: "Feb 20" },
+// ── Category filter config ─────────────────────────
+const EVENT_CATEGORIES: { key: string; label: string; types: TimelineEventType[] }[] = [
+  { key: "lead", label: "Lead", types: ["lead_created", "contact_attempt"] },
+  { key: "scheduling", label: "Scheduling", types: ["appointment_scheduled", "appointment_rescheduled", "appointment_completed", "install_scheduled"] },
+  { key: "measurement", label: "Measurement", types: ["measurement_completed"] },
+  { key: "quote", label: "Quote", types: ["quote_created", "quote_sent", "client_approved", "client_declined"] },
+  { key: "order", label: "Order", types: ["order_placed", "supplier_confirmed"] },
+  { key: "production", label: "Production", types: ["production_started", "production_update", "shipped", "delivered"] },
+  { key: "install", label: "Installation", types: ["install_started", "install_completed"] },
+  { key: "financial", label: "Financial", types: ["invoice_issued", "payment_received"] },
+  { key: "verification", label: "Verification", types: ["verification_completed", "partner_verified"] },
+  { key: "internal", label: "Internal", types: ["note_added", "assignment_changed", "stage_changed", "document_uploaded", "photo_uploaded", "issue_flagged", "system_event", "client_closeout"] },
 ]
 
-const filterOptions = ["All", "lead", "project", "appointment", "measurement", "order", "shipping", "invoice", "message", "security"]
+const ACTOR_ROLES = [
+  { key: "admin", label: "Admin" },
+  { key: "contractor", label: "Contractor" },
+  { key: "inspector", label: "Inspector" },
+  { key: "supplier", label: "Supplier" },
+  { key: "partner", label: "Partner" },
+  { key: "client", label: "Client" },
+  { key: "system", label: "System" },
+]
 
-/* ── component ─────────────────────────────────────────────── */
-export default function ActivityPage() {
-  const [filter, setFilter] = useState("All")
-  const filtered = filter === "All" ? activities : activities.filter(a => a.type === filter)
+export default function TimelinePage() {
+  const { data: session } = useSession()
+  const userRole = (session?.user?.role || "admin") as string
 
-  // Group by date
-  const grouped = filtered.reduce<Record<string, typeof activities>>((acc, a) => {
-    if (!acc[a.date]) acc[a.date] = []
-    acc[a.date].push(a)
-    return acc
-  }, {})
+  // Context selection state
+  const [contextType, setContextType] = useState<TimelineContextType | "all">("all")
+  const [contextId, setContextId] = useState<string | null>(null)
+
+  // View mode
+  const [viewMode, setViewMode] = useState<"hybrid" | "vertical">("hybrid")
+
+  // Filter panel
+  const [showFilters, setShowFilters] = useState(false)
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set())
+  const [activeRoles, setActiveRoles] = useState<Set<string>>(new Set())
+  const [stageChangesOnly, setStageChangesOnly] = useState(false)
+  const [attachmentsOnly, setAttachmentsOnly] = useState(false)
+  const [flaggedOnly, setFlaggedOnly] = useState(false)
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
+
+  const hasActiveFilters = activeCategories.size > 0 || activeRoles.size > 0 || stageChangesOnly || attachmentsOnly || flaggedOnly || dateFrom || dateTo
+
+  const clearAllFilters = useCallback(() => {
+    setActiveCategories(new Set())
+    setActiveRoles(new Set())
+    setStageChangesOnly(false)
+    setAttachmentsOnly(false)
+    setFlaggedOnly(false)
+    setDateFrom("")
+    setDateTo("")
+  }, [])
+
+  // Raw events from data layer
+  const rawEvents = useMemo((): TimelineEvent[] => {
+    if (contextType === "all") return getUniversalTimeline(userRole)
+    if (contextType === "lead" && contextId) return getTimelineByLead(contextId, userRole)
+    if (contextType === "client" && contextId) return getTimelineByClient(contextId, userRole)
+    if (contextType === "project" && contextId) return getTimelineByProject(contextId, userRole)
+    if (!contextId) return []
+    return getUniversalTimeline(userRole)
+  }, [contextType, contextId, userRole])
+
+  // Filtered events
+  const events = useMemo(() => {
+    let filtered = rawEvents
+
+    // Category filter
+    if (activeCategories.size > 0) {
+      const allowedTypes = new Set<string>()
+      EVENT_CATEGORIES.forEach(cat => {
+        if (activeCategories.has(cat.key)) cat.types.forEach(t => allowedTypes.add(t))
+      })
+      filtered = filtered.filter(e => allowedTypes.has(e.eventType))
+    }
+
+    // Role filter
+    if (activeRoles.size > 0) {
+      filtered = filtered.filter(e => activeRoles.has(e.actorRole))
+    }
+
+    // Stage changes only
+    if (stageChangesOnly) {
+      filtered = filtered.filter(e => e.previousStage || e.newStage)
+    }
+
+    // Attachments only
+    if (attachmentsOnly) {
+      filtered = filtered.filter(e => e.attachments && e.attachments.length > 0)
+    }
+
+    // Flagged only
+    if (flaggedOnly) {
+      filtered = filtered.filter(e => e.flagged)
+    }
+
+    // Date range
+    if (dateFrom) {
+      const from = new Date(dateFrom).getTime()
+      filtered = filtered.filter(e => new Date(e.timestamp).getTime() >= from)
+    }
+    if (dateTo) {
+      const to = new Date(dateTo).getTime() + 86400000
+      filtered = filtered.filter(e => new Date(e.timestamp).getTime() < to)
+    }
+
+    return filtered
+  }, [rawEvents, activeCategories, activeRoles, stageChangesOnly, attachmentsOnly, flaggedOnly, dateFrom, dateTo])
+
+  const toggleCategory = (key: string) => {
+    setActiveCategories(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
+  }
+
+  const toggleRole = (key: string) => {
+    setActiveRoles(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+    <div className="space-y-6 max-w-5xl">
+      {/* ── Header ──────────────────────────── */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Activity Log</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Complete audit trail — who changed what, when</p>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <Clock className="h-3.5 w-3.5" />
-          <span>{activities.length} events</span>
-        </div>
-      </motion.div>
-
-      {/* Filter Pills */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="flex items-center gap-2 flex-wrap">
-        <Filter className="h-4 w-4 text-slate-400 mr-1" />
-        {filterOptions.map(opt => (
-          <button key={opt} onClick={() => setFilter(opt)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all capitalize ${
-              filter === opt
-                ? "bg-blue-600 text-white shadow-sm"
-                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}>
-            {opt}
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Activity Timeline */}
-      <div className="space-y-8">
-        {Object.entries(grouped).map(([date, events], gi) => (
-          <motion.div key={date} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + gi * 0.05 }}>
-            <h3 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">{date}</h3>
-            <div className="relative pl-8">
-              {/* Timeline line */}
-              <div className="absolute left-3.5 top-2 bottom-2 w-px bg-slate-200 dark:bg-white/10" />
-
-              <div className="space-y-4">
-                {events.map((event, i) => {
-                  const Icon = iconMap[event.type] || Activity
-                  const colors = colorMap[event.type] || colorMap.document
-                  return (
-                    <motion.div key={event.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.15 + gi * 0.05 + i * 0.03 }}
-                      className="relative flex items-start gap-4">
-                      {/* Timeline dot */}
-                      <div className={`absolute -left-8 mt-1 p-1.5 rounded-lg ${colors} z-10`}>
-                        <Icon className="h-3.5 w-3.5" />
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 p-4 rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">
-                              {event.action}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                              {event.detail}
-                            </p>
-                          </div>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 whitespace-nowrap ml-3">{event.time}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 font-medium">
-                            {event.user}
-                          </span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium capitalize ${colors}`}>
-                            {event.type}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+              <Clock className="h-5 w-5 text-white" />
             </div>
-          </motion.div>
-        ))}
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Timeline</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Audit trail &amp; activity history across leads, clients, and projects</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border ${
+            showFilters || hasActiveFilters
+              ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20"
+              : "bg-white/60 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200/60 dark:border-white/10 hover:bg-white dark:hover:bg-white/10"
+          }`}
+        >
+          <Filter className="h-4 w-4" />
+          Filters
+          {hasActiveFilters && (
+            <span className="h-5 min-w-5 flex items-center justify-center px-1 rounded-full bg-blue-600 text-[10px] text-white font-bold">
+              {activeCategories.size + activeRoles.size + (stageChangesOnly ? 1 : 0) + (attachmentsOnly ? 1 : 0) + (flaggedOnly ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0)}
+            </span>
+          )}
+        </button>
       </div>
+
+      {/* ── Context Selector ────────────────── */}
+      <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/10">
+        <TimelineContextSelector
+          contextType={contextType}
+          contextId={contextId}
+          onContextTypeChange={setContextType}
+          onContextIdChange={setContextId}
+        />
+      </div>
+
+      {/* ── Advanced Filters Panel ──────────── */}
+      {showFilters && (
+        <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/10 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <Filter className="h-4 w-4 text-slate-400" />
+              Advanced Filters
+            </h3>
+            {hasActiveFilters && (
+              <button onClick={clearAllFilters} className="text-[10px] text-red-500 hover:underline flex items-center gap-1">
+                <X className="h-3 w-3" /> Clear all
+              </button>
+            )}
+          </div>
+
+          {/* Category pills */}
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+              <Tag className="h-3 w-3" /> Category
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {EVENT_CATEGORIES.map(cat => (
+                <button
+                  key={cat.key}
+                  onClick={() => toggleCategory(cat.key)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all border ${
+                    activeCategories.has(cat.key)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white/60 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200/60 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/30"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Role pills */}
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+              <User className="h-3 w-3" /> Actor Role
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {ACTOR_ROLES.map(r => (
+                <button
+                  key={r.key}
+                  onClick={() => toggleRole(r.key)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all border ${
+                    activeRoles.has(r.key)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white/60 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200/60 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/30"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Date range */}
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+              <Calendar className="h-3 w-3" /> Date Range
+            </p>
+            <div className="flex items-center gap-2">
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 text-xs text-slate-900 dark:text-white" />
+              <span className="text-xs text-slate-400">to</span>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-white/5 text-xs text-slate-900 dark:text-white" />
+            </div>
+          </div>
+
+          {/* Toggle filters */}
+          <div className="flex flex-wrap gap-3">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={stageChangesOnly} onChange={e => setStageChangesOnly(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-slate-300 dark:border-white/20 text-blue-600" />
+              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <ArrowUpDown className="h-3 w-3" /> Stage changes only
+              </span>
+            </label>
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={attachmentsOnly} onChange={e => setAttachmentsOnly(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-slate-300 dark:border-white/20 text-blue-600" />
+              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <Paperclip className="h-3 w-3" /> With attachments
+              </span>
+            </label>
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={flaggedOnly} onChange={e => setFlaggedOnly(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-slate-300 dark:border-white/20 text-blue-600" />
+              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" /> Flagged only
+              </span>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {/* ── Prompt to select (when context needs ID but none chosen) */}
+      {contextType !== "all" && !contextId && (
+        <div className="text-center py-16">
+          <Clock className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-sm text-slate-500 dark:text-slate-400">Select a {contextType} above to view its timeline</p>
+        </div>
+      )}
+
+      {/* ── Timeline Display ────────────────── */}
+      {(contextType === "all" || contextId) && (
+        <HybridTimelineView
+          events={events}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      )}
     </div>
   )
 }

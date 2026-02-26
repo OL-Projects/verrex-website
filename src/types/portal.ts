@@ -77,6 +77,8 @@ export type TimelineEventType =
   | 'partner_verified'
   | 'system_event';
 
+export type TimelineContextType = 'lead' | 'client' | 'project';
+
 export type AttachmentType = 'photo' | 'video' | 'audio' | 'pdf' | 'document' | 'receipt' | 'signature';
 
 export interface TimelineAttachment {
@@ -409,6 +411,6 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
   { label: 'Commissions', href: '/portal/dashboard/commissions', icon: 'BadgeDollarSign', roles: ['admin', 'partner'] },
   { label: 'Analytics', href: '/portal/dashboard/analytics', icon: 'BarChart3', roles: ['admin'] },
-  { label: 'Activity', href: '/portal/dashboard/activity', icon: 'Activity', roles: ['admin'] },
+  { label: 'Timeline', href: '/portal/dashboard/activity', icon: 'Clock', roles: ['admin'] },
   { label: 'Settings', href: '/portal/dashboard/settings', icon: 'Settings', roles: ['admin', 'client', 'contractor', 'supplier', 'partner', 'inspector'] },
 ];

@@ -485,3 +485,60 @@ export function getMessagesByProject(projectId: string, userRole: string): Messa
     .filter(m => userRole === 'admin' || userRole === 'contractor' || !m.isInternal)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
+
+// --- Timeline by Lead ---
+export function getTimelineByLead(leadId: string, userRole: string): TimelineEvent[] {
+  const role = userRole as UserRole;
+  const lead = mockLeads.find(l => l.id === leadId);
+  if (!lead) return [];
+  // Get events from linked project + lead-stage events
+  const projectIds = lead.projectId ? [lead.projectId] : [];
+  const leadEventTypes: string[] = ['lead_created', 'contact_attempt', 'assignment_changed', 'appointment_scheduled', 'stage_changed'];
+  return mockTimelineEvents
+    .filter(e => projectIds.includes(e.projectId) && leadEventTypes.includes(e.eventType))
+    .filter(e => {
+      const vis = e.visibility || 'all';
+      const allowedRoles = VISIBILITY_RULES[vis];
+      return allowedRoles?.includes(role) ?? false;
+    })
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+}
+
+// --- Timeline by Client (cross-project) ---
+export function getTimelineByClient(clientId: string, userRole: string): TimelineEvent[] {
+  const role = userRole as UserRole;
+  const clientProjects = mockProjects.filter(p => p.clientId === clientId);
+  const projectIds = clientProjects.map(p => p.id);
+  return mockTimelineEvents
+    .filter(e => projectIds.includes(e.projectId))
+    .filter(e => {
+      const vis = e.visibility || 'all';
+      const allowedRoles = VISIBILITY_RULES[vis];
+      return allowedRoles?.includes(role) ?? false;
+    })
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+}
+
+// --- Universal timeline (all events, admin) ---
+export function getUniversalTimeline(userRole: string): TimelineEvent[] {
+  const role = userRole as UserRole;
+  return mockTimelineEvents
+    .filter(e => {
+      const vis = e.visibility || 'all';
+      const allowedRoles = VISIBILITY_RULES[vis];
+      return allowedRoles?.includes(role) ?? false;
+    })
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+}
+
+// --- Get searchable entities for context selector ---
+export function getSearchableLeads() {
+  return mockLeads.map(l => ({ id: l.id, label: `${l.clientName} — ${l.address}`, stage: l.stage }));
+}
+export function getSearchableClients() {
+  const clientUsers = mockUsers.filter(u => u.role === 'client');
+  return clientUsers.map(u => ({ id: u.id, label: u.name, email: u.email }));
+}
+export function getSearchableProjects() {
+  return mockProjects.map(p => ({ id: p.id, label: `${p.clientName} — ${p.address}`, stage: p.stage }));
+}
