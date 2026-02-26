@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
 import { PipelineStatus } from "@/components/portal/pipeline-status"
 import { getProjectsByRole } from "@/lib/portal-data"
-import { MapPin, DollarSign, Package, FileText } from "lucide-react"
+import { Link as IntlLink } from "@/i18n/navigation"
+import { MapPin, DollarSign, Package, FileText, ArrowRight } from "lucide-react"
 
 export default function ProjectsPage() {
   const { data: session } = useSession()
@@ -24,12 +25,16 @@ export default function ProjectsPage() {
           className="p-6 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{project.clientName}</h3>
+              <IntlLink href={`/portal/dashboard/projects/${project.id}`} className="text-lg font-semibold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {project.clientName}
+              </IntlLink>
               <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5"><MapPin className="h-3.5 w-3.5" />{project.address}</p>
             </div>
-            <span className="text-[10px] px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 font-medium capitalize">
-              {project.stage.replace(/_/g, " ")}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 font-medium capitalize">
+                {project.stage.replace(/_/g, " ")}
+              </span>
+            </div>
           </div>
 
           <PipelineStatus currentStage={project.stage} />

@@ -16,6 +16,7 @@ import type {
   Notification,
   Partner,
   PortalUser,
+  TimelineEvent,
 } from '@/types/portal';
 
 // --- Partners ---
@@ -408,4 +409,68 @@ export function getInvoicesByRole(userId: string, role: string): Invoice[] {
 export function getCommissionsByPartner(userId: string): Commission[] {
   const user = mockUsers.find(u => u.id === userId);
   return mockCommissions.filter(c => c.partnerId === user?.partnerId);
+}
+
+// --- Timeline Events ---
+
+export const mockTimelineEvents: TimelineEvent[] = [
+  // proj_001 — Tremblay full journey
+  { id: 'tl_001', projectId: 'proj_001', timestamp: '2025-11-15T09:00:00', actorId: 'system', actorName: 'Home Depot API', actorRole: 'system', eventType: 'lead_created', title: 'Lead imported from Home Depot', notes: 'Source: Home Depot Laval. Partner: David Wilson. Priority: High.', isInternal: false },
+  { id: 'tl_002', projectId: 'proj_001', timestamp: '2025-11-16T10:30:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'contact_attempt', title: 'Initial contact — phone call', notes: 'Spoke with Jean-Pierre. He wants full home window replacement. 12 windows + 2 patio doors. Scheduled measurement visit.', isInternal: false },
+  { id: 'tl_003', projectId: 'proj_001', timestamp: '2025-11-18T11:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'assignment_changed', title: 'Assigned contractor: Mike Thompson', notes: 'Mike has availability and experience with full-home projects.', isInternal: true },
+  { id: 'tl_004', projectId: 'proj_001', timestamp: '2025-11-20T09:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'stage_changed', title: 'Lead converted to project', notes: 'Created project PRJ-001 from lead. All client info transferred.', isInternal: false },
+  { id: 'tl_005', projectId: 'proj_001', timestamp: '2025-11-22T14:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'appointment_scheduled', title: 'Measurement visit scheduled', notes: 'Dec 5, 2025 at 9:00 AM. Assigned to Mike Thompson. Duration: 2 hours.', isInternal: false },
+  { id: 'tl_006', projectId: 'proj_001', timestamp: '2025-12-05T11:30:00', actorId: 'usr_contractor_001', actorName: 'Mike Thompson', actorRole: 'contractor', eventType: 'appointment_completed', title: 'Measurement visit completed', notes: 'All 14 openings measured. Photos taken. Client present and cooperative.', isInternal: false },
+  { id: 'tl_007', projectId: 'proj_001', timestamp: '2025-12-05T12:00:00', actorId: 'usr_contractor_001', actorName: 'Mike Thompson', actorRole: 'contractor', eventType: 'measurement_completed', title: 'Measurements uploaded', notes: '4 rooms measured: Kitchen (2), Living Room (1 bay), Master BR (2), Dining Room (1 patio door).', isInternal: false },
+  { id: 'tl_008', projectId: 'proj_001', timestamp: '2025-12-05T16:00:00', actorId: 'usr_contractor_001', actorName: 'Mike Thompson', actorRole: 'contractor', eventType: 'note_added', title: 'Internal note — bay window concern', notes: 'Bay window rough opening is tighter than expected. May need custom shims — factor into install time.', isInternal: true },
+  { id: 'tl_009', projectId: 'proj_001', timestamp: '2025-12-10T10:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'quote_created', title: 'Quote prepared', notes: 'Total: $24,500 (products + labour + materials). Triple-glass Energy Star throughout.', isInternal: false },
+  { id: 'tl_010', projectId: 'proj_001', timestamp: '2025-12-12T09:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'quote_sent', title: 'Quote sent to client', notes: 'Emailed and portal notification sent. Deposit required: 30% ($7,350).', isInternal: false },
+  { id: 'tl_011', projectId: 'proj_001', timestamp: '2025-12-18T15:00:00', actorId: 'usr_client_001', actorName: 'Jean-Pierre Tremblay', actorRole: 'client', eventType: 'client_approved', title: 'Client approved quote', notes: 'Approved all selections. Deposit of $7,350 received via e-transfer.', isInternal: false },
+  { id: 'tl_012', projectId: 'proj_001', timestamp: '2025-12-19T10:00:00', actorId: 'system', actorName: 'System', actorRole: 'system', eventType: 'payment_received', title: 'Deposit payment received', notes: '$7,350 deposit confirmed. E-transfer ref: VRX-DEP-20251219.', isInternal: false, metadata: { amount: '7350', method: 'e-transfer' } },
+  { id: 'tl_013', projectId: 'proj_001', timestamp: '2026-01-25T10:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'order_placed', title: 'Purchase order sent to supplier', notes: 'Order ORD-001 placed with Fenestra Glass Corp. 7 items, rush production. ETA: March 10.', isInternal: false },
+  { id: 'tl_014', projectId: 'proj_001', timestamp: '2026-01-27T14:00:00', actorId: 'usr_supplier_001', actorName: 'Lisa Chen', actorRole: 'supplier', eventType: 'supplier_confirmed', title: 'Supplier confirmed order', notes: 'Fenestra confirmed all items. Custom bay window 4-6 week lead time. Standard items 2-3 weeks.', isInternal: false },
+  { id: 'tl_015', projectId: 'proj_001', timestamp: '2026-02-10T09:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'invoice_issued', title: 'Invoice INV-001 generated', notes: 'Full invoice: $27,025 (incl. tax). Deposit applied: $7,350. Balance due: $19,675. Due: Apr 15.', isInternal: false },
+  { id: 'tl_016', projectId: 'proj_001', timestamp: '2026-02-15T11:00:00', actorId: 'usr_supplier_001', actorName: 'Lisa Chen', actorRole: 'supplier', eventType: 'production_started', title: 'Production started', notes: 'All items entered production line. Bay window custom fabrication underway.', isInternal: false },
+  { id: 'tl_017', projectId: 'proj_001', timestamp: '2026-02-20T14:30:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'production_update', title: 'Production update — on track', notes: 'Supplier confirms on schedule. Expected delivery March 10. Install date being scheduled.', isInternal: false },
+
+  // proj_002 — Dubois journey (shorter)
+  { id: 'tl_018', projectId: 'proj_002', timestamp: '2026-01-10T12:00:00', actorId: 'system', actorName: 'Website', actorRole: 'system', eventType: 'lead_created', title: 'Lead received via website', notes: 'Marie Dubois submitted inquiry. Interested in casement windows for kitchen and living room.', isInternal: false },
+  { id: 'tl_019', projectId: 'proj_002', timestamp: '2026-01-12T10:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'contact_attempt', title: 'Initial contact — phone call', notes: 'Spoke with Marie. Budget ~$8,000. Prefers sandstone to match brick exterior.', isInternal: false },
+  { id: 'tl_020', projectId: 'proj_002', timestamp: '2026-01-15T09:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'stage_changed', title: 'Lead converted to project', notes: 'Created project PRJ-002. Assigned contractor Mike Thompson.', isInternal: false },
+  { id: 'tl_021', projectId: 'proj_002', timestamp: '2026-02-10T11:00:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'quote_created', title: 'Quote prepared', notes: 'Total: $7,800. Sandstone casement x3 + picture window. Double-glass standard.', isInternal: false },
+  { id: 'tl_022', projectId: 'proj_002', timestamp: '2026-02-18T09:15:00', actorId: 'usr_admin_001', actorName: 'Sarah Mitchell', actorRole: 'admin', eventType: 'appointment_scheduled', title: 'Consultation visit scheduled', notes: 'Mar 1, 2026 at 2:00 PM. Present quote and discuss options with client.', isInternal: false },
+];
+
+export function getTimelineByProject(projectId: string, userRole: string): TimelineEvent[] {
+  return mockTimelineEvents
+    .filter(e => e.projectId === projectId)
+    .filter(e => userRole === 'admin' || userRole === 'contractor' || !e.isInternal)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+}
+
+export function getProjectById(projectId: string): Project | undefined {
+  return mockProjects.find(p => p.id === projectId);
+}
+
+export function getOrdersByProject(projectId: string): Order[] {
+  return mockOrders.filter(o => o.projectId === projectId);
+}
+
+export function getAppointmentsByProject(projectId: string): Appointment[] {
+  return mockAppointments.filter(a => a.projectId === projectId);
+}
+
+export function getMeasurementsByProject(projectId: string): MeasurementEntry[] {
+  return mockMeasurements.filter(m => m.projectId === projectId);
+}
+
+export function getInvoicesByProject(projectId: string): Invoice[] {
+  return mockInvoices.filter(i => i.projectId === projectId);
+}
+
+export function getMessagesByProject(projectId: string, userRole: string): Message[] {
+  return mockMessages
+    .filter(m => m.projectId === projectId)
+    .filter(m => userRole === 'admin' || userRole === 'contractor' || !m.isInternal)
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }

@@ -37,6 +37,36 @@ export type GlassType = 'double' | 'triple' | 'low_e' | 'argon' | 'tempered' | '
 
 export type OpeningDirection = 'left' | 'right' | 'inswing' | 'outswing';
 
+export type TimelineEventType =
+  | 'lead_created'
+  | 'contact_attempt'
+  | 'appointment_scheduled'
+  | 'appointment_rescheduled'
+  | 'appointment_completed'
+  | 'measurement_completed'
+  | 'quote_created'
+  | 'quote_sent'
+  | 'client_approved'
+  | 'client_declined'
+  | 'order_placed'
+  | 'supplier_confirmed'
+  | 'production_started'
+  | 'production_update'
+  | 'shipped'
+  | 'delivered'
+  | 'install_scheduled'
+  | 'install_started'
+  | 'install_completed'
+  | 'verification_completed'
+  | 'invoice_issued'
+  | 'payment_received'
+  | 'client_closeout'
+  | 'assignment_changed'
+  | 'stage_changed'
+  | 'note_added'
+  | 'document_uploaded'
+  | 'system_event';
+
 // --- Interfaces ---
 
 export interface PortalUser {
@@ -237,6 +267,21 @@ export interface Commission {
   status: 'pending' | 'verified' | 'paid';
   verifiedAt?: string;
   paidAt?: string;
+}
+
+export interface TimelineEvent {
+  id: string;
+  projectId: string;
+  timestamp: string;
+  actorId: string;
+  actorName: string;
+  actorRole: UserRole | 'system';
+  eventType: TimelineEventType;
+  title: string;
+  notes?: string;
+  attachments?: string[];
+  isInternal: boolean;
+  metadata?: Record<string, string>;
 }
 
 export interface Notification {
