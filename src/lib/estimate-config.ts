@@ -1,138 +1,164 @@
-// ── Window Types ────────────────────────────────
-export interface WindowTypeConfig {
-  modules: string[]
-  label: string
-}
+// ── Window Type Configs ─────────────────────────
+export interface WindowTypeConfig { modules: string[]; label: string }
 
 export const WINDOW_TYPES: Record<string, WindowTypeConfig> = {
-  FIX:                 { modules: ["FIX"],                        label: "Fixed" },
-  "CAS-L":            { modules: ["CAS-L"],                      label: "Casement Left" },
-  "CAS-R":            { modules: ["CAS-R"],                      label: "Casement Right" },
-  "CAS-L+FIX":        { modules: ["CAS-L", "FIX"],              label: "Casement Left + Fixed" },
-  "FIX+CAS-R":        { modules: ["FIX", "CAS-R"],              label: "Fixed + Casement Right" },
-  "CAS-L+FIX+FIX":    { modules: ["CAS-L", "FIX", "FIX"],      label: "Casement L + 2 Fixed" },
-  "FIX+FIX+FIX":      { modules: ["FIX", "FIX", "FIX"],        label: "3 Fixed Panoramic" },
-  "FIX+FIX+CAS-R":    { modules: ["FIX", "FIX", "CAS-R"],      label: "2 Fixed + Casement R" },
-  "CAS-L+FIX+FIX+FIX":{ modules: ["CAS-L", "FIX", "FIX", "FIX"], label: "Casement L + 3 Fixed" },
-  SLIDER:              { modules: ["SLIDE", "FIX"],              label: "Single Slider" },
+  FIX:                  { modules: ["FIX"],                          label: "Fixed" },
+  "CAS-L":             { modules: ["CAS-L"],                        label: "Casement Left" },
+  "CAS-R":             { modules: ["CAS-R"],                        label: "Casement Right" },
+  "CAS-L+FIX":         { modules: ["CAS-L", "FIX"],                label: "Casement Left + Fixed" },
+  "FIX+CAS-R":         { modules: ["FIX", "CAS-R"],                label: "Fixed + Casement Right" },
+  "CAS-L+FIX+FIX":     { modules: ["CAS-L", "FIX", "FIX"],        label: "Casement L + 2 Fixed" },
+  "FIX+FIX+FIX":       { modules: ["FIX", "FIX", "FIX"],          label: "3 Fixed Panoramic" },
+  "FIX+FIX+CAS-R":     { modules: ["FIX", "FIX", "CAS-R"],        label: "2 Fixed + Casement R" },
+  "CAS-L+FIX+FIX+FIX": { modules: ["CAS-L", "FIX", "FIX", "FIX"],label: "Casement L + 3 Fixed" },
+  SLIDER:               { modules: ["SLIDE", "FIX"],                label: "Single Slider" },
 }
 
 export const PRODUCTS = [
-  { id: "hybrid",     label: '4600 Hybrid PVC/ALU 5¾"', tag: "HYBRID PVC/ALU", tagClass: "bg-slate-900 dark:bg-slate-700 text-white" },
-  { id: "pvc",        label: '4600 PVC 5¼"',            tag: "PVC",            tagClass: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
-  { id: "pvc-slider", label: '4000 PVC 5¼" — Slider',   tag: "PVC",            tagClass: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
+  { id: "hybrid",     label: '4600 Hybrid PVC/ALU 5¾"', tag: "HYBRID PVC/ALU", cls: "bg-slate-900 dark:bg-slate-700 text-white" },
+  { id: "pvc",        label: '4600 PVC 5¼"',            tag: "PVC",            cls: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
+  { id: "pvc-slider", label: '4000 PVC 5¼" — Slider',   tag: "PVC SLIDER",     cls: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
 ] as const
 
-export const EXT_COLORS = ["525 Black", "White", "Commercial Brown", "Custom"]
-export const INT_COLORS = ["White", "Custom"]
+export const DEFAULT_EXT_COLORS = ["525 Black", "White", "Commercial Brown"]
+export const DEFAULT_INT_COLORS = ["White"]
 
-// ── Item Shape ──────────────────────────────────
+// ── Data Models ─────────────────────────────────
 export interface EstimateItem {
   id: string
-  type: string       // key into WINDOW_TYPES
-  product: string    // key into PRODUCTS
+  type: string
+  product: string
   extColor: string
   intColor: string
-  width: number      // inches
-  height: number     // inches
-  location: string
+  width: number
+  height: number
+  depth: number
+  customLabel: string   // e.g. "Front – 2nd Floor"
+  location: string      // kept for legacy compat
   qty: number
   unitPrice: number
+  notes: string
+  attachmentNames: string[] // file names only (not uploaded)
+}
+
+export interface Room {
+  id: string
+  name: string
+  items: EstimateItem[]
+}
+
+export interface CompanyInfo {
+  name: string
+  tagline: string
+  address: string
+  city: string
+  phone: string
+  email: string
+  website: string
+  logoUrl: string // base64 data URL
 }
 
 export interface EstimateState {
-  companyName: string
-  tagline: string
+  company: CompanyInfo
   estimateNumber: string
   date: string
   validUntil: string
   requiredBy: string
+  soldToLabel: string
   clientName: string
   clientAddress: string
   clientCity: string
   clientPhone: string
   clientEmail: string
+  shipToLabel: string
   shipMethod: string
   shipAddress: string
   shipPhone: string
   repName: string
   repRef: string
-  items: EstimateItem[]
+  rooms: Room[]
   installPerUnit: number
   delivery: number
   depositPct: number
+  termsLines: string[]
 }
 
-export function createBlankItem(): EstimateItem {
+// ── Defaults / Factories ────────────────────────
+let _c = Date.now()
+function uid(p: string) { return `${p}_${(++_c).toString(36)}` }
+
+export function createItem(): EstimateItem {
   return {
-    id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    type: "CAS-L+FIX",
-    product: "hybrid",
-    extColor: "525 Black",
-    intColor: "White",
-    width: 48,
-    height: 48,
-    location: "",
-    qty: 1,
-    unitPrice: 0,
+    id: uid("itm"), type: "CAS-L+FIX", product: "hybrid",
+    extColor: "525 Black", intColor: "White",
+    width: 48, height: 48, depth: 5.75,
+    customLabel: "", location: "", qty: 1, unitPrice: 0,
+    notes: "", attachmentNames: [],
   }
+}
+
+export function createRoom(name = "Room"): Room {
+  return { id: uid("rm"), name, items: [createItem()] }
+}
+
+export const DEFAULT_TERMS = [
+  "This estimate is valid for 30 days from issue date.",
+  "A deposit of 30% is required at contract signing. Remaining 70% due 24 hours before delivery.",
+  "Approximate delivery as per required-by date — subject to manufacturer lead times.",
+  "All products carry full manufacturer warranty. Installation warranty provided separately.",
+  "Any modifications must be submitted in writing and may affect pricing and delivery timelines.",
+  "The value of delivered/installed products must be paid upon receipt of merchandise.",
+  "Prices include all listed products and services. Additional work quoted separately.",
+]
+
+export function defaultCompany(): CompanyInfo {
+  return { name: "VERREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "verrex-website.vercel.app", logoUrl: "" }
 }
 
 export function createBlankEstimate(): EstimateState {
   return {
-    companyName: "VERREX",
-    tagline: "WINDOWS & DOORS — FENÊTRES & PORTES",
+    company: defaultCompany(),
     estimateNumber: "VX-2025-0001",
     date: new Date().toISOString().slice(0, 10),
-    validUntil: "",
-    requiredBy: "",
-    clientName: "",
-    clientAddress: "",
-    clientCity: "",
-    clientPhone: "",
-    clientEmail: "",
-    shipMethod: "PICKUP",
-    shipAddress: "",
-    shipPhone: "",
-    repName: "",
-    repRef: "",
-    items: [createBlankItem()],
-    installPerUnit: 275,
-    delivery: 850,
-    depositPct: 30,
+    validUntil: "", requiredBy: "",
+    soldToLabel: "Sold To", clientName: "", clientAddress: "", clientCity: "", clientPhone: "", clientEmail: "",
+    shipToLabel: "Ship To", shipMethod: "PICKUP", shipAddress: "", shipPhone: "",
+    repName: "", repRef: "",
+    rooms: [createRoom("GROUND FLOOR")],
+    installPerUnit: 275, delivery: 850, depositPct: 30,
+    termsLines: [...DEFAULT_TERMS],
   }
 }
 
-// ── Helpers ─────────────────────────────────────
+// ── Helpers ──────────────────────────────────────
 export function toFraction(dec: number): string {
-  const whole = Math.floor(dec)
-  const frac = dec - whole
-  if (frac < 0.01) return `${whole}"`
-  const sixteenths = Math.round(frac * 16)
-  if (sixteenths === 16) return `${whole + 1}"`
-  if (sixteenths === 0) return `${whole}"`
-  let n = sixteenths, d = 16
+  const w = Math.floor(dec), f = dec - w
+  if (f < 0.01) return `${w}"`
+  const s = Math.round(f * 16)
+  if (s === 16) return `${w + 1}"`
+  if (s === 0) return `${w}"`
+  let n = s, d = 16
   while (n % 2 === 0) { n /= 2; d /= 2 }
-  return `${whole}-${n}/${d}"`
+  return `${w}-${n}/${d}"`
 }
 
-export function moduleWidth(totalW: number, numModules: number): number {
-  return totalW / numModules - 1 / 16
+export function moduleWidth(totalW: number, n: number) { return totalW / n - 1 / 16 }
+
+export function fmt(n: number) { return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }
+
+export function allItems(est: EstimateState): EstimateItem[] {
+  return est.rooms.flatMap(r => r.items)
 }
 
-export function fmt(n: number): string {
-  return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-}
-
-export function calcTotals(state: EstimateState) {
+export function calcTotals(est: EstimateState) {
+  const items = allItems(est)
   let prodTotal = 0, totalUnits = 0
-  state.items.forEach(it => { prodTotal += it.qty * it.unitPrice; totalUnits += it.qty })
-  const install = totalUnits * state.installPerUnit
-  const delivery = state.delivery
+  items.forEach(it => { prodTotal += it.qty * it.unitPrice; totalUnits += it.qty })
+  const install = totalUnits * est.installPerUnit
+  const delivery = est.delivery
   const subtax = prodTotal + install + delivery
-  const gst = subtax * 0.05
-  const qst = subtax * 0.09975
+  const gst = subtax * 0.05, qst = subtax * 0.09975
   const total = subtax + gst + qst
-  const deposit = total * (state.depositPct / 100)
-  return { prodTotal, totalUnits, install, delivery, subtax, gst, qst, total, deposit, balance: total - deposit }
+  const deposit = total * (est.depositPct / 100)
+  return { prodTotal, totalUnits, items: items.length, install, delivery, subtax, gst, qst, total, deposit, balance: total - deposit }
 }

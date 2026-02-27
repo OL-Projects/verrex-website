@@ -2,228 +2,305 @@
 
 import { useState, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, Printer, RotateCcw, FileText } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X } from "lucide-react"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
+import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo } from "@/lib/estimate-hooks"
 import {
-  type EstimateState, type EstimateItem,
-  WINDOW_TYPES, PRODUCTS, EXT_COLORS, INT_COLORS,
-  createBlankEstimate, createBlankItem, calcTotals, fmt,
+  type EstimateState, type EstimateItem, type Room,
+  WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
+  calcTotals, allItems, fmt,
 } from "@/lib/estimate-config"
 
-/* ── tiny helpers ─────────────────────────────── */
-const cls = {
-  card: "rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 p-5",
-  label: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1",
-  input: "w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 transition",
-  select: "w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 transition appearance-none",
+const C = {
+  card: "rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 p-5 print:bg-white print:border-slate-300",
+  lbl: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1",
+  inp: "w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 transition print:bg-transparent print:border-slate-200",
+  sel: "w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 appearance-none transition print:bg-transparent",
 }
 
 export default function EstimatesPage() {
   const [est, setEst] = useState<EstimateState>(createBlankEstimate)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const pdfRef = useRef<HTMLDivElement>(null)
+  const { extNames, intNames } = useColorPresets()
+  const { info: coInfo } = useCompanyInfo()
+  const { logo, uploadLogo, clearLogo } = useLogo()
+  const { remember, suggestions } = useAutocomplete()
+  const logoRef = useRef<HTMLInputElement>(null)
 
-  /* partial update */
+  // Merge company info on mount
+  useState(() => { setEst(p => ({ ...p, company: { ...p.company, ...coInfo, logoUrl: logo || p.company.logoUrl } })) })
+
   const set = useCallback(<K extends keyof EstimateState>(k: K, v: EstimateState[K]) => setEst(p => ({ ...p, [k]: v })), [])
-  const updateItem = useCallback((id: string, patch: Partial<EstimateItem>) => {
-    setEst(p => ({ ...p, items: p.items.map(it => it.id === id ? { ...it, ...patch } : it) }))
+  const setCompany = useCallback((k: string, v: string) => setEst(p => ({ ...p, company: { ...p.company, [k]: v } })), [])
+
+  const updateRoom = useCallback((rid: string, patch: Partial<Room>) => {
+    setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === rid ? { ...r, ...patch } : r) }))
   }, [])
-  const addItem = useCallback(() => {
-    setEst(p => ({ ...p, items: [...p.items, createBlankItem()] }))
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 120)
+  const addRoom = useCallback(() => setEst(p => ({ ...p, rooms: [...p.rooms, createRoom("NEW ROOM")] })), [])
+  const delRoom = useCallback((rid: string) => setEst(p => p.rooms.length <= 1 ? p : { ...p, rooms: p.rooms.filter(r => r.id !== rid) }), [])
+  const addItemToRoom = useCallback((rid: string) => {
+    setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === rid ? { ...r, items: [...r.items, createItem()] } : r) }))
   }, [])
-  const deleteItem = useCallback((id: string) => {
-    setEst(p => p.items.length <= 1 ? p : { ...p, items: p.items.filter(it => it.id !== id) })
+  const updateItem = useCallback((rid: string, iid: string, patch: Partial<EstimateItem>) => {
+    setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === rid ? { ...r, items: r.items.map(it => it.id === iid ? { ...it, ...patch } : it) } : r) }))
+  }, [])
+  const delItem = useCallback((rid: string, iid: string) => {
+    setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === rid ? { ...r, items: r.items.length <= 1 ? r.items : r.items.filter(it => it.id !== iid) } : r) }))
   }, [])
   const resetAll = useCallback(() => { if (confirm("Reset all data?")) setEst(createBlankEstimate()) }, [])
 
+  const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
+
+  const exportPDF = useCallback(async () => {
+    const el = pdfRef.current
+    if (!el) return
+    const html2pdf = (await import("html2pdf.js")).default
+    html2pdf().set({
+      margin: [8, 8, 8, 8],
+      filename: `${est.company.name} - Estimate ${est.estimateNumber}.pdf`,
+      image: { type: "jpeg", quality: 0.96 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "mm", format: "letter", orientation: "portrait" },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+    }).from(el).save()
+  }, [est.company.name, est.estimateNumber])
+
   const t = calcTotals(est)
+  let globalIdx = 0
 
   return (
-    <div className="space-y-5 max-w-4xl print:max-w-none print:space-y-3 pb-24">
-      {/* ── Page Title (hidden in print) ── */}
+    <div className="space-y-5 max-w-4xl pb-24">
+      {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText className="h-6 w-6 text-blue-500" /> Estimate Creator</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Create professional window & door estimates matching the VERREX template</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Professional window & door estimates with live diagrams</p>
       </motion.div>
 
-      {/* ── Header Card ── */}
-      <div className={`${cls.card} border-t-4 border-t-slate-800 dark:border-t-blue-500 print:border-t-slate-800`}>
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="flex-1">
-            <input value={est.companyName} onChange={e => set("companyName", e.target.value)} className="text-2xl font-extrabold text-slate-900 dark:text-white bg-transparent border-none outline-none w-full" />
-            <input value={est.tagline} onChange={e => set("tagline", e.target.value)} className="text-xs tracking-widest text-slate-500 dark:text-slate-400 bg-transparent border-none outline-none w-full mt-1" />
-          </div>
-          <div className="text-right space-y-2 min-w-[200px]">
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estimate #</p>
-            <input value={est.estimateNumber} onChange={e => set("estimateNumber", e.target.value)} className="text-lg font-extrabold text-slate-900 dark:text-white bg-transparent border-none outline-none text-right w-full" />
-            <div className="grid grid-cols-1 gap-1.5 text-left">
-              <div><label className={cls.label}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={cls.input} /></div>
-              <div><label className={cls.label}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={cls.input} /></div>
-              <div><label className={cls.label}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={cls.input} /></div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-slate-200 dark:border-white/10">
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Sold To</h3>
-            <input placeholder="Client Name" value={est.clientName} onChange={e => set("clientName", e.target.value)} className={cls.input} />
-            <input placeholder="Address" value={est.clientAddress} onChange={e => set("clientAddress", e.target.value)} className={cls.input} />
-            <input placeholder="City, Province, Postal" value={est.clientCity} onChange={e => set("clientCity", e.target.value)} className={cls.input} />
-            <input placeholder="Phone" value={est.clientPhone} onChange={e => set("clientPhone", e.target.value)} className={cls.input} />
-            <input placeholder="Email" value={est.clientEmail} onChange={e => set("clientEmail", e.target.value)} className={cls.input} />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Ship To</h3>
-            <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={cls.select}>
-              <option>PICKUP</option><option>DELIVERY</option>
-            </select>
-            <input placeholder="Address" value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={cls.input} />
-            <input placeholder="Phone" value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={cls.input} />
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 pt-2">Representative</h3>
-            <input placeholder="Rep Name" value={est.repName} onChange={e => set("repName", e.target.value)} className={cls.input} />
-            <input placeholder="Reference" value={est.repRef} onChange={e => set("repRef", e.target.value)} className={cls.input} />
-          </div>
-        </div>
-      </div>
-
-      {/* ── Items ── */}
-      {est.items.map((item, idx) => {
-        const prod = PRODUCTS.find(p => p.id === item.product)
-        const hasCasement = (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS"))
-        const egress = hasCasement && item.height >= 24
-        const lineTotal = item.qty * item.unitPrice
-
-        return (
-          <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.04 }}
-            className={`${cls.card} border-l-4 border-l-slate-800 dark:border-l-blue-500 print:border-l-slate-800 relative`}>
-            {/* delete */}
-            <button onClick={() => deleteItem(item.id)} className="absolute top-3 right-3 text-red-400 hover:text-red-600 transition print:hidden"><Trash2 className="h-4 w-4" /></button>
-
-            {/* header row */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">Item #{idx + 1}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${prod?.tagClass}`}>{prod?.tag}</span>
-                <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{item.width}&quot; W × {item.height}&quot; H</span>
-              </div>
-              <input placeholder="LOCATION" value={item.location} onChange={e => updateItem(item.id, { location: e.target.value })}
-                className="text-right text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-transparent border-none outline-none w-32 print:text-slate-700" />
-            </div>
-
-            {/* body: preview | config */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="flex items-center justify-center bg-slate-50/50 dark:bg-white/3 rounded-xl p-4 min-h-[200px]">
-                <EstimateWindowSVG width={item.width} height={item.height} type={item.type} />
-              </div>
-
-              <div className="space-y-3">
-                <div><label className={cls.label}>Window Type</label>
-                  <select value={item.type} onChange={e => updateItem(item.id, { type: e.target.value })} className={cls.select}>
-                    {Object.entries(WINDOW_TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><label className={cls.label}>Width (in)</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(item.id, { width: +e.target.value })} className={cls.input} /></div>
-                  <div><label className={cls.label}>Height (in)</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(item.id, { height: +e.target.value })} className={cls.input} /></div>
-                </div>
-                <div><label className={cls.label}>Product</label>
-                  <select value={item.product} onChange={e => updateItem(item.id, { product: e.target.value })} className={cls.select}>
-                    {PRODUCTS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><label className={cls.label}>Exterior</label>
-                    <select value={item.extColor} onChange={e => updateItem(item.id, { extColor: e.target.value })} className={cls.select}>
-                      {EXT_COLORS.map(c => <option key={c}>{c}</option>)}
-                    </select>
+      <div ref={pdfRef} className="space-y-5 print:space-y-3">
+        {/* ═══ HEADER ═══ */}
+        <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <div className="flex-1 flex gap-3 items-start">
+              {/* Logo */}
+              <div className="shrink-0">
+                {(logo || est.company.logoUrl) ? (
+                  <div className="relative group">
+                    <img src={logo || est.company.logoUrl} alt="Logo" className="h-14 w-14 object-contain rounded-lg" />
+                    <button onClick={clearLogo} className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full text-xs hidden group-hover:flex items-center justify-center print:hidden"><X className="h-3 w-3" /></button>
                   </div>
-                  <div><label className={cls.label}>Interior</label>
-                    <select value={item.intColor} onChange={e => updateItem(item.id, { intColor: e.target.value })} className={cls.select}>
-                      {INT_COLORS.map(c => <option key={c}>{c}</option>)}
-                    </select>
-                  </div>
+                ) : (
+                  <button onClick={() => logoRef.current?.click()} className="h-14 w-14 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 transition print:hidden">
+                    <ImagePlus className="h-5 w-5" />
+                  </button>
+                )}
+                <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadLogo(e.target.files[0]) }} />
+              </div>
+              <div className="flex-1">
+                <input value={est.company.name} onChange={e => setCompany("name", e.target.value)} className="text-2xl font-extrabold text-slate-900 dark:text-white bg-transparent outline-none w-full" />
+                <input value={est.company.tagline} onChange={e => setCompany("tagline", e.target.value)} className="text-xs tracking-widest text-slate-500 bg-transparent outline-none w-full mt-0.5" />
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
+                  <input placeholder="Address" value={est.company.address} onChange={e => setCompany("address", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder="City" value={est.company.city} onChange={e => setCompany("city", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder="Phone" value={est.company.phone} onChange={e => setCompany("phone", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder="Website" value={est.company.website} onChange={e => setCompany("website", e.target.value)} className="bg-transparent outline-none" />
                 </div>
-                <p className={`text-xs font-bold ${egress ? "text-green-600 dark:text-green-400" : "text-red-500"}`}>EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}</p>
               </div>
             </div>
-
-            {/* footer: qty + price */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-16"><label className={cls.label}>Qty</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(item.id, { qty: +e.target.value })} className={cls.input} /></div>
-                <div className="w-28"><label className={cls.label}>Unit Price</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(item.id, { unitPrice: +e.target.value })} className={`${cls.input} font-semibold`} /></div>
-              </div>
-              <span className="text-xl font-extrabold text-slate-900 dark:text-white">{fmt(lineTotal)}</span>
+            <div className="text-right space-y-1.5 min-w-[200px]">
+              <p className={C.lbl}>Estimate #</p>
+              <input value={est.estimateNumber} onChange={e => set("estimateNumber", e.target.value)} className="text-lg font-extrabold text-slate-900 dark:text-white bg-transparent outline-none text-right w-full border-b border-dashed border-slate-300 dark:border-white/20 focus:border-blue-500 print:border-none" />
+              <div><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={C.inp} /></div>
+              <div><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={C.inp} /></div>
+              <div><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={C.inp} /></div>
             </div>
-          </motion.div>
-        )
-      })}
-
-      {/* ── Add Item ── */}
-      <button onClick={addItem} className="w-full py-4 border-2 border-dashed border-slate-300 dark:border-white/15 rounded-2xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 transition print:hidden">
-        <Plus className="inline h-4 w-4 mr-1 -mt-0.5" /> Add Window Item
-      </button>
-
-      {/* ── Summary ── */}
-      <div className={`${cls.card} border-t-4 border-t-slate-800 dark:border-t-blue-500 print:border-t-slate-800`}>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Pricing Summary — {est.items.length} Line Items ({t.totalUnits} Units)</h2>
-        <div className="space-y-1.5">
-          {est.items.map((it, i) => {
-            const p = PRODUCTS.find(x => x.id === it.product)
-            return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">Item #{i + 1} — {p?.tag} {it.width}×{it.height} (×{it.qty})</span><span className="font-semibold text-slate-900 dark:text-white">{fmt(it.qty * it.unitPrice)}</span></div>
-          })}
-        </div>
-        <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
-        <div className="mt-3 space-y-1.5 text-sm">
-          <div className="flex justify-between items-center">
-            <span className="text-slate-600 dark:text-slate-300">Installation ({t.totalUnits} units × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 dark:border-white/20 text-center font-semibold outline-none print:border-none" />)</span>
-            <span className="font-semibold">{fmt(t.install)}</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-slate-600 dark:text-slate-300">Delivery & Handling $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 dark:border-white/20 text-center font-semibold outline-none print:border-none" /></span>
-            <span className="font-semibold">{fmt(t.delivery)}</span>
+
+          {/* Client + Ship */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-slate-200 dark:border-white/10">
+            <div className="space-y-2">
+              <input value={est.soldToLabel} onChange={e => set("soldToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
+              {(["clientName", "clientAddress", "clientCity", "clientPhone", "clientEmail"] as const).map(f => (
+                <div key={f} className="relative">
+                  <input list={`dl_${f}`} placeholder={f.replace("client", "")} value={est[f]} onChange={e => set(f, e.target.value)} onBlur={e => handleBlur(f, e.target.value)} className={C.inp} />
+                  <datalist id={`dl_${f}`}>{suggestions(f).map(s => <option key={s} value={s} />)}</datalist>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <input value={est.shipToLabel} onChange={e => set("shipToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
+              <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={C.sel}><option>PICKUP</option><option>DELIVERY</option></select>
+              <input placeholder="Address" value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={C.inp} />
+              <input placeholder="Phone" value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={C.inp} />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-2">Representative</p>
+              <input list="dl_rep" placeholder="Rep Name" value={est.repName} onChange={e => set("repName", e.target.value)} onBlur={e => handleBlur("repName", e.target.value)} className={C.inp} />
+              <datalist id="dl_rep">{suggestions("repName").map(s => <option key={s} value={s} />)}</datalist>
+              <input placeholder="Reference" value={est.repRef} onChange={e => set("repRef", e.target.value)} className={C.inp} />
+            </div>
           </div>
         </div>
-        <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
-        <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST (5%)</span><span>{fmt(t.gst)}</span></div>
-        <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST (9.975%)</span><span>{fmt(t.qst)}</span></div>
-        <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3 text-slate-900 dark:text-white"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
-        <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm">
-          <span>Deposit Required: {est.depositPct}%</span><span className="font-bold">{fmt(t.deposit)}</span>
+
+        {/* ═══ ROOMS + ITEMS ═══ */}
+        {est.rooms.map(room => {
+          const isCollapsed = collapsed[room.id]
+          return (
+            <div key={room.id}>
+              {/* Room header */}
+              <div className="flex items-center gap-2 mb-3 mt-2">
+                <button onClick={() => setCollapsed(p => ({ ...p, [room.id]: !isCollapsed }))} className="text-slate-400 hover:text-slate-600 transition print:hidden">
+                  {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+                <input value={room.name} onChange={e => updateRoom(room.id, { name: e.target.value })} className="text-xs font-extrabold uppercase tracking-[3px] text-slate-700 dark:text-slate-300 bg-transparent outline-none flex-1 border-b-2 border-slate-800 dark:border-white/20 pb-1" />
+                <button onClick={() => addItemToRoom(room.id)} className="text-xs text-blue-600 font-semibold hover:underline print:hidden">+ Window</button>
+                <button onClick={() => delRoom(room.id)} className="text-xs text-red-400 hover:text-red-600 transition print:hidden">Remove</button>
+              </div>
+
+              {!isCollapsed && room.items.map((item) => {
+                globalIdx++
+                const prod = PRODUCTS.find(p => p.id === item.product)
+                const hasCas = (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS"))
+                const egress = hasCas && item.height >= 24
+                const lineTotal = item.qty * item.unitPrice
+
+                return (
+                  <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                    className={`${C.card} border-l-4 border-l-slate-800 dark:border-l-blue-500 mb-4 relative`}>
+
+                    {/* Header row */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-extrabold text-slate-900 dark:text-white">Item #{globalIdx}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${prod?.cls}`}>{prod?.tag}</span>
+                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{item.width}&quot;W × {item.height}&quot;H × {item.depth}&quot;D</span>
+                      </div>
+                      <input placeholder="Custom Label" value={item.customLabel} onChange={e => updateItem(room.id, item.id, { customLabel: e.target.value })}
+                        className="text-right text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-transparent outline-none w-36" />
+                    </div>
+
+                    {/* Body: SVG | Config */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="flex items-center justify-center bg-slate-50/50 dark:bg-white/3 rounded-xl p-3 min-h-[200px]">
+                        <EstimateWindowSVG width={item.width} height={item.height} type={item.type} />
+                      </div>
+                      <div className="space-y-2.5">
+                        <div><label className={C.lbl}>Window Type</label>
+                          <select value={item.type} onChange={e => updateItem(room.id, item.id, { type: e.target.value })} className={C.sel}>
+                            {Object.entries(WINDOW_TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
+                          <div><label className={C.lbl}>Height</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
+                          <div><label className={C.lbl}>Depth</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>
+                        </div>
+                        <div><label className={C.lbl}>Product</label>
+                          <select value={item.product} onChange={e => updateItem(room.id, item.id, { product: e.target.value })} className={C.sel}>
+                            {PRODUCTS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div><label className={C.lbl}>Exterior</label>
+                            <select value={item.extColor} onChange={e => updateItem(room.id, item.id, { extColor: e.target.value })} className={C.sel}>
+                              {extNames.map(c => <option key={c}>{c}</option>)}
+                            </select>
+                          </div>
+                          <div><label className={C.lbl}>Interior</label>
+                            <select value={item.intColor} onChange={e => updateItem(room.id, item.id, { intColor: e.target.value })} className={C.sel}>
+                              {intNames.map(c => <option key={c}>{c}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}</p>
+                        {/* Notes */}
+                        <div><label className={C.lbl}>Notes</label>
+                          <textarea rows={2} value={item.notes} onChange={e => updateItem(room.id, item.id, { notes: e.target.value })} placeholder="Special instructions…" className={`${C.inp} resize-none`} />
+                        </div>
+                        {/* Attachments (hidden in PDF) */}
+                        <div className="print:hidden">
+                          <label className={C.lbl}>Attachments</label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {item.attachmentNames.map((name, ai) => (
+                              <span key={ai} className="text-[10px] bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded flex items-center gap-1">
+                                <Paperclip className="h-3 w-3" />{name}
+                                <button onClick={() => updateItem(room.id, item.id, { attachmentNames: item.attachmentNames.filter((_, j) => j !== ai) })} className="text-red-400 hover:text-red-600"><X className="h-3 w-3" /></button>
+                              </span>
+                            ))}
+                            <label className="text-[10px] text-blue-600 cursor-pointer hover:underline">
+                              + Attach
+                              <input type="file" className="hidden" onChange={e => { if (e.target.files?.[0]) updateItem(room.id, item.id, { attachmentNames: [...item.attachmentNames, e.target.files[0].name] }) }} />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer: qty + price + delete */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200 dark:border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-16"><label className={C.lbl}>Qty</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
+                        <div className="w-28"><label className={C.lbl}>Unit Price</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl font-extrabold text-slate-900 dark:text-white">{fmt(lineTotal)}</span>
+                        <button onClick={() => delItem(room.id, item.id)} className="text-red-400 hover:text-red-600 transition print:hidden" title="Delete item"><Trash2 className="h-4 w-4" /></button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          )
+        })}
+
+        {/* Add room */}
+        <button onClick={addRoom} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-white/15 rounded-2xl text-sm font-semibold text-slate-500 hover:border-blue-500 hover:text-blue-500 transition print:hidden">
+          <Plus className="inline h-4 w-4 mr-1 -mt-0.5" /> Add Room
+        </button>
+
+        {/* ═══ SUMMARY ═══ */}
+        <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Pricing Summary — {t.items} Items ({t.totalUnits} Units)</h2>
+          <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * it.unitPrice)}</span></div> })) })()}</div>
+          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
+          <div className="mt-3 space-y-1.5 text-sm">
+            <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>
+            <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>
+          </div>
+          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
+          <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST (5%)</span><span>{fmt(t.gst)}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST (9.975%)</span><span>{fmt(t.qst)}</span></div>
+          <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
+          <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm items-center">
+            <span>Deposit Required: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</span>
+            <span className="font-bold">{fmt(t.deposit)}</span>
+          </div>
+        </div>
+
+        {/* ═══ TERMS (editable) ═══ */}
+        <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">Terms & Conditions</h2>
+          <ol className="list-decimal pl-5 space-y-1.5">
+            {est.termsLines.map((line, i) => (
+              <li key={i}><textarea rows={2} value={line} onChange={e => { const next = [...est.termsLines]; next[i] = e.target.value; set("termsLines", next) }} className="w-full bg-transparent outline-none resize-none text-xs print:bg-transparent" /></li>
+            ))}
+          </ol>
+          <button onClick={() => set("termsLines", [...est.termsLines, ""])} className="text-blue-600 text-xs font-semibold mt-2 print:hidden">+ Add clause</button>
+
+          <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
+            <p className={C.lbl}>Acceptance & Signatures</p>
+            <p className="mb-6 text-xs">By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.</p>
+            <div className="grid grid-cols-2 gap-12 mt-8">
+              <div className="min-h-[80px] border-b border-slate-800 dark:border-slate-300"><p className="text-[11px] mt-[76px]">Client Signature & Date</p></div>
+              <div className="min-h-[80px] border-b border-slate-800 dark:border-slate-300"><p className="text-[11px] mt-[76px]">Representative Signature & Date</p></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── Terms ── */}
-      <div className={`${cls.card} text-xs text-slate-500 dark:text-slate-400 leading-relaxed`}>
-        <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">Terms & Conditions</h2>
-        <ol className="list-decimal pl-5 space-y-0.5">
-          <li>This estimate is valid for 30 days from issue date.</li>
-          <li>A deposit of {est.depositPct}% is required at contract signing. Remaining {100 - est.depositPct}% due 24 hours before delivery.</li>
-          <li>Approximate delivery as per required-by date — subject to manufacturer lead times.</li>
-          <li>All products carry full manufacturer warranty. Installation warranty provided separately.</li>
-          <li>Any modifications must be submitted in writing and may affect pricing and delivery timelines.</li>
-          <li>The value of delivered/installed products must be paid upon receipt of merchandise.</li>
-          <li>Prices include all listed products and services. Additional work quoted separately.</li>
-        </ol>
-        <div className="mt-5 pt-4 border-t border-slate-200 dark:border-white/10">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">Acceptance & Signatures</h3>
-          <p className="mb-4">By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.</p>
-          <div className="grid grid-cols-2 gap-8">
-            <div className="border-t border-slate-800 dark:border-slate-300 pt-1 text-[11px]">Client Signature & Date</div>
-            <div className="border-t border-slate-800 dark:border-slate-300 pt-1 text-[11px]">Representative Signature & Date</div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Sticky Action Bar ── */}
-      <div ref={bottomRef} className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-3 px-4 flex items-center justify-center gap-3 z-50 print:hidden">
-        <button onClick={resetAll} className="px-5 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-sm font-bold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
-          <RotateCcw className="h-4 w-4" /> Reset
-        </button>
-        <button onClick={() => window.print()} className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-sm font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5">
-          <Printer className="h-4 w-4" /> Export PDF
-        </button>
+      {/* ═══ STICKY BAR ═══ */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-3 px-4 flex items-center justify-center gap-3 z-50 print:hidden">
+        <button onClick={resetAll} className="px-5 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-sm font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5"><RotateCcw className="h-4 w-4" /> Reset</button>
+        <button onClick={exportPDF} className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-sm font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5"><Download className="h-4 w-4" /> Export PDF</button>
       </div>
     </div>
   )
