@@ -161,6 +161,69 @@ export function createBlankEstimate(): EstimateState {
   }
 }
 
+// ── Glass Rate Unit Labels ──────────────────────
+export const GLASS_RATE_UNITS = [
+  { id: "sqin" as const, label: "per sq inch", short: "/sq in" },
+  { id: "sqft" as const, label: "per sq foot", short: "/sq ft" },
+  { id: "sqm" as const, label: "per sq meter", short: "/sq m" },
+]
+
+export type GlassRateUnit = "sqin" | "sqft" | "sqm"
+
+/** Compute glass area in the chosen unit (width & height are always in inches) */
+export function glassArea(widthIn: number, heightIn: number, unit: GlassRateUnit): number {
+  switch (unit) {
+    case "sqft": return (widthIn / 12) * (heightIn / 12)
+    case "sqm":  return (widthIn * 0.0254) * (heightIn * 0.0254)
+    default:     return widthIn * heightIn // sqin
+  }
+}
+
+/**
+ * Compute the calculated glass price for an item.
+ * Pass the relevant settings fields (works for both windows and doors).
+ */
+export function computeCalculatedPrice(
+  item: EstimateItem,
+  rate: number,
+  unit: GlassRateUnit,
+): number {
+  if (rate <= 0) return 0
+  const area = glassArea(item.width, item.height, unit)
+  return area * rate
+}
+
+/**
+ * Get the correct glass rate for an item based on its product and whether it's a door.
+ * Returns { rate, unit, show } from the settings object.
+ */
+export function getGlassRateForItem(
+  item: EstimateItem,
+  settings: {
+    showCalculatedPrice: boolean
+    glassRateUnit: GlassRateUnit
+    doubleTemperedRate: number
+    tripleTemperedRate: number
+    doorShowCalculatedPrice: boolean
+    doorGlassRateUnit: GlassRateUnit
+    doorDoubleTemperedRate: number
+    doorTripleTemperedRate: number
+  },
+): { rate: number; unit: GlassRateUnit; show: boolean } {
+  const door = isDoorType(item.type)
+  const show = door ? settings.doorShowCalculatedPrice : settings.showCalculatedPrice
+  const unit = door ? settings.doorGlassRateUnit : settings.glassRateUnit
+
+  let rate = 0
+  if (item.product === "double-tempered") {
+    rate = door ? settings.doorDoubleTemperedRate : settings.doubleTemperedRate
+  } else if (item.product === "triple-tempered") {
+    rate = door ? settings.doorTripleTemperedRate : settings.tripleTemperedRate
+  }
+
+  return { rate, unit, show }
+}
+
 // ── Helpers ──────────────────────────────────────
 export function toFraction(dec: number): string {
   const w = Math.floor(dec), f = dec - w

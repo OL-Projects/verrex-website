@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
-import { WINDOW_TYPES, PRODUCTS } from "@/lib/estimate-config"
+import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS } from "@/lib/estimate-config"
 
 const CLS = {
   lbl: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5",
@@ -225,6 +225,40 @@ export function EstimateCustomizePanel(props: Props) {
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
             <ColorManager label="Interior Colors" colors={props.intColors} onAdd={props.onAddInt} onRemove={props.onRemoveInt} />
           </div>
+
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1.5">🔢 Calculated Price</p>
+            <div className={CLS.row}><span className="text-[11px]">Show Calculated Price</span><Toggle on={s.showCalculatedPrice ?? true} onToggle={() => uSet({ showCalculatedPrice: !(s.showCalculatedPrice ?? true) })} /></div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Measurement Unit</label>
+              <div className="flex gap-1">
+                {GLASS_RATE_UNITS.map(u => (
+                  <button key={u.id} onClick={() => uSet({ glassRateUnit: u.id })}
+                    className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.glassRateUnit ?? "sqin") === u.id ? "bg-emerald-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
+                    {u.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Double Tempered Glass Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.doubleTemperedRate ?? 0.50} onChange={e => uSet({ doubleTemperedRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{GLASS_RATE_UNITS.find(u => u.id === (s.glassRateUnit ?? "sqin"))?.short}</span>
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Triple Tempered Glass Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.tripleTemperedRate ?? 0.75} onChange={e => uSet({ tripleTemperedRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{GLASS_RATE_UNITS.find(u => u.id === (s.glassRateUnit ?? "sqin"))?.short}</span>
+              </div>
+            </div>
+          </div>
         </Section>
 
         {/* ═══ SECTION 3: DOOR CARD ═══ */}
@@ -260,6 +294,40 @@ export function EstimateCustomizePanel(props: Props) {
 
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Colors</p>
           <p className="text-[9px] text-slate-400 italic">Door colors share the same Exterior/Interior presets as windows. Edit them in the Window Card section above.</p>
+
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1.5">🔢 Calculated Price</p>
+            <div className={CLS.row}><span className="text-[11px]">Show Calculated Price</span><Toggle on={s.doorShowCalculatedPrice ?? true} onToggle={() => uSet({ doorShowCalculatedPrice: !(s.doorShowCalculatedPrice ?? true) })} /></div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Measurement Unit</label>
+              <div className="flex gap-1">
+                {GLASS_RATE_UNITS.map(u => (
+                  <button key={u.id} onClick={() => uSet({ doorGlassRateUnit: u.id })}
+                    className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.doorGlassRateUnit ?? "sqin") === u.id ? "bg-emerald-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
+                    {u.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Double Tempered Glass Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.doorDoubleTemperedRate ?? 0.50} onChange={e => uSet({ doorDoubleTemperedRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{GLASS_RATE_UNITS.find(u => u.id === (s.doorGlassRateUnit ?? "sqin"))?.short}</span>
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Triple Tempered Glass Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.doorTripleTemperedRate ?? 0.75} onChange={e => uSet({ doorTripleTemperedRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{GLASS_RATE_UNITS.find(u => u.id === (s.doorGlassRateUnit ?? "sqin"))?.short}</span>
+              </div>
+            </div>
+          </div>
         </Section>
 
         {/* ═══ SECTION 4: PRICING SUMMARY ═══ */}

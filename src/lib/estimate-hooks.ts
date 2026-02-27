@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v3"
+const APP_DEFAULTS_VERSION = "v4"
 const VER_KEY = "verrex_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -155,9 +155,19 @@ export interface EstimateSettings {
   enabledProducts: string[]
   customWindowTypes: CustomOption[]
   customProducts: CustomOption[]
+  // Window card — glass pricing
+  showCalculatedPrice: boolean
+  glassRateUnit: "sqin" | "sqft" | "sqm"
+  doubleTemperedRate: number
+  tripleTemperedRate: number
   // Door card
   enabledDoorTypes: string[]
   customDoorTypes: CustomOption[]
+  // Door card — glass pricing
+  doorShowCalculatedPrice: boolean
+  doorGlassRateUnit: "sqin" | "sqft" | "sqm"
+  doorDoubleTemperedRate: number
+  doorTripleTemperedRate: number
   // Pricing summary
   showInstallation: boolean
   showDelivery: boolean
@@ -192,11 +202,19 @@ function defaultSettings(): EstimateSettings {
     ],
     enabledProducts: ["double-tempered", "triple-tempered"],
     customWindowTypes: [], customProducts: [],
+    showCalculatedPrice: true,
+    glassRateUnit: "sqin",
+    doubleTemperedRate: 0.50,
+    tripleTemperedRate: 0.75,
     enabledDoorTypes: [
       "SWING-L-IN", "SWING-R-IN", "SWING-L-OUT", "SWING-R-OUT", "SWING-FRENCH",
       "SLIDE-DOOR-2", "SLIDE-DOOR-3", "FOLD-2", "FOLD-4",
     ],
     customDoorTypes: [],
+    doorShowCalculatedPrice: true,
+    doorGlassRateUnit: "sqin",
+    doorDoubleTemperedRate: 0.50,
+    doorTripleTemperedRate: 0.75,
     showInstallation: true, showDelivery: true,
     showGST: true, showQST: true, showDeposit: true, showTerms: true, showBalance: true,
     gstRate: 5, qstRate: 9.975,
