@@ -2,12 +2,14 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
-import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings } from "@/lib/estimate-hooks"
+import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings, useEstimateHistory } from "@/lib/estimate-hooks"
+import { useEstimateStore } from "@/lib/estimate-store"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
 import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel"
+import { EstimateLeftSidebar } from "@/components/portal/estimate-left-sidebar"
 import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import {
   type EstimateState, type EstimateItem, type Room,
@@ -23,7 +25,10 @@ const C = {
 }
 
 export default function EstimatesPage() {
-  const [est, setEst] = useState<EstimateState>(createBlankEstimate)
+  const store = useEstimateStore()
+  const { est, setEst, records, activeId, saveStatus, saveNow, newEstimate, loadEstimate, deleteEstimate, duplicateEstimate } = store
+  const history = useEstimateHistory(est, setEst)
+  const { canUndo, canRedo, undo, redo } = history
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const pdfRef = useRef<HTMLDivElement>(null)
   const colors = useColorPresets()
@@ -43,6 +48,16 @@ export default function EstimatesPage() {
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
 
+  // Keyboard shortcuts: Ctrl+Z / Ctrl+Y
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) { e.preventDefault(); undo() }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); redo() }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [undo, redo])
+
   // Load saved signatures
   useEffect(() => {
     try { const s = localStorage.getItem("vx_sigs"); if (s) setSigs(JSON.parse(s)) } catch {}
@@ -50,9 +65,6 @@ export default function EstimatesPage() {
   const saveSig = useCallback((who: "client" | "rep", data: string) => {
     setSigs(p => { const n = { ...p, [who]: data }; localStorage.setItem("vx_sigs", JSON.stringify(n)); return n })
   }, [])
-
-  // Merge company info on mount
-  useState(() => { setEst(p => ({ ...p, company: { ...p.company, ...coInfo, logoUrl: logo || p.company.logoUrl } })) })
 
   const set = useCallback(<K extends keyof EstimateState>(k: K, v: EstimateState[K]) => setEst(p => ({ ...p, [k]: v })), [])
   const setCompany = useCallback((k: string, v: string) => setEst(p => ({ ...p, company: { ...p.company, [k]: v } })), [])
@@ -96,7 +108,7 @@ export default function EstimatesPage() {
     }
   }, [est, logo, sigs])
 
-  const t = calcTotals(est)
+  const t = calcTotals(est, estCfg.gstRate, estCfg.qstRate)
 
   // ═══ SEND — mailto with estimate summary ═══
   const sendEstimate = useCallback(() => {
@@ -121,7 +133,10 @@ export default function EstimatesPage() {
 
   return (
     <>
-    <div className={`lg:flex gap-6 items-start pb-24 ${sidePanel !== "none" ? "max-w-none" : "max-w-4xl"}`}>
+    <div className="lg:flex gap-4 items-start pb-24 max-w-none">
+    {/* ═══ LEFT SIDEBAR ═══ */}
+    <EstimateLeftSidebar records={records} activeId={activeId} saveStatus={saveStatus}
+      onNew={newEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate} />
     <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
@@ -344,7 +359,7 @@ export default function EstimatesPage() {
 
         {/* ═══ SUMMARY ═══ */}
         <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Pricing Summary — {t.items} Items ({t.totalUnits} Units)</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{estCfg.summaryTitle} — {t.items} Items ({t.totalUnits} Units)</h2>
           <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * it.unitPrice)}</span></div> })) })()}</div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
@@ -352,9 +367,10 @@ export default function EstimatesPage() {
             {estCfg.showDelivery && <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
-          {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST (5%)</span><span>{fmt(t.gst)}</span></div>}
-          {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST (9.975%)</span><span>{fmt(t.qst)}</span></div>}
+          {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST ({estCfg.gstRate}%)</span><span>{fmt(t.gst)}</span></div>}
+          {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST ({estCfg.qstRate}%)</span><span>{fmt(t.qst)}</span></div>}
           <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
+          {estCfg.showBalance && estCfg.showDeposit && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500 font-semibold">Balance Remaining</span><span className="font-bold">{fmt(t.balance)}</span></div>}
           {estCfg.showDeposit && <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm items-center">
             <span>Deposit Required: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</span>
             <span className="font-bold">{fmt(t.deposit)}</span>
@@ -452,6 +468,12 @@ export default function EstimatesPage() {
       <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-4xl mx-auto">
         <button onClick={() => setTheme(isDark ? "light" : "dark")} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition" title={isDark ? "Light Mode" : "Dark Mode"}>
           {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
+        </button>
+        <button onClick={undo} disabled={!canUndo} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">
+          <Undo2 className="h-4 w-4 text-slate-500" />
+        </button>
+        <button onClick={redo} disabled={!canRedo} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Y)">
+          <Redo2 className="h-4 w-4 text-slate-500" />
         </button>
         <button onClick={() => setSidePanel(p => p === "settings" ? "none" : "settings")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showCustomize ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`} title="Settings">
           <Settings className="h-4 w-4" /><span className="hidden sm:inline">Settings</span>

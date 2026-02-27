@@ -178,14 +178,14 @@ export function allItems(est: EstimateState): EstimateItem[] {
   return est.rooms.flatMap(r => r.items)
 }
 
-export function calcTotals(est: EstimateState) {
+export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975) {
   const items = allItems(est)
   let prodTotal = 0, totalUnits = 0
   items.forEach(it => { prodTotal += it.qty * it.unitPrice; totalUnits += it.qty })
   const install = totalUnits * est.installPerUnit
   const delivery = est.delivery
   const subtax = prodTotal + install + delivery
-  const gst = subtax * 0.05, qst = subtax * 0.09975
+  const gst = subtax * (gstRate / 100), qst = subtax * (qstRate / 100)
   const total = subtax + gst + qst
   const deposit = total * (est.depositPct / 100)
   return { prodTotal, totalUnits, items: items.length, install, delivery, subtax, gst, qst, total, deposit, balance: total - deposit }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "./estimate-config"
 
 // ── Generic localStorage helper ─────────────────
@@ -248,7 +248,65 @@ export function useEstimateSettings() {
   }
 }
 
-// ── 6. Logo (persisted base64) ──────────────────
+// ── 6. Undo / Redo History ──────────────────────
+import type { EstimateState } from "./estimate-config"
+
+const MAX_HISTORY = 50
+
+export function useEstimateHistory(est: EstimateState, setEst: (e: EstimateState) => void) {
+  const [past, setPast] = useState<EstimateState[]>([])
+  const [future, setFuture] = useState<EstimateState[]>([])
+  const skipRef = useRef(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  // Debounced snapshot — push to history 800ms after last change
+  useEffect(() => {
+    if (skipRef.current) { skipRef.current = false; return }
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      setPast(p => {
+        const last = p[p.length - 1]
+        if (last && JSON.stringify(last) === JSON.stringify(est)) return p
+        const next = [...p, est].slice(-MAX_HISTORY)
+        return next
+      })
+      setFuture([]) // new change clears redo stack
+    }, 800)
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [est]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const canUndo = past.length > 1
+  const canRedo = future.length > 0
+
+  const undo = useCallback(() => {
+    if (!canUndo) return
+    setPast(p => {
+      const prev = [...p]
+      const current = prev.pop()!
+      const target = prev[prev.length - 1]
+      setFuture(f => [current, ...f])
+      skipRef.current = true
+      setEst(target)
+      return prev
+    })
+  }, [canUndo, setEst])
+
+  const redo = useCallback(() => {
+    if (!canRedo) return
+    setFuture(f => {
+      const next = [...f]
+      const target = next.shift()!
+      setPast(p => [...p, target])
+      skipRef.current = true
+      setEst(target)
+      return next
+    })
+  }, [canRedo, setEst])
+
+  return { canUndo, canRedo, undo, redo }
+}
+
+// ── 7. Logo (persisted base64) ──────────────────
 const LOGO_KEY = "verrex_logo"
 export function useLogo() {
   const [logo, setLogo] = useState<string>(() => readLS(LOGO_KEY, ""))
