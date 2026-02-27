@@ -43,13 +43,15 @@ export function getTypeGroups(): { group: string; types: [string, WindowTypeConf
 export function isDoorType(typeKey: string): boolean { return WINDOW_TYPES[typeKey]?.category === "door" }
 
 export const PRODUCTS = [
-  { id: "hybrid",     label: '4600 Hybrid PVC/ALU 5¾"', tag: "HYBRID PVC/ALU", cls: "bg-slate-900 dark:bg-slate-700 text-white" },
+  { id: "double-tempered", label: "Double Tempered Glass", tag: "DTG", cls: "bg-blue-600 dark:bg-blue-700 text-white" },
+  { id: "triple-tempered", label: "Triple Tempered Glass", tag: "TTG", cls: "bg-slate-900 dark:bg-slate-700 text-white" },
+  { id: "hybrid",     label: '4600 Hybrid PVC/ALU 5¾"', tag: "HYBRID PVC/ALU", cls: "bg-slate-600 dark:bg-slate-600 text-white" },
   { id: "pvc",        label: '4600 PVC 5¼"',            tag: "PVC",            cls: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
   { id: "pvc-slider", label: '4000 PVC 5¼" — Slider',   tag: "PVC SLIDER",     cls: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
 ] as const
 
-export const DEFAULT_EXT_COLORS = ["525 Black", "White", "Commercial Brown"]
-export const DEFAULT_INT_COLORS = ["White"]
+export const DEFAULT_EXT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry"]
+export const DEFAULT_INT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry"]
 
 // ── Data Models ─────────────────────────────────
 export interface EstimateItem {
@@ -61,6 +63,7 @@ export interface EstimateItem {
   width: number
   height: number
   depth: number
+  thickness: number     // glass thickness in mm
   customLabel: string   // e.g. "Front – 2nd Floor"
   location: string      // kept for legacy compat
   qty: number
@@ -117,9 +120,9 @@ function uid(p: string) { return `${p}_${(++_c).toString(36)}` }
 
 export function createItem(): EstimateItem {
   return {
-    id: uid("itm"), type: "CAS-L+FIX", product: "hybrid",
-    extColor: "525 Black", intColor: "White",
-    width: 48, height: 48, depth: 5.75,
+    id: uid("itm"), type: "CAS-L+FIX", product: "double-tempered",
+    extColor: "White", intColor: "White",
+    width: 48, height: 48, depth: 5.75, thickness: 4,
     customLabel: "", location: "", qty: 1, unitPrice: 0,
     notes: "", attachmentNames: [],
   }

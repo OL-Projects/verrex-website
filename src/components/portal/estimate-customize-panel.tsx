@@ -186,6 +186,7 @@ export function EstimateCustomizePanel(props: Props) {
 
         {/* ═══ SECTION 2: WINDOW CARD ═══ */}
         <Section icon={PanelTop} title="Window Card" open={!!open.window} onToggle={() => t("window")}>
+          <div className={CLS.row}><span className="text-[11px]">Thickness Field</span><Toggle on={s.showThickness ?? true} onToggle={() => uSet({ showThickness: !(s.showThickness ?? true) })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Depth Field</span><Toggle on={s.showDepth} onToggle={() => uSet({ showDepth: !s.showDepth })} /></div>
 
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Diagram</p>

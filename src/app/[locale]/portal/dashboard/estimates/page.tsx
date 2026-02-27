@@ -367,9 +367,10 @@ export default function EstimatesPage() {
                             })}
                           </select>
                         </div>
-                        <div className={`grid gap-2 ${estCfg.showDepth ? "grid-cols-3" : "grid-cols-2"}`}>
+                        <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
                           <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
                           <div><label className={C.lbl}>Height</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
+                          {(estCfg.showThickness ?? true) && <div><label className={C.lbl}>Thickness</label><input type="number" min={1} max={20} step={0.5} value={item.thickness ?? 4} onChange={e => updateItem(room.id, item.id, { thickness: +e.target.value })} className={C.inp} /></div>}
                           {estCfg.showDepth && <div><label className={C.lbl}>Depth</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
                         </div>
                         <div><label className={C.lbl}>Product</label>

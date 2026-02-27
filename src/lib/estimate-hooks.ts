@@ -27,11 +27,12 @@ export interface ColorPreset { id: string; name: string; hex: string }
 const EXT_KEY = "verrex_ext_colors"
 const INT_KEY = "verrex_int_colors"
 
+const COLOR_HEX: Record<string, string> = { "White": "#FFFFFF", "Grey": "#9CA3AF", "Wood Grain": "#8B5E3C", "Walnut Wood": "#5C3D1E", "Cherry": "#8B1A1A" }
 function defaultExtPresets(): ColorPreset[] {
-  return DEFAULT_EXT_COLORS.map((n, i) => ({ id: `ext_${i}`, name: n, hex: n === "525 Black" ? "#000000" : n === "White" ? "#FFFFFF" : "#4A3728" }))
+  return DEFAULT_EXT_COLORS.map((n, i) => ({ id: `ext_${i}`, name: n, hex: COLOR_HEX[n] || "#CCCCCC" }))
 }
 function defaultIntPresets(): ColorPreset[] {
-  return DEFAULT_INT_COLORS.map((n, i) => ({ id: `int_${i}`, name: n, hex: "#FFFFFF" }))
+  return DEFAULT_INT_COLORS.map((n, i) => ({ id: `int_${i}`, name: n, hex: COLOR_HEX[n] || "#FFFFFF" }))
 }
 
 export function useColorPresets() {
@@ -132,6 +133,7 @@ export interface EstimateSettings {
   customShipMethods: string[]
   // Window card
   showDepth: boolean
+  showThickness: boolean
   enabledWindowTypes: string[]
   enabledProducts: string[]
   customWindowTypes: CustomOption[]
@@ -164,13 +166,14 @@ function defaultSettings(): EstimateSettings {
     showShipAddress: true, showShipPhone: true, showShipMethod: true,
     soldToLabel: "Sold To", shipToLabel: "Ship To",
     customShipMethods: [],
-    showDepth: true,
+    showDepth: false,
+    showThickness: true,
     enabledWindowTypes: [
       "FIX", "TOP-HUNG", "SLIDER", "CAS-L", "CAS-R", "TT-L", "TT-R",
       "CAS-L+FIX", "FIX+CAS-R", "TT-L+FIX", "FIX+TT-R",
       "CAS-L+FIX+FIX", "FIX+FIX+FIX", "FIX+FIX+CAS-R", "CAS-L+FIX+FIX+FIX",
     ],
-    enabledProducts: ["hybrid", "pvc", "pvc-slider"],
+    enabledProducts: ["double-tempered", "triple-tempered"],
     customWindowTypes: [], customProducts: [],
     enabledDoorTypes: [
       "SWING-L-IN", "SWING-R-IN", "SWING-L-OUT", "SWING-R-OUT", "SWING-FRENCH",
