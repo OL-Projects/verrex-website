@@ -10,7 +10,7 @@ import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel
 import {
   type EstimateState, type EstimateItem, type Room,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
-  calcTotals, allItems, fmt,
+  calcTotals, allItems, fmt, getTypeGroups, isDoorType,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -191,9 +191,19 @@ export default function EstimatesPage() {
                         <EstimateWindowSVG width={item.width} height={item.height} type={item.type} />
                       </div>
                       <div className="space-y-2.5">
-                        <div><label className={C.lbl}>Window Type</label>
-                          <select value={item.type} onChange={e => updateItem(room.id, item.id, { type: e.target.value })} className={C.sel}>
-                            {Object.entries(WINDOW_TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                        <div><label className={C.lbl}>{isDoorType(item.type) ? "Door" : "Window"} Type</label>
+                          <select value={item.type} onChange={e => {
+                            const newType = e.target.value
+                            const patch: Partial<EstimateItem> = { type: newType }
+                            if (isDoorType(newType) && !isDoorType(item.type)) { patch.height = 80; patch.width = 36 }
+                            if (!isDoorType(newType) && isDoorType(item.type)) { patch.height = 48; patch.width = 48 }
+                            updateItem(room.id, item.id, patch)
+                          }} className={C.sel}>
+                            {getTypeGroups().map(g => (
+                              <optgroup key={g.group} label={g.group}>
+                                {g.types.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                              </optgroup>
+                            ))}
                           </select>
                         </div>
                         <div className="grid grid-cols-3 gap-2">

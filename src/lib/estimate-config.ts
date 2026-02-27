@@ -1,18 +1,46 @@
-// ── Window Type Configs ─────────────────────────
-export interface WindowTypeConfig { modules: string[]; label: string }
+// ── Window & Door Type Configs ──────────────────
+export type TypeCategory = "window" | "door"
+export interface WindowTypeConfig { modules: string[]; label: string; category: TypeCategory; group: string }
 
 export const WINDOW_TYPES: Record<string, WindowTypeConfig> = {
-  FIX:                  { modules: ["FIX"],                          label: "Fixed" },
-  "CAS-L":             { modules: ["CAS-L"],                        label: "Casement Left" },
-  "CAS-R":             { modules: ["CAS-R"],                        label: "Casement Right" },
-  "CAS-L+FIX":         { modules: ["CAS-L", "FIX"],                label: "Casement Left + Fixed" },
-  "FIX+CAS-R":         { modules: ["FIX", "CAS-R"],                label: "Fixed + Casement Right" },
-  "CAS-L+FIX+FIX":     { modules: ["CAS-L", "FIX", "FIX"],        label: "Casement L + 2 Fixed" },
-  "FIX+FIX+FIX":       { modules: ["FIX", "FIX", "FIX"],          label: "3 Fixed Panoramic" },
-  "FIX+FIX+CAS-R":     { modules: ["FIX", "FIX", "CAS-R"],        label: "2 Fixed + Casement R" },
-  "CAS-L+FIX+FIX+FIX": { modules: ["CAS-L", "FIX", "FIX", "FIX"],label: "Casement L + 3 Fixed" },
-  SLIDER:               { modules: ["SLIDE", "FIX"],                label: "Single Slider" },
+  // ── WINDOWS ──
+  FIX:                  { modules: ["FIX"],                          label: "Fixed",                       category: "window", group: "Windows" },
+  "TOP-HUNG":           { modules: ["AWNING"],                       label: "Top Hung (Awning)",           category: "window", group: "Windows" },
+  SLIDER:               { modules: ["SLIDE", "FIX"],                 label: "Horizontal Slider",           category: "window", group: "Windows" },
+  "CAS-L":              { modules: ["CAS-L"],                        label: "Casement Left — Crank Out",   category: "window", group: "Windows" },
+  "CAS-R":              { modules: ["CAS-R"],                        label: "Casement Right — Crank Out",  category: "window", group: "Windows" },
+  "TT-L":               { modules: ["TT-L"],                         label: "Tilt & Turn Left (Inswing)",  category: "window", group: "Windows" },
+  "TT-R":               { modules: ["TT-R"],                         label: "Tilt & Turn Right (Inswing)", category: "window", group: "Windows" },
+  "CAS-L+FIX":          { modules: ["CAS-L", "FIX"],                label: "Casement L + Fixed",          category: "window", group: "Windows — Combo" },
+  "FIX+CAS-R":          { modules: ["FIX", "CAS-R"],                label: "Fixed + Casement R",          category: "window", group: "Windows — Combo" },
+  "TT-L+FIX":           { modules: ["TT-L", "FIX"],                 label: "Tilt & Turn L + Fixed",       category: "window", group: "Windows — Combo" },
+  "FIX+TT-R":           { modules: ["FIX", "TT-R"],                 label: "Fixed + Tilt & Turn R",       category: "window", group: "Windows — Combo" },
+  "CAS-L+FIX+FIX":      { modules: ["CAS-L", "FIX", "FIX"],        label: "Casement L + 2 Fixed",        category: "window", group: "Windows — Combo" },
+  "FIX+FIX+FIX":        { modules: ["FIX", "FIX", "FIX"],          label: "3 Fixed Panoramic",           category: "window", group: "Windows — Combo" },
+  "FIX+FIX+CAS-R":      { modules: ["FIX", "FIX", "CAS-R"],        label: "2 Fixed + Casement R",        category: "window", group: "Windows — Combo" },
+  "CAS-L+FIX+FIX+FIX":  { modules: ["CAS-L", "FIX", "FIX", "FIX"],label: "Casement L + 3 Fixed",        category: "window", group: "Windows — Combo" },
+  // ── DOORS ──
+  "SWING-L-IN":         { modules: ["SWING-L-IN"],                   label: "Swing Door — Left Inswing",   category: "door", group: "Doors — Swing" },
+  "SWING-R-IN":         { modules: ["SWING-R-IN"],                   label: "Swing Door — Right Inswing",  category: "door", group: "Doors — Swing" },
+  "SWING-L-OUT":        { modules: ["SWING-L-OUT"],                  label: "Swing Door — Left Outswing",  category: "door", group: "Doors — Swing" },
+  "SWING-R-OUT":        { modules: ["SWING-R-OUT"],                  label: "Swing Door — Right Outswing", category: "door", group: "Doors — Swing" },
+  "SWING-FRENCH":       { modules: ["SWING-L-IN", "SWING-R-IN"],    label: "French Door (Double Swing)",   category: "door", group: "Doors — Swing" },
+  "SLIDE-DOOR-2":       { modules: ["SLIDE-D", "FIX-D"],            label: "Sliding Door — 2 Panel",      category: "door", group: "Doors — Sliding" },
+  "SLIDE-DOOR-3":       { modules: ["SLIDE-D", "FIX-D", "SLIDE-D"], label: "Sliding Door — 3 Panel",      category: "door", group: "Doors — Sliding" },
+  "FOLD-2":             { modules: ["FOLD", "FOLD"],                 label: "Folding Door — 2 Panel",      category: "door", group: "Doors — Folding" },
+  "FOLD-4":             { modules: ["FOLD", "FOLD", "FOLD", "FOLD"], label: "Folding Door — 4 Panel",      category: "door", group: "Doors — Folding" },
 }
+
+/** Get unique groups for optgroup rendering */
+export function getTypeGroups(): { group: string; types: [string, WindowTypeConfig][] }[] {
+  const map = new Map<string, [string, WindowTypeConfig][]>()
+  Object.entries(WINDOW_TYPES).forEach(([k, v]) => {
+    const arr = map.get(v.group) || []; arr.push([k, v]); map.set(v.group, arr)
+  })
+  return Array.from(map.entries()).map(([group, types]) => ({ group, types }))
+}
+
+export function isDoorType(typeKey: string): boolean { return WINDOW_TYPES[typeKey]?.category === "door" }
 
 export const PRODUCTS = [
   { id: "hybrid",     label: '4600 Hybrid PVC/ALU 5¾"', tag: "HYBRID PVC/ALU", cls: "bg-slate-900 dark:bg-slate-700 text-white" },
