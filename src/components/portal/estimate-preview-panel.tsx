@@ -12,7 +12,6 @@ import {
 const FULL_W = 816
 const FULL_H = 1056
 const PANEL_W = 380
-const SCALE = PANEL_W / FULL_W // ≈ 0.466
 
 interface Props {
   est: EstimateState
@@ -24,6 +23,8 @@ export function EstimatePreviewPanel({ est, logo, onClose }: Props) {
   const [page, setPage] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
   const [totalPages, setTotalPages] = useState(1)
+  const [scalePct, setScalePct] = useState(47) // default ~47% (PANEL_W / FULL_W)
+  const SCALE = scalePct / 100
 
   useEffect(() => {
     if (!contentRef.current) return
@@ -139,11 +140,21 @@ export function EstimatePreviewPanel({ est, logo, onClose }: Props) {
         </div>
       </div>
 
-      {/* Page Nav */}
-      <div className="flex items-center justify-center gap-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-b-xl border border-t-0 border-slate-200 dark:border-white/10">
-        <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} className="text-slate-500 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
-        <span className="text-[10px] font-bold text-slate-500">Page {page + 1} of {totalPages}</span>
-        <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="text-slate-500 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+      {/* Scale slider + Page Nav */}
+      <div className="bg-slate-100 dark:bg-slate-800 rounded-b-xl border border-t-0 border-slate-200 dark:border-white/10 px-3 py-2 space-y-1.5">
+        {/* Scale control */}
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] font-bold text-slate-400 w-8">Scale</span>
+          <input type="range" min={20} max={100} value={scalePct} onChange={e => setScalePct(+e.target.value)}
+            className="flex-1 h-1 accent-blue-500 cursor-pointer" />
+          <span className="text-[10px] font-bold text-slate-500 w-9 text-right">{scalePct}%</span>
+        </div>
+        {/* Page nav */}
+        <div className="flex items-center justify-center gap-3">
+          <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} className="text-slate-500 disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
+          <span className="text-[10px] font-bold text-slate-500">Page {page + 1} of {totalPages}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="text-slate-500 disabled:opacity-30"><ChevronRight className="h-4 w-4" /></button>
+        </div>
       </div>
     </div>
   )

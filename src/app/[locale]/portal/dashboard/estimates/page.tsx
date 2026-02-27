@@ -70,32 +70,54 @@ export default function EstimatesPage() {
 
   const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
 
-  // ═══ PDF EXPORT — Uses window.print() which is 100% reliable ═══
-  // Forces light mode for clean PDF, then restores state after print
-  const exportPDF = useCallback(() => {
+  // ═══ PDF EXPORT — jspdf + html2canvas → real .pdf file download ═══
+  const exportPDF = useCallback(async () => {
+    const el = pdfRef.current
+    if (!el) return
+    // Force light mode for clean capture
     const wasDark = document.documentElement.classList.contains("dark")
-    // Force light mode for clean PDF rendering
     if (wasDark) document.documentElement.classList.remove("dark")
-    // Set document title for PDF filename
-    const origTitle = document.title
-    document.title = `${est.company.name} - Estimate ${est.estimateNumber}`
-    // Small delay to let DOM repaint in light mode, then print
-    setTimeout(() => {
+    // Hide non-print elements
+    el.querySelectorAll(".print\\:hidden").forEach(n => (n as HTMLElement).style.display = "none")
+    // Wait for repaint
+    await new Promise(r => setTimeout(r, 200))
+    try {
+      const html2canvas = (await import("html2canvas")).default
+      const { jsPDF } = await import("jspdf")
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        windowWidth: 816,
+      })
+      const imgData = canvas.toDataURL("image/jpeg", 0.95)
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
+      const pdfW = pdf.internal.pageSize.getWidth()
+      const pdfH = pdf.internal.pageSize.getHeight()
+      const imgW = pdfW - 16 // 8mm margin each side
+      const imgH = (canvas.height * imgW) / canvas.width
+      let yOffset = 0
+      let pageNum = 0
+      while (yOffset < imgH) {
+        if (pageNum > 0) pdf.addPage()
+        pdf.addImage(imgData, "JPEG", 8, 8 - yOffset, imgW, imgH)
+        yOffset += pdfH - 16
+        pageNum++
+      }
+      const filename = `${est.company.name} - Estimate ${est.estimateNumber} - ${est.clientName || "Client"}.pdf`
+        .replace(/[^a-zA-Z0-9 \-_.]/g, "")
+      pdf.save(filename)
+    } catch (err) {
+      console.error("PDF export error:", err)
+      // Fallback to window.print()
       window.print()
-      // Restore after print dialog closes
-      const restore = () => {
-        document.title = origTitle
-        if (wasDark) document.documentElement.classList.add("dark")
-      }
-      // onafterprint fires when dialog closes (works in all modern browsers)
-      if ("onafterprint" in window) {
-        window.addEventListener("afterprint", restore, { once: true })
-      } else {
-        // Fallback for Safari: restore after 2s
-        setTimeout(restore, 2000)
-      }
-    }, 100)
-  }, [est.company.name, est.estimateNumber])
+    } finally {
+      // Restore
+      el.querySelectorAll(".print\\:hidden").forEach(n => (n as HTMLElement).style.display = "")
+      if (wasDark) document.documentElement.classList.add("dark")
+    }
+  }, [est.company.name, est.estimateNumber, est.clientName])
 
   const t = calcTotals(est)
 
