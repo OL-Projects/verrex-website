@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v4"
+const APP_DEFAULTS_VERSION = "v5"
 const VER_KEY = "verrex_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -228,7 +228,10 @@ function defaultSettings(): EstimateSettings {
 
 const SETTINGS_KEY = "verrex_estimate_settings"
 export function useEstimateSettings() {
-  const [settings, setSettings] = useState<EstimateSettings>(() => readLS(SETTINGS_KEY, defaultSettings()))
+  const [settings, setSettings] = useState<EstimateSettings>(() => {
+    const stored = readLS<Partial<EstimateSettings>>(SETTINGS_KEY, {})
+    return { ...defaultSettings(), ...stored }
+  })
   useEffect(() => { writeLS(SETTINGS_KEY, settings) }, [settings])
   const update = useCallback((patch: Partial<EstimateSettings>) => setSettings(p => ({ ...p, ...patch })), [])
   const reset = useCallback(() => setSettings(defaultSettings()), [])

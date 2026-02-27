@@ -211,14 +211,14 @@ export function getGlassRateForItem(
   },
 ): { rate: number; unit: GlassRateUnit; show: boolean } {
   const door = isDoorType(item.type)
-  const show = door ? settings.doorShowCalculatedPrice : settings.showCalculatedPrice
-  const unit = door ? settings.doorGlassRateUnit : settings.glassRateUnit
+  const show = door ? (settings.doorShowCalculatedPrice ?? true) : (settings.showCalculatedPrice ?? true)
+  const unit = door ? (settings.doorGlassRateUnit ?? "sqin") : (settings.glassRateUnit ?? "sqin")
 
   let rate = 0
   if (item.product === "double-tempered") {
-    rate = door ? settings.doorDoubleTemperedRate : settings.doubleTemperedRate
+    rate = door ? (settings.doorDoubleTemperedRate ?? 0.50) : (settings.doubleTemperedRate ?? 0.50)
   } else if (item.product === "triple-tempered") {
-    rate = door ? settings.doorTripleTemperedRate : settings.tripleTemperedRate
+    rate = door ? (settings.doorTripleTemperedRate ?? 0.75) : (settings.tripleTemperedRate ?? 0.75)
   }
 
   return { rate, unit, show }
