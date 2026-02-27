@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2 } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -44,6 +44,14 @@ export default function EstimatesPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const showPreview = sidePanel === "preview"
   const showCustomize = sidePanel === "settings"
+
+  // Lock body scroll when mobile overlay panels are open
+  useEffect(() => {
+    if (sidePanel !== "none") {
+      document.body.style.overflow = "hidden"
+      return () => { document.body.style.overflow = "" }
+    }
+  }, [sidePanel])
   const [sigs, setSigs] = useState<{ client: string; rep: string }>({ client: "", rep: "" })
   const [addMenuRoom, setAddMenuRoom] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
@@ -118,7 +126,7 @@ export default function EstimatesPage() {
     }
   }, [est, logo, sigs])
 
-  const t = calcTotals(est, estCfg.gstRate, estCfg.qstRate)
+  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate), [est, estCfg.gstRate, estCfg.qstRate])
 
   // ═══ SEND — 2-step: PDF download + email modal ═══
   const [showSendModal, setShowSendModal] = useState(false)

@@ -112,13 +112,13 @@ export function EstimateCustomizePanel(props: Props) {
   const doorEntries = Object.entries(WINDOW_TYPES).filter(([, v]) => v.category === "door")
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[420px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[420px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]" style={{ touchAction: "pan-y" }}>
       <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100 dark:bg-slate-800 lg:rounded-t-xl border-b lg:border border-slate-200 dark:border-white/10">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Estimate Settings</span>
         <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
       </div>
 
-      <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
+      <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900" style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
         {/* ═══ SECTION 1: HEADER ═══ */}
         <Section icon={FileText} title="Estimate Header" open={!!open.header} onToggle={() => t("header")}>
           <div className={CLS.row}><span className="text-[11px]">Date</span><Toggle on={s.showDate} onToggle={() => uSet({ showDate: !s.showDate })} /></div>
