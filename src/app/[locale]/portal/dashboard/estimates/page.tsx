@@ -110,7 +110,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} settings={estCfg} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -139,7 +139,7 @@ export default function EstimatesPage() {
     // Auto-generate and download PDF
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} settings={estCfg} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -426,8 +426,8 @@ export default function EstimatesPage() {
                     </div>
 
                     {/* Footer: qty + unit price + calculated price + line total + delete */}
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex-wrap gap-y-2">
-                      <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-end justify-between mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex-wrap gap-y-2">
+                      <div className="flex items-end gap-3 flex-wrap">
                         <div className="w-16"><label className={C.lbl}>Qty</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
                         <div className="w-28"><label className={C.lbl}>Unit Price</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
                         {(() => {
@@ -436,12 +436,11 @@ export default function EstimatesPage() {
                           const calcPrice = computeCalculatedPrice(item, glassInfo.rate, glassInfo.unit)
                           const unitLabel = GLASS_RATE_UNITS.find(u => u.id === glassInfo.unit)?.short || "/sq in"
                           return (
-                            <div className="w-36">
+                            <div className="w-36 print:hidden">
                               <label className={C.lbl}>Calculated Price</label>
-                              <div className="px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                              <div className="px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-sm font-bold text-emerald-700 dark:text-emerald-400" title={`${item.width}×${item.height} @ ${fmt(glassInfo.rate)}${unitLabel}`}>
                                 {fmt(calcPrice)}
                               </div>
-                              <p className="text-[9px] text-slate-400 mt-0.5">{item.width}×{item.height} @ {fmt(glassInfo.rate)}{unitLabel}</p>
                             </div>
                           )
                         })()}

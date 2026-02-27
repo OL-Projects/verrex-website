@@ -5,10 +5,7 @@ import { EstimateWindowSVGPDF } from "./estimate-window-svg-pdf"
 import {
   type EstimateState,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt,
-  computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS,
-  type GlassRateUnit,
 } from "@/lib/estimate-config"
-import type { EstimateSettings } from "@/lib/estimate-hooks"
 
 const s = StyleSheet.create({
   page: { padding: 40, fontSize: 9, fontFamily: "Helvetica", color: "#0f172a" },
@@ -64,23 +61,9 @@ interface Props {
   est: EstimateState
   logo?: string
   sigs?: { client: string; rep: string }
-  settings?: Partial<EstimateSettings>
 }
 
-// Default settings for glass pricing (used when settings prop not provided)
-const defaultGlassSettings = {
-  showCalculatedPrice: true,
-  glassRateUnit: "sqin" as GlassRateUnit,
-  doubleTemperedRate: 0.50,
-  tripleTemperedRate: 0.75,
-  doorShowCalculatedPrice: true,
-  doorGlassRateUnit: "sqin" as GlassRateUnit,
-  doorDoubleTemperedRate: 0.50,
-  doorTripleTemperedRate: 0.75,
-}
-
-export function EstimatePDFDocument({ est, logo, sigs, settings }: Props) {
-  const cfg = { ...defaultGlassSettings, ...settings }
+export function EstimatePDFDocument({ est, logo, sigs }: Props) {
   const t = calcTotals(est)
   let gi = 0
 
@@ -152,17 +135,6 @@ export function EstimatePDFDocument({ est, logo, sigs, settings }: Props) {
                       EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}
                     </Text>
                     {item.notes ? <Text style={s.itemNotes}>{item.notes}</Text> : null}
-                    {(() => {
-                      const glassInfo = getGlassRateForItem(item, cfg)
-                      if (!glassInfo.show || glassInfo.rate <= 0) return null
-                      const calcPrice = computeCalculatedPrice(item, glassInfo.rate, glassInfo.unit)
-                      const unitLabel = GLASS_RATE_UNITS.find(u => u.id === glassInfo.unit)?.short || "/sq in"
-                      return (
-                        <Text style={{ fontSize: 7, color: "#059669", fontWeight: "bold", marginTop: 1, fontFamily: "Helvetica-Bold" }}>
-                          Glass Calc: {fmt(calcPrice)} ({item.width}×{item.height} @ {fmt(glassInfo.rate)}{unitLabel})
-                        </Text>
-                      )
-                    })()}
                     <Text style={s.itemPrice}>×{item.qty} — {fmt(item.qty * item.unitPrice)}</Text>
                   </View>
                 </View>
