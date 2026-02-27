@@ -41,6 +41,7 @@ export default function EstimatesPage() {
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const logoRef = useRef<HTMLInputElement>(null)
   const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const showPreview = sidePanel === "preview"
   const showCustomize = sidePanel === "settings"
   const [sigs, setSigs] = useState<{ client: string; rep: string }>({ client: "", rep: "" })
@@ -215,7 +216,8 @@ export default function EstimatesPage() {
     <div className="lg:flex gap-4 items-start pb-24 max-w-none">
     {/* ═══ LEFT SIDEBAR ═══ */}
     <EstimateLeftSidebar records={records} activeId={activeId} saveStatus={saveStatus}
-      onNew={handleNewEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate} />
+      onNew={handleNewEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate}
+      mobileOpen={sidebarOpen} onMobileToggle={() => setSidebarOpen(p => !p)} />
     <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
