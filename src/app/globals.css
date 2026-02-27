@@ -650,3 +650,11 @@ html {
     margin: 0.5in;
   }
 }
+
+/* ===== MOBILE INPUT ZOOM FIX ===== */
+/* iOS Safari zooms when font-size < 16px on inputs. Force 16px minimum on mobile. */
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}

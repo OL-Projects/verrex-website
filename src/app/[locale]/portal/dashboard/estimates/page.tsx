@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Palette, Grid3X3, Printer, Eye, Share2 } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop } from "lucide-react"
+import { useTheme } from "next-themes"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
@@ -32,7 +33,18 @@ export default function EstimatesPage() {
   const logoRef = useRef<HTMLInputElement>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [showCustomize, setShowCustomize] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [sigs, setSigs] = useState<{ client: string; rep: string }>({ client: "", rep: "" })
+  const [addMenuRoom, setAddMenuRoom] = useState<string | null>(null)
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === "dark"
+
+  // Load saved signatures
+  useEffect(() => {
+    try { const s = localStorage.getItem("vx_sigs"); if (s) setSigs(JSON.parse(s)) } catch {}
+  }, [])
+  const saveSig = useCallback((who: "client" | "rep", data: string) => {
+    setSigs(p => { const n = { ...p, [who]: data }; localStorage.setItem("vx_sigs", JSON.stringify(n)); return n })
+  }, [])
 
   // Merge company info on mount
   useState(() => { setEst(p => ({ ...p, company: { ...p.company, ...coInfo, logoUrl: logo || p.company.logoUrl } })) })
@@ -159,7 +171,22 @@ export default function EstimatesPage() {
                   {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
                 </button>
                 <input value={room.name} onChange={e => updateRoom(room.id, { name: e.target.value })} className="text-xs font-extrabold uppercase tracking-[3px] text-slate-700 dark:text-slate-300 bg-transparent outline-none flex-1 border-b-2 border-slate-800 dark:border-white/20 pb-1" />
-                <button onClick={() => addItemToRoom(room.id)} className="text-xs text-blue-600 font-semibold hover:underline print:hidden">+ Window</button>
+                <div className="relative print:hidden">
+                  <button onClick={() => setAddMenuRoom(addMenuRoom === room.id ? null : room.id)} className="text-xs text-blue-600 font-semibold hover:underline">+ Add Item</button>
+                  {addMenuRoom === room.id && (
+                    <div className="absolute right-0 top-7 z-30 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-white/15 p-1.5 flex gap-1">
+                      <button onClick={() => { addItemToRoom(room.id); setAddMenuRoom(null) }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+                        <PanelTop className="h-4 w-4 text-blue-500" /> Window
+                      </button>
+                      <button onClick={() => {
+                        setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === room.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-R-IN", width: 36, height: 80 }] } : r) }))
+                        setAddMenuRoom(null)
+                      }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition">
+                        <DoorOpen className="h-4 w-4 text-amber-600" /> Door
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <button onClick={() => delRoom(room.id)} className="text-xs text-red-400 hover:text-red-600 transition print:hidden">Remove</button>
               </div>
 
@@ -307,9 +334,53 @@ export default function EstimatesPage() {
           <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
             <p className={C.lbl}>Acceptance & Signatures</p>
             <p className="mb-6 text-xs">By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.</p>
-            <div className="grid grid-cols-2 gap-12 mt-8">
-              <div className="min-h-[80px] border-b border-slate-800 dark:border-slate-300"><p className="text-[11px] mt-[76px]">Client Signature & Date</p></div>
-              <div className="min-h-[80px] border-b border-slate-800 dark:border-slate-300"><p className="text-[11px] mt-[76px]">Representative Signature & Date</p></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-12 mt-8">
+              {(["client", "rep"] as const).map(who => (
+                <div key={who}>
+                  <div className="min-h-[80px] border-b-2 border-slate-800 dark:border-slate-300 relative group cursor-pointer"
+                    onClick={() => {
+                      const canvas = document.createElement("canvas"); canvas.width = 500; canvas.height = 150
+                      const ctx = canvas.getContext("2d"); if (!ctx) return
+                      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 500, 150)
+                      const overlay = document.createElement("div")
+                      overlay.style.cssText = "position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);gap:12px"
+                      const inner = document.createElement("div"); inner.style.cssText = "background:#fff;border-radius:16px;padding:20px;text-align:center"
+                      inner.innerHTML = `<p style="font-size:14px;font-weight:700;margin-bottom:8px">${who === "client" ? "Client" : "Representative"} Signature</p><p style="font-size:11px;color:#666;margin-bottom:12px">Draw your signature below</p>`
+                      inner.appendChild(canvas); canvas.style.cssText = "border:2px solid #e2e8f0;border-radius:8px;cursor:crosshair;touch-action:none"
+                      const btnRow = document.createElement("div"); btnRow.style.cssText = "display:flex;gap:8px;margin-top:12px;justify-content:center"
+                      const btnClear = document.createElement("button"); btnClear.textContent = "Clear"; btnClear.style.cssText = "padding:8px 20px;border-radius:8px;border:1px solid #ccc;font-size:13px;font-weight:600;cursor:pointer"
+                      const btnSave = document.createElement("button"); btnSave.textContent = "Save"; btnSave.style.cssText = "padding:8px 20px;border-radius:8px;background:#1e40af;color:#fff;font-size:13px;font-weight:600;cursor:pointer"
+                      const btnCancel = document.createElement("button"); btnCancel.textContent = "Cancel"; btnCancel.style.cssText = "padding:8px 20px;border-radius:8px;border:1px solid #ccc;font-size:13px;cursor:pointer"
+                      btnRow.append(btnClear, btnSave, btnCancel); inner.appendChild(btnRow); overlay.appendChild(inner); document.body.appendChild(overlay)
+                      let drawing = false
+                      const getPos = (e: MouseEvent | TouchEvent) => {
+                        const r = canvas.getBoundingClientRect(); const t = "touches" in e ? e.touches[0] : e
+                        return { x: (t.clientX - r.left) * (500 / r.width), y: (t.clientY - r.top) * (150 / r.height) }
+                      }
+                      const start = (e: MouseEvent | TouchEvent) => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y) }
+                      const move = (e: MouseEvent | TouchEvent) => { if (!drawing) return; e.preventDefault(); const p = getPos(e); ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#000"; ctx.lineTo(p.x, p.y); ctx.stroke() }
+                      const end = () => { drawing = false }
+                      canvas.addEventListener("mousedown", start); canvas.addEventListener("mousemove", move); canvas.addEventListener("mouseup", end)
+                      canvas.addEventListener("touchstart", start, { passive: false }); canvas.addEventListener("touchmove", move, { passive: false }); canvas.addEventListener("touchend", end)
+                      btnClear.onclick = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 500, 150) }
+                      btnSave.onclick = () => { saveSig(who, canvas.toDataURL("image/png")); document.body.removeChild(overlay) }
+                      btnCancel.onclick = () => { document.body.removeChild(overlay) }
+                      overlay.onclick = (e) => { if (e.target === overlay) document.body.removeChild(overlay) }
+                    }}>
+                    {sigs[who] ? (
+                      <img src={sigs[who]} alt={`${who} signature`} className="h-[76px] w-full object-contain" />
+                    ) : (
+                      <div className="h-[76px] flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition">
+                        <span className="text-xs font-medium print:hidden">Click to sign</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-[11px]">{who === "client" ? "Client" : "Representative"} Signature & Date</p>
+                    {sigs[who] && <button onClick={(e) => { e.stopPropagation(); saveSig(who, "") }} className="text-[10px] text-red-400 hover:text-red-600 print:hidden">Clear</button>}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -321,37 +392,26 @@ export default function EstimatesPage() {
     {showPreview && <EstimatePreviewPanel est={est} logo={logo} onClose={() => setShowPreview(false)} />}
     </div>
 
-    {/* ═══ STICKY BAR ═══ */}
-    <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-2.5 px-4 flex items-center justify-center gap-2 z-50 print:hidden">
-      {/* Left group */}
-      <button onClick={() => setDarkMode(!darkMode)} className="p-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition" title={darkMode ? "Light Mode" : "Dark Mode"}>
-        {darkMode ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
-      </button>
-      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Document Style">
-        <Palette className="h-4 w-4 text-pink-500" /><span className="hidden sm:inline">Document</span>
-      </button>
-      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Diagram Settings">
-        <Grid3X3 className="h-4 w-4 text-blue-500" /><span className="hidden sm:inline">Diagrams</span>
-      </button>
-      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Print Settings">
-        <Printer className="h-4 w-4 text-slate-500" /><span className="hidden sm:inline">Print</span>
-      </button>
-
-      <div className="w-px h-7 bg-slate-300 dark:bg-white/15 mx-1" />
-
-      {/* Right group */}
-      <button onClick={resetAll} className="px-4 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
-        <RotateCcw className="h-4 w-4" /> Reset
-      </button>
-      <button onClick={() => setShowPreview(p => !p)} className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border-2 border-slate-800 dark:border-white/20 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
-        <Eye className="h-4 w-4" /> Preview
-      </button>
-      <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Print / Save as PDF via browser">
-        <Share2 className="h-4 w-4" /> Print
-      </button>
-      <button onClick={exportPDF} className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Download as PDF file">
-        <Download className="h-4 w-4" /> Export PDF
-      </button>
+    {/* ═══ STICKY BAR — mobile-safe, no overflow ═══ */}
+    <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-2 px-3 z-50 print:hidden">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-4xl mx-auto">
+        <button onClick={() => setTheme(isDark ? "light" : "dark")} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition" title={isDark ? "Light Mode" : "Dark Mode"}>
+          {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
+        </button>
+        <button onClick={() => setShowCustomize(true)} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Settings">
+          <Settings className="h-4 w-4 text-slate-500" /><span className="hidden sm:inline">Settings</span>
+        </button>
+        <button onClick={resetAll} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
+          <RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">Reset</span>
+        </button>
+        <div className="w-px h-6 bg-slate-300 dark:bg-white/15 hidden sm:block" />
+        <button onClick={() => setShowPreview(p => !p)} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
+          <Eye className="h-4 w-4" /><span className="hidden sm:inline">Preview</span>
+        </button>
+        <button onClick={exportPDF} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Download as PDF file">
+          <Download className="h-4 w-4" /><span className="hidden xs:inline">Export PDF</span>
+        </button>
+      </div>
     </div>
 
     {/* ═══ CUSTOMIZE PANEL ═══ */}
