@@ -35,8 +35,9 @@ export default function EstimatesPage() {
   const { remember, suggestions } = useAutocomplete()
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const logoRef = useRef<HTMLInputElement>(null)
-  const [showPreview, setShowPreview] = useState(false)
-  const [showCustomize, setShowCustomize] = useState(false)
+  const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
+  const showPreview = sidePanel === "preview"
+  const showCustomize = sidePanel === "settings"
   const [sigs, setSigs] = useState<{ client: string; rep: string }>({ client: "", rep: "" })
   const [addMenuRoom, setAddMenuRoom] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
@@ -120,8 +121,8 @@ export default function EstimatesPage() {
 
   return (
     <>
-    <div className={`lg:flex gap-6 items-start pb-24 ${showPreview ? "max-w-none" : "max-w-4xl"}`}>
-    <div className={`flex-1 space-y-5 ${showPreview ? "max-w-3xl" : "max-w-4xl"}`}>
+    <div className={`lg:flex gap-6 items-start pb-24 ${sidePanel !== "none" ? "max-w-none" : "max-w-4xl"}`}>
+    <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText className="h-6 w-6 text-blue-500" /> Estimate Creator</h1>
@@ -428,7 +429,22 @@ export default function EstimatesPage() {
     </div>
 
     {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
-    {showPreview && <EstimatePreviewPanel est={est} logo={logo} sigs={sigs} onClose={() => setShowPreview(false)} />}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo} sigs={sigs} onClose={() => setSidePanel("none")} />}
+    {showCustomize && <EstimateCustomizePanel
+      onClose={() => setSidePanel("none")}
+      style={estStyle} onUpdateStyle={updateStyle}
+      settings={estCfg} onUpdateSettings={estSettings.update}
+      onToggleWindowType={estSettings.toggleWindowType}
+      onToggleDoorType={estSettings.toggleDoorType}
+      onToggleProduct={estSettings.toggleProduct}
+      onAddCustomWindowType={estSettings.addCustomWindowType} onRemoveCustomWindowType={estSettings.removeCustomWindowType}
+      onAddCustomDoorType={estSettings.addCustomDoorType} onRemoveCustomDoorType={estSettings.removeCustomDoorType}
+      onAddCustomProduct={estSettings.addCustomProduct} onRemoveCustomProduct={estSettings.removeCustomProduct}
+      extColors={colors.ext} intColors={colors.int}
+      onAddExt={colors.addExt} onRemoveExt={colors.removeExt}
+      onAddInt={colors.addInt} onRemoveInt={colors.removeInt}
+      onReset={() => { resetStyle(); estSettings.reset() }}
+    />}
     </div>
 
     {/* ═══ STICKY BAR — mobile-safe, no overflow ═══ */}
@@ -437,14 +453,14 @@ export default function EstimatesPage() {
         <button onClick={() => setTheme(isDark ? "light" : "dark")} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition" title={isDark ? "Light Mode" : "Dark Mode"}>
           {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
         </button>
-        <button onClick={() => setShowCustomize(true)} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Settings">
-          <Settings className="h-4 w-4 text-slate-500" /><span className="hidden sm:inline">Settings</span>
+        <button onClick={() => setSidePanel(p => p === "settings" ? "none" : "settings")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showCustomize ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`} title="Settings">
+          <Settings className="h-4 w-4" /><span className="hidden sm:inline">Settings</span>
         </button>
         <button onClick={resetAll} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
           <RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">Reset</span>
         </button>
         <div className="w-px h-6 bg-slate-300 dark:bg-white/15 hidden sm:block" />
-        <button onClick={() => setShowPreview(p => !p)} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
+        <button onClick={() => setSidePanel(p => p === "preview" ? "none" : "preview")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
           <Eye className="h-4 w-4" /><span className="hidden sm:inline">Preview</span>
         </button>
         <button onClick={exportPDF} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Export / Save as PDF">
@@ -456,19 +472,6 @@ export default function EstimatesPage() {
       </div>
     </div>
 
-    {/* ═══ CUSTOMIZE PANEL ═══ */}
-    <EstimateCustomizePanel
-      open={showCustomize} onClose={() => setShowCustomize(false)}
-      style={estStyle} onUpdateStyle={updateStyle}
-      settings={estCfg} onUpdateSettings={estSettings.update}
-      onToggleWindowType={estSettings.toggleWindowType}
-      onToggleDoorType={estSettings.toggleDoorType}
-      onToggleProduct={estSettings.toggleProduct}
-      extColors={colors.ext} intColors={colors.int}
-      onAddExt={colors.addExt} onRemoveExt={colors.removeExt}
-      onAddInt={colors.addInt} onRemoveInt={colors.removeInt}
-      onReset={() => { resetStyle(); estSettings.reset() }}
-    />
     </>
   )
 }

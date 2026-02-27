@@ -111,18 +111,34 @@ export function useEstimateStyle() {
 }
 
 // ── 5. Estimate Settings (field visibility, enabled types, etc.) ────
+export interface CustomOption { id: string; label: string }
+
 export interface EstimateSettings {
   // Header card
   showDate: boolean
   showValidUntil: boolean
   showRequiredBy: boolean
   showRepSection: boolean
+  showClientName: boolean
+  showClientAddress: boolean
+  showClientCity: boolean
+  showClientPhone: boolean
+  showClientEmail: boolean
+  showShipAddress: boolean
+  showShipPhone: boolean
+  showShipMethod: boolean
+  soldToLabel: string
+  shipToLabel: string
+  customShipMethods: string[]
   // Window card
   showDepth: boolean
   enabledWindowTypes: string[]
   enabledProducts: string[]
+  customWindowTypes: CustomOption[]
+  customProducts: CustomOption[]
   // Door card
   enabledDoorTypes: string[]
+  customDoorTypes: CustomOption[]
   // Pricing summary
   showInstallation: boolean
   showDelivery: boolean
@@ -130,14 +146,19 @@ export interface EstimateSettings {
   showQST: boolean
   showDeposit: boolean
   showTerms: boolean
+  showBalance: boolean
+  gstRate: number
+  qstRate: number
+  summaryTitle: string
 }
 
 function defaultSettings(): EstimateSettings {
   return {
-    showDate: true,
-    showValidUntil: true,
-    showRequiredBy: true,
-    showRepSection: true,
+    showDate: true, showValidUntil: true, showRequiredBy: true, showRepSection: true,
+    showClientName: true, showClientAddress: true, showClientCity: true, showClientPhone: true, showClientEmail: true,
+    showShipAddress: true, showShipPhone: true, showShipMethod: true,
+    soldToLabel: "Sold To", shipToLabel: "Ship To",
+    customShipMethods: [],
     showDepth: true,
     enabledWindowTypes: [
       "FIX", "TOP-HUNG", "SLIDER", "CAS-L", "CAS-R", "TT-L", "TT-R",
@@ -145,16 +166,16 @@ function defaultSettings(): EstimateSettings {
       "CAS-L+FIX+FIX", "FIX+FIX+FIX", "FIX+FIX+CAS-R", "CAS-L+FIX+FIX+FIX",
     ],
     enabledProducts: ["hybrid", "pvc", "pvc-slider"],
+    customWindowTypes: [], customProducts: [],
     enabledDoorTypes: [
       "SWING-L-IN", "SWING-R-IN", "SWING-L-OUT", "SWING-R-OUT", "SWING-FRENCH",
       "SLIDE-DOOR-2", "SLIDE-DOOR-3", "FOLD-2", "FOLD-4",
     ],
-    showInstallation: true,
-    showDelivery: true,
-    showGST: true,
-    showQST: true,
-    showDeposit: true,
-    showTerms: true,
+    customDoorTypes: [],
+    showInstallation: true, showDelivery: true,
+    showGST: true, showQST: true, showDeposit: true, showTerms: true, showBalance: true,
+    gstRate: 5, qstRate: 9.975,
+    summaryTitle: "Pricing Summary",
   }
 }
 
@@ -192,7 +213,39 @@ export function useEstimateSettings() {
     })
   }, [])
 
-  return { settings, update, reset, toggleWindowType, toggleDoorType, toggleProduct }
+  const addCustomWindowType = useCallback((label: string) => {
+    setSettings(p => ({ ...p, customWindowTypes: [...p.customWindowTypes, { id: `cwt_${Date.now()}`, label }] }))
+  }, [])
+  const removeCustomWindowType = useCallback((id: string) => {
+    setSettings(p => ({ ...p, customWindowTypes: p.customWindowTypes.filter(c => c.id !== id) }))
+  }, [])
+  const addCustomDoorType = useCallback((label: string) => {
+    setSettings(p => ({ ...p, customDoorTypes: [...p.customDoorTypes, { id: `cdt_${Date.now()}`, label }] }))
+  }, [])
+  const removeCustomDoorType = useCallback((id: string) => {
+    setSettings(p => ({ ...p, customDoorTypes: p.customDoorTypes.filter(c => c.id !== id) }))
+  }, [])
+  const addCustomProduct = useCallback((label: string) => {
+    setSettings(p => ({ ...p, customProducts: [...p.customProducts, { id: `cp_${Date.now()}`, label }] }))
+  }, [])
+  const removeCustomProduct = useCallback((id: string) => {
+    setSettings(p => ({ ...p, customProducts: p.customProducts.filter(c => c.id !== id) }))
+  }, [])
+  const addShipMethod = useCallback((method: string) => {
+    setSettings(p => ({ ...p, customShipMethods: [...p.customShipMethods, method] }))
+  }, [])
+  const removeShipMethod = useCallback((method: string) => {
+    setSettings(p => ({ ...p, customShipMethods: p.customShipMethods.filter(m => m !== method) }))
+  }, [])
+
+  return {
+    settings, update, reset,
+    toggleWindowType, toggleDoorType, toggleProduct,
+    addCustomWindowType, removeCustomWindowType,
+    addCustomDoorType, removeCustomDoorType,
+    addCustomProduct, removeCustomProduct,
+    addShipMethod, removeShipMethod,
+  }
 }
 
 // ── 6. Logo (persisted base64) ──────────────────
