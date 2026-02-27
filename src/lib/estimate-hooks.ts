@@ -110,7 +110,92 @@ export function useEstimateStyle() {
   return { style, update, reset, setStyle }
 }
 
-// ── 5. Logo (persisted base64) ──────────────────
+// ── 5. Estimate Settings (field visibility, enabled types, etc.) ────
+export interface EstimateSettings {
+  // Header card
+  showDate: boolean
+  showValidUntil: boolean
+  showRequiredBy: boolean
+  showRepSection: boolean
+  // Window card
+  showDepth: boolean
+  enabledWindowTypes: string[]
+  enabledProducts: string[]
+  // Door card
+  enabledDoorTypes: string[]
+  // Pricing summary
+  showInstallation: boolean
+  showDelivery: boolean
+  showGST: boolean
+  showQST: boolean
+  showDeposit: boolean
+  showTerms: boolean
+}
+
+function defaultSettings(): EstimateSettings {
+  return {
+    showDate: true,
+    showValidUntil: true,
+    showRequiredBy: true,
+    showRepSection: true,
+    showDepth: true,
+    enabledWindowTypes: [
+      "FIX", "TOP-HUNG", "SLIDER", "CAS-L", "CAS-R", "TT-L", "TT-R",
+      "CAS-L+FIX", "FIX+CAS-R", "TT-L+FIX", "FIX+TT-R",
+      "CAS-L+FIX+FIX", "FIX+FIX+FIX", "FIX+FIX+CAS-R", "CAS-L+FIX+FIX+FIX",
+    ],
+    enabledProducts: ["hybrid", "pvc", "pvc-slider"],
+    enabledDoorTypes: [
+      "SWING-L-IN", "SWING-R-IN", "SWING-L-OUT", "SWING-R-OUT", "SWING-FRENCH",
+      "SLIDE-DOOR-2", "SLIDE-DOOR-3", "FOLD-2", "FOLD-4",
+    ],
+    showInstallation: true,
+    showDelivery: true,
+    showGST: true,
+    showQST: true,
+    showDeposit: true,
+    showTerms: true,
+  }
+}
+
+const SETTINGS_KEY = "verrex_estimate_settings"
+export function useEstimateSettings() {
+  const [settings, setSettings] = useState<EstimateSettings>(() => readLS(SETTINGS_KEY, defaultSettings()))
+  useEffect(() => { writeLS(SETTINGS_KEY, settings) }, [settings])
+  const update = useCallback((patch: Partial<EstimateSettings>) => setSettings(p => ({ ...p, ...patch })), [])
+  const reset = useCallback(() => setSettings(defaultSettings()), [])
+
+  const toggleWindowType = useCallback((key: string) => {
+    setSettings(p => {
+      const arr = p.enabledWindowTypes.includes(key)
+        ? p.enabledWindowTypes.filter(k => k !== key)
+        : [...p.enabledWindowTypes, key]
+      return { ...p, enabledWindowTypes: arr }
+    })
+  }, [])
+
+  const toggleDoorType = useCallback((key: string) => {
+    setSettings(p => {
+      const arr = p.enabledDoorTypes.includes(key)
+        ? p.enabledDoorTypes.filter(k => k !== key)
+        : [...p.enabledDoorTypes, key]
+      return { ...p, enabledDoorTypes: arr }
+    })
+  }, [])
+
+  const toggleProduct = useCallback((id: string) => {
+    setSettings(p => {
+      const arr = p.enabledProducts.includes(id)
+        ? p.enabledProducts.filter(k => k !== id)
+        : [...p.enabledProducts, id]
+      return { ...p, enabledProducts: arr }
+    })
+  }, [])
+
+  return { settings, update, reset, toggleWindowType, toggleDoorType, toggleProduct }
+}
+
+// ── 6. Logo (persisted base64) ──────────────────
 const LOGO_KEY = "verrex_logo"
 export function useLogo() {
   const [logo, setLogo] = useState<string>(() => readLS(LOGO_KEY, ""))

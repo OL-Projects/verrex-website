@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send } from "lucide-react"
 import { useTheme } from "next-themes"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
-import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
+import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings } from "@/lib/estimate-hooks"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
 import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel"
 import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
@@ -26,7 +26,10 @@ export default function EstimatesPage() {
   const [est, setEst] = useState<EstimateState>(createBlankEstimate)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const pdfRef = useRef<HTMLDivElement>(null)
-  const { extNames, intNames } = useColorPresets()
+  const colors = useColorPresets()
+  const { extNames, intNames } = colors
+  const estSettings = useEstimateSettings()
+  const { settings: estCfg } = estSettings
   const { info: coInfo } = useCompanyInfo()
   const { logo, uploadLogo, clearLogo } = useLogo()
   const { remember, suggestions } = useAutocomplete()
@@ -155,12 +158,12 @@ export default function EstimatesPage() {
                 </div>
               </div>
             </div>
-            <div className="text-right space-y-1.5 min-w-[200px]">
+            <div className="text-right space-y-1.5 w-full sm:min-w-[200px] sm:w-auto">
               <p className={C.lbl}>Estimate #</p>
               <input value={est.estimateNumber} onChange={e => set("estimateNumber", e.target.value)} className="text-lg font-extrabold text-slate-900 dark:text-white bg-transparent outline-none text-right w-full border-b border-dashed border-slate-300 dark:border-white/20 focus:border-blue-500 print:border-none" />
-              <div><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={C.inp} /></div>
-              <div><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={C.inp} /></div>
-              <div><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={C.inp} /></div>
+              {estCfg.showDate && <div><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
+              {estCfg.showValidUntil && <div><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
+              {estCfg.showRequiredBy && <div><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
             </div>
           </div>
 
@@ -180,10 +183,12 @@ export default function EstimatesPage() {
               <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={C.sel}><option>PICKUP</option><option>DELIVERY</option></select>
               <input placeholder="Address" value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={C.inp} />
               <input placeholder="Phone" value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={C.inp} />
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-2">Representative</p>
-              <input list="dl_rep" placeholder="Rep Name" value={est.repName} onChange={e => set("repName", e.target.value)} onBlur={e => handleBlur("repName", e.target.value)} className={C.inp} />
-              <datalist id="dl_rep">{suggestions("repName").map(s => <option key={s} value={s} />)}</datalist>
-              <input placeholder="Reference" value={est.repRef} onChange={e => set("repRef", e.target.value)} className={C.inp} />
+              {estCfg.showRepSection && (<>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-2">Representative</p>
+                <input list="dl_rep" placeholder="Rep Name" value={est.repName} onChange={e => set("repName", e.target.value)} onBlur={e => handleBlur("repName", e.target.value)} className={C.inp} />
+                <datalist id="dl_rep">{suggestions("repName").map(s => <option key={s} value={s} />)}</datalist>
+                <input placeholder="Reference" value={est.repRef} onChange={e => set("repRef", e.target.value)} className={C.inp} />
+              </>)}
             </div>
           </div>
         </div>
@@ -254,21 +259,27 @@ export default function EstimatesPage() {
                             if (!isDoorType(newType) && isDoorType(item.type)) { patch.height = 48; patch.width = 48 }
                             updateItem(room.id, item.id, patch)
                           }} className={C.sel}>
-                            {getTypeGroups().map(g => (
-                              <optgroup key={g.group} label={g.group}>
-                                {g.types.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-                              </optgroup>
-                            ))}
+                            {getTypeGroups().map(g => {
+                              const filtered = g.types.filter(([k, v]) =>
+                                v.category === "window" ? estCfg.enabledWindowTypes.includes(k) : estCfg.enabledDoorTypes.includes(k)
+                              )
+                              if (filtered.length === 0) return null
+                              return (
+                                <optgroup key={g.group} label={g.group}>
+                                  {filtered.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                                </optgroup>
+                              )
+                            })}
                           </select>
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className={`grid gap-2 ${estCfg.showDepth ? "grid-cols-3" : "grid-cols-2"}`}>
                           <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
                           <div><label className={C.lbl}>Height</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
-                          <div><label className={C.lbl}>Depth</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>
+                          {estCfg.showDepth && <div><label className={C.lbl}>Depth</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
                         </div>
                         <div><label className={C.lbl}>Product</label>
                           <select value={item.product} onChange={e => updateItem(room.id, item.id, { product: e.target.value })} className={C.sel}>
-                            {PRODUCTS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                            {PRODUCTS.filter(p => estCfg.enabledProducts.includes(p.id)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
                           </select>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -336,21 +347,21 @@ export default function EstimatesPage() {
           <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * it.unitPrice)}</span></div> })) })()}</div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
-            <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>
-            <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>
+            {estCfg.showInstallation && <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
+            {estCfg.showDelivery && <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
-          <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST (5%)</span><span>{fmt(t.gst)}</span></div>
-          <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST (9.975%)</span><span>{fmt(t.qst)}</span></div>
+          {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST (5%)</span><span>{fmt(t.gst)}</span></div>}
+          {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST (9.975%)</span><span>{fmt(t.qst)}</span></div>}
           <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
-          <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm items-center">
+          {estCfg.showDeposit && <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm items-center">
             <span>Deposit Required: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</span>
             <span className="font-bold">{fmt(t.deposit)}</span>
-          </div>
+          </div>}
         </div>
 
         {/* ═══ TERMS (editable) ═══ */}
-        <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
+        {estCfg.showTerms && <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
           <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">Terms & Conditions</h2>
           <ol className="list-decimal pl-5 space-y-1.5">
             {est.termsLines.map((line, i) => (
@@ -411,7 +422,7 @@ export default function EstimatesPage() {
               ))}
             </div>
           </div>
-        </div>
+        </div>}
       </div>
 
     </div>
@@ -446,7 +457,18 @@ export default function EstimatesPage() {
     </div>
 
     {/* ═══ CUSTOMIZE PANEL ═══ */}
-    <EstimateCustomizePanel open={showCustomize} onClose={() => setShowCustomize(false)} style={estStyle} onUpdate={updateStyle} onReset={resetStyle} />
+    <EstimateCustomizePanel
+      open={showCustomize} onClose={() => setShowCustomize(false)}
+      style={estStyle} onUpdateStyle={updateStyle}
+      settings={estCfg} onUpdateSettings={estSettings.update}
+      onToggleWindowType={estSettings.toggleWindowType}
+      onToggleDoorType={estSettings.toggleDoorType}
+      onToggleProduct={estSettings.toggleProduct}
+      extColors={colors.ext} intColors={colors.int}
+      onAddExt={colors.addExt} onRemoveExt={colors.removeExt}
+      onAddInt={colors.addInt} onRemoveInt={colors.removeInt}
+      onReset={() => { resetStyle(); estSettings.reset() }}
+    />
     </>
   )
 }
