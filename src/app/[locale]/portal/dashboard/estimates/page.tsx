@@ -91,7 +91,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -161,7 +161,7 @@ export default function EstimatesPage() {
                     <ImagePlus className="h-5 w-5" />
                   </button>
                 )}
-                <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadLogo(e.target.files[0]) }} />
+                <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) { uploadLogo(e.target.files[0]); const reader = new FileReader(); reader.onload = () => { if (typeof reader.result === "string") setCompany("logoUrl", reader.result) }; reader.readAsDataURL(e.target.files[0]) } }} />
               </div>
               <div className="flex-1">
                 <input value={est.company.name} onChange={e => setCompany("name", e.target.value)} className="text-2xl font-extrabold text-slate-900 dark:text-white bg-transparent outline-none w-full" />
@@ -352,10 +352,20 @@ export default function EstimatesPage() {
           )
         })}
 
-        {/* Add room */}
-        <button onClick={addRoom} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-white/15 rounded-2xl text-sm font-semibold text-slate-500 hover:border-blue-500 hover:text-blue-500 transition print:hidden">
-          <Plus className="inline h-4 w-4 mr-1 -mt-0.5" /> Add Room
-        </button>
+        {/* Add buttons: Room / Window / Door */}
+        <div className="flex gap-2 print:hidden">
+          <button onClick={addRoom} className="flex-1 py-3 border-2 border-dashed border-slate-300 dark:border-white/15 rounded-2xl text-sm font-semibold text-slate-500 hover:border-blue-500 hover:text-blue-500 transition flex items-center justify-center gap-1.5">
+            <Plus className="h-4 w-4" /> Add Room
+          </button>
+          <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) addItemToRoom(last.id) }}
+            className="flex-1 py-3 border-2 border-dashed border-blue-300 dark:border-blue-500/30 rounded-2xl text-sm font-semibold text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition flex items-center justify-center gap-1.5">
+            <PanelTop className="h-4 w-4" /> Add Window
+          </button>
+          <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === last.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-R-IN", width: 36, height: 80 }] } : r) })) }}
+            className="flex-1 py-3 border-2 border-dashed border-amber-300 dark:border-amber-500/30 rounded-2xl text-sm font-semibold text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition flex items-center justify-center gap-1.5">
+            <DoorOpen className="h-4 w-4" /> Add Door
+          </button>
+        </div>
 
         {/* ═══ SUMMARY ═══ */}
         <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
@@ -379,7 +389,7 @@ export default function EstimatesPage() {
 
         {/* ═══ TERMS (editable) ═══ */}
         {estCfg.showTerms && <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">Terms & Conditions</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">{estCfg.termsTitle ?? "Terms & Conditions"}</h2>
           <ol className="list-decimal pl-5 space-y-1.5">
             {est.termsLines.map((line, i) => (
               <li key={i}><textarea rows={2} value={line} onChange={e => { const next = [...est.termsLines]; next[i] = e.target.value; set("termsLines", next) }} className="w-full bg-transparent outline-none resize-none text-xs print:bg-transparent" /></li>
@@ -387,7 +397,7 @@ export default function EstimatesPage() {
           </ol>
           <button onClick={() => set("termsLines", [...est.termsLines, ""])} className="text-blue-600 text-xs font-semibold mt-2 print:hidden">+ Add clause</button>
 
-          <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
+          {(estCfg.showSignatures ?? true) && <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
             <p className={C.lbl}>Acceptance & Signatures</p>
             <p className="mb-6 text-xs">By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-12 mt-8">
@@ -438,14 +448,14 @@ export default function EstimatesPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
         </div>}
       </div>
 
     </div>
 
     {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
-    {showPreview && <EstimatePreviewPanel est={est} logo={logo} sigs={sigs} onClose={() => setSidePanel("none")} />}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo || est.company.logoUrl} sigs={sigs} onClose={() => setSidePanel("none")} />}
     {showCustomize && <EstimateCustomizePanel
       onClose={() => setSidePanel("none")}
       style={estStyle} onUpdateStyle={updateStyle}

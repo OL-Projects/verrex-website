@@ -150,6 +150,10 @@ export interface EstimateSettings {
   gstRate: number
   qstRate: number
   summaryTitle: string
+  // Terms & Conditions
+  termsTitle: string
+  showSignatures: boolean
+  showSignatureDate: boolean
 }
 
 function defaultSettings(): EstimateSettings {
@@ -176,6 +180,9 @@ function defaultSettings(): EstimateSettings {
     showGST: true, showQST: true, showDeposit: true, showTerms: true, showBalance: true,
     gstRate: 5, qstRate: 9.975,
     summaryTitle: "Pricing Summary",
+    termsTitle: "Terms & Conditions",
+    showSignatures: true,
+    showSignatureDate: true,
   }
 }
 

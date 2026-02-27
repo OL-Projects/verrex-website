@@ -266,6 +266,14 @@ export function EstimateCustomizePanel(props: Props) {
           <div className={CLS.row}><span className="text-[11px]">Deposit</span><Toggle on={s.showDeposit} onToggle={() => uSet({ showDeposit: !s.showDeposit })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Balance Remaining</span><Toggle on={s.showBalance} onToggle={() => uSet({ showBalance: !s.showBalance })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Terms & Conditions</span><Toggle on={s.showTerms} onToggle={() => uSet({ showTerms: !s.showTerms })} /></div>
+          {s.showTerms && <>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>T&C Section Title</label>
+              <input value={s.termsTitle ?? "Terms & Conditions"} onChange={e => uSet({ termsTitle: e.target.value })} className={CLS.inp + " w-full"} />
+            </div>
+            <div className={CLS.row}><span className="text-[11px]">Signatures</span><Toggle on={s.showSignatures ?? true} onToggle={() => uSet({ showSignatures: !(s.showSignatures ?? true) })} /></div>
+            <div className={CLS.row}><span className="text-[11px]">Signature Date Label</span><Toggle on={s.showSignatureDate ?? true} onToggle={() => uSet({ showSignatureDate: !(s.showSignatureDate ?? true) })} /></div>
+          </>}
         </Section>
       </div>
 
