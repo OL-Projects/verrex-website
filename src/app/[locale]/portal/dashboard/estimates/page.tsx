@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send } from "lucide-react"
 import { useTheme } from "next-themes"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
@@ -70,21 +70,54 @@ export default function EstimatesPage() {
 
   const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
 
-  const exportPDF = useCallback(async () => {
-    const el = pdfRef.current
-    if (!el) return
-    const html2pdf = (await import("html2pdf.js")).default
-    html2pdf().set({
-      margin: [8, 8, 8, 8],
-      filename: `${est.company.name} - Estimate ${est.estimateNumber}.pdf`,
-      image: { type: "jpeg", quality: 0.96 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "letter", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-    }).from(el).save()
+  // ═══ PDF EXPORT — Uses window.print() which is 100% reliable ═══
+  // Forces light mode for clean PDF, then restores state after print
+  const exportPDF = useCallback(() => {
+    const wasDark = document.documentElement.classList.contains("dark")
+    // Force light mode for clean PDF rendering
+    if (wasDark) document.documentElement.classList.remove("dark")
+    // Set document title for PDF filename
+    const origTitle = document.title
+    document.title = `${est.company.name} - Estimate ${est.estimateNumber}`
+    // Small delay to let DOM repaint in light mode, then print
+    setTimeout(() => {
+      window.print()
+      // Restore after print dialog closes
+      const restore = () => {
+        document.title = origTitle
+        if (wasDark) document.documentElement.classList.add("dark")
+      }
+      // onafterprint fires when dialog closes (works in all modern browsers)
+      if ("onafterprint" in window) {
+        window.addEventListener("afterprint", restore, { once: true })
+      } else {
+        // Fallback for Safari: restore after 2s
+        setTimeout(restore, 2000)
+      }
+    }, 100)
   }, [est.company.name, est.estimateNumber])
 
   const t = calcTotals(est)
+
+  // ═══ SEND — mailto with estimate summary ═══
+  const sendEstimate = useCallback(() => {
+    const totals = calcTotals(est)
+    const email = est.clientEmail || ""
+    const subject = encodeURIComponent(`Estimate ${est.estimateNumber} — ${est.company.name}`)
+    const body = encodeURIComponent(
+      `Dear ${est.clientName || "Client"},\n\n` +
+      `Please find your estimate details below:\n\n` +
+      `Estimate #: ${est.estimateNumber}\n` +
+      `Date: ${est.date}\n` +
+      `Items: ${totals.items} (${totals.totalUnits} units)\n` +
+      `Total: ${fmt(totals.total)}\n` +
+      `Deposit Required: ${fmt(totals.deposit)}\n\n` +
+      `To view the full estimate with diagrams, please use the attached PDF.\n\n` +
+      `Tip: Before sending this email, click "Export PDF" in the estimate tool to download the PDF, then attach it to this email.\n\n` +
+      `Best regards,\n${est.repName || est.company.name}\n${est.company.phone}`
+    )
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_self")
+  }, [est])
   let globalIdx = 0
 
   return (
@@ -408,8 +441,11 @@ export default function EstimatesPage() {
         <button onClick={() => setShowPreview(p => !p)} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
           <Eye className="h-4 w-4" /><span className="hidden sm:inline">Preview</span>
         </button>
-        <button onClick={exportPDF} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Download as PDF file">
-          <Download className="h-4 w-4" /><span className="hidden xs:inline">Export PDF</span>
+        <button onClick={exportPDF} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Export / Save as PDF">
+          <Download className="h-4 w-4" /><span className="hidden sm:inline">Export PDF</span>
+        </button>
+        <button onClick={sendEstimate} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition flex items-center gap-1.5" title="Send estimate via email">
+          <Send className="h-4 w-4" /><span className="hidden sm:inline">Send</span>
         </button>
       </div>
     </div>
