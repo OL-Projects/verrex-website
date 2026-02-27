@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { type CompanyInfo, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "./estimate-config"
+import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "./estimate-config"
 
 // ── Generic localStorage helper ─────────────────
 function readLS<T>(key: string, fallback: T): T {
@@ -249,8 +249,6 @@ export function useEstimateSettings() {
 }
 
 // ── 6. Undo / Redo History ──────────────────────
-import type { EstimateState } from "./estimate-config"
-
 const MAX_HISTORY = 50
 
 export function useEstimateHistory(est: EstimateState, setEst: (e: EstimateState) => void) {
