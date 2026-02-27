@@ -583,3 +583,70 @@ html {
 .desktop-forced .lg\:pb-0 {
   padding-bottom: 0 !important;
 }
+
+/* ===== PRINT STYLES — Estimate PDF Export ===== */
+@media print {
+  /* Hide all portal chrome */
+  nav, header, aside, footer,
+  .print\:hidden,
+  [data-portal-sidebar],
+  [data-portal-topbar] {
+    display: none !important;
+  }
+
+  /* Reset page */
+  html, body {
+    background: white !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Remove dark mode overrides */
+  .dark * {
+    background-color: transparent !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Force white backgrounds on cards */
+  [class*="bg-white"],
+  [class*="backdrop-blur"] {
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  /* SVG colors — force dark for print */
+  svg text { fill: #0f172a !important; }
+  svg .text-slate-700, svg .text-slate-600, svg .text-slate-500 { color: #334155 !important; }
+  svg .text-slate-400 { color: #64748b !important; }
+  svg .text-slate-100 { color: #f8fafc !important; }
+
+  /* Make estimate fill the page */
+  .max-w-4xl, .max-w-3xl, .max-w-2xl, .max-w-none {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Remove shadows, blurs */
+  * {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Page breaks */
+  .rounded-2xl { page-break-inside: avoid; }
+
+  /* Remove transitions for clean render */
+  *, *::before, *::after {
+    transition: none !important;
+  }
+
+  @page {
+    size: letter portrait;
+    margin: 0.5in;
+  }
+}

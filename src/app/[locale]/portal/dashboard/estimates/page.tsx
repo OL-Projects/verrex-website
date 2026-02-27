@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Palette, Grid3X3, Printer, Eye } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Palette, Grid3X3, Printer, Eye, Share2 } from "lucide-react"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
@@ -346,7 +346,10 @@ export default function EstimatesPage() {
       <button onClick={() => setShowPreview(p => !p)} className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border-2 border-slate-800 dark:border-white/20 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
         <Eye className="h-4 w-4" /> Preview
       </button>
-      <button onClick={exportPDF} className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5">
+      <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Print / Save as PDF via browser">
+        <Share2 className="h-4 w-4" /> Print
+      </button>
+      <button onClick={exportPDF} className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Download as PDF file">
         <Download className="h-4 w-4" /> Export PDF
       </button>
     </div>
