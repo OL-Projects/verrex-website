@@ -3,6 +3,23 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
 
+// ── App Version Migration ───────────────────────
+const APP_DEFAULTS_VERSION = "v2"
+const VER_KEY = "verrex_app_version"
+if (typeof window !== "undefined") {
+  try {
+    const stored = localStorage.getItem(VER_KEY)
+    if (stored !== APP_DEFAULTS_VERSION) {
+      // Clear settings + color presets to force fresh defaults
+      localStorage.removeItem("verrex_estimate_settings")
+      localStorage.removeItem("verrex_ext_colors")
+      localStorage.removeItem("verrex_int_colors")
+      localStorage.removeItem("verrex_estimate_style")
+      localStorage.setItem(VER_KEY, APP_DEFAULTS_VERSION)
+    }
+  } catch { /* ignore */ }
+}
+
 // ── Generic localStorage helper ─────────────────
 function readLS<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback

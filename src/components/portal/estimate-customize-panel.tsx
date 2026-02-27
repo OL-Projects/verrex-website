@@ -229,6 +229,17 @@ export function EstimateCustomizePanel(props: Props) {
 
         {/* ═══ SECTION 3: DOOR CARD ═══ */}
         <Section icon={DoorOpen} title="Door Card" open={!!open.door} onToggle={() => t("door")}>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Diagram</p>
+          <div className="flex gap-1.5 mb-1">
+            {(["sm","md","lg"] as const).map(sz => (
+              <button key={sz} onClick={() => uS({ cardSize: sz })} className={`flex-1 py-1 rounded-lg text-[10px] font-bold ${style.cardSize === sz ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>{sz.toUpperCase()}</button>
+            ))}
+          </div>
+          {([["showModuleLabels","Module Labels"],["showDimensions","Dimensions"]] as const).map(([k,l]) => (
+            <div key={k} className={CLS.row}><span className="text-[11px]">{l}</span><Toggle on={style[k]} onToggle={() => uS({ [k]: !style[k] })} /></div>
+          ))}
+
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Door Types</p>
           <div className="max-h-36 overflow-y-auto space-y-0.5 mb-1">
             {doorEntries.map(([k, cfg]) => (
               <div key={k} className="flex items-center justify-between p-1 rounded-lg bg-slate-50/30 dark:bg-white/2">
@@ -238,6 +249,17 @@ export function EstimateCustomizePanel(props: Props) {
             ))}
           </div>
           <AddRemoveList label="Custom Door Types" items={s.customDoorTypes} onAdd={props.onAddCustomDoorType} onRemove={props.onRemoveCustomDoorType} />
+
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Products</p>
+          {PRODUCTS.map(p => (
+            <div key={p.id} className="flex items-center justify-between p-1 rounded-lg bg-slate-50/30 dark:bg-white/2 mb-0.5">
+              <span className="text-[10px]">{p.label}</span>
+              <Toggle on={s.enabledProducts.includes(p.id)} onToggle={() => props.onToggleProduct(p.id)} />
+            </div>
+          ))}
+
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Colors</p>
+          <p className="text-[9px] text-slate-400 italic">Door colors share the same Exterior/Interior presets as windows. Edit them in the Window Card section above.</p>
         </Section>
 
         {/* ═══ SECTION 4: PRICING SUMMARY ═══ */}
