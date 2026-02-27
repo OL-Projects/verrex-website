@@ -1,6 +1,7 @@
 "use client"
 
 import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer"
+import { EstimateWindowSVGPDF } from "./estimate-window-svg-pdf"
 import {
   type EstimateState,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt,
@@ -69,6 +70,8 @@ export function EstimatePDFDocument({ est, logo, sigs }: Props) {
   return (
     <Document title={`${est.company.name} - Estimate ${est.estimateNumber}`} author={est.company.name}>
       <Page size="LETTER" style={s.page}>
+        {/* Page number footer */}
+        <Text style={{ position: "absolute", bottom: 20, left: 0, right: 0, textAlign: "center", fontSize: 7, color: "#94a3b8" }} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} fixed />
         {/* ── Header ── */}
         <View style={s.hdr}>
           <View style={s.hdrLeft}>
@@ -118,9 +121,8 @@ export function EstimatePDFDocument({ est, logo, sigs }: Props) {
               const egress = hasCas && item.height >= 24
               return (
                 <View key={item.id} style={s.itemRow} wrap={false}>
-                  <View style={{ width: 90, minHeight: 60 }}>
-                    <Text style={{ fontSize: 7, color: "#94a3b8", textAlign: "center" }}>[{wt?.label || item.type}]</Text>
-                    <Text style={{ fontSize: 6, color: "#cbd5e1", textAlign: "center" }}>{item.width}" × {item.height}"</Text>
+                  <View style={{ width: 110, minHeight: 80, alignItems: "center", justifyContent: "center" }}>
+                    <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} />
                   </View>
                   <View style={s.itemRight}>
                     <View style={s.itemHeader}>
