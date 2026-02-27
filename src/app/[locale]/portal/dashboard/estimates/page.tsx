@@ -8,10 +8,11 @@ import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
 import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel"
+import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import {
   type EstimateState, type EstimateItem, type Room,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
-  calcTotals, allItems, fmt, getTypeGroups, isDoorType,
+  calcTotals, fmt, getTypeGroups, isDoorType,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -70,54 +71,26 @@ export default function EstimatesPage() {
 
   const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
 
-  // ═══ PDF EXPORT — jspdf + html2canvas → real .pdf file download ═══
+  // ═══ PDF EXPORT — @react-pdf/renderer → real vector .pdf file download ═══
   const exportPDF = useCallback(async () => {
-    const el = pdfRef.current
-    if (!el) return
-    // Force light mode for clean capture
-    const wasDark = document.documentElement.classList.contains("dark")
-    if (wasDark) document.documentElement.classList.remove("dark")
-    // Hide non-print elements
-    el.querySelectorAll(".print\\:hidden").forEach(n => (n as HTMLElement).style.display = "none")
-    // Wait for repaint
-    await new Promise(r => setTimeout(r, 200))
     try {
-      const html2canvas = (await import("html2canvas")).default
-      const { jsPDF } = await import("jspdf")
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        windowWidth: 816,
-      })
-      const imgData = canvas.toDataURL("image/jpeg", 0.95)
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
-      const pdfW = pdf.internal.pageSize.getWidth()
-      const pdfH = pdf.internal.pageSize.getHeight()
-      const imgW = pdfW - 16 // 8mm margin each side
-      const imgH = (canvas.height * imgW) / canvas.width
-      let yOffset = 0
-      let pageNum = 0
-      while (yOffset < imgH) {
-        if (pageNum > 0) pdf.addPage()
-        pdf.addImage(imgData, "JPEG", 8, 8 - yOffset, imgW, imgH)
-        yOffset += pdfH - 16
-        pageNum++
-      }
-      const filename = `${est.company.name} - Estimate ${est.estimateNumber} - ${est.clientName || "Client"}.pdf`
+      const { pdf } = await import("@react-pdf/renderer")
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `${est.company.name} - Estimate ${est.estimateNumber} - ${est.clientName || "Client"}.pdf`
         .replace(/[^a-zA-Z0-9 \-_.]/g, "")
-      pdf.save(filename)
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
     } catch (err) {
       console.error("PDF export error:", err)
-      // Fallback to window.print()
       window.print()
-    } finally {
-      // Restore
-      el.querySelectorAll(".print\\:hidden").forEach(n => (n as HTMLElement).style.display = "")
-      if (wasDark) document.documentElement.classList.add("dark")
     }
-  }, [est.company.name, est.estimateNumber, est.clientName])
+  }, [est, logo, sigs])
 
   const t = calcTotals(est)
 
@@ -444,7 +417,7 @@ export default function EstimatesPage() {
     </div>
 
     {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
-    {showPreview && <EstimatePreviewPanel est={est} logo={logo} onClose={() => setShowPreview(false)} />}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo} sigs={sigs} onClose={() => setShowPreview(false)} />}
     </div>
 
     {/* ═══ STICKY BAR — mobile-safe, no overflow ═══ */}
