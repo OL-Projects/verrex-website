@@ -12,20 +12,20 @@ import {
   LayoutDashboard, UserPlus, FolderKanban, CalendarDays,
   Ruler, Package, MessageSquare, Receipt, BadgeDollarSign,
   Settings, PanelLeftClose, PanelLeft, X, LogOut, ChevronDown,
-  BarChart3, Activity, Clock,
+  BarChart3, Activity, Clock, FileText,
 } from "lucide-react"
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard, UserPlus, FolderKanban, CalendarDays,
   Ruler, Package, MessageSquare, Receipt, BadgeDollarSign, Settings,
-  BarChart3, Activity, Clock,
+  BarChart3, Activity, Clock, FileText,
 }
 
 // Navigation groups for visual organization
 const NAV_GROUPS = [
   { label: "Overview", items: ["Dashboard"] },
   { label: "CRM", items: ["Leads", "Projects"] },
-  { label: "Operations", items: ["Appointments", "Measurements", "Orders"] },
+  { label: "Operations", items: ["Appointments", "Measurements", "Estimates", "Orders"] },
   { label: "Communication", items: ["Messages"] },
   { label: "Finance", items: ["Invoices", "Commissions"] },
   { label: "Insights", items: ["Analytics", "Timeline"] },

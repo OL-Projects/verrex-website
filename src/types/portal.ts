@@ -406,6 +406,7 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Projects', href: '/portal/dashboard/projects', icon: 'FolderKanban', roles: ['admin', 'client', 'contractor', 'inspector'] },
   { label: 'Appointments', href: '/portal/dashboard/appointments', icon: 'CalendarDays', roles: ['admin', 'client', 'contractor', 'inspector'] },
   { label: 'Measurements', href: '/portal/dashboard/measurements', icon: 'Ruler', roles: ['admin', 'contractor', 'inspector'] },
+  { label: 'Estimates', href: '/portal/dashboard/estimates', icon: 'FileText', roles: ['admin'] },
   { label: 'Orders', href: '/portal/dashboard/orders', icon: 'Package', roles: ['admin', 'supplier'] },
   { label: 'Messages', href: '/portal/dashboard/messages', icon: 'MessageSquare', roles: ['admin', 'client', 'contractor'] },
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
