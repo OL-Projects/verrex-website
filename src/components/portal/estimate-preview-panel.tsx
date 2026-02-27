@@ -17,7 +17,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, onClose }: Props) {
   const [zoom, setZoom] = useState(100)
 
   return (
-    <div className="hidden lg:flex flex-col w-[860px] shrink-0 sticky top-0 h-[calc(100vh-4rem)] z-10">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[860px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-t-xl border border-slate-200 dark:border-white/10">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">PDF Preview</span>

@@ -119,25 +119,95 @@ export default function EstimatesPage() {
 
   const t = calcTotals(est, estCfg.gstRate, estCfg.qstRate)
 
-  // ═══ SEND — mailto with estimate summary ═══
-  const sendEstimate = useCallback(() => {
-    const totals = calcTotals(est)
-    const email = est.clientEmail || ""
-    const subject = encodeURIComponent(`Estimate ${est.estimateNumber} — ${est.company.name}`)
-    const body = encodeURIComponent(
-      `Dear ${est.clientName || "Client"},\n\n` +
-      `Please find your estimate details below:\n\n` +
-      `Estimate #: ${est.estimateNumber}\n` +
-      `Date: ${est.date}\n` +
-      `Items: ${totals.items} (${totals.totalUnits} units)\n` +
-      `Total: ${fmt(totals.total)}\n` +
-      `Deposit Required: ${fmt(totals.deposit)}\n\n` +
-      `To view the full estimate with diagrams, please use the attached PDF.\n\n` +
-      `Tip: Before sending this email, click "Export PDF" in the estimate tool to download the PDF, then attach it to this email.\n\n` +
-      `Best regards,\n${est.repName || est.company.name}\n${est.company.phone}`
-    )
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_self")
-  }, [est])
+  // ═══ SEND — 2-step: PDF download + email modal ═══
+  const [showSendModal, setShowSendModal] = useState(false)
+  const [pdfReady, setPdfReady] = useState(false)
+
+  const sendEstimate = useCallback(async () => {
+    setPdfReady(false)
+    setShowSendModal(true)
+    // Auto-generate and download PDF
+    try {
+      const { pdf } = await import("@react-pdf/renderer")
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `${est.company.name} - Estimate ${est.estimateNumber}.pdf`.replace(/[^a-zA-Z0-9 \-_.]/g, "")
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      setPdfReady(true)
+    } catch { setPdfReady(true) }
+  }, [est, logo, sigs])
+
+  const emailSubject = `Estimate ${est.estimateNumber} — ${est.company.name}`
+  const emailBody = [
+    `Dear ${est.clientName || "Client"},`,
+    ``,
+    `Thank you for your interest. Please find your estimate details below.`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `  ESTIMATE SUMMARY`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    `  Company:        ${est.company.name}`,
+    `  Estimate #:     ${est.estimateNumber}`,
+    `  Date:           ${est.date}`,
+    `  Valid Until:     ${est.validUntil}`,
+    ``,
+    `  Client:         ${est.clientName}`,
+    `  Address:        ${est.clientAddress}${est.clientCity ? `, ${est.clientCity}` : ""}`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `  ITEMS`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    ...est.rooms.flatMap(r => [
+      `  📍 ${r.name}`,
+      ...r.items.map(it => {
+        const prod = PRODUCTS.find(p => p.id === it.product)
+        return `    • ${prod?.tag || it.product} — ${it.width}"W × ${it.height}"H — Qty: ${it.qty} — ${fmt(it.qty * it.unitPrice)}`
+      }),
+      ``,
+    ]),
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `  PRICING`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    `  Items:          ${t.items} (${t.totalUnits} units)`,
+    `  Subtotal:       ${fmt(t.prodTotal)}`,
+    ...(estCfg.showInstallation ? [`  Installation:   ${fmt(t.install)}`] : []),
+    ...(estCfg.showDelivery ? [`  Delivery:       ${fmt(t.delivery)}`] : []),
+    `  ─────────────────────`,
+    `  Before Tax:     ${fmt(t.subtax)}`,
+    ...(estCfg.showGST ? [`  GST (${estCfg.gstRate}%):     ${fmt(t.gst)}`] : []),
+    ...(estCfg.showQST ? [`  QST (${estCfg.qstRate}%):   ${fmt(t.qst)}`] : []),
+    `  ═════════════════════`,
+    `  TOTAL:          ${fmt(t.total)}`,
+    ...(estCfg.showDeposit ? [`  Deposit (${est.depositPct}%): ${fmt(t.deposit)}`] : []),
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
+    `📎 The detailed PDF estimate with diagrams is attached.`,
+    ``,
+    `If you have any questions, please don't hesitate to reach out.`,
+    ``,
+    `Best regards,`,
+    `${est.repName || est.company.name}`,
+    `${est.company.phone}`,
+    `${est.company.website}`,
+  ].join("\n")
+
+  const openMailto = useCallback(() => {
+    window.open(`mailto:${est.clientEmail || ""}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`, "_self")
+  }, [est.clientEmail, emailSubject, emailBody])
+
+  const copyEmail = useCallback(() => {
+    navigator.clipboard.writeText(emailBody).catch(() => {})
+  }, [emailBody])
   let globalIdx = 0
 
   return (
@@ -512,6 +582,52 @@ export default function EstimatesPage() {
         </button>
       </div>
     </div>
+
+    {/* ═══ SEND MODAL ═══ */}
+    {showSendModal && (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowSendModal(false)}>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+          {/* Modal header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-white/10">
+            <div className="flex items-center gap-2">
+              <Send className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-bold text-slate-900 dark:text-white">Send Estimate</span>
+            </div>
+            <button onClick={() => setShowSendModal(false)} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
+          </div>
+
+          {/* PDF status */}
+          <div className={`mx-5 mt-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${pdfReady ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400"}`}>
+            {pdfReady ? (
+              <><Download className="h-4 w-4" /> PDF downloaded — please attach it to your outgoing email</>
+            ) : (
+              <><div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" /> Generating and downloading PDF…</>
+            )}
+          </div>
+
+          {/* Email info */}
+          <div className="px-5 mt-3 space-y-2">
+            <div><span className="text-[10px] font-bold text-slate-400 uppercase">To:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{est.clientEmail || "(no email)"}</span></div>
+            <div><span className="text-[10px] font-bold text-slate-400 uppercase">Subject:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{emailSubject}</span></div>
+          </div>
+
+          {/* Email body preview */}
+          <div className="flex-1 overflow-y-auto mx-5 mt-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+            <pre className="text-[11px] text-slate-600 dark:text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">{emailBody}</pre>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 px-5 py-4 border-t border-slate-200 dark:border-white/10 mt-3">
+            <button onClick={copyEmail} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-center justify-center gap-1.5">
+              📋 Copy Email Text
+            </button>
+            <button onClick={openMailto} disabled={!pdfReady} className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-1.5">
+              <Send className="h-3.5 w-3.5" /> Open Email Client
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
 
     </>
   )
