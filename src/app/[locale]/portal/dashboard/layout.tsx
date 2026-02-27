@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { Sidebar } from "@/components/portal/sidebar"
 import { PortalTopbar } from "@/components/portal/portal-topbar"
 import { PortalStoreProvider } from "@/lib/portal-store"
@@ -11,6 +12,17 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { setTheme } = useTheme()
+
+  // Portal defaults to light mode on first visit (website uses dark)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem("vx_portal_theme_set")) {
+        setTheme("light")
+        localStorage.setItem("vx_portal_theme_set", "1")
+      }
+    } catch {}
+  }, [setTheme])
 
   return (
     <PortalStoreProvider>

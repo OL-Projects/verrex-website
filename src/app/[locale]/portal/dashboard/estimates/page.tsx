@@ -49,16 +49,6 @@ export default function EstimatesPage() {
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
 
-  // Portal defaults to light mode (website uses dark)
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem("vx_portal_theme_set")) {
-        setTheme("light")
-        localStorage.setItem("vx_portal_theme_set", "1")
-      }
-    } catch {}
-  }, [setTheme])
-
   // Keyboard shortcuts: Ctrl+Z / Ctrl+Y
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
