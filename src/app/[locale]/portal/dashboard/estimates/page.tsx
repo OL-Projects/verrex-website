@@ -2,9 +2,11 @@
 
 import { useState, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Palette, Grid3X3, Printer, Eye } from "lucide-react"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
-import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo } from "@/lib/estimate-hooks"
+import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle } from "@/lib/estimate-hooks"
+import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
+import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel"
 import {
   type EstimateState, type EstimateItem, type Room,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
@@ -26,7 +28,11 @@ export default function EstimatesPage() {
   const { info: coInfo } = useCompanyInfo()
   const { logo, uploadLogo, clearLogo } = useLogo()
   const { remember, suggestions } = useAutocomplete()
+  const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const logoRef = useRef<HTMLInputElement>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [showCustomize, setShowCustomize] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
 
   // Merge company info on mount
   useState(() => { setEst(p => ({ ...p, company: { ...p.company, ...coInfo, logoUrl: logo || p.company.logoUrl } })) })
@@ -70,7 +76,9 @@ export default function EstimatesPage() {
   let globalIdx = 0
 
   return (
-    <div className="space-y-5 max-w-4xl pb-24">
+    <>
+    <div className={`lg:flex gap-6 items-start pb-24 ${showPreview ? "max-w-none" : "max-w-4xl"}`}>
+    <div className={`flex-1 space-y-5 ${showPreview ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText className="h-6 w-6 text-blue-500" /> Estimate Creator</h1>
@@ -297,11 +305,44 @@ export default function EstimatesPage() {
         </div>
       </div>
 
-      {/* ═══ STICKY BAR ═══ */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-3 px-4 flex items-center justify-center gap-3 z-50 print:hidden">
-        <button onClick={resetAll} className="px-5 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-sm font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5"><RotateCcw className="h-4 w-4" /> Reset</button>
-        <button onClick={exportPDF} className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-sm font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5"><Download className="h-4 w-4" /> Export PDF</button>
-      </div>
     </div>
+
+    {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo} onClose={() => setShowPreview(false)} />}
+    </div>
+
+    {/* ═══ STICKY BAR ═══ */}
+    <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 py-2.5 px-4 flex items-center justify-center gap-2 z-50 print:hidden">
+      {/* Left group */}
+      <button onClick={() => setDarkMode(!darkMode)} className="p-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition" title={darkMode ? "Light Mode" : "Dark Mode"}>
+        {darkMode ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
+      </button>
+      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Document Style">
+        <Palette className="h-4 w-4 text-pink-500" /><span className="hidden sm:inline">Document</span>
+      </button>
+      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Diagram Settings">
+        <Grid3X3 className="h-4 w-4 text-blue-500" /><span className="hidden sm:inline">Diagrams</span>
+      </button>
+      <button onClick={() => setShowCustomize(true)} className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Print Settings">
+        <Printer className="h-4 w-4 text-slate-500" /><span className="hidden sm:inline">Print</span>
+      </button>
+
+      <div className="w-px h-7 bg-slate-300 dark:bg-white/15 mx-1" />
+
+      {/* Right group */}
+      <button onClick={resetAll} className="px-4 py-2.5 rounded-xl border-2 border-slate-800 dark:border-white/20 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
+        <RotateCcw className="h-4 w-4" /> Reset
+      </button>
+      <button onClick={() => setShowPreview(p => !p)} className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border-2 border-slate-800 dark:border-white/20 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
+        <Eye className="h-4 w-4" /> Preview
+      </button>
+      <button onClick={exportPDF} className="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5">
+        <Download className="h-4 w-4" /> Export PDF
+      </button>
+    </div>
+
+    {/* ═══ CUSTOMIZE PANEL ═══ */}
+    <EstimateCustomizePanel open={showCustomize} onClose={() => setShowCustomize(false)} style={estStyle} onUpdate={updateStyle} onReset={resetStyle} />
+    </>
   )
 }

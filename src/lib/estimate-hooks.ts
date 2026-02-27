@@ -77,7 +77,40 @@ export function useAutocomplete() {
   return { remember, suggestions }
 }
 
-// ── 4. Logo (persisted base64) ──────────────────
+// ── 4. Estimate Style / Customization ───────────
+export interface EstimateStyle {
+  accentColor: string
+  fontSize: "sm" | "md" | "lg"
+  layout: "compact" | "standard" | "detailed"
+  cardSize: "sm" | "md" | "lg"
+  showModuleLabels: boolean
+  showEgressBadge: boolean
+  showDimensions: boolean
+  showExteriorLabel: boolean
+  paperSize: "letter" | "legal" | "a4"
+  orientation: "portrait" | "landscape"
+  margins: number
+  pdfQuality: "draft" | "standard" | "high"
+}
+
+function defaultStyle(): EstimateStyle {
+  return {
+    accentColor: "#1e293b", fontSize: "md", layout: "standard", cardSize: "md",
+    showModuleLabels: true, showEgressBadge: true, showDimensions: true, showExteriorLabel: true,
+    paperSize: "letter", orientation: "portrait", margins: 8, pdfQuality: "standard",
+  }
+}
+
+const STYLE_KEY = "verrex_estimate_style"
+export function useEstimateStyle() {
+  const [style, setStyle] = useState<EstimateStyle>(() => readLS(STYLE_KEY, defaultStyle()))
+  useEffect(() => { writeLS(STYLE_KEY, style) }, [style])
+  const update = useCallback((patch: Partial<EstimateStyle>) => setStyle(p => ({ ...p, ...patch })), [])
+  const reset = useCallback(() => setStyle(defaultStyle()), [])
+  return { style, update, reset, setStyle }
+}
+
+// ── 5. Logo (persisted base64) ──────────────────
 const LOGO_KEY = "verrex_logo"
 export function useLogo() {
   const [logo, setLogo] = useState<string>(() => readLS(LOGO_KEY, ""))
