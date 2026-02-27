@@ -50,8 +50,8 @@ export const PRODUCTS = [
   { id: "pvc-slider", label: '4000 PVC 5¼" — Slider',   tag: "PVC SLIDER",     cls: "bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white" },
 ] as const
 
-export const DEFAULT_EXT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry"]
-export const DEFAULT_INT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry"]
+export const DEFAULT_EXT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry", "Black"]
+export const DEFAULT_INT_COLORS = ["White", "Grey", "Wood Grain", "Walnut Wood", "Cherry", "Black"]
 
 // ── Data Models ─────────────────────────────────
 export interface EstimateItem {

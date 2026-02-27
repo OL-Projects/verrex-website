@@ -49,6 +49,16 @@ export default function EstimatesPage() {
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
 
+  // Portal defaults to light mode (website uses dark)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem("vx_portal_theme_set")) {
+        setTheme("light")
+        localStorage.setItem("vx_portal_theme_set", "1")
+      }
+    } catch {}
+  }, [setTheme])
+
   // Keyboard shortcuts: Ctrl+Z / Ctrl+Y
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -255,12 +265,12 @@ export default function EstimatesPage() {
                 </div>
               </div>
             </div>
-            <div className="text-right space-y-1.5 w-full sm:min-w-[200px] sm:w-auto">
+            <div className="text-right space-y-1.5 w-full sm:min-w-[200px] sm:w-auto overflow-hidden">
               <p className={C.lbl}>Estimate #</p>
               <input value={est.estimateNumber} onChange={e => set("estimateNumber", e.target.value)} className="text-lg font-extrabold text-slate-900 dark:text-white bg-transparent outline-none text-right w-full border-b border-dashed border-slate-300 dark:border-white/20 focus:border-blue-500 print:border-none" />
-              {estCfg.showDate && <div><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
-              {estCfg.showValidUntil && <div><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
-              {estCfg.showRequiredBy && <div><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={`${C.inp} max-w-full`} /></div>}
+              {estCfg.showDate && <div className="overflow-hidden"><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
+              {estCfg.showValidUntil && <div className="overflow-hidden"><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
+              {estCfg.showRequiredBy && <div className="overflow-hidden"><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
             </div>
           </div>
 

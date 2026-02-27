@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v2"
+const APP_DEFAULTS_VERSION = "v3"
 const VER_KEY = "verrex_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -44,7 +44,7 @@ export interface ColorPreset { id: string; name: string; hex: string }
 const EXT_KEY = "verrex_ext_colors"
 const INT_KEY = "verrex_int_colors"
 
-const COLOR_HEX: Record<string, string> = { "White": "#FFFFFF", "Grey": "#9CA3AF", "Wood Grain": "#8B5E3C", "Walnut Wood": "#5C3D1E", "Cherry": "#8B1A1A" }
+const COLOR_HEX: Record<string, string> = { "White": "#FFFFFF", "Grey": "#9CA3AF", "Wood Grain": "#8B5E3C", "Walnut Wood": "#5C3D1E", "Cherry": "#8B1A1A", "Black": "#000000" }
 function defaultExtPresets(): ColorPreset[] {
   return DEFAULT_EXT_COLORS.map((n, i) => ({ id: `ext_${i}`, name: n, hex: COLOR_HEX[n] || "#CCCCCC" }))
 }
