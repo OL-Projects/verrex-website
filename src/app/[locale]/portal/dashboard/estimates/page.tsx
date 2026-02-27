@@ -85,6 +85,15 @@ export default function EstimatesPage() {
   }, [])
   const resetAll = useCallback(() => { if (confirm("Reset all data?")) setEst(createBlankEstimate()) }, [])
 
+  // Wrap newEstimate to apply saved default T&C clauses
+  const handleNewEstimate = useCallback(() => {
+    newEstimate()
+    const defaults = estCfg.defaultTermsLines
+    if (defaults && defaults.length > 0) {
+      setTimeout(() => set("termsLines", [...defaults]), 50)
+    }
+  }, [newEstimate, estCfg.defaultTermsLines])
+
   const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
 
   // ═══ PDF EXPORT — @react-pdf/renderer → real vector .pdf file download ═══
@@ -136,7 +145,7 @@ export default function EstimatesPage() {
     <div className="lg:flex gap-4 items-start pb-24 max-w-none">
     {/* ═══ LEFT SIDEBAR ═══ */}
     <EstimateLeftSidebar records={records} activeId={activeId} saveStatus={saveStatus}
-      onNew={newEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate} />
+      onNew={handleNewEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate} />
     <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
@@ -161,7 +170,7 @@ export default function EstimatesPage() {
                     <ImagePlus className="h-5 w-5" />
                   </button>
                 )}
-                <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) { uploadLogo(e.target.files[0]); const reader = new FileReader(); reader.onload = () => { if (typeof reader.result === "string") setCompany("logoUrl", reader.result) }; reader.readAsDataURL(e.target.files[0]) } }} />
+                <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadLogo(e.target.files[0]) }} />
               </div>
               <div className="flex-1">
                 <input value={est.company.name} onChange={e => setCompany("name", e.target.value)} className="text-2xl font-extrabold text-slate-900 dark:text-white bg-transparent outline-none w-full" />

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "./estimate-config"
+import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
 
 // ── Generic localStorage helper ─────────────────
 function readLS<T>(key: string, fallback: T): T {
@@ -154,6 +154,7 @@ export interface EstimateSettings {
   termsTitle: string
   showSignatures: boolean
   showSignatureDate: boolean
+  defaultTermsLines: string[]
 }
 
 function defaultSettings(): EstimateSettings {
@@ -183,6 +184,7 @@ function defaultSettings(): EstimateSettings {
     termsTitle: "Terms & Conditions",
     showSignatures: true,
     showSignatureDate: true,
+    defaultTermsLines: [...DEFAULT_TERMS],
   }
 }
 

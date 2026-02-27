@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, X } from "lucide-react"
+import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
 import { WINDOW_TYPES, PRODUCTS } from "@/lib/estimate-config"
 
@@ -265,15 +265,36 @@ export function EstimateCustomizePanel(props: Props) {
           </div>
           <div className={CLS.row}><span className="text-[11px]">Deposit</span><Toggle on={s.showDeposit} onToggle={() => uSet({ showDeposit: !s.showDeposit })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Balance Remaining</span><Toggle on={s.showBalance} onToggle={() => uSet({ showBalance: !s.showBalance })} /></div>
-          <div className={CLS.row}><span className="text-[11px]">Terms & Conditions</span><Toggle on={s.showTerms} onToggle={() => uSet({ showTerms: !s.showTerms })} /></div>
-          {s.showTerms && <>
-            <div className="mt-1.5">
-              <label className={CLS.lbl}>T&C Section Title</label>
-              <input value={s.termsTitle ?? "Terms & Conditions"} onChange={e => uSet({ termsTitle: e.target.value })} className={CLS.inp + " w-full"} />
-            </div>
-            <div className={CLS.row}><span className="text-[11px]">Signatures</span><Toggle on={s.showSignatures ?? true} onToggle={() => uSet({ showSignatures: !(s.showSignatures ?? true) })} /></div>
-            <div className={CLS.row}><span className="text-[11px]">Signature Date Label</span><Toggle on={s.showSignatureDate ?? true} onToggle={() => uSet({ showSignatureDate: !(s.showSignatureDate ?? true) })} /></div>
-          </>}
+        </Section>
+
+        {/* ═══ SECTION 5: TERMS & CONDITIONS ═══ */}
+        <Section icon={ScrollText} title="Terms & Conditions" open={!!open.terms} onToggle={() => t("terms")}>
+          <div className={CLS.row}><span className="text-[11px]">Show T&C Section</span><Toggle on={s.showTerms} onToggle={() => uSet({ showTerms: !s.showTerms })} /></div>
+          <div className="mt-1.5">
+            <label className={CLS.lbl}>Section Title</label>
+            <input value={s.termsTitle ?? "Terms & Conditions"} onChange={e => uSet({ termsTitle: e.target.value })} className={CLS.inp + " w-full"} />
+          </div>
+          <div className={CLS.row}><span className="text-[11px]">Signatures</span><Toggle on={s.showSignatures ?? true} onToggle={() => uSet({ showSignatures: !(s.showSignatures ?? true) })} /></div>
+          <div className={CLS.row}><span className="text-[11px]">Signature Date</span><Toggle on={s.showSignatureDate ?? true} onToggle={() => uSet({ showSignatureDate: !(s.showSignatureDate ?? true) })} /></div>
+
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-3 mb-1">Default Clauses (for new estimates)</p>
+          <div className="space-y-1.5">
+            {(s.defaultTermsLines ?? []).map((line, i) => (
+              <div key={i} className="flex gap-1 items-start">
+                <span className="text-[9px] text-slate-400 mt-1 shrink-0">{i + 1}.</span>
+                <textarea rows={2} value={line} onChange={e => {
+                  const next = [...(s.defaultTermsLines ?? [])]; next[i] = e.target.value
+                  uSet({ defaultTermsLines: next })
+                }} className={CLS.inp + " w-full resize-none text-[10px]"} />
+                <button onClick={() => {
+                  const next = (s.defaultTermsLines ?? []).filter((_, j) => j !== i)
+                  uSet({ defaultTermsLines: next })
+                }} className="text-red-400 hover:text-red-600 shrink-0 mt-1"><Trash2 className="h-3 w-3" /></button>
+              </div>
+            ))}
+          </div>
+          <button onClick={() => uSet({ defaultTermsLines: [...(s.defaultTermsLines ?? []), ""] })}
+            className="text-blue-600 text-[10px] font-semibold mt-1.5 hover:underline">+ Add clause</button>
         </Section>
       </div>
 
