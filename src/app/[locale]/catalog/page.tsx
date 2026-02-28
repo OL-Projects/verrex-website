@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
 import {
   Search, X, ArrowRight, LayoutGrid, List, Check, Sparkles,
-  ChevronRight, ChevronDown, AppWindow, DoorOpen, Box, ArrowLeft, Info,
+  ChevronRight, ChevronDown, AppWindow, DoorOpen, Box, ArrowLeft, Info, SlidersHorizontal,
 } from "lucide-react"
 
 type SortOption = "name-asc" | "name-desc"
@@ -34,12 +34,16 @@ export default function CatalogPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<SortOption>("name-asc")
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["windows", "doors"]))
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   const toggleNode = (id: string) => {
     setExpandedNodes(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
   }
 
-  const selectFilter = (filter: string) => setActiveFilter(filter)
+  const selectFilter = (filter: string) => {
+    setActiveFilter(filter)
+    setIsMobileFilterOpen(false)
+  }
 
   const filteredProducts = useMemo(() => {
     let result = products.filter((product) => {
@@ -189,12 +193,135 @@ export default function CatalogPage() {
                 <Input placeholder={t('searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm" />
               </div>
 
-              {/* Mobile Filters */}
-              <div className="lg:hidden flex gap-2 flex-wrap mb-4">
-                <Button variant={activeFilter === "all" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("all")} className="text-xs">{t('allTypes')}</Button>
-                <Button variant={activeFilter === "windows" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("windows")} className="text-xs">{t('catWindows')}</Button>
-                <Button variant={activeFilter === "doors" ? "secondary" : "ghost"} size="sm" onClick={() => selectFilter("doors")} className="text-xs">{t('catDoors')}</Button>
+              {/* Mobile Filter Trigger */}
+              <div className="lg:hidden flex items-center gap-2 mb-4">
+                <Button variant="outline" size="sm" onClick={() => setIsMobileFilterOpen(true)} className="gap-2 text-xs">
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                  {t('productTypes')}
+                  {activeFilter !== "all" && (
+                    <Badge variant="primary" className="text-[10px] h-5 px-1.5 ml-0.5">1</Badge>
+                  )}
+                </Button>
+                {activeFilter !== "all" && (
+                  <button onClick={clearFilters} className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                    <X className="h-3 w-3" /> {t('clearFilters')}
+                  </button>
+                )}
               </div>
+
+              {/* Mobile Filter Drawer */}
+              {isMobileFilterOpen && (
+                <div className="lg:hidden fixed inset-0 z-50 flex">
+                  {/* Backdrop */}
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm drawer-backdrop" onClick={() => setIsMobileFilterOpen(false)} />
+                  {/* Panel */}
+                  <div className="relative w-[300px] max-w-[85vw] h-full bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto drawer-slide-in">
+                    {/* Header */}
+                    <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+                      <h2 className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                        <SlidersHorizontal className="h-4 w-4" /> {t('productTypes')}
+                      </h2>
+                      <button onClick={() => setIsMobileFilterOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+                    {/* Content */}
+                    <div className="p-5 space-y-5">
+                      {/* Search */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input placeholder={t('searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm" />
+                        {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>}
+                      </div>
+
+                      {/* Tree Navigation */}
+                      <nav>
+                        <button onClick={() => selectFilter("all")} className={btnCls("all")}>
+                          <span>{t('allTypes')}</span>
+                          <Badge variant="secondary" className="text-[10px] h-5 min-w-[20px] justify-center">{products.length}</Badge>
+                        </button>
+
+                        {/* Windows */}
+                        <div className="mt-2">
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => toggleNode("windows")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                              {expandedNodes.has("windows") ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                            </button>
+                            <button onClick={() => selectFilter("windows")} className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive("windows") ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}>
+                              <AppWindow className="h-4 w-4" /> {t('catWindows')}
+                            </button>
+                          </div>
+                          {expandedNodes.has("windows") && (
+                            <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
+                              <button onClick={() => selectFilter("top-hung")} className={subCls("top-hung")}>{t('topHung')}</button>
+                              <button onClick={() => selectFilter("sliding-window")} className={subCls("sliding-window")}>{t('slidingWindow')}</button>
+                              <div>
+                                <div className="flex items-center gap-0.5">
+                                  <button onClick={() => toggleNode("casement")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 shrink-0">
+                                    {expandedNodes.has("casement") ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                                  </button>
+                                  <button onClick={() => selectFilter("casement")} className={subCls("casement")}>{t('casement')}</button>
+                                </div>
+                                {expandedNodes.has("casement") && (
+                                  <div className="ml-5 mt-0.5 space-y-0.5 border-l border-slate-200 dark:border-slate-700 pl-2.5">
+                                    <button onClick={() => selectFilter("tilt-turn")} className={subCls("tilt-turn")}>
+                                      <span>{t('tiltTurn')}</span>
+                                      <span className="ml-1 text-[10px] text-slate-400">({t('opensInside')})</span>
+                                    </button>
+                                    <button onClick={() => selectFilter("hand-cranked")} className={subCls("hand-cranked")}>
+                                      <span>{t('handCranked')}</span>
+                                      <span className="ml-1 text-[10px] text-slate-400">({t('opensOutside')})</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Doors */}
+                        <div className="mt-2">
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => toggleNode("doors")} className="p-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                              {expandedNodes.has("doors") ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                            </button>
+                            <button onClick={() => selectFilter("doors")} className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${isActive("doors") ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"}`}>
+                              <DoorOpen className="h-4 w-4" /> {t('catDoors')}
+                            </button>
+                          </div>
+                          {expandedNodes.has("doors") && (
+                            <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-slate-200 dark:border-slate-700 pl-3">
+                              <button onClick={() => selectFilter("sliding-door")} className={subCls("sliding-door")}>{t('slidingDoor')}</button>
+                              <button onClick={() => selectFilter("folding")} className={subCls("folding")}>{t('folding')}</button>
+                              <button onClick={() => selectFilter("swing")} className={subCls("swing")}>{t('swing')}</button>
+                            </div>
+                          )}
+                        </div>
+                      </nav>
+
+                      {/* Quick Links */}
+                      <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+                        <h3 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">{t('quickLinks')}</h3>
+                        <ul className="space-y-1.5">
+                          <li><IntlLink href="/products/windows" onClick={() => setIsMobileFilterOpen(false)} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('windowsSection')}</IntlLink></li>
+                          <li><IntlLink href="/products/doors" onClick={() => setIsMobileFilterOpen(false)} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ChevronRight className="h-3.5 w-3.5" />{t('doorsSection')}</IntlLink></li>
+                          <li><IntlLink href="/products/window-types" onClick={() => setIsMobileFilterOpen(false)} className="flex items-center gap-2 text-sm font-semibold transition-colors text-violet-600 dark:text-violet-400 hover:text-blue-600 dark:hover:text-blue-400"><Box className="h-3.5 w-3.5" />✦ {t('configurator3d')}</IntlLink></li>
+                        </ul>
+                      </div>
+
+                      {/* 3D Configurator Promo */}
+                      <IntlLink href="/products/window-types" onClick={() => setIsMobileFilterOpen(false)}>
+                        <div className="rounded-xl bg-gradient-to-br from-indigo-600 via-blue-600 to-violet-700 p-4 text-white ring-1 ring-white/15 shadow-[0_4px_20px_rgba(99,102,241,0.35)] cursor-pointer">
+                          <Box className="h-6 w-6 mb-2 opacity-90" />
+                          <p className="text-sm font-bold">3D Configurator</p>
+                          <p className="text-[11px] text-white/75 mt-0.5">Visualize windows & doors interactively</p>
+                          <div className="mt-3 flex items-center gap-1 text-xs font-medium text-white/90">Try it now <ArrowRight className="h-3 w-3" /></div>
+                        </div>
+                      </IntlLink>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Toolbar */}
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
