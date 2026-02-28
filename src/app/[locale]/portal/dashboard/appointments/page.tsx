@@ -11,6 +11,7 @@ import {
   AlertTriangle, TrendingUp, Users,
 } from "lucide-react"
 import type { Appointment } from "@/types/portal"
+import AppointmentForm from "./appointment-form"
 
 const FullCalendarView = dynamic(() => import("./calendar-view"), { ssr: false,
   loading: () => <div className="h-[600px] flex items-center justify-center rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-200/60 dark:border-white/10"><div className="h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>,
@@ -54,6 +55,7 @@ export default function AppointmentsPage() {
   const store = usePortalStore()
   const userId = session?.user?.id || "usr_admin_001"
   const [view, setView] = useState<ViewTab>("calendar")
+  const [showForm, setShowForm] = useState(false)
 
   const upcoming = store.appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
   const past = store.appointments.filter(a => a.status === "completed" || a.status === "cancelled")
@@ -95,15 +97,23 @@ export default function AppointmentsPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Appointments</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{upcoming.length} upcoming · {past.length} past</p>
         </div>
-        <div className="flex bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-slate-200/60 dark:border-white/10 p-1">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all">
+            <CalendarDays className="h-3.5 w-3.5" />+ New
+          </button>
+          <div className="flex bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-slate-200/60 dark:border-white/10 p-1">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setView(t.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${view === t.id ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"}`}>
               <t.icon className="h-3.5 w-3.5" />{t.label}
             </button>
           ))}
+          </div>
         </div>
       </motion.div>
+
+      {/* Appointment Form */}
+      <AppointmentForm open={showForm} onClose={() => setShowForm(false)} userId={userId} />
 
       {/* Stats Ribbon */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
