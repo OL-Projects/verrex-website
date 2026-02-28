@@ -1,7 +1,9 @@
 "use client"
 
-import { Download, Send, CheckCircle2, Ban, Printer } from "lucide-react"
+import { useState, useRef, useCallback } from "react"
+import { Download, Send, CheckCircle2, Ban, Printer, Loader2 } from "lucide-react"
 import type { Invoice } from "@/types/portal"
+import { InvoicePDFDocument } from "./invoice-pdf-doc"
 
 interface Props {
   invoice: Invoice
@@ -40,6 +42,48 @@ function amountToWords(n: number): string {
 export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, onVoid, onDownloadPdf }: Props) {
   const fmt = (n: number) => `$${n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   const isVoid = inv.status === "void"
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const invoiceDocRef = useRef<HTMLDivElement>(null)
+
+  /* ── PDF Download via @react-pdf/renderer ── */
+  const exportPDF = useCallback(async () => {
+    setPdfLoading(true)
+    try {
+      const { pdf } = await import("@react-pdf/renderer")
+      const doc = <InvoicePDFDocument invoice={inv} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Verrex - Invoice ${inv.invoiceNumber} - ${inv.clientName}.pdf`.replace(/[^a-zA-Z0-9 \-_.]/g, "")
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error("PDF export error:", err)
+      alert("PDF generation failed. Please try again.")
+    } finally {
+      setPdfLoading(false)
+    }
+  }, [inv])
+
+  /* ── Print just the invoice document (not the whole page) ── */
+  const printInvoice = useCallback(() => {
+    const el = invoiceDocRef.current
+    if (!el) return
+    const win = window.open("", "_blank", "width=800,height=1000")
+    if (!win) return
+    win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.invoiceNumber}</title>
+      <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #0f172a; background: #fff; }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+      </style>
+    </head><body>${el.innerHTML}</body></html>`)
+    win.document.close()
+    setTimeout(() => { win.print(); win.close() }, 400)
+  }, [inv.invoiceNumber])
 
   return (
     <div className="h-full flex flex-col">
@@ -53,13 +97,16 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
           {inv.status === "draft" && <button onClick={onSend} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-blue-600 hover:bg-blue-700 text-white"><Send className="h-3 w-3" />Send</button>}
           {(inv.status === "sent" || inv.status === "overdue") && <button onClick={onPay} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-emerald-600 hover:bg-emerald-700 text-white"><CheckCircle2 className="h-3 w-3" />Paid</button>}
           {inv.status !== "void" && inv.status !== "paid" && <button onClick={onVoid} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-red-50 dark:bg-red-500/10 text-red-600"><Ban className="h-3 w-3" />Void</button>}
-          <button onClick={onDownloadPdf} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"><Download className="h-3 w-3" />PDF</button>
-          <button onClick={() => window.print()} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><Printer className="h-4 w-4" /></button>
+          <button onClick={exportPDF} disabled={pdfLoading} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-50">
+            {pdfLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}PDF
+          </button>
+          <button onClick={printInvoice} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400" title="Print invoice only"><Printer className="h-4 w-4" /></button>
         </div>
       </div>
 
       {/* Invoice Document */}
       <div className="flex-1 overflow-y-auto p-5">
+        <div ref={invoiceDocRef}>
         <div className="max-w-[640px] mx-auto bg-white dark:bg-slate-950 border-2 border-blue-200 dark:border-blue-900/40 shadow-lg rounded-sm overflow-hidden relative border-l-4 border-l-blue-400">
 
           {/* VOID watermark */}
@@ -222,6 +269,7 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
