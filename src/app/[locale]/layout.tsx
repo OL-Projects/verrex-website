@@ -27,15 +27,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "VERREX | Premium Windows & Doors",
-    template: "%s | VERREX",
+    default: "VEREX | Premium Windows & Doors",
+    template: "%s | VEREX",
   },
   description:
-    "VERREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Canada.",
+    "VEREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Canada.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "VERREX",
+    title: "VEREX",
   },
   formatDetection: {
     telephone: true,
@@ -60,16 +60,16 @@ export const metadata: Metadata = {
     "institutional",
   ],
   openGraph: {
-    title: "VERREX | Premium Windows & Doors",
+    title: "VEREX | Premium Windows & Doors",
     description:
       "Premium window and door solutions for residential, commercial, and industrial projects.",
     type: "website",
     locale: "en_CA",
-    siteName: "VERREX",
+    siteName: "VEREX",
   },
   twitter: {
     card: "summary_large_image",
-    title: "VERREX | Premium Windows & Doors",
+    title: "VEREX | Premium Windows & Doors",
     description: "Premium window and door solutions for residential, commercial, and industrial projects.",
   },
   robots: {
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://verrex.com",
+    canonical: "https://VEREX.com",
   },
   category: "business",
 }

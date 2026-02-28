@@ -5,16 +5,16 @@ import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLOR
 
 // ── App Version Migration ───────────────────────
 const APP_DEFAULTS_VERSION = "v5"
-const VER_KEY = "verrex_app_version"
+const VER_KEY = "VEREX_app_version"
 if (typeof window !== "undefined") {
   try {
     const stored = localStorage.getItem(VER_KEY)
     if (stored !== APP_DEFAULTS_VERSION) {
       // Clear settings + color presets to force fresh defaults
-      localStorage.removeItem("verrex_estimate_settings")
-      localStorage.removeItem("verrex_ext_colors")
-      localStorage.removeItem("verrex_int_colors")
-      localStorage.removeItem("verrex_estimate_style")
+      localStorage.removeItem("VEREX_estimate_settings")
+      localStorage.removeItem("VEREX_ext_colors")
+      localStorage.removeItem("VEREX_int_colors")
+      localStorage.removeItem("VEREX_estimate_style")
       localStorage.setItem(VER_KEY, APP_DEFAULTS_VERSION)
     }
   } catch { /* ignore */ }
@@ -31,7 +31,7 @@ function writeLS<T>(key: string, val: T) {
 }
 
 // ── 1. Company Info (persisted) ─────────────────
-const CO_KEY = "verrex_company_info"
+const CO_KEY = "VEREX_company_info"
 export function useCompanyInfo() {
   const [info, setInfo] = useState<CompanyInfo>(() => readLS(CO_KEY, defaultCompany()))
   useEffect(() => { writeLS(CO_KEY, info) }, [info])
@@ -41,8 +41,8 @@ export function useCompanyInfo() {
 
 // ── 2. Color Presets (persisted) ────────────────
 export interface ColorPreset { id: string; name: string; hex: string }
-const EXT_KEY = "verrex_ext_colors"
-const INT_KEY = "verrex_int_colors"
+const EXT_KEY = "VEREX_ext_colors"
+const INT_KEY = "VEREX_int_colors"
 
 const COLOR_HEX: Record<string, string> = { "White": "#FFFFFF", "Grey": "#9CA3AF", "Wood Grain": "#8B5E3C", "Walnut Wood": "#5C3D1E", "Cherry": "#8B1A1A", "Black": "#000000" }
 function defaultExtPresets(): ColorPreset[] {
@@ -74,7 +74,7 @@ export function useColorPresets() {
 }
 
 // ── 3. Autocomplete Memory (persisted) ──────────
-const AC_KEY = "verrex_autocomplete"
+const AC_KEY = "VEREX_autocomplete"
 export function useAutocomplete() {
   const [store, setStore] = useState<Record<string, string[]>>(() => readLS(AC_KEY, {}))
   useEffect(() => { writeLS(AC_KEY, store) }, [store])
@@ -119,7 +119,7 @@ function defaultStyle(): EstimateStyle {
   }
 }
 
-const STYLE_KEY = "verrex_estimate_style"
+const STYLE_KEY = "VEREX_estimate_style"
 export function useEstimateStyle() {
   const [style, setStyle] = useState<EstimateStyle>(() => readLS(STYLE_KEY, defaultStyle()))
   useEffect(() => { writeLS(STYLE_KEY, style) }, [style])
@@ -226,7 +226,7 @@ function defaultSettings(): EstimateSettings {
   }
 }
 
-const SETTINGS_KEY = "verrex_estimate_settings"
+const SETTINGS_KEY = "VEREX_estimate_settings"
 export function useEstimateSettings() {
   const [settings, setSettings] = useState<EstimateSettings>(() => {
     const stored = readLS<Partial<EstimateSettings>>(SETTINGS_KEY, {})
@@ -355,7 +355,7 @@ export function useEstimateHistory(est: EstimateState, setEst: (e: EstimateState
 }
 
 // ── 7. Logo (persisted base64) ──────────────────
-const LOGO_KEY = "verrex_logo"
+const LOGO_KEY = "VEREX_logo"
 export function useLogo() {
   const [logo, setLogo] = useState<string>(() => readLS(LOGO_KEY, ""))
   useEffect(() => { writeLS(LOGO_KEY, logo) }, [logo])

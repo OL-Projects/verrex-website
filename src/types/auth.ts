@@ -1,5 +1,5 @@
 // ============================================================
-// VERREX PORTAL — Auth Type Extensions
+// VEREX PORTAL — Auth Type Extensions
 // ============================================================
 
 import type { UserRole } from './portal';

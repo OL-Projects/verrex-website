@@ -356,7 +356,7 @@ export const testimonials: Testimonial[] = [
     name: "Sarah Mitchell",
     role: "Homeowner",
     content:
-      "VERREX transformed our home with beautiful new windows. The team was professional from the initial consultation through installation. Our energy bills have dropped significantly!",
+      "VEREX transformed our home with beautiful new windows. The team was professional from the initial consultation through installation. Our energy bills have dropped significantly!",
     rating: 5,
   },
   {
@@ -365,7 +365,7 @@ export const testimonials: Testimonial[] = [
     role: "Property Manager",
     company: "Pinnacle Properties",
     content:
-      "We've used VERREX for multiple commercial projects. Their storefront systems are top-quality and their installation team is the best in the business. Highly recommend for any commercial glazing needs.",
+      "We've used VEREX for multiple commercial projects. Their storefront systems are top-quality and their installation team is the best in the business. Highly recommend for any commercial glazing needs.",
     rating: 5,
   },
   {
@@ -374,7 +374,7 @@ export const testimonials: Testimonial[] = [
     role: "Architect",
     company: "Chen & Associates",
     content:
-      "As an architect, I'm very particular about the products I specify. VERREX consistently delivers high-quality window and door solutions that meet our design requirements and exceed performance expectations.",
+      "As an architect, I'm very particular about the products I specify. VEREX consistently delivers high-quality window and door solutions that meet our design requirements and exceed performance expectations.",
     rating: 5,
   },
   {
@@ -383,7 +383,7 @@ export const testimonials: Testimonial[] = [
     role: "Factory Manager",
     company: "Thompson Manufacturing",
     content:
-      "The industrial safety glass VERREX installed in our facility has been outstanding. Their team understood our safety requirements and delivered a solution that keeps our workers protected.",
+      "The industrial safety glass VEREX installed in our facility has been outstanding. Their team understood our safety requirements and delivered a solution that keeps our workers protected.",
     rating: 5,
   },
 ]
@@ -440,7 +440,7 @@ export const projects: Project[] = [
     tags: ["luxury", "lakefront", "energy-efficient", "custom"],
     isFeatured: true,
     testimonial: {
-      quote: "VERREX transformed our lake house. The new windows are stunning and our heating bills dropped by 40%.",
+      quote: "VEREX transformed our lake house. The new windows are stunning and our heating bills dropped by 40%.",
       author: "Robert Morrison",
       role: "Homeowner"
     }
@@ -461,7 +461,7 @@ export const projects: Project[] = [
     tags: ["storefront", "high-rise", "downtown", "automatic-doors"],
     isFeatured: true,
     testimonial: {
-      quote: "The VERREX team delivered a world-class storefront that sets our building apart. Professional from start to finish.",
+      quote: "The VEREX team delivered a world-class storefront that sets our building apart. Professional from start to finish.",
       author: "James Rodriguez",
       role: "Property Manager, Pinnacle Properties"
     }
@@ -503,7 +503,7 @@ export const projects: Project[] = [
     tags: ["safety-glass", "fire-rated", "manufacturing", "industrial"],
     isFeatured: false,
     testimonial: {
-      quote: "Safety is our top priority. VERREX delivered door systems that exceed our safety requirements.",
+      quote: "Safety is our top priority. VEREX delivered door systems that exceed our safety requirements.",
       author: "Michael Thompson",
       role: "Factory Manager"
     }
@@ -579,12 +579,12 @@ export const projects: Project[] = [
 ]
 
 export const companyInfo = {
-  name: "VERREX",
+  name: "VEREX",
   tagline: "Premium Windows & Doors",
   description:
-    "VERREX is a premier window and door corporation providing high-performance fenestration systems for residential, commercial, institutional, and industrial clients across Canada. From project planning to professional installation, we deliver excellence at every step.",
+    "VEREX is a premier window and door corporation providing high-performance fenestration systems for residential, commercial, institutional, and industrial clients across Canada. From project planning to professional installation, we deliver excellence at every step.",
   phone: "(416) 555-0199",
-  email: "info@verrex.com",
+  email: "info@VEREX.com",
   address: "123 Glass Avenue, Toronto, ON M5V 3A8",
   hours: {
     weekdays: "8:00 AM - 6:00 PM",

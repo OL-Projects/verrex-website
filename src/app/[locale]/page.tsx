@@ -72,7 +72,7 @@ export default function HomePage() {
         {/* Background Image */}
         <Image
           src="/images/hero/hero-main-new.jpg"
-          alt="VERREX premium window and door systems"
+          alt="VEREX premium window and door systems"
           fill
           className="object-cover object-center"
           priority
@@ -331,13 +331,13 @@ export default function HomePage() {
         </div>
       </RevealSection>
 
-      {/* Why Choose VERREX — Day/Night Theme-Aware Background */}
+      {/* Why Choose VEREX — Day/Night Theme-Aware Background */}
       <section className="relative overflow-hidden min-h-[600px]">
         {/* Day Background (Light Mode) */}
         <div className="absolute inset-0 z-0 block dark:hidden">
           <Image
             src="/images/hero/Day.svg"
-            alt="Modern home with VERREX windows — daytime"
+            alt="Modern home with VEREX windows — daytime"
             fill
             className="object-cover object-center"
             sizes="100vw"
@@ -349,7 +349,7 @@ export default function HomePage() {
         <div className="absolute inset-0 z-0 hidden dark:block">
           <Image
             src="/images/hero/Night.svg"
-            alt="Modern home with VERREX windows — nighttime"
+            alt="Modern home with VEREX windows — nighttime"
             fill
             className="object-cover object-center"
             sizes="100vw"
@@ -365,7 +365,7 @@ export default function HomePage() {
           <div className="max-w-lg">
             <FadeIn>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
-                Why Choose <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">VERREX</span>?
+                Why Choose <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">VEREX</span>?
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>

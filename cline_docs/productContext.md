@@ -1,15 +1,15 @@
-# VERREX - Product Context
+# VEREX - Product Context
 
 ## Why This Project Exists
-VERREX is a premium **window and door corporation** website for a new high-incorporation business. The website serves as the primary digital presence, handling client relations, product catalog browsing, quote/estimation requests, appointment scheduling, installations coordination, and partner/affiliate management.
+VEREX is a premium **window and door corporation** website for a new high-incorporation business. The website serves as the primary digital presence, handling client relations, product catalog browsing, quote/estimation requests, appointment scheduling, installations coordination, and partner/affiliate management.
 
 ## Business Identity
-- **Name**: VERREX
+- **Name**: VEREX
 - **Industry**: Windows & Doors (Fenestration)
 - **Type**: High incorporation / B2B-focused with B2C capability
 - **Location**: Toronto, Ontario, Canada
 - **Branding**: "Premium Windows & Doors" — "Engineered for Every Project"
-- **GitHub**: `OL-Projects/verrex-website`
+- **GitHub**: `OL-Projects/VEREX-website`
 - **Deployed**: Vercel (auto-deploy from GitHub main branch)
 
 ## What Problems It Solves

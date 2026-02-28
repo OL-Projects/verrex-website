@@ -1,5 +1,5 @@
 // ============================================================
-// VERREX — Combined Proxy (i18n + Auth Protection)
+// VEREX — Combined Proxy (i18n + Auth Protection)
 // Next.js 16 uses proxy.ts instead of middleware.ts
 // ============================================================
 

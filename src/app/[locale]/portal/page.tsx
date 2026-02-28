@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { useTranslations } from "next-intl"
 import { Link as IntlLink } from "@/i18n/navigation"
-import { VerrexLogo } from "@/components/ui/verrex-logo"
+import { VEREXLogo } from "@/components/ui/verrex-logo"
 import {
   LogIn,
   UserPlus,
@@ -44,11 +44,11 @@ export default function PortalWelcomePage() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <VerrexLogo variant="icon" size={64} />
+              <VEREXLogo variant="icon" size={64} />
             </motion.div>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
-            VERREX <span className="text-blue-600 dark:text-blue-400">Portal</span>
+            VEREX <span className="text-blue-600 dark:text-blue-400">Portal</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10">
             Your secure hub for project tracking, appointments, orders, and communication — everything in one place.
@@ -126,7 +126,7 @@ export default function PortalWelcomePage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
             {[
-              { role: "Admin", email: "admin@verrex.com" },
+              { role: "Admin", email: "admin@VEREX.com" },
               { role: "Client", email: "client@demo.com" },
               { role: "Contractor", email: "contractor@demo.com" },
               { role: "Supplier", email: "supplier@demo.com" },

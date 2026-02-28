@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react"
 import { Link as IntlLink } from "@/i18n/navigation"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { VerrexLogo } from "@/components/ui/verrex-logo"
+import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { SIDEBAR_NAV } from "@/types/portal"
 import type { UserRole } from "@/types/portal"
 import {
@@ -88,7 +88,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {/* ── Logo Area ─────────────────────────── */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-white/10">
         <IntlLink href="/" className="flex items-center gap-2.5 group">
-          <VerrexLogo variant="icon" size={32} />
+          <VEREXLogo variant="icon" size={32} />
           <AnimatePresence>
             {!collapsed && (
               <motion.span
@@ -97,7 +97,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 exit={{ opacity: 0, width: 0 }}
                 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight"
               >
-                VERREX
+                VEREX
               </motion.span>
             )}
           </AnimatePresence>

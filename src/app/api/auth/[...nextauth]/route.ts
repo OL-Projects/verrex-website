@@ -1,5 +1,5 @@
 // ============================================================
-// VERREX PORTAL — NextAuth API Route Handler
+// VEREX PORTAL — NextAuth API Route Handler
 // ============================================================
 
 import { handlers } from '@/lib/auth';

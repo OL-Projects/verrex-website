@@ -1,4 +1,4 @@
-# VERREX - Tech Context
+# VEREX - Tech Context
 
 ## Technologies Used
 - **Framework**: Next.js 16.1.6 (App Router)
@@ -15,18 +15,18 @@
 - **Package Manager**: npm
 - **Dev Server**: `npm run dev` → http://localhost:3000
 - **Build**: `npm run build` (~2.7s compile time)
-- **Working Directory**: `c:\Users\Spiro\Desktop\WEB.2026\verrex`
+- **Working Directory**: `c:\Users\Spiro\Desktop\WEB.2026\VEREX`
 
 ## Deployment
-- **GitHub Repository**: `OL-Projects/verrex-website` (main branch)
+- **GitHub Repository**: `OL-Projects/VEREX-website` (main branch)
 - **Hosting**: Vercel (auto-deploy on push to main)
-- **Domain**: verrex.com (configured in Vercel)
+- **Domain**: VEREX.com (configured in Vercel)
 - **Build Command**: `next build`
 - **Output**: Static + Server-side rendering
 
 ## Project Structure
 ```
-verrex/
+VEREX/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
 │   │   ├── layout.tsx          # Root layout (Header + Footer + ThemeProvider)

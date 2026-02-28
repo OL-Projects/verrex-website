@@ -22,7 +22,7 @@ export function ViewportToggle() {
     setIsMobileDevice(checkMobile)
 
     // Restore saved preference
-    const saved = localStorage.getItem("verrex-viewport-mode")
+    const saved = localStorage.getItem("VEREX-viewport-mode")
     if (saved === "desktop" && checkMobile) {
       setIsDesktopMode(true)
       setTimeout(() => switchToDesktop(), 200)
@@ -82,7 +82,7 @@ export function ViewportToggle() {
   const toggle = () => {
     const newMode = !isDesktopMode
     setIsDesktopMode(newMode)
-    localStorage.setItem("verrex-viewport-mode", newMode ? "desktop" : "mobile")
+    localStorage.setItem("VEREX-viewport-mode", newMode ? "desktop" : "mobile")
     
     if (newMode) {
       switchToDesktop()

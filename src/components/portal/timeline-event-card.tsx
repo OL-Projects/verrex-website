@@ -110,7 +110,7 @@ export function TimelineEventCard({ event, index, userRole, isLast = false, show
   const colors = eventColorMap[event.eventType] || eventColorMap.system_event
   const isClient = userRole === "client"
   const displayTitle = isClient ? (CLIENT_EVENT_LABELS[event.eventType] || event.title) : event.title
-  const displayActor = isClient && event.actorRole !== "client" ? "Verrex Team" : event.actorName
+  const displayActor = isClient && event.actorRole !== "client" ? "VEREX Team" : event.actorName
 
   // Card border/bg by visibility level
   const borderStyle = event.visibility === "admin_only"

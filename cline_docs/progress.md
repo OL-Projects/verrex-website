@@ -1,4 +1,4 @@
-# VERREX - Progress
+# VEREX - Progress
 
 ## What Works
 - ✅ Full Next.js 16 project with TypeScript and Tailwind CSS v4
@@ -26,7 +26,7 @@
 - ✅ 98 catalog page images uploaded and integrated
 
 ## Deployment Info
-- **GitHub**: `OL-Projects/verrex-website` (main branch)
+- **GitHub**: `OL-Projects/VEREX-website` (main branch)
 - **Hosting**: Vercel (auto-deploy on push to main)
 - **Latest commit**: `b483e89` — Realistic 3D renders with MeshTransmissionMaterial, spring physics
 - **Build**: Compiles successfully (~3.6s, 22 pages)

@@ -50,7 +50,7 @@ export function Footer() {
               </div>
               <div>
                 <span className="text-2xl font-bold tracking-tight">
-                  VERREX
+                  VEREX
                 </span>
                 <span className="block text-[10px] text-slate-400 -mt-1 tracking-widest uppercase">
                   {t('premiumWindows')}
@@ -155,7 +155,7 @@ export function Footer() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-400">
-              © {new Date().getFullYear()} VERREX. {t('allRightsReserved')}
+              © {new Date().getFullYear()} VEREX. {t('allRightsReserved')}
             </p>
             <div className="flex items-center gap-4">
               <a

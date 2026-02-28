@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { motion } from "framer-motion"
 import { Link as IntlLink } from "@/i18n/navigation"
-import { VerrexLogo } from "@/components/ui/verrex-logo"
+import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { Button } from "@/components/ui/button"
 import {
   UserPlus, Mail, Lock, User, Phone, Eye, EyeOff,
@@ -83,7 +83,7 @@ export default function SignupPage() {
 
         <div className="p-8 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4"><VerrexLogo variant="icon" size={48} /></div>
+            <div className="flex justify-center mb-4"><VEREXLogo variant="icon" size={48} /></div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
               {step === "success" ? "Account Created!" : "Create Account"}
             </h1>
@@ -120,7 +120,7 @@ export default function SignupPage() {
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
                   className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/15 text-sm text-amber-800 dark:text-amber-300">
                   <p className="font-medium mb-1">This role requires admin approval</p>
-                  <p className="text-xs text-amber-700 dark:text-amber-400/70">Contact your Verrex representative or email admin@verrex.com to request access.</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400/70">Contact your VEREX representative or email admin@VEREX.com to request access.</p>
                 </motion.div>
               )}
               <div className="pt-4 text-center">

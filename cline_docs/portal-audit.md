@@ -1,4 +1,4 @@
-# VERREX PORTAL — Comprehensive Audit Report
+# VEREX PORTAL — Comprehensive Audit Report
 **Date:** February 25, 2026  
 **Build Status:** ✅ Clean (zero errors, zero warnings)
 

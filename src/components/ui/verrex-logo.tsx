@@ -1,17 +1,17 @@
 import React from "react"
 
-interface VerrexLogoProps {
+interface VEREXLogoProps {
   className?: string
   size?: number
   variant?: "icon" | "full"
 }
 
 /**
- * VERREX VX Monogram Logo — Premium Edition
+ * VEREX VX Monogram Logo — Premium Edition
  * A sophisticated V+X geometric mark with layered strokes,
  * inner glow, and gradient depth for a high-end brand feel.
  */
-export function VerrexIcon({ className = "", size = 40 }: { className?: string; size?: number }) {
+export function VEREXIcon({ className = "", size = 40 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 48 52"
@@ -20,7 +20,7 @@ export function VerrexIcon({ className = "", size = 40 }: { className?: string; 
       width={size}
       height={size}
       className={className}
-      aria-label="VERREX logo"
+      aria-label="VEREX logo"
     >
       <defs>
         {/* Primary gradient — bright blue to white */}
@@ -102,7 +102,7 @@ export function VerrexIcon({ className = "", size = 40 }: { className?: string; 
   )
 }
 
-export function VerrexLogo({ className = "", size = 44, variant = "icon" }: VerrexLogoProps) {
+export function VEREXLogo({ className = "", size = 44, variant = "icon" }: VEREXLogoProps) {
   if (variant === "icon") {
     return (
       <div
@@ -111,7 +111,7 @@ export function VerrexLogo({ className = "", size = 44, variant = "icon" }: Verr
       >
         {/* Inner subtle highlight */}
         <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent via-transparent to-white/10" />
-        <VerrexIcon size={size * 0.62} />
+        <VEREXIcon size={size * 0.62} />
       </div>
     )
   }
@@ -123,11 +123,11 @@ export function VerrexLogo({ className = "", size = 44, variant = "icon" }: Verr
         style={{ width: size, height: size }}
       >
         <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent via-transparent to-white/10" />
-        <VerrexIcon size={size * 0.62} />
+        <VEREXIcon size={size * 0.62} />
       </div>
       <div className="flex flex-col">
         <span className="text-2xl font-extrabold tracking-tight leading-none">
-          VERREX
+          VEREX
         </span>
         <span className="text-[9px] tracking-[0.2em] uppercase opacity-60 leading-tight mt-0.5">
           Windows & Doors

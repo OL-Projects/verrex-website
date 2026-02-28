@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Link as IntlLink } from "@/i18n/navigation"
-import { VerrexLogo } from "@/components/ui/verrex-logo"
+import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { Button } from "@/components/ui/button"
 import {
   LogIn, Mail, Lock, Eye, EyeOff, AlertCircle,
@@ -120,9 +120,9 @@ function LoginContent() {
         {/* Login Card */}
         <div className="p-8 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 dark:shadow-black/20">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4"><VerrexLogo variant="icon" size={48} /></div>
+            <div className="flex justify-center mb-4"><VEREXLogo variant="icon" size={48} /></div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sign in to your Verrex Portal account</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Sign in to your VEREX Portal account</p>
           </div>
 
           {/* Error Message */}
@@ -191,7 +191,7 @@ function LoginContent() {
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Admin", email: "admin@verrex.com", pass: "admin123" },
+              { label: "Admin", email: "admin@VEREX.com", pass: "admin123" },
               { label: "Client", email: "client@demo.com", pass: "client123" },
               { label: "Contractor", email: "contractor@demo.com", pass: "contractor123" },
               { label: "Supplier", email: "supplier@demo.com", pass: "supplier123" },

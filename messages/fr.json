@@ -17,7 +17,7 @@
     "bookAppointment": "Prendre rendez-vous",
     "searchPlaceholder": "Rechercher...",
     "searchFullPlaceholder": "Rechercher produits, services, équipe...",
-    "verrex": "VERREX",
+    "VEREX": "VEREX",
     "windowsAndDoors": "Fenêtres et portes",
     "monFri": "Lun-Ven : ",
     "callUs": "Appelez-nous",
@@ -54,10 +54,10 @@
     "badge": "Fenêtres et portes haut de gamme",
     "heroTitle": "Conçu pour",
     "heroTitleGradient": "chaque projet",
-    "heroDescription": "VERREX offre des systèmes de fenêtres et de portes haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels. Fait confiance par les promoteurs, architectes et gestionnaires d'installations partout au Canada.",
+    "heroDescription": "VEREX offre des systèmes de fenêtres et de portes haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels. Fait confiance par les promoteurs, architectes et gestionnaires d'installations partout au Canada.",
     "viewCatalog": "Voir le catalogue de produits",
     "bookConsultation": "Réserver une consultation",
-    "heroAlt": "Systèmes de fenêtres et portes haut de gamme VERREX",
+    "heroAlt": "Systèmes de fenêtres et portes haut de gamme VEREX",
     "stat1Value": "500+",
     "stat1Label": "Projets livrés",
     "stat2Value": "2M+",
@@ -71,7 +71,7 @@
     "cert3": "ENERGY STAR® Canada",
     "cert4": "FenestrationCanada",
     "certsTitle": "Certifications et normes reconnues",
-    "certsDesc": "Chaque produit VERREX est testé, certifié et évalué par les principaux organismes de l'industrie pour garantir les plus hauts standards de performance, d'efficacité énergétique et de sécurité.",
+    "certsDesc": "Chaque produit VEREX est testé, certifié et évalué par les principaux organismes de l'industrie pour garantir les plus hauts standards de performance, d'efficacité énergétique et de sécurité.",
     "certEnergyStarDesc": "Conforme ou supérieur aux exigences ENERGY STAR® Canada pour une efficacité énergétique supérieure et des coûts de chauffage réduits.",
     "certNfrcDesc": "Évalué de manière indépendante par le National Fenestration Rating Council pour la performance thermique, le gain solaire et l'infiltration d'air.",
     "certCsaDesc": "Certifié selon les normes CSA A440 pour l'intégrité structurelle, la résistance à l'eau et l'étanchéité à l'air.",
@@ -123,10 +123,10 @@
     "quoteFormSubtitle": "Obtenir une soumission gratuite"
   },
   "AboutPage": {
-    "title": "À propos de VERREX",
+    "title": "À propos de VEREX",
     "description": "Découvrez notre engagement à offrir des solutions de fenestration haut de gamme partout au Canada.",
     "missionTitle": "Notre mission",
-    "missionText1": "VERREX est une entreprise de fenêtres et de portes de premier plan qui offre des systèmes de fenestration haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels.",
+    "missionText1": "VEREX est une entreprise de fenêtres et de portes de premier plan qui offre des systèmes de fenestration haute performance pour les projets résidentiels, commerciaux, institutionnels et industriels.",
     "missionText2": "Nous avons bâti une solide réputation de qualité artisanale, de service fiable et de solutions innovantes. Notre équipe travaille étroitement avec les architectes, promoteurs, entrepreneurs et propriétaires pour livrer des résultats exceptionnels sur chaque projet.",
     "licensedInsured": "Licencié et assuré",
     "qualityCertified": "Certifié qualité",
@@ -185,7 +185,7 @@
     "phoneNumber": "(416) 555-0199"
   },
   "CatalogPage": {
-    "badge": "Index des produits VERREX",
+    "badge": "Index des produits VEREX",
     "title": "Catalogue de produits",
     "description": "Parcourez notre base de données complète de fenêtres, portes et systèmes de fenestration haut de gamme. Trouvez le bon produit pour votre projet résidentiel, commercial ou industriel.",
     "searchPlaceholder": "Rechercher par nom, type ou caractéristique...",
@@ -259,8 +259,8 @@
     "mainPhone": "(416) 555-0199",
     "tollFree": "1-800-555-0199",
     "emailUs": "Écrivez-nous",
-    "generalEmail": "info@verrex.com",
-    "salesEmail": "ventes@verrex.com",
+    "generalEmail": "info@VEREX.com",
+    "salesEmail": "ventes@VEREX.com",
     "businessHours": "Heures d'ouverture",
     "monFri": "Lundi - Vendredi : 8h00 - 18h00",
     "saturday": "Samedi : 9h00 - 16h00",
@@ -433,7 +433,7 @@
     "estimatedDuration": "Durée estimée",
     "learnMore": "En savoir plus",
     "getStarted": "Commencer",
-    "whyChoose": "Pourquoi choisir VERREX?",
+    "whyChoose": "Pourquoi choisir VEREX?",
     "whyChooseDesc": "Nous offrons des solutions complètes avec une expertise de premier plan.",
     "certifiedExperts": "Experts certifiés",
     "certifiedExpertsDesc": "Tous nos techniciens sont certifiés et formés selon les normes les plus élevées de l'industrie.",
@@ -447,7 +447,7 @@
     "bookConsultation": "Réserver une consultation"
   },
   "WindowsPage": {
-    "badge": "Fenêtres VERREX",
+    "badge": "Fenêtres VEREX",
     "title": "Systèmes de fenêtres",
     "description": "Solutions de fenêtres haut de gamme conçues pour l'efficacité énergétique, la durabilité et l'esthétique moderne. Des guillotines classiques aux battants contemporains.",
     "configure3d": "Configurer en 3D",
@@ -518,7 +518,7 @@
     "ctaDesc": "Visualisez différents styles de fenêtres, couleurs de cadre et types de verre dans notre outil 3D interactif."
   },
   "DoorsPage": {
-    "badge": "Portes VERREX",
+    "badge": "Portes VEREX",
     "title": "Systèmes de portes",
     "description": "Solutions de portes professionnelles pour les applications résidentielles, commerciales et industrielles. Portes-fenêtres coulissantes, systèmes d'entrée commerciale et portes basculantes industrielles.",
     "getQuote": "Obtenir une soumission",
@@ -722,7 +722,7 @@
     },
     "testimonials": {
       "t1": {
-        "content": "VERREX a livré une qualité exceptionnelle sur notre projet de condos. Le système de murs-rideaux a dépassé nos attentes en termes de performance et d'esthétique.",
+        "content": "VEREX a livré une qualité exceptionnelle sur notre projet de condos. Le système de murs-rideaux a dépassé nos attentes en termes de performance et d'esthétique.",
         "name": "David Chen",
         "role": "Gestionnaire de projet",
         "company": "Pinnacle Developments"
@@ -734,7 +734,7 @@
         "company": "Villa au Lac"
       },
       "t3": {
-        "content": "Nous avons fait appel à VERREX pour plusieurs projets commerciaux. Leurs systèmes de devanture sont de premier ordre et leur service est fiable.",
+        "content": "Nous avons fait appel à VEREX pour plusieurs projets commerciaux. Leurs systèmes de devanture sont de premier ordre et leur service est fiable.",
         "name": "Michael Torres",
         "role": "Directeur des installations",
         "company": "Skyline Properties"
@@ -746,19 +746,19 @@
         "company": "Conseil du patrimoine"
       },
       "t5": {
-        "content": "Rapide, professionnel et de haute qualité. VERREX a installé le verre de sécurité dans toute notre usine en avance sur l'échéancier.",
+        "content": "Rapide, professionnel et de haute qualité. VEREX a installé le verre de sécurité dans toute notre usine en avance sur l'échéancier.",
         "name": "Robert Kim",
         "role": "Directeur d'usine",
         "company": "AutoTech Industries"
       },
       "t6": {
-        "content": "Le design de fenêtres sur mesure pour notre conversion de brasserie en lofts était parfait. VERREX a compris l'esthétique industrielle que nous recherchions.",
+        "content": "Le design de fenêtres sur mesure pour notre conversion de brasserie en lofts était parfait. VEREX a compris l'esthétique industrielle que nous recherchions.",
         "name": "Jessica Lavoie",
         "role": "Directrice créative",
         "company": "Urban Revival Inc."
       },
       "t7": {
-        "content": "D'excellentes améliorations en efficacité énergétique. Nos coûts de chauffage ont considérablement diminué après que VERREX ait remplacé toutes nos fenêtres.",
+        "content": "D'excellentes améliorations en efficacité énergétique. Nos coûts de chauffage ont considérablement diminué après que VEREX ait remplacé toutes nos fenêtres.",
         "name": "Thomas Anderson",
         "role": "Gestionnaire d'immeuble",
         "company": "Riverside Commons"

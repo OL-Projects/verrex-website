@@ -34,13 +34,13 @@ const team = [
 
 // Static pages for search
 const pages = [
-  { title: "Home", description: "VERREX homepage - Premium windows & doors solutions for residential, commercial, and industrial clients.", href: "/", keywords: ["home", "main", "verrex", "windows", "glass"] },
+  { title: "Home", description: "VEREX homepage - Premium windows & doors solutions for residential, commercial, and industrial clients.", href: "/", keywords: ["home", "main", "VEREX", "windows", "glass"] },
   { title: "Products Catalog", description: "Browse our comprehensive catalog of windows, doors, and door systems.", href: "/products", keywords: ["products", "catalog", "windows", "doors", "glass", "browse", "shop"] },
   { title: "Our Services", description: "Consultation, measurement, installation, inspection, and custom solutions.", href: "/services", keywords: ["services", "consultation", "measurement", "installation", "inspection", "repair"] },
   { title: "Request a Quote", description: "Get a free detailed estimate for your window and door project.", href: "/quote", keywords: ["quote", "estimate", "pricing", "free", "cost"] },
   { title: "Book Appointment", description: "Schedule a consultation, measurement, or installation appointment.", href: "/appointments", keywords: ["appointment", "schedule", "book", "meeting", "calendar"] },
   { title: "Contact Us", description: "Get in touch with our team via phone, email, or visit our office.", href: "/contact", keywords: ["contact", "phone", "email", "address", "location", "reach"] },
-  { title: "About VERREX", description: "Learn about our mission, values, team, and partner network.", href: "/about", keywords: ["about", "mission", "team", "values", "company", "history"] },
+  { title: "About VEREX", description: "Learn about our mission, values, team, and partner network.", href: "/about", keywords: ["about", "mission", "team", "values", "company", "history"] },
 ]
 
 type SearchResultType = "product" | "service" | "team" | "page" | "partner"

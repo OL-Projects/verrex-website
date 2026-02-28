@@ -17,7 +17,7 @@
     "bookAppointment": "Book Appointment",
     "searchPlaceholder": "Search...",
     "searchFullPlaceholder": "Search products, services, team...",
-    "verrex": "VERREX",
+    "VEREX": "VEREX",
     "windowsAndDoors": "Windows & Doors",
     "monFri": "Mon-Fri: ",
     "callUs": "Call Us",
@@ -54,10 +54,10 @@
     "badge": "Premium Windows & Doors",
     "heroTitle": "Engineered for",
     "heroTitleGradient": "Every Project",
-    "heroDescription": "VERREX delivers high-performance window and door systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Canada.",
+    "heroDescription": "VEREX delivers high-performance window and door systems for residential, commercial, institutional, and industrial projects. Trusted by developers, architects, and facility managers across Canada.",
     "viewCatalog": "View Product Catalog",
     "bookConsultation": "Book Consultation",
-    "heroAlt": "VERREX premium window and door systems",
+    "heroAlt": "VEREX premium window and door systems",
     "stat1Value": "500+",
     "stat1Label": "Projects Delivered",
     "stat2Value": "2M+",
@@ -71,7 +71,7 @@
     "cert3": "ENERGY STAR® Canada",
     "cert4": "FenestrationCanada",
     "certsTitle": "Trusted Certifications & Standards",
-    "certsDesc": "Every VERREX product is tested, certified, and rated by leading industry organizations to ensure the highest performance, energy efficiency, and safety standards.",
+    "certsDesc": "Every VEREX product is tested, certified, and rated by leading industry organizations to ensure the highest performance, energy efficiency, and safety standards.",
     "certEnergyStarDesc": "Meets or exceeds ENERGY STAR® Canada requirements for superior energy efficiency and reduced heating costs.",
     "certNfrcDesc": "Independently rated by the National Fenestration Rating Council for thermal performance, solar gain, and air leakage.",
     "certCsaDesc": "Certified to CSA A440 standards for structural integrity, water resistance, and air tightness.",
@@ -123,10 +123,10 @@
     "quoteFormSubtitle": "Get a Free Quote"
   },
   "AboutPage": {
-    "title": "About VERREX",
+    "title": "About VEREX",
     "description": "Learn about our commitment to delivering premium fenestration solutions across Canada.",
     "missionTitle": "Our Mission",
-    "missionText1": "VERREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects.",
+    "missionText1": "VEREX is a premier window and door corporation delivering high-performance fenestration systems for residential, commercial, institutional, and industrial projects.",
     "missionText2": "We have built a strong reputation for quality craftsmanship, reliable service, and innovative solutions. Our team works closely with architects, developers, contractors, and homeowners to deliver exceptional results on every project.",
     "licensedInsured": "Licensed & Insured",
     "qualityCertified": "Quality Certified",
@@ -185,7 +185,7 @@
     "phoneNumber": "(416) 555-0199"
   },
   "CatalogPage": {
-    "badge": "VERREX Product Index",
+    "badge": "VEREX Product Index",
     "title": "Product Catalog",
     "description": "Browse our complete database of premium windows, doors, and fenestration systems. Find the right product for your residential, commercial, or industrial project.",
     "searchPlaceholder": "Search by name, type, or feature...",
@@ -259,8 +259,8 @@
     "mainPhone": "(416) 555-0199",
     "tollFree": "1-800-555-0199",
     "emailUs": "Email Us",
-    "generalEmail": "info@verrex.com",
-    "salesEmail": "sales@verrex.com",
+    "generalEmail": "info@VEREX.com",
+    "salesEmail": "sales@VEREX.com",
     "businessHours": "Business Hours",
     "monFri": "Monday - Friday: 8:00 AM - 6:00 PM",
     "saturday": "Saturday: 9:00 AM - 4:00 PM",
@@ -433,7 +433,7 @@
     "estimatedDuration": "Estimated Duration",
     "learnMore": "Learn More",
     "getStarted": "Get Started",
-    "whyChoose": "Why Choose VERREX?",
+    "whyChoose": "Why Choose VEREX?",
     "whyChooseDesc": "We provide end-to-end solutions with industry-leading expertise.",
     "certifiedExperts": "Certified Experts",
     "certifiedExpertsDesc": "All our technicians are certified and trained to the highest industry standards.",
@@ -447,7 +447,7 @@
     "bookConsultation": "Book Consultation"
   },
   "WindowsPage": {
-    "badge": "VERREX Windows",
+    "badge": "VEREX Windows",
     "title": "Window Systems",
     "description": "Premium window solutions engineered for energy efficiency, durability, and modern aesthetics. From classic double hung to contemporary casement designs.",
     "configure3d": "Configure in 3D",
@@ -518,7 +518,7 @@
     "ctaDesc": "Visualize different window styles, frame colors, and glass types in our interactive 3D tool."
   },
   "DoorsPage": {
-    "badge": "VERREX Doors",
+    "badge": "VEREX Doors",
     "title": "Door Systems",
     "description": "Professional door solutions for residential, commercial, and industrial applications. Sliding patio doors, commercial entry systems, and industrial overhead doors.",
     "getQuote": "Get a Quote",
@@ -722,7 +722,7 @@
     },
     "testimonials": {
       "t1": {
-        "content": "VERREX delivered exceptional quality on our condo project. The curtain wall system exceeded our expectations in both performance and aesthetics.",
+        "content": "VEREX delivered exceptional quality on our condo project. The curtain wall system exceeded our expectations in both performance and aesthetics.",
         "name": "David Chen",
         "role": "Project Manager",
         "company": "Pinnacle Developments"
@@ -734,7 +734,7 @@
         "company": "Lakeside Villa"
       },
       "t3": {
-        "content": "We have used VERREX for multiple commercial projects. Their storefront systems are top-notch and their service is reliable.",
+        "content": "We have used VEREX for multiple commercial projects. Their storefront systems are top-notch and their service is reliable.",
         "name": "Michael Torres",
         "role": "Facilities Director",
         "company": "Skyline Properties"
@@ -746,19 +746,19 @@
         "company": "Heritage Board"
       },
       "t5": {
-        "content": "Fast, professional, and high quality. VERREX installed safety glass throughout our manufacturing facility ahead of schedule.",
+        "content": "Fast, professional, and high quality. VEREX installed safety glass throughout our manufacturing facility ahead of schedule.",
         "name": "Robert Kim",
         "role": "Plant Manager",
         "company": "AutoTech Industries"
       },
       "t6": {
-        "content": "The custom window design for our brewery loft conversion was perfect. VERREX understood the industrial aesthetic we wanted.",
+        "content": "The custom window design for our brewery loft conversion was perfect. VEREX understood the industrial aesthetic we wanted.",
         "name": "Jessica Lavoie",
         "role": "Creative Director",
         "company": "Urban Revival Inc."
       },
       "t7": {
-        "content": "Excellent energy efficiency improvements. Our heating costs dropped significantly after VERREX replaced all our windows.",
+        "content": "Excellent energy efficiency improvements. Our heating costs dropped significantly after VEREX replaced all our windows.",
         "name": "Thomas Anderson",
         "role": "Property Manager",
         "company": "Riverside Commons"

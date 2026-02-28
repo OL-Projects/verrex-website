@@ -1,5 +1,5 @@
 // ============================================================
-// VERREX PORTAL — NextAuth v5 Configuration
+// VEREX PORTAL — NextAuth v5 Configuration
 // Phase 1: Demo users + in-memory registration
 // ============================================================
 
@@ -11,7 +11,7 @@ import type { UserRole } from '@/types/portal';
 const DEMO_USERS = [
   {
     id: 'usr_admin_001',
-    email: 'admin@verrex.com',
+    email: 'admin@VEREX.com',
     password: 'admin123',
     name: 'Sarah Mitchell',
     role: 'admin' as UserRole,
@@ -136,7 +136,7 @@ export function getAllUsers() {
 
 // ── NextAuth configuration ─────────────────────────────────
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'verrex-portal-demo-secret-2026-change-in-production',
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'VEREX-portal-demo-secret-2026-change-in-production',
   providers: [
     Credentials({
       name: 'Credentials',

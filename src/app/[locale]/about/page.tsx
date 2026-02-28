@@ -36,7 +36,7 @@ export default async function AboutPage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-transparent to-transparent dark:from-black/70 z-10" />
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Badge variant="primary" className="mb-4">About VERREX</Badge>
+          <Badge variant="primary" className="mb-4">About VEREX</Badge>
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white max-w-3xl">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-8 flex items-center gap-6 flex-wrap">
@@ -97,10 +97,10 @@ export default async function AboutPage() {
             </div>
             {/* HQ Image */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/hero/hero-hq.svg" alt="VERREX headquarters" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              <Image src="/images/hero/hero-hq.svg" alt="VEREX headquarters" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2">
-                <p className="text-sm font-bold text-slate-900 dark:text-white">VERREX</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">VEREX</p>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default async function AboutPage() {
           <div className="text-center mb-10">
             <Badge variant="secondary" className="mb-3">Industry Standards</Badge>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Certifications &amp; Compliance</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">All VERREX products meet or exceed the highest industry standards</p>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">All VEREX products meet or exceed the highest industry standards</p>
           </div>
           <CertificationsBar variant="full" />
         </div>

@@ -143,7 +143,7 @@ export const DEFAULT_TERMS = [
 ]
 
 export function defaultCompany(): CompanyInfo {
-  return { name: "VERREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "verrex-website.vercel.app", logoUrl: "" }
+  return { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "VEREX-website.vercel.app", logoUrl: "" }
 }
 
 export function createBlankEstimate(): EstimateState {

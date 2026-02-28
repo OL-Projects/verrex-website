@@ -40,7 +40,7 @@ export default async function ServicesPage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-transparent to-transparent dark:from-black/80 z-10" />
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Badge variant="primary" className="mb-3">VERREX Services</Badge>
+          <Badge variant="primary" className="mb-3">VEREX Services</Badge>
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-6 flex gap-3 flex-wrap">

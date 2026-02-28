@@ -1,5 +1,5 @@
 // ============================================================
-// VERREX PORTAL — Core Type Definitions
+// VEREX PORTAL — Core Type Definitions
 // ============================================================
 
 // --- Enums ---

@@ -1,4 +1,4 @@
-# VERREX - System Patterns
+# VEREX - System Patterns
 
 ## Architecture
 - **Next.js App Router**: File-based routing with server/client component split
@@ -51,7 +51,7 @@
 ├──────────────────────────────────────────────┤
 │ SERVICES (6 service cards, 3x2 grid)         │
 ├──────────────────────────────────────────────┤
-│ WHY CHOOSE VERREX (2-col: benefits + image)  │
+│ WHY CHOOSE VEREX (2-col: benefits + image)  │
 ├──────────────────────────────────────────────┤
 │ TESTIMONIALS (4 cards)                       │
 ├──────────────────────────────────────────────┤

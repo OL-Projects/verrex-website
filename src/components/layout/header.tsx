@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { ViewportToggle } from "@/components/ui/viewport-toggle"
-import { VerrexLogo } from "@/components/ui/verrex-logo"
+import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { companyInfo } from "@/lib/data"
 import {
   Phone,
@@ -88,11 +88,11 @@ export function Header() {
                 whileTap={{ scale: 0.95 }}
                 className="relative"
               >
-                <VerrexLogo variant="icon" size={44} />
+                <VEREXLogo variant="icon" size={44} />
               </motion.div>
               <div className="flex flex-col">
                 <span className="text-2xl font-extrabold tracking-tight leading-none text-slate-900 dark:text-white drop-shadow-sm">
-                  VERREX
+                  VEREX
                 </span>
                 <span className="hidden sm:block text-[8px] text-slate-600 dark:text-slate-300 tracking-[0.18em] uppercase leading-tight mt-0.5 font-medium whitespace-nowrap">
                   {t('windowsAndDoors')}

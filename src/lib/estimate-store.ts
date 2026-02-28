@@ -14,13 +14,13 @@ export interface EstimateRecord {
 }
 
 // We store records metadata separately from full estimate data
-// Full data: verrex_est_data_{id} — one key per estimate
-// Records list: verrex_est_records — array of EstimateRecord (metadata only)
-// Active ID: verrex_est_active_id
+// Full data: VEREX_est_data_{id} — one key per estimate
+// Records list: VEREX_est_records — array of EstimateRecord (metadata only)
+// Active ID: VEREX_est_active_id
 
-const RECORDS_KEY = "verrex_est_records"
-const ACTIVE_KEY = "verrex_est_active_id"
-const DATA_PREFIX = "verrex_est_data_"
+const RECORDS_KEY = "VEREX_est_records"
+const ACTIVE_KEY = "VEREX_est_active_id"
+const DATA_PREFIX = "VEREX_est_data_"
 
 function uid() { return `est_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}` }
 
