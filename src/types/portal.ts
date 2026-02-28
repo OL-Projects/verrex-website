@@ -261,17 +261,28 @@ export interface ChatThread {
 
 export interface Invoice {
   id: string;
+  invoiceNumber: string;
   projectId: string;
   clientId: string;
   clientName: string;
+  clientAddress: string;
+  clientCity: string;
   items: InvoiceItem[];
   subtotal: number;
+  taxGST: number;
+  taxQST: number;
   tax: number;
   total: number;
   depositPaid: number;
   balanceDue: number;
-  status: 'draft' | 'sent' | 'paid' | 'overdue';
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'void';
+  issueDate: string;
   dueDate: string;
+  paymentTerms: string;
+  notes: string;
+  paidDate?: string;
+  paidMethod?: string;
+  sentDate?: string;
   createdAt: string;
 }
 

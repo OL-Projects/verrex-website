@@ -294,7 +294,8 @@ function FinancialsTab({ project, invoices }: { project: import("@/types/portal"
           ))}</div>
           <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 space-y-1 text-xs">
             <div className="flex justify-between"><span className="text-slate-400">Subtotal</span><span>${inv.subtotal.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span className="text-slate-400">Tax</span><span>${inv.tax.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-slate-400">GST (5%)</span><span>${inv.taxGST.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-slate-400">QST (9.975%)</span><span>${inv.taxQST.toLocaleString()}</span></div>
             <div className="flex justify-between font-bold text-sm"><span>Total</span><span>${inv.total.toLocaleString()}</span></div>
             <div className="flex justify-between text-green-600 dark:text-green-400"><span>Deposit</span><span>-${inv.depositPaid.toLocaleString()}</span></div>
             <div className="flex justify-between font-bold text-base text-amber-600 dark:text-amber-400 pt-1 border-t border-slate-100 dark:border-white/5"><span>Balance Due</span><span>${inv.balanceDue.toLocaleString()}</span></div>

@@ -60,6 +60,9 @@ interface PortalStore {
   // Invoices
   createInvoice: (data: Omit<Invoice, "id" | "createdAt">) => Invoice
   markInvoicePaid: (id: string, amount: number, actor: string) => void
+  sendInvoice: (id: string) => void
+  voidInvoice: (id: string) => void
+  updateInvoice: (id: string, data: Partial<Invoice>) => void
 
   // Measurements
   addMeasurement: (data: Omit<MeasurementEntry, "id">) => MeasurementEntry
@@ -212,12 +215,24 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
     return inv
   }, [pushTimeline])
 
+  const sendInvoice = useCallback((id: string) => {
+    setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, status: 'sent' as const, sentDate: new Date().toISOString().split('T')[0] } : inv))
+  }, [])
+
+  const voidInvoice = useCallback((id: string) => {
+    setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, status: 'void' as const } : inv))
+  }, [])
+
+  const updateInvoice = useCallback((id: string, data: Partial<Invoice>) => {
+    setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, ...data } : inv))
+  }, [])
+
   const markInvoicePaid = useCallback((id: string, amount: number, actor: string) => {
     setInvoices(prev => prev.map(inv => {
       if (inv.id !== id) return inv
       const newPaid = inv.depositPaid + amount
       pushTimeline({ projectId: inv.projectId, timestamp: now(), actorId: actor, actorName: mockUsers.find(u => u.id === actor)?.name || actor, actorRole: "admin", eventType: "payment_received", title: `Payment received: $${amount.toLocaleString()}`, visibility: "all" as TimelineVisibility })
-      return { ...inv, depositPaid: newPaid, balanceDue: inv.total - newPaid, status: newPaid >= inv.total ? "paid" as const : inv.status }
+      return { ...inv, depositPaid: newPaid, balanceDue: inv.total - newPaid, status: newPaid >= inv.total ? "paid" as const : inv.status, paidDate: newPaid >= inv.total ? today() : inv.paidDate }
     }))
   }, [pushTimeline])
 
@@ -249,7 +264,7 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
     createLead, updateLead, changeLeadStage, convertLeadToProject,
     updateProject, changeProjectStage, assignToProject,
     createAppointment, updateAppointment, cancelAppointment, completeAppointment,
-    updateOrderStatus, sendMessage, createInvoice, markInvoicePaid,
+    updateOrderStatus, sendMessage, createInvoice, markInvoicePaid, sendInvoice, voidInvoice, updateInvoice,
     addMeasurement, addTimelineEvent, markNotificationRead, addNotification,
   }
 
