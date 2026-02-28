@@ -126,6 +126,31 @@ export default function CalendarView({ appointments, typeBgColors, conflicts, on
         .fc-portal-wrapper .fc-scrollgrid th {
           border-color: var(--fc-border-color) !important;
         }
+        /* Mobile responsive toolbar */
+        @media (max-width: 640px) {
+          .fc-portal-wrapper .fc-toolbar {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          .fc-portal-wrapper .fc-toolbar-chunk {
+            display: flex !important;
+            justify-content: center !important;
+          }
+          .fc-portal-wrapper .fc-toolbar-title {
+            font-size: 0.85rem !important;
+          }
+          .fc-portal-wrapper .fc-button {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+          }
+          .fc-portal-wrapper .fc-col-header-cell {
+            font-size: 0.6rem !important;
+          }
+          .fc-portal-wrapper .fc-daygrid-day-number {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.35rem !important;
+          }
+        }
         .dark .fc-portal-wrapper .fc-list-event-title a,
         .dark .fc-portal-wrapper .fc-list-event-time {
           color: #e2e8f0 !important;

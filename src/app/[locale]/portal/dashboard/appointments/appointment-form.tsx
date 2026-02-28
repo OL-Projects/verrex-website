@@ -9,6 +9,7 @@ import {
   CheckCircle2, ChevronDown, History,
 } from "lucide-react"
 import type { Appointment } from "@/types/portal"
+import type { AppointmentTemplate } from "./settings-panel"
 
 export interface EditRecord {
   timestamp: string
@@ -29,6 +30,9 @@ interface Props {
   defaultDuration?: number
   defaultStatus?: "scheduled" | "confirmed"
   defaultStartTime?: string
+  durationOptions?: { value: number; label: string }[]
+  startTimeOptions?: string[]
+  templates?: AppointmentTemplate[]
 }
 
 const aptTypes: { id: AppointmentType; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -40,17 +44,17 @@ const aptTypes: { id: AppointmentType; label: string; icon: React.ComponentType<
   { id: "follow_up", label: "Follow-up", icon: CalendarDays, color: "bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-300 dark:border-cyan-600" },
 ]
 
-const durations = [
+const defaultDurations = [
   { value: 30, label: "30 min" }, { value: 60, label: "1 hour" },
   { value: 90, label: "1.5 hours" }, { value: 120, label: "2 hours" },
   { value: 180, label: "3 hours" }, { value: 240, label: "4 hours" },
   { value: 480, label: "Full Day (8h)" },
 ]
 
-const timeSlots: string[] = []
+const defaultTimeSlots: string[] = []
 for (let h = 7; h <= 18; h++) {
-  timeSlots.push(`${String(h).padStart(2, "0")}:00`)
-  if (h < 18) timeSlots.push(`${String(h).padStart(2, "0")}:30`)
+  defaultTimeSlots.push(`${String(h).padStart(2, "0")}:00`)
+  if (h < 18) defaultTimeSlots.push(`${String(h).padStart(2, "0")}:30`)
 }
 
 const defaultChecklistItems = [
@@ -58,10 +62,12 @@ const defaultChecklistItems = [
   "Client signature form", "Sample materials", "Site access key/code",
 ]
 
-export default function AppointmentForm({ open, onClose, userId, mode = "create", appointment, editHistory = [], onEditSave, checklistItems: customChecklist, defaultDuration = 60, defaultStatus = "scheduled", defaultStartTime = "09:00" }: Props) {
+export default function AppointmentForm({ open, onClose, userId, mode = "create", appointment, editHistory = [], onEditSave, checklistItems: customChecklist, defaultDuration = 60, defaultStatus = "scheduled", defaultStartTime = "09:00", durationOptions, startTimeOptions, templates = [] }: Props) {
   const store = usePortalStore()
   const isEdit = mode === "edit" && !!appointment
   const activeChecklist = customChecklist || defaultChecklistItems
+  const activeDurations = durationOptions || defaultDurations
+  const activeTimeSlots = startTimeOptions && startTimeOptions.length > 0 ? startTimeOptions : defaultTimeSlots
 
   // Form state — pre-populated in edit mode
   const [selectedLead, setSelectedLead] = useState("")
@@ -183,6 +189,21 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
           </div>
         ) : (
           <div className="p-6 space-y-6">
+            {/* Template Selector */}
+            {!isEdit && templates.length > 0 && (
+              <div>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Apply Template</label>
+                <select onChange={(e) => {
+                  const tpl = templates.find(t => t.name === e.target.value)
+                  if (tpl) { setAptType(tpl.type); setDuration(tpl.duration); setTime(tpl.time); setStatus(tpl.status) }
+                }} defaultValue=""
+                  className="w-full h-10 px-3 rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/10 text-sm text-slate-900 dark:text-white">
+                  <option value="">— Select a template —</option>
+                  {templates.map(t => <option key={t.name} value={t.name}>{t.name} ({t.type}, {t.duration}m, {t.time})</option>)}
+                </select>
+              </div>
+            )}
+
             {/* Lead Selector */}
             <div>
               <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Link to Lead (optional)</label>
@@ -232,14 +253,14 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">Time *</label>
                 <select value={time} onChange={e => setTime(e.target.value)}
                   className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
-                  {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
+                  {activeTimeSlots.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 block">Duration</label>
                 <select value={duration} onChange={e => setDuration(Number(e.target.value))}
                   className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
-                  {durations.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  {activeDurations.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </div>
             </div>
