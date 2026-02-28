@@ -6,13 +6,29 @@ import type { AppointmentType } from "@/types/portal"
 import {
   X, CalendarDays, Ruler, Eye, Wrench, Search as SearchIcon,
   Clock, MapPin, User, FileText, Paperclip, AlertTriangle,
-  CheckCircle2, ChevronDown,
+  CheckCircle2, ChevronDown, History,
 } from "lucide-react"
+import type { Appointment } from "@/types/portal"
+
+export interface EditRecord {
+  timestamp: string
+  changedFields: string[]
+  before: Partial<Appointment>
+  after: Partial<Appointment>
+}
 
 interface Props {
   open: boolean
   onClose: () => void
   userId: string
+  mode?: "create" | "edit"
+  appointment?: Appointment | null
+  editHistory?: EditRecord[]
+  onEditSave?: (id: string, data: Partial<Appointment>, history: EditRecord) => void
+  checklistItems?: string[]
+  defaultDuration?: number
+  defaultStatus?: "scheduled" | "confirmed"
+  defaultStartTime?: string
 }
 
 const aptTypes: { id: AppointmentType; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -37,29 +53,32 @@ for (let h = 7; h <= 18; h++) {
   if (h < 18) timeSlots.push(`${String(h).padStart(2, "0")}:30`)
 }
 
-const checklistItems = [
+const defaultChecklistItems = [
   "Bring laser measure", "Camera / photos needed", "Safety equipment",
   "Client signature form", "Sample materials", "Site access key/code",
 ]
 
-export default function AppointmentForm({ open, onClose, userId }: Props) {
+export default function AppointmentForm({ open, onClose, userId, mode = "create", appointment, editHistory = [], onEditSave, checklistItems: customChecklist, defaultDuration = 60, defaultStatus = "scheduled", defaultStartTime = "09:00" }: Props) {
   const store = usePortalStore()
+  const isEdit = mode === "edit" && !!appointment
+  const activeChecklist = customChecklist || defaultChecklistItems
 
-  // Form state
+  // Form state — pre-populated in edit mode
   const [selectedLead, setSelectedLead] = useState("")
-  const [clientName, setClientName] = useState("")
-  const [address, setAddress] = useState("")
-  const [aptType, setAptType] = useState<AppointmentType>("consultation")
-  const [date, setDate] = useState("")
-  const [time, setTime] = useState("09:00")
-  const [duration, setDuration] = useState(60)
-  const [assignedTo, setAssignedTo] = useState("")
-  const [assignedName, setAssignedName] = useState("")
-  const [status, setStatus] = useState<"scheduled" | "confirmed">("scheduled")
-  const [notes, setNotes] = useState("")
+  const [clientName, setClientName] = useState(isEdit ? appointment.clientName : "")
+  const [address, setAddress] = useState(isEdit ? appointment.address : "")
+  const [aptType, setAptType] = useState<AppointmentType>(isEdit ? appointment.type : "consultation")
+  const [date, setDate] = useState(isEdit ? appointment.date : "")
+  const [time, setTime] = useState(isEdit ? appointment.time : defaultStartTime)
+  const [duration, setDuration] = useState(isEdit ? appointment.duration : defaultDuration)
+  const [assignedTo, setAssignedTo] = useState(isEdit ? appointment.assignedTo : "")
+  const [assignedName, setAssignedName] = useState(isEdit ? appointment.assignedName : "")
+  const [status, setStatus] = useState<"scheduled" | "confirmed">(isEdit ? (appointment.status === "confirmed" ? "confirmed" : "scheduled") : defaultStatus)
+  const [notes, setNotes] = useState(isEdit ? appointment.notes : "")
   const [checklist, setChecklist] = useState<Set<string>>(new Set())
   const [attachments, setAttachments] = useState<string[]>([])
   const [submitted, setSubmitted] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   // Auto-fill from lead selection
   const handleLeadSelect = (leadId: string) => {
@@ -123,20 +142,22 @@ export default function AppointmentForm({ open, onClose, userId }: Props) {
     if (!isValid) return
     const checkNotes = checklist.size > 0 ? `\nChecklist: ${[...checklist].join(", ")}` : ""
     const attachNotes = attachments.length > 0 ? `\nAttachments: ${attachments.join(", ")}` : ""
-    const projectId = selectedLead ? store.leads.find(l => l.id === selectedLead)?.id || "" : ""
-    store.createAppointment({
-      projectId,
-      clientName: clientName.trim(),
-      address: address.trim(),
-      type: aptType,
-      date,
-      time,
-      duration,
-      assignedTo,
-      assignedName,
-      notes: (notes.trim() + checkNotes + attachNotes).trim(),
-      status,
-    })
+
+    if (isEdit && onEditSave) {
+      const updated: Partial<Appointment> = { clientName: clientName.trim(), address: address.trim(), type: aptType, date, time, duration, assignedTo, assignedName, notes: (notes.trim() + checkNotes + attachNotes).trim(), status }
+      const changedFields: string[] = []
+      const before: Partial<Appointment> = {}
+      const after: Partial<Appointment> = {}
+      const fields: (keyof Appointment)[] = ["clientName", "address", "type", "date", "time", "duration", "assignedTo", "assignedName", "notes", "status"]
+      for (const f of fields) {
+        if (updated[f] !== appointment![f]) { changedFields.push(f); (before as Record<string, unknown>)[f] = appointment![f]; (after as Record<string, unknown>)[f] = updated[f] }
+      }
+      const record: EditRecord = { timestamp: new Date().toISOString(), changedFields, before, after }
+      onEditSave(appointment!.id, updated, record)
+    } else {
+      const projectId = selectedLead ? store.leads.find(l => l.id === selectedLead)?.id || "" : ""
+      store.createAppointment({ projectId, clientName: clientName.trim(), address: address.trim(), type: aptType, date, time, duration, assignedTo, assignedName, notes: (notes.trim() + checkNotes + attachNotes).trim(), status })
+    }
     setSubmitted(true)
     setTimeout(() => { setSubmitted(false); onClose() }, 1200)
   }
@@ -151,14 +172,14 @@ export default function AppointmentForm({ open, onClose, userId }: Props) {
 
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">New Appointment</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">{isEdit ? "Edit Appointment" : "New Appointment"}</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"><X className="h-5 w-5" /></button>
         </div>
 
         {submitted ? (
           <div className="flex flex-col items-center justify-center h-64 gap-3">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
-            <p className="text-lg font-semibold text-slate-900 dark:text-white">Appointment Created!</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{isEdit ? "Appointment Updated!" : "Appointment Created!"}</p>
           </div>
         ) : (
           <div className="p-6 space-y-6">
@@ -276,7 +297,7 @@ export default function AppointmentForm({ open, onClose, userId }: Props) {
             <div>
               <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Prep Checklist</label>
               <div className="grid grid-cols-2 gap-1.5">
-                {checklistItems.map(item => (
+                {activeChecklist.map(item => (
                   <button key={item} onClick={() => toggleChecklist(item)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all text-left ${checklist.has(item) ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400" : "bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400"}`}>
                     <div className={`h-4 w-4 rounded border-2 flex items-center justify-center shrink-0 ${checklist.has(item) ? "bg-green-500 border-green-500 text-white" : "border-slate-300 dark:border-slate-600"}`}>
@@ -306,10 +327,36 @@ export default function AppointmentForm({ open, onClose, userId }: Props) {
               </button>
             </div>
 
+            {/* Edit History */}
+            {isEdit && editHistory.length > 0 && (
+              <div>
+                <button onClick={() => setShowHistory(!showHistory)} className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 hover:text-blue-600 transition-colors">
+                  <History className="h-3.5 w-3.5" />Edit History ({editHistory.length}) {showHistory ? "▾" : "▸"}
+                </button>
+                {showHistory && (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {editHistory.map((h, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs">
+                        <p className="text-slate-500 dark:text-slate-400 mb-1">{new Date(h.timestamp).toLocaleString()}</p>
+                        {h.changedFields.map(f => (
+                          <div key={f} className="flex items-center gap-2 mt-1">
+                            <span className="font-medium text-slate-700 dark:text-slate-300 capitalize">{f}:</span>
+                            <span className="line-through text-red-500">{String((h.before as Record<string, unknown>)[f] ?? "")}</span>
+                            <span className="text-slate-400">→</span>
+                            <span className="text-green-600 dark:text-green-400">{String((h.after as Record<string, unknown>)[f] ?? "")}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Submit */}
             <button onClick={handleSubmit} disabled={!isValid}
               className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${isValid ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25" : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed"}`}>
-              Create Appointment
+              {isEdit ? "Save Changes" : "Create Appointment"}
             </button>
           </div>
         )}

@@ -8,10 +8,11 @@ import { usePortalStore } from "@/lib/portal-store"
 import {
   CalendarDays, MapPin, Clock, User, Wrench, Ruler, Search as SearchIcon,
   Eye, XCircle, CheckCircle2, List, CalendarRange, GanttChart,
-  AlertTriangle, TrendingUp, Users,
+  AlertTriangle, TrendingUp, Users, Settings, Pencil,
 } from "lucide-react"
 import type { Appointment } from "@/types/portal"
-import AppointmentForm from "./appointment-form"
+import AppointmentForm, { type EditRecord } from "./appointment-form"
+import SettingsPanel, { loadSettings, type AppointmentSettings } from "./settings-panel"
 
 const FullCalendarView = dynamic(() => import("./calendar-view"), { ssr: false,
   loading: () => <div className="h-[600px] flex items-center justify-center rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-200/60 dark:border-white/10"><div className="h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>,
@@ -54,8 +55,12 @@ export default function AppointmentsPage() {
   const { data: session } = useSession()
   const store = usePortalStore()
   const userId = session?.user?.id || "usr_admin_001"
-  const [view, setView] = useState<ViewTab>("calendar")
+  const [settings, setSettings] = useState<AppointmentSettings>(() => loadSettings())
+  const [view, setView] = useState<ViewTab>(() => settings.defaultView)
   const [showForm, setShowForm] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [editingApt, setEditingApt] = useState<Appointment | null>(null)
+  const [editHistoryMap, setEditHistoryMap] = useState<Record<string, EditRecord[]>>({})
 
   const upcoming = store.appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
   const past = store.appointments.filter(a => a.status === "completed" || a.status === "cancelled")
@@ -98,7 +103,10 @@ export default function AppointmentsPage() {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{upcoming.length} upcoming · {past.length} past</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowForm(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all">
+          <button onClick={() => setShowSettings(true)} className="p-2 rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
+            <Settings className="h-4 w-4" />
+          </button>
+          <button onClick={() => { setEditingApt(null); setShowForm(true) }} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-lg shadow-blue-500/25 transition-all">
             <CalendarDays className="h-3.5 w-3.5" />+ New
           </button>
           <div className="flex bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-slate-200/60 dark:border-white/10 p-1">
@@ -112,8 +120,27 @@ export default function AppointmentsPage() {
         </div>
       </motion.div>
 
-      {/* Appointment Form */}
-      <AppointmentForm open={showForm} onClose={() => setShowForm(false)} userId={userId} />
+      {/* Create Form */}
+      <AppointmentForm open={showForm && !editingApt} onClose={() => setShowForm(false)} userId={userId}
+        checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime} />
+
+      {/* Edit Form */}
+      {editingApt && (
+        <AppointmentForm key={editingApt.id} open={!!editingApt} onClose={() => setEditingApt(null)} userId={userId}
+          mode="edit" appointment={editingApt} editHistory={editHistoryMap[editingApt.id] || []}
+          checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime}
+          onEditSave={(id, data, record) => {
+            const apt = store.appointments.find(a => a.id === id)
+            if (apt) {
+              Object.assign(apt, data) // Update in store
+              setEditHistoryMap(prev => ({ ...prev, [id]: [...(prev[id] || []), record] }))
+            }
+            setEditingApt(null)
+          }} />
+      )}
+
+      {/* Settings */}
+      <SettingsPanel open={showSettings} onClose={() => setShowSettings(false)} settings={settings} onSave={setSettings} />
 
       {/* Stats Ribbon */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -134,25 +161,28 @@ export default function AppointmentsPage() {
 
       {/* VIEWS */}
       {view === "calendar" && (
-        <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts} />
+        <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts}
+          onEventClick={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) setEditingApt(apt) }} />
       )}
 
       {view === "gantt" && (
-        <GanttView appointments={store.appointments} technicians={technicians} typeBgColors={typeBgColors} conflicts={conflicts} />
+        <GanttView appointments={store.appointments} technicians={technicians} typeBgColors={typeBgColors} conflicts={conflicts}
+          onEdit={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) setEditingApt(apt) }} />
       )}
 
       {view === "list" && (
-        <ListView upcoming={upcoming} past={past} store={store} userId={userId} typeIcons={typeIcons} typeColors={typeColors} statusColors={statusColors} conflicts={conflicts} />
+        <ListView upcoming={upcoming} past={past} store={store} userId={userId} typeIcons={typeIcons} typeColors={typeColors} statusColors={statusColors} conflicts={conflicts}
+          onEdit={(apt) => setEditingApt(apt)} />
       )}
     </div>
   )
 }
 
 /* ─── LIST VIEW ─── */
-function ListView({ upcoming, past, store, userId, typeIcons, typeColors, statusColors, conflicts }: {
+function ListView({ upcoming, past, store, userId, typeIcons, typeColors, statusColors, conflicts, onEdit }: {
   upcoming: Appointment[]; past: Appointment[]; store: ReturnType<typeof usePortalStore>; userId: string;
   typeIcons: Record<string, React.ComponentType<{ className?: string }>>; typeColors: Record<string, string>;
-  statusColors: Record<string, string>; conflicts: string[];
+  statusColors: Record<string, string>; conflicts: string[]; onEdit: (apt: Appointment) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -184,6 +214,7 @@ function ListView({ upcoming, past, store, userId, typeIcons, typeColors, status
                       {apt.notes && <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 italic">{apt.notes}</p>}
                     </div>
                     <div className="flex flex-col gap-1.5 shrink-0">
+                      <button onClick={() => onEdit(apt)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-500/20 transition-colors"><Pencil className="h-3 w-3" />Edit</button>
                       <button onClick={() => store.completeAppointment(apt.id, userId)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/20 transition-colors"><CheckCircle2 className="h-3 w-3" />Complete</button>
                       <button onClick={() => store.cancelAppointment(apt.id, userId)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"><XCircle className="h-3 w-3" />Cancel</button>
                     </div>
@@ -218,8 +249,9 @@ function ListView({ upcoming, past, store, userId, typeIcons, typeColors, status
 }
 
 /* ─── GANTT / TIMELINE VIEW ─── */
-function GanttView({ appointments, technicians, typeBgColors, conflicts }: {
+function GanttView({ appointments, technicians, typeBgColors, conflicts, onEdit }: {
   appointments: Appointment[]; technicians: string[]; typeBgColors: Record<string, string>; conflicts: string[];
+  onEdit: (id: string) => void;
 }) {
   const active = appointments.filter(a => a.status !== "cancelled")
   const dates = [...new Set(active.map(a => a.date))].sort()
@@ -251,9 +283,10 @@ function GanttView({ appointments, technicians, typeBgColors, conflicts }: {
                   return (
                     <td key={d} className="p-1.5 align-top">
                       {dayApts.map(apt => (
-                        <div key={apt.id} className={`px-2 py-1 mb-1 rounded-md text-[10px] text-white font-medium truncate ${conflicts.includes(apt.id) ? "ring-2 ring-red-500" : ""}`}
+                        <div key={apt.id} onClick={() => onEdit(apt.id)}
+                          className={`px-2 py-1 mb-1 rounded-md text-[10px] text-white font-medium truncate cursor-pointer hover:opacity-80 transition-opacity ${conflicts.includes(apt.id) ? "ring-2 ring-red-500" : ""}`}
                           style={{ backgroundColor: typeBgColors[apt.type] || "#3b82f6" }}
-                          title={`${apt.clientName} — ${apt.type} — ${apt.time} (${apt.duration}m)`}>
+                          title={`Click to edit — ${apt.clientName} — ${apt.type} — ${apt.time} (${apt.duration}m)`}>
                           {apt.time} {apt.clientName.split(" ")[0]}
                         </div>
                       ))}
