@@ -4,7 +4,8 @@ import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/render
 import { EstimateWindowSVGPDF } from "./estimate-window-svg-pdf"
 import {
   type EstimateState,
-  WINDOW_TYPES, PRODUCTS, calcTotals, fmt,
+  type GlassPricingSettings,
+  WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice,
 } from "@/lib/estimate-config"
 
 const s = StyleSheet.create({
@@ -61,10 +62,11 @@ interface Props {
   est: EstimateState
   logo?: string
   sigs?: { client: string; rep: string }
+  glassSettings?: GlassPricingSettings
 }
 
-export function EstimatePDFDocument({ est, logo, sigs }: Props) {
-  const t = calcTotals(est)
+export function EstimatePDFDocument({ est, logo, sigs, glassSettings }: Props) {
+  const t = calcTotals(est, 5, 9.975, glassSettings)
   let gi = 0
 
   return (
@@ -135,7 +137,7 @@ export function EstimatePDFDocument({ est, logo, sigs }: Props) {
                       EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}
                     </Text>
                     {item.notes ? <Text style={s.itemNotes}>{item.notes}</Text> : null}
-                    <Text style={s.itemPrice}>×{item.qty} — {fmt(item.qty * item.unitPrice)}</Text>
+                    <Text style={s.itemPrice}>×{item.qty} — {fmt(item.qty * getEffectiveUnitPrice(item, glassSettings))}</Text>
                   </View>
                 </View>
               )

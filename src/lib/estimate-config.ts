@@ -244,10 +244,39 @@ export function allItems(est: EstimateState): EstimateItem[] {
   return est.rooms.flatMap(r => r.items)
 }
 
-export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975) {
+/** Settings shape needed for effective pricing (subset of EstimateSettings) */
+export type GlassPricingSettings = {
+  showCalculatedPrice: boolean
+  glassRateUnit: GlassRateUnit
+  doubleTemperedRate: number
+  tripleTemperedRate: number
+  doorShowCalculatedPrice: boolean
+  doorGlassRateUnit: GlassRateUnit
+  doorDoubleTemperedRate: number
+  doorTripleTemperedRate: number
+}
+
+/**
+ * Get the effective unit price for an item:
+ * - If the user entered a manual unitPrice > 0, use that.
+ * - Otherwise, use the calculated glass price (if enabled and applicable).
+ */
+export function getEffectiveUnitPrice(item: EstimateItem, glassSettings?: GlassPricingSettings): number {
+  if (item.unitPrice > 0) return item.unitPrice
+  if (!glassSettings) return item.unitPrice
+  const gl = getGlassRateForItem(item, glassSettings)
+  if (gl.show && gl.rate > 0) return computeCalculatedPrice(item, gl.rate, gl.unit)
+  return item.unitPrice
+}
+
+export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings) {
   const items = allItems(est)
   let prodTotal = 0, totalUnits = 0
-  items.forEach(it => { prodTotal += it.qty * it.unitPrice; totalUnits += it.qty })
+  items.forEach(it => {
+    const eff = getEffectiveUnitPrice(it, glassSettings)
+    prodTotal += it.qty * eff
+    totalUnits += it.qty
+  })
   const install = totalUnits * est.installPerUnit
   const delivery = est.delivery
   const subtax = prodTotal + install + delivery

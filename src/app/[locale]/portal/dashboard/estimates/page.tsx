@@ -15,7 +15,7 @@ import {
   type EstimateState, type EstimateItem, type Room,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
   calcTotals, fmt, getTypeGroups, isDoorType,
-  computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS,
+  computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -110,7 +110,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -127,7 +127,7 @@ export default function EstimatesPage() {
     }
   }, [est, logo, sigs])
 
-  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate), [est, estCfg.gstRate, estCfg.qstRate])
+  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate, estCfg), [est, estCfg])
 
   // ═══ SEND — 2-step: PDF download + email modal ═══
   const [showSendModal, setShowSendModal] = useState(false)
@@ -139,7 +139,7 @@ export default function EstimatesPage() {
     // Auto-generate and download PDF
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -179,7 +179,8 @@ export default function EstimatesPage() {
       `  📍 ${r.name}`,
       ...r.items.map(it => {
         const prod = PRODUCTS.find(p => p.id === it.product)
-        return `    • ${prod?.tag || it.product} — ${it.width}"W × ${it.height}"H — Qty: ${it.qty} — ${fmt(it.qty * it.unitPrice)}`
+        const eff = getEffectiveUnitPrice(it, estCfg)
+        return `    • ${prod?.tag || it.product} — ${it.width}"W × ${it.height}"H — Qty: ${it.qty} — ${fmt(it.qty * eff)}`
       }),
       ``,
     ]),
@@ -334,7 +335,8 @@ export default function EstimatesPage() {
                 const prod = PRODUCTS.find(p => p.id === item.product)
                 const hasCas = (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS"))
                 const egress = hasCas && item.height >= 24
-                const lineTotal = item.qty * item.unitPrice
+                const effPrice = getEffectiveUnitPrice(item, estCfg)
+                const lineTotal = item.qty * effPrice
 
                 return (
                   <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
@@ -475,7 +477,7 @@ export default function EstimatesPage() {
         {/* ═══ SUMMARY ═══ */}
         <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{estCfg.summaryTitle} — {t.items} Items ({t.totalUnits} Units)</h2>
-          <div className="space-y-1">{(() => { let gi = 0; let calcTotal = 0; const rows = est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); const gl = getGlassRateForItem(it, estCfg); const cp = gl.show && gl.rate > 0 ? computeCalculatedPrice(it, gl.rate, gl.unit) : 0; calcTotal += cp * it.qty; return <div key={it.id} className="flex justify-between text-sm gap-2"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="flex items-center gap-3">{cp > 0 && <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold print:hidden">Calc: {fmt(cp * it.qty)}</span>}<span className="font-semibold">{fmt(it.qty * it.unitPrice)}</span></span></div> })); return <>{rows}{calcTotal > 0 && <div className="flex justify-between text-sm mt-2 pt-2 border-t border-dashed border-emerald-200 dark:border-emerald-500/20 print:hidden"><span className="text-emerald-600 dark:text-emerald-400 font-semibold">Calculated Subtotal</span><span className="text-emerald-600 dark:text-emerald-400 font-bold">{fmt(calcTotal)}</span></div>}</> })()}</div>
+          <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); const eff = getEffectiveUnitPrice(it, estCfg); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * eff)}</span></div> })) })()}</div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
             {estCfg.showInstallation && <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
