@@ -10,7 +10,7 @@ interface Props {
   est: EstimateState
   logo: string
   sigs?: { client: string; rep: string }
-  glassSettings?: GlassPricingSettings
+  glassSettings?: GlassPricingSettings & { gstRate?: number; qstRate?: number; showInstallation?: boolean; showDelivery?: boolean; showGST?: boolean; showQST?: boolean }
   onClose: () => void
 }
 
@@ -32,7 +32,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }
 
       {/* PDF iframe — actual rendered PDF */}
       <div className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-950 border-x border-slate-200 dark:border-white/10">
-        <BlobProvider document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} />}>
+        <BlobProvider document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} gstRate={glassSettings?.gstRate} qstRate={glassSettings?.qstRate} showInstallation={glassSettings?.showInstallation} showDelivery={glassSettings?.showDelivery} showGST={glassSettings?.showGST} showQST={glassSettings?.showQST} />}>
           {({ url, loading, error }) => {
             if (loading) {
               return (

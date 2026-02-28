@@ -65,10 +65,14 @@ interface Props {
   glassSettings?: GlassPricingSettings
   gstRate?: number
   qstRate?: number
+  showInstallation?: boolean
+  showDelivery?: boolean
+  showGST?: boolean
+  showQST?: boolean
 }
 
-export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975 }: Props) {
-  const t = calcTotals(est, gstRate, qstRate, glassSettings)
+export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975, showInstallation = true, showDelivery = true, showGST = true, showQST = true }: Props) {
+  const t = calcTotals(est, gstRate, qstRate, glassSettings, { showInstallation, showDelivery, showGST, showQST })
   let gi = 0
 
   return (
@@ -150,10 +154,10 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
         {/* ── Summary ── */}
         <View style={s.summaryBox}>
           <View style={s.sumRow}><Text style={s.sumBold}>Products Subtotal</Text><Text style={s.sumBold}>{fmt(t.prodTotal)}</Text></View>
-          <View style={s.sumRow}><Text style={s.sumSub}>Installation ({t.totalUnits} units)</Text><Text style={s.sumSub}>{fmt(t.install)}</Text></View>
-          <View style={s.sumRow}><Text style={s.sumSub}>Delivery</Text><Text style={s.sumSub}>{fmt(t.delivery)}</Text></View>
-          <View style={s.sumRow}><Text style={s.sumSub}>GST (5%)</Text><Text style={s.sumSub}>{fmt(t.gst)}</Text></View>
-          <View style={s.sumRow}><Text style={s.sumSub}>QST (9.975%)</Text><Text style={s.sumSub}>{fmt(t.qst)}</Text></View>
+          {showInstallation && <View style={s.sumRow}><Text style={s.sumSub}>Installation ({t.totalUnits} units)</Text><Text style={s.sumSub}>{fmt(t.install)}</Text></View>}
+          {showDelivery && <View style={s.sumRow}><Text style={s.sumSub}>Delivery</Text><Text style={s.sumSub}>{fmt(t.delivery)}</Text></View>}
+          {showGST && <View style={s.sumRow}><Text style={s.sumSub}>GST ({gstRate}%)</Text><Text style={s.sumSub}>{fmt(t.gst)}</Text></View>}
+          {showQST && <View style={s.sumRow}><Text style={s.sumSub}>QST ({qstRate}%)</Text><Text style={s.sumSub}>{fmt(t.qst)}</Text></View>}
           <View style={s.totalRow}><Text>TOTAL</Text><Text>{fmt(t.total)}</Text></View>
           <View style={s.depositRow}><Text>Deposit ({est.depositPct}%)</Text><Text>{fmt(t.deposit)}</Text></View>
         </View>

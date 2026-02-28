@@ -269,7 +269,15 @@ export function getEffectiveUnitPrice(item: EstimateItem, glassSettings?: GlassP
   return item.unitPrice
 }
 
-export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings) {
+export interface CalcTotalsFlags {
+  showInstallation?: boolean
+  showDelivery?: boolean
+  showGST?: boolean
+  showQST?: boolean
+}
+
+export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags) {
+  const { showInstallation = true, showDelivery = true, showGST = true, showQST = true } = flags || {}
   const items = allItems(est)
   let prodTotal = 0, totalUnits = 0
   items.forEach(it => {
@@ -277,10 +285,11 @@ export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, gla
     prodTotal += it.qty * eff
     totalUnits += it.qty
   })
-  const install = totalUnits * est.installPerUnit
-  const delivery = est.delivery
+  const install = showInstallation ? totalUnits * est.installPerUnit : 0
+  const delivery = showDelivery ? est.delivery : 0
   const subtax = prodTotal + install + delivery
-  const gst = subtax * (gstRate / 100), qst = subtax * (qstRate / 100)
+  const gst = showGST ? subtax * (gstRate / 100) : 0
+  const qst = showQST ? subtax * (qstRate / 100) : 0
   const total = subtax + gst + qst
   const deposit = total * (est.depositPct / 100)
   return { prodTotal, totalUnits, items: items.length, install, delivery, subtax, gst, qst, total, deposit, balance: total - deposit }
