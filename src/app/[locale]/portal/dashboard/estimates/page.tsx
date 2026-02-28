@@ -110,7 +110,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -139,7 +139,7 @@ export default function EstimatesPage() {
     // Auto-generate and download PDF
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -562,7 +562,7 @@ export default function EstimatesPage() {
     </div>
 
     {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
-    {showPreview && <EstimatePreviewPanel est={est} logo={logo || est.company.logoUrl} sigs={sigs} onClose={() => setSidePanel("none")} />}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo || est.company.logoUrl} sigs={sigs} glassSettings={estCfg} onClose={() => setSidePanel("none")} />}
     {showCustomize && <EstimateCustomizePanel
       onClose={() => setSidePanel("none")}
       style={estStyle} onUpdateStyle={updateStyle}

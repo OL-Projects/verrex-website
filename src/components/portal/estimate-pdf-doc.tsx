@@ -63,10 +63,12 @@ interface Props {
   logo?: string
   sigs?: { client: string; rep: string }
   glassSettings?: GlassPricingSettings
+  gstRate?: number
+  qstRate?: number
 }
 
-export function EstimatePDFDocument({ est, logo, sigs, glassSettings }: Props) {
-  const t = calcTotals(est, 5, 9.975, glassSettings)
+export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975 }: Props) {
+  const t = calcTotals(est, gstRate, qstRate, glassSettings)
   let gi = 0
 
   return (

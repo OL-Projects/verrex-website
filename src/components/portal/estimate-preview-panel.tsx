@@ -4,16 +4,17 @@ import { useState } from "react"
 import { X, ZoomIn, ZoomOut } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { EstimatePDFDocument } from "./estimate-pdf-doc"
-import { type EstimateState } from "@/lib/estimate-config"
+import { type EstimateState, type GlassPricingSettings } from "@/lib/estimate-config"
 
 interface Props {
   est: EstimateState
   logo: string
   sigs?: { client: string; rep: string }
+  glassSettings?: GlassPricingSettings
   onClose: () => void
 }
 
-export function EstimatePreviewPanel({ est, logo, sigs, onClose }: Props) {
+export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }: Props) {
   const [zoom, setZoom] = useState(100)
 
   return (
@@ -31,7 +32,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, onClose }: Props) {
 
       {/* PDF iframe — actual rendered PDF */}
       <div className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-950 border-x border-slate-200 dark:border-white/10">
-        <BlobProvider document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} />}>
+        <BlobProvider document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} />}>
           {({ url, loading, error }) => {
             if (loading) {
               return (
