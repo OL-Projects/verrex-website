@@ -55,7 +55,7 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `Verrex - Invoice ${inv.invoiceNumber} - ${inv.clientName}.pdf`.replace(/[^a-zA-Z0-9 \-_.]/g, "")
+      a.download = `Verex - Invoice ${inv.invoiceNumber} - ${inv.clientName}.pdf`.replace(/[^a-zA-Z0-9 \-_.]/g, "")
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -68,22 +68,23 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
     }
   }, [inv])
 
-  /* ── Print just the invoice document (not the whole page) ── */
-  const printInvoice = useCallback(() => {
-    const el = invoiceDocRef.current
-    if (!el) return
-    const win = window.open("", "_blank", "width=800,height=1000")
-    if (!win) return
-    win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.invoiceNumber}</title>
-      <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #0f172a; background: #fff; }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-      </style>
-    </head><body>${el.innerHTML}</body></html>`)
-    win.document.close()
-    setTimeout(() => { win.print(); win.close() }, 400)
-  }, [inv.invoiceNumber])
+  /* ── Print — generate PDF and open in new tab for proper print ── */
+  const [printLoading, setPrintLoading] = useState(false)
+  const printInvoice = useCallback(async () => {
+    setPrintLoading(true)
+    try {
+      const { pdf } = await import("@react-pdf/renderer")
+      const doc = <InvoicePDFDocument invoice={inv} />
+      const blob = await pdf(doc).toBlob()
+      const url = URL.createObjectURL(blob)
+      window.open(url, "_blank")
+    } catch (err) {
+      console.error("Print PDF error:", err)
+      alert("Could not generate print preview. Please try the PDF download instead.")
+    } finally {
+      setPrintLoading(false)
+    }
+  }, [inv])
 
   return (
     <div className="h-full flex flex-col">
@@ -100,7 +101,9 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
           <button onClick={exportPDF} disabled={pdfLoading} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-50">
             {pdfLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}PDF
           </button>
-          <button onClick={printInvoice} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400" title="Print invoice only"><Printer className="h-4 w-4" /></button>
+          <button onClick={printInvoice} disabled={printLoading} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 disabled:opacity-50" title="Print invoice only">
+            {printLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
@@ -120,12 +123,12 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
           <div className="bg-blue-50 dark:bg-blue-950/40 px-7 py-5 border-b-2 border-blue-200 dark:border-blue-900/40">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-xl font-black tracking-[0.15em] text-blue-900 dark:text-blue-200 uppercase">Verrex Industries</h1>
+                <h1 className="text-xl font-black tracking-[0.15em] text-blue-900 dark:text-blue-200 uppercase">Verex Industries</h1>
                 <p className="text-blue-600/60 dark:text-blue-400/50 text-[10px] font-semibold tracking-wider uppercase mt-0.5">Premium Windows & Doors Manufacturer</p>
                 <div className="text-[10px] text-blue-800/60 dark:text-blue-300/50 mt-3 space-y-0.5 leading-relaxed font-medium">
                   <p>1234 Boulevard Industriel</p>
                   <p>Montréal, QC H2X 3K6</p>
-                  <p>Tél: (514) 555-0100 · info@verrexindustries.ca</p>
+                  <p>Tél: (514) 555-0100 · info@verexindustries.ca</p>
                 </div>
               </div>
               <div className="text-right">
@@ -242,8 +245,8 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
           <div className="px-7 py-3 border-t border-blue-100 dark:border-blue-900/20 bg-blue-50/50 dark:bg-blue-950/20">
             <p className="text-[9px] font-bold text-blue-700/50 dark:text-blue-400/40 uppercase tracking-[0.12em] mb-1.5">Payment Information / Modalités de paiement</p>
             <div className="text-[10px] text-slate-500 dark:text-slate-400 space-y-0.5 leading-relaxed">
-              <p>Interac E-Transfer: <span className="font-medium">payments@verrexindustries.ca</span></p>
-              <p>Cheque payable to: <span className="font-medium">Verrex Industries Inc.</span></p>
+              <p>Interac E-Transfer: <span className="font-medium">payments@verexindustries.ca</span></p>
+              <p>Cheque payable to: <span className="font-medium">Verex Industries Inc.</span></p>
               <p>Reference: <span className="font-mono font-bold">{inv.invoiceNumber}</span></p>
             </div>
             {inv.paidDate && (
@@ -257,14 +260,14 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
           <div className="px-7 py-3 border-t-2 border-blue-200 dark:border-blue-900/40 bg-blue-50 dark:bg-blue-950/40">
             <div className="flex items-start justify-between gap-4">
               <div className="text-[8px] text-blue-800/40 dark:text-blue-400/30 space-y-0.5 leading-relaxed font-medium">
-                <p>Verrex Industries Inc. — Licensed Contractor (RBQ #5678-9012-34)</p>
+                <p>Verex Industries Inc. — Licensed Contractor (RBQ #5678-9012-34)</p>
                 <p>GST/TPS: 123 456 789 RT0001 · QST/TVQ: 1234 5678 9012 TQ0001</p>
                 <p>Energy Star® Certified · NFRC Rated · CSA Approved</p>
               </div>
               <div className="text-right shrink-0">
                 <div className="border border-blue-200 dark:border-blue-800/40 rounded px-2 py-1 inline-block">
                   <p className="text-[7px] text-blue-800/40 dark:text-blue-400/30 uppercase font-bold tracking-wider leading-tight">Official Document</p>
-                  <p className="text-[7px] text-blue-800/40 dark:text-blue-400/30 font-mono">verrexindustries.ca</p>
+                  <p className="text-[7px] text-blue-800/40 dark:text-blue-400/30 font-mono">verexindustries.ca</p>
                 </div>
               </div>
             </div>

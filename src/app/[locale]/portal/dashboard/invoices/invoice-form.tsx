@@ -87,7 +87,8 @@ export default function InvoiceForm({ onClose, editInvoice }: Props) {
       </div>
 
       {/* Form */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="max-w-xl mx-auto space-y-4">
         {/* Link Lead */}
         {!isEdit && (
           <div>
@@ -161,6 +162,7 @@ export default function InvoiceForm({ onClose, editInvoice }: Props) {
         <button onClick={handleSubmit} disabled={!isValid} className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${isValid ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25" : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed"}`}>
           {isEdit ? "Save Changes" : "Create Invoice"}
         </button>
+        </div>
       </div>
     </div>
   )

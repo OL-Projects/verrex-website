@@ -110,9 +110,9 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         <View style={s.header}>
           <View style={s.headerRow}>
             <View>
-              <Text style={s.companyName}>Verrex Industries</Text>
+              <Text style={s.companyName}>Verex Industries</Text>
               <Text style={s.companyTag}>PREMIUM WINDOWS & DOORS MANUFACTURER</Text>
-              <Text style={s.companyInfo}>1234 Boulevard Industriel{"\n"}Montréal, QC H2X 3K6{"\n"}Tél: (514) 555-0100 · info@verrexindustries.ca</Text>
+              <Text style={s.companyInfo}>1234 Boulevard Industriel{"\n"}Montréal, QC H2X 3K6{"\n"}Tél: (514) 555-0100 · info@verexindustries.ca</Text>
             </View>
             <View>
               <Text style={s.invLabel}>Facture / Invoice</Text>
@@ -203,8 +203,8 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         {/* Payment Info */}
         <View style={s.payBox}>
           <Text style={s.payLabel}>Payment Information / Modalités de paiement</Text>
-          <Text style={s.payText}>Interac E-Transfer: <Text style={s.payBold}>payments@verrexindustries.ca</Text></Text>
-          <Text style={s.payText}>Cheque payable to: <Text style={s.payBold}>Verrex Industries Inc.</Text></Text>
+          <Text style={s.payText}>Interac E-Transfer: <Text style={s.payBold}>payments@verexindustries.ca</Text></Text>
+          <Text style={s.payText}>Cheque payable to: <Text style={s.payBold}>Verex Industries Inc.</Text></Text>
           <Text style={s.payText}>Reference: <Text style={s.payBold}>{inv.invoiceNumber}</Text></Text>
           {inv.paidDate && <Text style={s.paidStamp}>✓ PAID — {inv.paidDate}{inv.paidMethod ? ` via ${inv.paidMethod}` : ""}</Text>}
         </View>
@@ -212,13 +212,13 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         {/* Footer */}
         <View style={s.footer}>
           <View>
-            <Text style={s.footerText}>Verrex Industries Inc. — Licensed Contractor (RBQ #5678-9012-34)</Text>
+            <Text style={s.footerText}>Verex Industries Inc. — Licensed Contractor (RBQ #5678-9012-34)</Text>
             <Text style={s.footerText}>GST/TPS: 123 456 789 RT0001 · QST/TVQ: 1234 5678 9012 TQ0001</Text>
             <Text style={s.footerText}>Energy Star® Certified · NFRC Rated · CSA Approved</Text>
           </View>
           <View style={s.footerSeal}>
             <Text style={s.footerSealText}>OFFICIAL DOCUMENT</Text>
-            <Text style={s.footerSealText}>verrexindustries.ca</Text>
+            <Text style={s.footerSealText}>verexindustries.ca</Text>
           </View>
         </View>
       </Page>
