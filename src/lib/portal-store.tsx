@@ -6,11 +6,12 @@ import type {
   MeasurementEntry, TimelineEvent, Commission, Notification,
   PipelineStage, OrderStatus, LeadSource, LeadPriority, AppointmentType,
   TimelineEventType, TimelineVisibility, UserRole,
+  Contract,
 } from "@/types/portal"
 import {
   mockLeads, mockProjects, mockAppointments, mockOrders,
   mockInvoices, mockMessages, mockChatThreads, mockMeasurements,
-  mockTimelineEvents, mockCommissions, mockNotifications, mockUsers,
+  mockTimelineEvents, mockCommissions, mockContracts, mockNotifications, mockUsers,
 } from "@/lib/portal-data"
 
 // ── Utility ────────────────────────────────────────
@@ -32,6 +33,9 @@ interface PortalStore {
   measurements: MeasurementEntry[]
   timeline: TimelineEvent[]
   commissions: Commission[]
+  contracts: Contract[]
+  createContract: (data: Omit<Contract, "id" | "createdAt">) => Contract
+  updateContract: (id: string, data: Partial<Contract>) => void
   notifications: Notification[]
 
   // Lead CRUD
@@ -94,6 +98,15 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
   const [measurements, setMeasurements] = useState<MeasurementEntry[]>(() => [...mockMeasurements])
   const [timeline, setTimeline] = useState<TimelineEvent[]>(() => [...mockTimelineEvents])
   const [commissions] = useState<Commission[]>(() => [...mockCommissions])
+  const [contracts, setContracts] = useState<Contract[]>(() => [...mockContracts])
+  const createContract = useCallback((data: Omit<Contract, "id" | "createdAt">) => {
+    const c: Contract = { ...data, id: uid("cont"), createdAt: today() }
+    setContracts(prev => [c, ...prev])
+    return c
+  }, [])
+  const updateContract = useCallback((id: string, data: Partial<Contract>) => {
+    setContracts(prev => prev.map(c => c.id === id ? { ...c, ...data } : c))
+  }, [])
   const [notifications, setNotifications] = useState<Notification[]>(() => [...mockNotifications])
 
   // ── Helpers ──
@@ -265,6 +278,7 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
     updateProject, changeProjectStage, assignToProject,
     createAppointment, updateAppointment, cancelAppointment, completeAppointment,
     updateOrderStatus, sendMessage, createInvoice, markInvoicePaid, sendInvoice, voidInvoice, updateInvoice,
+    contracts, createContract, updateContract,
     addMeasurement, addTimelineEvent, markNotificationRead, addNotification,
   }
 

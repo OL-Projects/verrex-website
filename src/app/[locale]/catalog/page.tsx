@@ -187,26 +187,27 @@ export default function CatalogPage() {
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
-              {/* Mobile Search */}
-              <div className="lg:hidden mb-4 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input placeholder={t('searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm" />
-              </div>
-
-              {/* Mobile Filter Trigger */}
-              <div className="lg:hidden flex items-center gap-2 mb-4">
-                <Button variant="outline" size="sm" onClick={() => setIsMobileFilterOpen(true)} className="gap-2 text-xs">
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  {t('productTypes')}
-                  {activeFilter !== "all" && (
-                    <Badge variant="primary" className="text-[10px] h-5 px-1.5 ml-0.5">1</Badge>
-                  )}
-                </Button>
-                {activeFilter !== "all" && (
-                  <button onClick={clearFilters} className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    <X className="h-3 w-3" /> {t('clearFilters')}
+              {/* Mobile Search + Filter Bar */}
+              <div className="lg:hidden mb-4 space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input placeholder={t('searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setIsMobileFilterOpen(true)}
+                    className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <SlidersHorizontal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span>{t('productTypes')}</span>
+                    {activeFilter !== "all" && (
+                      <Badge variant="primary" className="text-[10px] h-5 px-1.5 ml-0.5">1</Badge>
+                    )}
                   </button>
-                )}
+                  {activeFilter !== "all" && (
+                    <button onClick={clearFilters} className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                      <X className="h-3 w-3" /> {t('clearFilters')}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Mobile Filter Drawer */}
@@ -437,8 +438,28 @@ export default function CatalogPage() {
         </div>
       </section>
 
+      {/* Mobile Floating Action Button — always visible */}
+      <div className="lg:hidden fixed bottom-6 right-4 z-40 flex flex-col items-end gap-2.5">
+        {/* 3D Configurator mini-FAB */}
+        <IntlLink href="/products/window-types">
+          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 via-blue-600 to-violet-700 text-white shadow-lg shadow-blue-500/30 ring-1 ring-white/20 hover:shadow-xl hover:scale-105 transition-all">
+            <Box className="h-4 w-4" />
+            <span className="text-xs font-semibold">3D</span>
+          </div>
+        </IntlLink>
+        {/* Filter FAB */}
+        <button onClick={() => setIsMobileFilterOpen(true)}
+          className="flex items-center gap-2 px-4 py-3 rounded-full bg-white dark:bg-slate-900 text-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg shadow-black/10 hover:shadow-xl hover:scale-105 transition-all">
+          <SlidersHorizontal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span className="text-sm font-semibold">{t('productTypes')}</span>
+          {activeFilter !== "all" && (
+            <span className="flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">1</span>
+          )}
+        </button>
+      </div>
+
       {/* CTA */}
-      <section className="py-12 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
+      <section className="py-12 pb-28 lg:pb-12 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('ctaTitle')}</h2>
           <p className="mt-2 text-slate-600 dark:text-slate-400">{t('ctaDesc')}</p>

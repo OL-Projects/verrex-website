@@ -293,6 +293,40 @@ export interface InvoiceItem {
   total: number;
 }
 
+export interface Contract {
+  id: string;
+  contractNumber: string;
+  projectId: string;
+  clientName: string;
+  clientAddress: string;
+  clientCity: string;
+  scopeItems: ContractScopeItem[];
+  totalValue: number;
+  paymentSchedule: ContractPayment[];
+  startDate: string;
+  completionDate: string;
+  warrantyYears: number;
+  terms: string[];
+  status: 'draft' | 'sent' | 'signed' | 'active' | 'completed' | 'void';
+  signedDate?: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface ContractScopeItem {
+  description: string;
+  quantity: number;
+  specifications: string;
+}
+
+export interface ContractPayment {
+  milestone: string;
+  percentage: number;
+  amount: number;
+  dueDate: string;
+  status: 'pending' | 'paid';
+}
+
 export interface Commission {
   id: string;
   partnerId: string;
@@ -418,6 +452,7 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Appointments', href: '/portal/dashboard/appointments', icon: 'CalendarDays', roles: ['admin', 'client', 'contractor', 'inspector'] },
   { label: 'Measurements', href: '/portal/dashboard/measurements', icon: 'Ruler', roles: ['admin', 'contractor', 'inspector'] },
   { label: 'Estimates', href: '/portal/dashboard/estimates', icon: 'FileText', roles: ['admin'] },
+  { label: 'Contracts', href: '/portal/dashboard/contracts', icon: 'ClipboardSignature', roles: ['admin'] },
   { label: 'Orders', href: '/portal/dashboard/orders', icon: 'Package', roles: ['admin', 'supplier'] },
   { label: 'Messages', href: '/portal/dashboard/messages', icon: 'MessageSquare', roles: ['admin', 'client', 'contractor'] },
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
