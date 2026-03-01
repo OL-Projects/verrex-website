@@ -12,11 +12,12 @@ import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel
 import { EstimateLeftSidebar } from "@/components/portal/estimate-left-sidebar"
 import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import {
-  type EstimateState, type EstimateItem, type Room,
+  type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
   calcTotals, fmt, getTypeGroups, isDoorType,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
-  perimeterInches, perimeterFeet,
+  perimeterInches, perimeterFeet, perimeterInUnit, getItemTrimCost, getItemInstallCost,
+  inToDisplay, displayToIn, dimLabel, TRIM_UNITS,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -128,7 +129,9 @@ export default function EstimatesPage() {
     }
   }, [est, logo, sigs])
 
-  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate, estCfg, { showInstallation: estCfg.showInstallation, showDelivery: estCfg.showDelivery, showGST: estCfg.showGST, showQST: estCfg.showQST }), [est, estCfg])
+  const trimS: TrimRateSettings = useMemo(() => ({ trimUnit: estCfg.trimUnit ?? "in", flatTrimRate: estCfg.flatTrimRate ?? 0.50, colonialTrimRate: estCfg.colonialTrimRate ?? 0.75 }), [estCfg.trimUnit, estCfg.flatTrimRate, estCfg.colonialTrimRate])
+  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate, estCfg, { showInstallation: estCfg.showInstallation, showDelivery: estCfg.showDelivery, showGST: estCfg.showGST, showQST: estCfg.showQST }, trimS), [est, estCfg, trimS])
+  const dU = estCfg.dimensionUnit ?? "in"
 
   // ═══ SEND — 2-step: PDF download + email modal ═══
   const [showSendModal, setShowSendModal] = useState(false)
@@ -421,17 +424,17 @@ export default function EstimatesPage() {
                           </div>
                         </div>
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}</p>
-                        {/* Trim Installation */}
-                        <div className="rounded-lg border border-slate-200 dark:border-white/10 p-2.5 space-y-2">
+                        {/* Trim */}
+                        <div className="rounded-lg border border-orange-200 dark:border-orange-500/20 p-2.5 space-y-2">
                           <label className="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" checked={item.trimInstall ?? false} onChange={e => updateItem(room.id, item.id, { trimInstall: e.target.checked })} className="accent-orange-500 w-3.5 h-3.5" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Trim Installation</span>
-                            <span className="text-[9px] text-slate-400 ml-auto">Perimeter: {perimeterInches(item.width, item.height)} in</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">Trim</span>
+                            <span className="text-[9px] text-slate-400 ml-auto">Perimeter: {perimeterInUnit(item.width, item.height, estCfg.trimUnit ?? "in").toFixed(1)} {TRIM_UNITS.find(u => u.id === (estCfg.trimUnit ?? "in"))?.short?.slice(1) ?? "in"}</span>
                           </label>
                           {(item.trimInstall ?? false) && (
-                            <div className="grid grid-cols-2 gap-2 pt-1">
+                            <div className="grid grid-cols-3 gap-2 pt-1">
                               <div>
-                                <label className={C.lbl}>Trim Style</label>
+                                <label className={C.lbl}>Style</label>
                                 <div className="flex gap-2">
                                   <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
                                     <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "flat"} onChange={() => updateItem(room.id, item.id, { trimStyle: "flat" })} className="accent-orange-500 w-3 h-3" /> Flat
@@ -442,12 +445,36 @@ export default function EstimatesPage() {
                                 </div>
                               </div>
                               <div>
-                                <label className={C.lbl}>Trim Price (per unit)</label>
-                                <input type="number" min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} className={`${C.inp} font-semibold`} />
+                                <label className={C.lbl}>Override $</label>
+                                <input type="number" min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} placeholder="0=auto" className={`${C.inp} font-semibold text-xs`} />
+                              </div>
+                              <div>
+                                <label className={C.lbl}>Trim Cost</label>
+                                <div className="px-2 py-2 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 text-xs font-bold text-orange-600 dark:text-orange-400">
+                                  {fmt(getItemTrimCost(item, trimS))}
+                                </div>
                               </div>
                             </div>
                           )}
                         </div>
+                        {/* Installation */}
+                        {estCfg.showInstallation && (
+                        <div className="rounded-lg border border-blue-200 dark:border-blue-500/20 p-2.5 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Installation</span>
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">{fmt(getItemInstallCost(item, est.installPerUnit))}</span>
+                          </div>
+                          <label className="flex items-center gap-2 cursor-pointer print:hidden">
+                            <input type="checkbox" checked={item.installOverride ?? false} onChange={e => updateItem(room.id, item.id, { installOverride: e.target.checked })} className="accent-blue-500 w-3 h-3" />
+                            <span className="text-[9px] text-slate-500">Override global rate (${est.installPerUnit}/unit)</span>
+                          </label>
+                          {(item.installOverride ?? false) && (
+                            <div className="pt-1">
+                              <input type="number" min={0} step={0.01} value={item.installPrice ?? 0} onChange={e => updateItem(room.id, item.id, { installPrice: +e.target.value })} placeholder="Custom install price" className={`${C.inp} font-semibold text-xs`} />
+                            </div>
+                          )}
+                        </div>
+                        )}
                         {/* Notes */}
                         <div><label className={C.lbl}>Notes</label>
                           <textarea rows={2} value={item.notes} onChange={e => updateItem(room.id, item.id, { notes: e.target.value })} placeholder="Special instructions…" className={`${C.inp} resize-none`} />
@@ -527,11 +554,11 @@ export default function EstimatesPage() {
             {estCfg.showInstallation && <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
             {estCfg.showDelivery && <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
-          {/* Itemized Trim Installation Costs */}
+          {/* Itemized Trim Costs */}
           {t.trimTotal > 0 && (
             <div className="mt-2 pt-2 border-t border-orange-200 dark:border-orange-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Trim Installation</p>
-              <div className="space-y-0.5">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; if (!it.trimInstall || !(it.trimPrice > 0)) return null; const peri = perimeterInches(it.width, it.height); const style = (it.trimStyle ?? "flat").charAt(0).toUpperCase() + (it.trimStyle ?? "flat").slice(1); return <div key={it.id} className="flex justify-between text-xs"><span className="text-slate-500">#{gi} Trim ({style}) — {peri} in perimeter (×{it.qty})</span><span className="font-semibold text-orange-600 dark:text-orange-400">{fmt(it.qty * it.trimPrice)}</span></div> })) })()}</div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Trim</p>
+              <div className="space-y-0.5">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; if (!it.trimInstall) return null; const tc = getItemTrimCost(it, trimS); if (tc <= 0) return null; const style = (it.trimStyle ?? "flat").charAt(0).toUpperCase() + (it.trimStyle ?? "flat").slice(1); const periU = perimeterInUnit(it.width, it.height, estCfg.trimUnit ?? "in").toFixed(1); const uLbl = TRIM_UNITS.find(u => u.id === (estCfg.trimUnit ?? "in"))?.short?.slice(1) ?? "in"; return <div key={it.id} className="flex justify-between text-xs"><span className="text-slate-500">#{gi} {style} — {periU} {uLbl} (×{it.qty})</span><span className="font-semibold text-orange-600 dark:text-orange-400">{fmt(it.qty * tc)}</span></div> })) })()}</div>
               <div className="flex justify-between text-sm font-bold mt-1"><span className="text-orange-600 dark:text-orange-400">Trim Total</span><span className="text-orange-600 dark:text-orange-400">{fmt(t.trimTotal)}</span></div>
             </div>
           )}
@@ -539,13 +566,31 @@ export default function EstimatesPage() {
           {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST ({estCfg.gstRate}%)</span><span>{fmt(t.gst)}</span></div>}
           {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST ({estCfg.qstRate}%)</span><span>{fmt(t.qst)}</span></div>}
           <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
-          {estCfg.showDeposit && <div className={`flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 mt-3 px-5 py-3 text-sm items-center ${estCfg.showBalance ? '' : '-mb-5 rounded-b-2xl'}`}>
-            <span>Deposit Required: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</span>
-            <span className="font-bold">{fmt(t.deposit)}</span>
-          </div>}
-          {estCfg.showBalance && estCfg.showDeposit && <div className="flex justify-between font-semibold bg-slate-50 dark:bg-white/3 -mx-5 -mb-5 px-5 py-2.5 rounded-b-2xl text-sm items-center border-t border-slate-200 dark:border-white/5">
-            <span className="text-slate-500">Balance Remaining</span><span className="font-bold">{fmt(t.balance)}</span>
-          </div>}
+          {/* Payment Stages */}
+          {(() => {
+            const stages = (estCfg.paymentStages ?? []).filter(s => s.show)
+            if (stages.length === 0) return null
+            let usedPct = 0
+            const rows = stages.map((s, i) => {
+              const isDeposit = s.id === "deposit"
+              const pct = isDeposit ? est.depositPct : s.pct
+              const isRemainder = pct === 0 && !isDeposit
+              let amount: number
+              if (isRemainder) { amount = t.total * (1 - usedPct / 100) } else { amount = t.total * (pct / 100); usedPct += pct }
+              const isLast = i === stages.length - 1
+              return (
+                <div key={s.id} className={`flex justify-between font-semibold ${i === 0 ? 'bg-slate-100 dark:bg-white/5 -mx-5 mt-3 px-5 py-3' : 'bg-slate-50 dark:bg-white/3 -mx-5 px-5 py-2.5 border-t border-slate-200 dark:border-white/5'} text-sm items-center ${isLast ? '-mb-5 rounded-b-2xl' : ''}`}>
+                  <span className={i === 0 ? '' : 'text-slate-500'}>
+                    {s.label}{isDeposit && (<>: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</>)}
+                    {isRemainder && <span className="text-[9px] text-slate-400 ml-1">(remainder)</span>}
+                    {!isDeposit && !isRemainder && pct > 0 && <span className="text-[9px] text-slate-400 ml-1">({pct}%)</span>}
+                  </span>
+                  <span className="font-bold">{fmt(amount)}</span>
+                </div>
+              )
+            })
+            return <>{rows}</>
+          })()}
         </div>
 
         {/* ═══ TERMS (editable) ═══ */}

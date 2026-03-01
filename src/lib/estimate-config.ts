@@ -71,9 +71,11 @@ export interface EstimateItem {
   notes: string
   attachmentNames: string[] // file names only (not uploaded)
   hingeLeft: boolean    // flip SVG render left/right
-  trimInstall: boolean  // enable trim installation for this item
+  trimInstall: boolean  // enable trim for this item
   trimStyle: "flat" | "colonial"  // trim profile style
-  trimPrice: number     // trim installation cost (per unit)
+  trimPrice: number     // trim price override (0 = use global rate)
+  installOverride: boolean  // override global install rate for this item
+  installPrice: number      // per-item installation cost (used when installOverride=true)
 }
 
 export interface Room {
@@ -130,6 +132,7 @@ export function createItem(): EstimateItem {
     customLabel: "", location: "", qty: 1, unitPrice: 0,
     notes: "", attachmentNames: [],
     hingeLeft: false, trimInstall: false, trimStyle: "flat", trimPrice: 0,
+    installOverride: false, installPrice: 0,
   }
 }
 
@@ -243,6 +246,52 @@ export function toFraction(dec: number): string {
 
 export function moduleWidth(totalW: number, n: number) { return totalW / n - 1 / 16 }
 
+// ── Payment Stage Config ────────────────────────
+export interface PaymentStageConfig {
+  id: string
+  label: string
+  pct: number       // percentage of grand total (0 = auto-remainder)
+  show: boolean
+}
+export function defaultPaymentStages(): PaymentStageConfig[] {
+  return [
+    { id: "deposit", label: "Deposit Required", pct: 30, show: true },
+    { id: "balance", label: "Balance Remaining", pct: 0, show: true },
+    { id: "after_install", label: "After Installation Complete", pct: 0, show: false },
+  ]
+}
+
+// ── Trim Rate Units ─────────────────────────────
+export type TrimUnit = "in" | "lft" | "m" | "cm"
+export const TRIM_UNITS = [
+  { id: "in" as const, label: "per inch", short: "/in" },
+  { id: "lft" as const, label: "per linear foot", short: "/lft" },
+  { id: "m" as const, label: "per meter", short: "/m" },
+  { id: "cm" as const, label: "per cm", short: "/cm" },
+]
+/** Convert perimeter from inches to the given trim unit */
+export function perimeterInUnit(w: number, h: number, unit: TrimUnit): number {
+  const pIn = 2 * (w + h)
+  switch (unit) {
+    case "lft": return pIn / 12
+    case "m":   return pIn * 0.0254
+    case "cm":  return pIn * 2.54
+    default:    return pIn // inches
+  }
+}
+
+// ── Dimension Units ─────────────────────────────
+export type DimensionUnit = "in" | "cm"
+/** Convert stored inches to display value */
+export function inToDisplay(inches: number, unit: DimensionUnit): number {
+  return unit === "cm" ? Math.round(inches * 2.54 * 10) / 10 : inches
+}
+/** Convert display input back to inches for storage */
+export function displayToIn(val: number, unit: DimensionUnit): number {
+  return unit === "cm" ? val / 2.54 : val
+}
+export function dimLabel(unit: DimensionUnit): string { return unit === "cm" ? "cm" : "in" }
+
 /** Perimeter of a window/door in inches = 2×(W+H) */
 export function perimeterInches(w: number, h: number): number { return 2 * (w + h) }
 /** Perimeter in linear feet */
@@ -286,19 +335,45 @@ export interface CalcTotalsFlags {
   showQST?: boolean
 }
 
-export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags) {
+export interface TrimRateSettings {
+  trimUnit: TrimUnit
+  flatTrimRate: number
+  colonialTrimRate: number
+}
+
+/** Get the effective trim cost for one item (qty×1) */
+export function getItemTrimCost(it: EstimateItem, trimSettings?: TrimRateSettings): number {
+  if (!it.trimInstall) return 0
+  // Manual override
+  if ((it.trimPrice ?? 0) > 0) return it.trimPrice
+  // Auto from global rate
+  if (!trimSettings) return 0
+  const rate = it.trimStyle === "colonial" ? trimSettings.colonialTrimRate : trimSettings.flatTrimRate
+  if (rate <= 0) return 0
+  const peri = perimeterInUnit(it.width, it.height, trimSettings.trimUnit)
+  return peri * rate
+}
+
+/** Get the effective installation cost for one item (qty×1) */
+export function getItemInstallCost(it: EstimateItem, globalInstallPerUnit: number): number {
+  if (it.installOverride && it.installPrice > 0) return it.installPrice
+  return globalInstallPerUnit
+}
+
+export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags, trimSettings?: TrimRateSettings) {
   const { showInstallation = true, showDelivery = true, showGST = true, showQST = true } = flags || {}
   const items = allItems(est)
-  let prodTotal = 0, totalUnits = 0, trimTotal = 0
+  let prodTotal = 0, totalUnits = 0, trimTotal = 0, installTotal = 0
   items.forEach(it => {
     const eff = getEffectiveUnitPrice(it, glassSettings)
     prodTotal += it.qty * eff
     totalUnits += it.qty
-    if (it.trimInstall && (it.trimPrice ?? 0) > 0) {
-      trimTotal += it.qty * it.trimPrice
+    trimTotal += it.qty * getItemTrimCost(it, trimSettings)
+    if (showInstallation) {
+      installTotal += it.qty * getItemInstallCost(it, est.installPerUnit)
     }
   })
-  const install = showInstallation ? totalUnits * est.installPerUnit : 0
+  const install = installTotal
   const delivery = showDelivery ? est.delivery : 0
   const subtax = prodTotal + install + delivery + trimTotal
   const gst = showGST ? subtax * (gstRate / 100) : 0

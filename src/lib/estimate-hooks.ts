@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { type CompanyInfo, type EstimateState, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS } from "./estimate-config"
+import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v5"
+const APP_DEFAULTS_VERSION = "v6"
 const VER_KEY = "VEREX_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -179,6 +179,14 @@ export interface EstimateSettings {
   gstRate: number
   qstRate: number
   summaryTitle: string
+  // Measurements
+  dimensionUnit: DimensionUnit
+  // Trim pricing
+  trimUnit: TrimUnit
+  flatTrimRate: number
+  colonialTrimRate: number
+  // Payment stages
+  paymentStages: PaymentStageConfig[]
   // Terms & Conditions
   termsTitle: string
   showSignatures: boolean
@@ -219,6 +227,11 @@ function defaultSettings(): EstimateSettings {
     showGST: true, showQST: true, showDeposit: true, showTerms: true, showBalance: true,
     gstRate: 5, qstRate: 9.975,
     summaryTitle: "Pricing Summary",
+    dimensionUnit: "in" as DimensionUnit,
+    trimUnit: "in" as TrimUnit,
+    flatTrimRate: 0.50,
+    colonialTrimRate: 0.75,
+    paymentStages: defaultPaymentStages(),
     termsTitle: "Terms & Conditions",
     showSignatures: true,
     showSignatureDate: true,
@@ -288,6 +301,17 @@ export function useEstimateSettings() {
     setSettings(p => ({ ...p, customShipMethods: p.customShipMethods.filter(m => m !== method) }))
   }, [])
 
+  // Payment stage CRUD
+  const addPaymentStage = useCallback((label: string, pct = 0) => {
+    setSettings(p => ({ ...p, paymentStages: [...p.paymentStages, { id: `ps_${Date.now()}`, label, pct, show: true }] }))
+  }, [])
+  const removePaymentStage = useCallback((id: string) => {
+    setSettings(p => ({ ...p, paymentStages: p.paymentStages.filter(s => s.id !== id) }))
+  }, [])
+  const updatePaymentStage = useCallback((id: string, patch: Partial<PaymentStageConfig>) => {
+    setSettings(p => ({ ...p, paymentStages: p.paymentStages.map(s => s.id === id ? { ...s, ...patch } : s) }))
+  }, [])
+
   return {
     settings, update, reset,
     toggleWindowType, toggleDoorType, toggleProduct,
@@ -295,6 +319,7 @@ export function useEstimateSettings() {
     addCustomDoorType, removeCustomDoorType,
     addCustomProduct, removeCustomProduct,
     addShipMethod, removeShipMethod,
+    addPaymentStage, removePaymentStage, updatePaymentStage,
   }
 }
 

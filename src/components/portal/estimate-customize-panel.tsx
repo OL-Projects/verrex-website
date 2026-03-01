@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X } from "lucide-react"
+import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X, Ruler, CreditCard } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
-import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS } from "@/lib/estimate-config"
+import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, type PaymentStageConfig } from "@/lib/estimate-config"
 
 const CLS = {
   lbl: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5",
@@ -354,8 +354,86 @@ export function EstimateCustomizePanel(props: Props) {
               <Toggle on={s.showQST} onToggle={() => uSet({ showQST: !s.showQST })} />
             </div>
           </div>
-          <div className={CLS.row}><span className="text-[11px]">Deposit</span><Toggle on={s.showDeposit} onToggle={() => uSet({ showDeposit: !s.showDeposit })} /></div>
-          <div className={CLS.row}><span className="text-[11px]">Balance Remaining</span><Toggle on={s.showBalance} onToggle={() => uSet({ showBalance: !s.showBalance })} /></div>
+        </Section>
+
+        {/* ═══ SECTION 4B: MEASUREMENTS ═══ */}
+        <Section icon={Ruler} title="Measurements & Trim" open={!!open.measure} onToggle={() => t("measure")}>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Dimension Unit</p>
+          <div className="flex gap-1.5 mb-3">
+            {([["in","Inches (″)"],["cm","Centimeters (cm)"]] as const).map(([k,l]) => (
+              <button key={k} onClick={() => uSet({ dimensionUnit: k as "in" | "cm" })}
+                className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.dimensionUnit ?? "in") === k ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>{l}</button>
+            ))}
+          </div>
+
+          <p className="text-[9px] font-bold uppercase tracking-widest text-orange-500 mb-1">🔸 Trim Pricing</p>
+          <div className="mt-1.5">
+            <label className={CLS.lbl}>Trim Rate Unit</label>
+            <div className="flex gap-1">
+              {TRIM_UNITS.map(u => (
+                <button key={u.id} onClick={() => uSet({ trimUnit: u.id })}
+                  className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.trimUnit ?? "in") === u.id ? "bg-orange-500 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
+                  {u.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-1.5">
+            <label className={CLS.lbl}>Flat Trim Rate</label>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] text-slate-400">$</span>
+              <input type="number" value={s.flatTrimRate ?? 0.50} onChange={e => uSet({ flatTrimRate: +e.target.value })} step={0.01} min={0}
+                className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+              <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
+            </div>
+          </div>
+          <div className="mt-1.5">
+            <label className={CLS.lbl}>Colonial Trim Rate</label>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] text-slate-400">$</span>
+              <input type="number" value={s.colonialTrimRate ?? 0.75} onChange={e => uSet({ colonialTrimRate: +e.target.value })} step={0.01} min={0}
+                className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+              <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
+            </div>
+          </div>
+        </Section>
+
+        {/* ═══ SECTION 4C: PAYMENT STAGES ═══ */}
+        <Section icon={CreditCard} title="Payment Stages" open={!!open.payments} onToggle={() => t("payments")}>
+          <p className="text-[9px] text-slate-400 mb-2">Configure the payment breakdown shown below the total. Stages with 0% auto-fill the remainder.</p>
+          <div className="space-y-1.5">
+            {(s.paymentStages ?? []).map((stage, i) => (
+              <div key={stage.id} className="p-2 rounded-xl bg-slate-50/50 dark:bg-white/3 space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Toggle on={stage.show} onToggle={() => {
+                    const next = [...(s.paymentStages ?? [])]; next[i] = { ...next[i], show: !next[i].show }; uSet({ paymentStages: next })
+                  }} />
+                  <input value={stage.label} onChange={e => {
+                    const next = [...(s.paymentStages ?? [])]; next[i] = { ...next[i], label: e.target.value }; uSet({ paymentStages: next })
+                  }} className={CLS.inp + " text-[11px] font-semibold"} />
+                  {stage.id !== "deposit" && (
+                    <button onClick={() => uSet({ paymentStages: (s.paymentStages ?? []).filter(x => x.id !== stage.id) })}
+                      className="text-red-400 hover:text-red-600 shrink-0"><Trash2 className="h-3 w-3" /></button>
+                  )}
+                </div>
+                {stage.id !== "deposit" && (
+                  <div className="flex items-center gap-1 pl-11">
+                    <input type="number" value={stage.pct} min={0} max={100} onChange={e => {
+                      const next = [...(s.paymentStages ?? [])]; next[i] = { ...next[i], pct: +e.target.value }; uSet({ paymentStages: next })
+                    }} className="w-14 px-1 py-0.5 rounded bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                    <span className="text-[9px] text-slate-400">% of total {stage.pct === 0 && "(remainder)"}</span>
+                  </div>
+                )}
+                {stage.id === "deposit" && (
+                  <p className="text-[9px] text-slate-400 pl-11">Uses deposit % set on each estimate</p>
+                )}
+              </div>
+            ))}
+          </div>
+          <button onClick={() => {
+            const id = `ps_${Date.now()}`
+            uSet({ paymentStages: [...(s.paymentStages ?? []), { id, label: "New Payment Stage", pct: 0, show: true }] })
+          }} className="text-blue-600 text-[10px] font-semibold mt-2 hover:underline">+ Add Payment Stage</button>
         </Section>
 
         {/* ═══ SECTION 5: TERMS & CONDITIONS ═══ */}
