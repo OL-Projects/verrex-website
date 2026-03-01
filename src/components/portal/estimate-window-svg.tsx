@@ -49,7 +49,7 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
   }
 
   return (
-    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full">
+    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full" style={{ maxHeight: isDoor ? 360 : 220 }}>
       <defs>
         <linearGradient id="glassG" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#b8d4e8" stopOpacity={0.22} />

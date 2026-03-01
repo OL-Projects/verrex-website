@@ -1,16 +1,24 @@
 import { Svg, Rect, Line, Circle, Path, G, Text as SvgText, Defs, LinearGradient, Stop } from "@react-pdf/renderer"
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
 
-interface Props { width: number; height: number; type: string }
+interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean }
 
-export function EstimateWindowSVGPDF({ width, height, type }: Props) {
+export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swingIn = true }: Props) {
   const cfg = WINDOW_TYPES[type]
-  const modules = cfg?.modules || ["FIX"]
+  let modules = cfg?.modules || ["FIX"]
   const isDoor = isDoorType(type)
+
+  // Sliding doors: flipH controls which side the sliding panel is on
+  if (modules.includes("SLIDE-D") && flipH) {
+    modules = [...modules].reverse()
+  }
+
   const n = modules.length
-  const ratio = isDoor ? Math.max(1.4, Math.min(height / width, 3.0)) : Math.max(0.3, Math.min(height / width, 2.5))
+  // True ratio with scale cap for PDF
+  const ratio = height / (width || 1)
   const svgW = 140
-  const svgH = Math.min(svgW * ratio, isDoor ? 160 : 130)
+  const maxH = isDoor ? 180 : 120
+  const svgH = Math.min(svgW * ratio, maxH)
   const f = 3
   const m = 2
   const sash = 1.5
@@ -22,7 +30,7 @@ export function EstimateWindowSVGPDF({ width, height, type }: Props) {
   const IC = "#f1f5f9" // inner bg (slate-100)
   const ML = "#475569" // mullion (slate-600)
   const GL = "#d4e8f4" // glass
-  const DP = "#a8957b" // door panel
+  const DP = "#9ca3af" // door panel (grey)
   const LC = "#64748b" // line color (slate-500)
   const TXT = "#334155"
 

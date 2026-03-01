@@ -5,7 +5,9 @@ import { EstimateWindowSVGPDF } from "./estimate-window-svg-pdf"
 import {
   type EstimateState,
   type GlassPricingSettings,
+  type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
+  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost,
 } from "@/lib/estimate-config"
 
 const s = StyleSheet.create({
@@ -130,7 +132,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
               return (
                 <View key={item.id} style={s.itemRow} wrap={false}>
                   <View style={{ width: 110, minHeight: 80, alignItems: "center", justifyContent: "center" }}>
-                    <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} />
+                    <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} />
                   </View>
                   <View style={s.itemRight}>
                     <View style={s.itemHeader}>
@@ -144,6 +146,9 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                       {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some((m: string) => m.startsWith("CAS") || m.startsWith("TT")))
                         ? ` • ${(item.swingInside ?? true) ? "Inswing" : "Outswing"}` : ""}
                       {(item.trimInstall) ? ` • Trim: ${(item.trimStyle ?? "flat").charAt(0).toUpperCase() + (item.trimStyle ?? "flat").slice(1)}` : ""}
+                    </Text>
+                    <Text style={{ fontSize: 7, color: "#94a3b8" }}>
+                      Perimeter: {perimeterInches(item.width, item.height)}" ({perimeterFeet(item.width, item.height).toFixed(1)} ft)
                     </Text>
                     <Text style={{ ...s.egress, color: egress ? "#16a34a" : "#ef4444" }}>
                       EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}
@@ -162,10 +167,12 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
           <View style={s.sumRow}><Text style={s.sumBold}>Products Subtotal</Text><Text style={s.sumBold}>{fmt(t.prodTotal)}</Text></View>
           {showInstallation && <View style={s.sumRow}><Text style={s.sumSub}>Installation ({t.totalUnits} units)</Text><Text style={s.sumSub}>{fmt(t.install)}</Text></View>}
           {showDelivery && <View style={s.sumRow}><Text style={s.sumSub}>Delivery</Text><Text style={s.sumSub}>{fmt(t.delivery)}</Text></View>}
+          {(t.trimTotal ?? 0) > 0 && <View style={s.sumRow}><Text style={{ ...s.sumSub, color: "#ea580c" }}>Trim Total</Text><Text style={{ ...s.sumSub, color: "#ea580c" }}>{fmt(t.trimTotal)}</Text></View>}
           {showGST && <View style={s.sumRow}><Text style={s.sumSub}>GST ({gstRate}%)</Text><Text style={s.sumSub}>{fmt(t.gst)}</Text></View>}
           {showQST && <View style={s.sumRow}><Text style={s.sumSub}>QST ({qstRate}%)</Text><Text style={s.sumSub}>{fmt(t.qst)}</Text></View>}
           <View style={s.totalRow}><Text>TOTAL</Text><Text>{fmt(t.total)}</Text></View>
-          <View style={s.depositRow}><Text>Deposit ({est.depositPct}%)</Text><Text>{fmt(t.deposit)}</Text></View>
+          <View style={s.depositRow}><Text>Deposit Required ({est.depositPct}%)</Text><Text>{fmt(t.deposit)}</Text></View>
+          <View style={{ ...s.depositRow, backgroundColor: "#fff7ed", marginTop: 2 }}><Text style={{ color: "#9a3412" }}>Balance Remaining</Text><Text style={{ color: "#9a3412" }}>{fmt(t.total - t.deposit)}</Text></View>
         </View>
 
         {/* ── Terms ── */}
