@@ -6,6 +6,7 @@ import {
   type EstimateState,
   type GlassPricingSettings,
   type TrimRateSettings,
+  type PaymentStageConfig,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
   perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription,
 } from "@/lib/estimate-config"
@@ -71,9 +72,10 @@ interface Props {
   showDelivery?: boolean
   showGST?: boolean
   showQST?: boolean
+  paymentStages?: PaymentStageConfig[]
 }
 
-export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975, showInstallation = true, showDelivery = true, showGST = true, showQST = true }: Props) {
+export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975, showInstallation = true, showDelivery = true, showGST = true, showQST = true, paymentStages }: Props) {
   const t = calcTotals(est, gstRate, qstRate, glassSettings, { showInstallation, showDelivery, showGST, showQST })
   let gi = 0
 
@@ -169,8 +171,34 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
           {showGST && <View style={s.sumRow}><Text style={s.sumSub}>GST ({gstRate}%)</Text><Text style={s.sumSub}>{fmt(t.gst)}</Text></View>}
           {showQST && <View style={s.sumRow}><Text style={s.sumSub}>QST ({qstRate}%)</Text><Text style={s.sumSub}>{fmt(t.qst)}</Text></View>}
           <View style={s.totalRow}><Text>TOTAL</Text><Text>{fmt(t.total)}</Text></View>
-          <View style={s.depositRow}><Text>Deposit Required ({est.depositPct}%)</Text><Text>{fmt(t.deposit)}</Text></View>
-          <View style={{ ...s.depositRow, backgroundColor: "#fff7ed", marginTop: 2 }}><Text style={{ color: "#9a3412" }}>Balance Remaining</Text><Text style={{ color: "#9a3412" }}>{fmt(t.total - t.deposit)}</Text></View>
+          {/* Dynamic payment stages */}
+          {(() => {
+            const stages = (paymentStages ?? []).filter(st => st.show)
+            if (stages.length === 0) {
+              return (
+                <>
+                  <View style={s.depositRow}><Text>Deposit Required ({est.depositPct}%)</Text><Text>{fmt(t.deposit)}</Text></View>
+                  <View style={{ ...s.depositRow, backgroundColor: "#fff7ed", marginTop: 2 }}><Text style={{ color: "#9a3412" }}>Balance Remaining</Text><Text style={{ color: "#9a3412" }}>{fmt(t.total - t.deposit)}</Text></View>
+                </>
+              )
+            }
+            let usedPct = 0
+            return stages.map((st, si) => {
+              const isDeposit = st.id === "deposit"
+              const pct = isDeposit ? est.depositPct : st.pct
+              const isRemainder = pct === 0 && !isDeposit
+              let amount: number
+              if (isRemainder) { amount = t.total * (1 - usedPct / 100) } else { amount = t.total * (pct / 100); usedPct += pct }
+              const bg = si === 0 ? "#f1f5f9" : si % 2 === 1 ? "#fff7ed" : "#f0fdf4"
+              const color = si === 0 ? "#0f172a" : si % 2 === 1 ? "#9a3412" : "#166534"
+              return (
+                <View key={st.id} style={{ ...s.depositRow, backgroundColor: bg, marginTop: si === 0 ? 6 : 2 }}>
+                  <Text style={{ color }}>{st.label}{isDeposit ? ` (${est.depositPct}%)` : isRemainder ? "" : pct > 0 ? ` (${pct}%)` : ""}</Text>
+                  <Text style={{ color }}>{fmt(amount)}</Text>
+                </View>
+              )
+            })
+          })()}
         </View>
 
         {/* ── Terms ── */}

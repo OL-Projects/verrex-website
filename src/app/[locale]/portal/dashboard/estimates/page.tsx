@@ -112,7 +112,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -143,7 +143,7 @@ export default function EstimatesPage() {
     // Auto-generate and download PDF
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")

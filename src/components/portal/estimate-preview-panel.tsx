@@ -4,13 +4,13 @@ import { useState, useMemo } from "react"
 import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { EstimatePDFDocument } from "./estimate-pdf-doc"
-import { type EstimateState, type GlassPricingSettings, allItems } from "@/lib/estimate-config"
+import { type EstimateState, type GlassPricingSettings, type PaymentStageConfig, allItems } from "@/lib/estimate-config"
 
 interface Props {
   est: EstimateState
   logo: string
   sigs?: { client: string; rep: string }
-  glassSettings?: GlassPricingSettings & { gstRate?: number; qstRate?: number; showInstallation?: boolean; showDelivery?: boolean; showGST?: boolean; showQST?: boolean }
+  glassSettings?: GlassPricingSettings & { gstRate?: number; qstRate?: number; showInstallation?: boolean; showDelivery?: boolean; showGST?: boolean; showQST?: boolean; paymentStages?: PaymentStageConfig[] }
   onClose: () => void
 }
 
@@ -41,7 +41,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }
 
       {/* PDF iframe — actual rendered PDF */}
       <div className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-950 border-x border-slate-200 dark:border-white/10">
-        <BlobProvider key={pdfKey} document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} gstRate={glassSettings?.gstRate} qstRate={glassSettings?.qstRate} showInstallation={glassSettings?.showInstallation} showDelivery={glassSettings?.showDelivery} showGST={glassSettings?.showGST} showQST={glassSettings?.showQST} />}>
+        <BlobProvider key={pdfKey} document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} gstRate={glassSettings?.gstRate} qstRate={glassSettings?.qstRate} showInstallation={glassSettings?.showInstallation} showDelivery={glassSettings?.showDelivery} showGST={glassSettings?.showGST} showQST={glassSettings?.showQST} paymentStages={glassSettings?.paymentStages} />}>
           {({ url, loading, error }) => {
             if (loading) {
               return (
