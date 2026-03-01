@@ -13,6 +13,15 @@ export interface EstimateRecord {
   itemCount: number
 }
 
+// ── Template Types ──────────────────────────────
+export interface EstimateTemplate {
+  id: string
+  name: string
+  savedAt: string
+  /** All estimate fields EXCEPT rooms (window/door items) */
+  data: Omit<EstimateState, "rooms">
+}
+
 // We store records metadata separately from full estimate data
 // Full data: VEREX_est_data_{id} — one key per estimate
 // Records list: VEREX_est_records — array of EstimateRecord (metadata only)
@@ -21,6 +30,7 @@ export interface EstimateRecord {
 const RECORDS_KEY = "VEREX_est_records"
 const ACTIVE_KEY = "VEREX_est_active_id"
 const DATA_PREFIX = "VEREX_est_data_"
+const TEMPLATES_KEY = "VEREX_est_templates"
 
 function uid() { return `est_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}` }
 
@@ -190,10 +200,56 @@ export function useEstimateStore() {
     setRecords(prev => { const next = [meta, ...prev]; writeRecords(next); return next })
   }, [])
 
+  // ── Templates ───────────────────────────────
+  const [templates, setTemplates] = useState<EstimateTemplate[]>(() => readLS(TEMPLATES_KEY, []))
+
+  /** Save current estimate (minus rooms) as a named template */
+  const saveAsTemplate = useCallback((name: string) => {
+    const { rooms: _rooms, ...rest } = est
+    const tpl: EstimateTemplate = {
+      id: `tpl_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+      name: name || est.clientName || "Untitled Template",
+      savedAt: new Date().toISOString(),
+      data: rest,
+    }
+    setTemplates(prev => {
+      const next = [tpl, ...prev]
+      writeLS(TEMPLATES_KEY, next)
+      return next
+    })
+  }, [est])
+
+  /** Apply a template to current estimate — preserves rooms (items) */
+  const loadTemplate = useCallback((id: string) => {
+    const tpl = templates.find(t => t.id === id)
+    if (!tpl) return
+    setEst(prev => ({ ...prev, ...tpl.data }))
+  }, [templates])
+
+  /** Delete a template */
+  const deleteTemplate = useCallback((id: string) => {
+    setTemplates(prev => {
+      const next = prev.filter(t => t.id !== id)
+      writeLS(TEMPLATES_KEY, next)
+      return next
+    })
+  }, [])
+
+  /** Rename a template */
+  const renameTemplate = useCallback((id: string, name: string) => {
+    setTemplates(prev => {
+      const next = prev.map(t => t.id === id ? { ...t, name } : t)
+      writeLS(TEMPLATES_KEY, next)
+      return next
+    })
+  }, [])
+
   return {
     est, setEst,
     records, activeId,
     saveStatus, saveNow,
     newEstimate, loadEstimate, deleteEstimate, duplicateEstimate,
+    // Templates
+    templates, saveAsTemplate, loadTemplate, deleteTemplate, renameTemplate,
   }
 }

@@ -70,6 +70,10 @@ export interface EstimateItem {
   unitPrice: number
   notes: string
   attachmentNames: string[] // file names only (not uploaded)
+  hingeLeft: boolean    // flip SVG render left/right
+  trimInstall: boolean  // enable trim installation for this item
+  trimStyle: "flat" | "colonial"  // trim profile style
+  trimPrice: number     // trim installation cost (per unit)
 }
 
 export interface Room {
@@ -125,6 +129,7 @@ export function createItem(): EstimateItem {
     width: 48, height: 48, depth: 5.75, thickness: 4,
     customLabel: "", location: "", qty: 1, unitPrice: 0,
     notes: "", attachmentNames: [],
+    hingeLeft: false, trimInstall: false, trimStyle: "flat", trimPrice: 0,
   }
 }
 
@@ -238,6 +243,11 @@ export function toFraction(dec: number): string {
 
 export function moduleWidth(totalW: number, n: number) { return totalW / n - 1 / 16 }
 
+/** Perimeter of a window/door in inches = 2×(W+H) */
+export function perimeterInches(w: number, h: number): number { return 2 * (w + h) }
+/** Perimeter in linear feet */
+export function perimeterFeet(w: number, h: number): number { return perimeterInches(w, h) / 12 }
+
 export function fmt(n: number) { return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }
 
 export function allItems(est: EstimateState): EstimateItem[] {
@@ -279,18 +289,21 @@ export interface CalcTotalsFlags {
 export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags) {
   const { showInstallation = true, showDelivery = true, showGST = true, showQST = true } = flags || {}
   const items = allItems(est)
-  let prodTotal = 0, totalUnits = 0
+  let prodTotal = 0, totalUnits = 0, trimTotal = 0
   items.forEach(it => {
     const eff = getEffectiveUnitPrice(it, glassSettings)
     prodTotal += it.qty * eff
     totalUnits += it.qty
+    if (it.trimInstall && (it.trimPrice ?? 0) > 0) {
+      trimTotal += it.qty * it.trimPrice
+    }
   })
   const install = showInstallation ? totalUnits * est.installPerUnit : 0
   const delivery = showDelivery ? est.delivery : 0
-  const subtax = prodTotal + install + delivery
+  const subtax = prodTotal + install + delivery + trimTotal
   const gst = showGST ? subtax * (gstRate / 100) : 0
   const qst = showQST ? subtax * (qstRate / 100) : 0
   const total = subtax + gst + qst
   const deposit = total * (est.depositPct / 100)
-  return { prodTotal, totalUnits, items: items.length, install, delivery, subtax, gst, qst, total, deposit, balance: total - deposit }
+  return { prodTotal, totalUnits, items: items.length, install, delivery, trimTotal, subtax, gst, qst, total, deposit, balance: total - deposit }
 }

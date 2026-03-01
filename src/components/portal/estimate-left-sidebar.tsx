@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Search, FileText, MoreVertical, Copy, Trash2, Check, Loader2, PanelLeftOpen, PanelLeftClose, X } from "lucide-react"
-import { type EstimateRecord } from "@/lib/estimate-store"
+import { Plus, Search, FileText, MoreVertical, Copy, Trash2, Check, Loader2, PanelLeftOpen, PanelLeftClose, X, BookTemplate, Save, Download } from "lucide-react"
+import { type EstimateRecord, type EstimateTemplate } from "@/lib/estimate-store"
 import { fmt } from "@/lib/estimate-config"
+
+type SidebarTab = "history" | "templates"
 
 interface Props {
   records: EstimateRecord[]
@@ -15,6 +17,11 @@ interface Props {
   onDuplicate: (id: string) => void
   mobileOpen: boolean
   onMobileToggle: () => void
+  // Template props
+  templates: EstimateTemplate[]
+  onSaveAsTemplate: (name: string) => void
+  onLoadTemplate: (id: string) => void
+  onDeleteTemplate: (id: string) => void
 }
 
 function timeAgo(iso: string): string {
@@ -28,15 +35,25 @@ function timeAgo(iso: string): string {
   return d.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
 }
 
-export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLoad, onDelete, onDuplicate, mobileOpen, onMobileToggle }: Props) {
+export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLoad, onDelete, onDuplicate, mobileOpen, onMobileToggle, templates, onSaveAsTemplate, onLoadTemplate, onDeleteTemplate }: Props) {
   const [search, setSearch] = useState("")
   const [menuId, setMenuId] = useState<string | null>(null)
+  const [tab, setTab] = useState<SidebarTab>("history")
+  const [tplMenuId, setTplMenuId] = useState<string | null>(null)
+  const [showSaveTPL, setShowSaveTPL] = useState(false)
+  const [tplName, setTplName] = useState("")
   const activeRecord = records.find(r => r.id === activeId)
 
   const filtered = records.filter(r => {
     if (!search) return true
     const q = search.toLowerCase()
     return r.clientName.toLowerCase().includes(q) || r.estimateNumber.toLowerCase().includes(q)
+  })
+
+  const filteredTemplates = templates.filter(t => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return t.name.toLowerCase().includes(q) || t.data.clientName?.toLowerCase().includes(q)
   })
 
   const sidebarContent = (
@@ -54,68 +71,144 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
             <button onClick={onMobileToggle} className="lg:hidden text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
           </div>
         </div>
-        <button onClick={onNew}
-          className="w-full py-1.5 rounded-lg bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-blue-500 transition">
-          <Plus className="h-3 w-3" /> New Estimate
+        {tab === "history" ? (
+          <button onClick={onNew} className="w-full py-1.5 rounded-lg bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-blue-500 transition">
+            <Plus className="h-3 w-3" /> New Estimate
+          </button>
+        ) : (
+          <button onClick={() => setShowSaveTPL(true)} className="w-full py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center gap-1 hover:bg-emerald-500 transition">
+            <Save className="h-3 w-3" /> Save as Template
+          </button>
+        )}
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
+        <button onClick={() => setTab("history")} className={`flex-1 py-1.5 text-[10px] font-bold text-center transition border-b-2 ${tab === "history" ? "border-blue-500 text-blue-600 dark:text-blue-400" : "border-transparent text-slate-400 hover:text-slate-600"}`}>
+          <FileText className="h-3 w-3 inline -mt-0.5 mr-0.5" /> History
+        </button>
+        <button onClick={() => setTab("templates")} className={`flex-1 py-1.5 text-[10px] font-bold text-center transition border-b-2 ${tab === "templates" ? "border-emerald-500 text-emerald-600 dark:text-emerald-400" : "border-transparent text-slate-400 hover:text-slate-600"}`}>
+          <BookTemplate className="h-3 w-3 inline -mt-0.5 mr-0.5" /> Templates
         </button>
       </div>
+
+      {/* Save Template Prompt */}
+      {showSaveTPL && (
+        <div className="px-2 py-2 lg:border-x border-slate-200 dark:border-white/10 bg-emerald-50 dark:bg-emerald-500/10">
+          <input value={tplName} onChange={e => setTplName(e.target.value)} placeholder="Template name…" autoFocus
+            className="w-full px-2 py-1 rounded-lg bg-white dark:bg-white/10 border border-emerald-200 dark:border-emerald-500/30 text-[10px] outline-none mb-1.5" />
+          <div className="flex gap-1">
+            <button onClick={() => { if (tplName.trim()) { onSaveAsTemplate(tplName.trim()); setTplName(""); setShowSaveTPL(false) } }}
+              className="flex-1 py-1 rounded-lg bg-emerald-600 text-white text-[9px] font-bold hover:bg-emerald-500 transition">Save</button>
+            <button onClick={() => { setShowSaveTPL(false); setTplName("") }}
+              className="flex-1 py-1 rounded-lg border border-slate-200 dark:border-white/15 text-[9px] font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 transition">Cancel</button>
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div className="px-2 py-1.5 lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tab === "history" ? "Search estimates…" : "Search templates…"}
             className="w-full pl-6 pr-2 py-1 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] outline-none" />
         </div>
       </div>
 
-      {/* List */}
-      <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
-        {filtered.length === 0 ? (
-          <div className="p-4 text-center">
-            <FileText className="h-6 w-6 text-slate-300 dark:text-slate-600 mx-auto mb-1" />
-            <p className="text-[10px] text-slate-400">No estimates yet</p>
-          </div>
-        ) : filtered.map(r => (
-          <div key={r.id}
-            onClick={() => { onLoad(r.id); onMobileToggle() }}
-            className={`group relative px-2.5 py-2 cursor-pointer transition border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/3 ${r.id === activeId ? "bg-blue-50 dark:bg-blue-500/10 border-l-2 border-l-blue-500" : ""}`}>
-            <div className="flex items-start justify-between gap-1">
-              <div className="flex-1 min-w-0">
-                <p className={`text-[11px] font-bold truncate ${r.id === activeId ? "text-blue-700 dark:text-blue-300" : "text-slate-800 dark:text-slate-200"}`}>
-                  {r.clientName || "Untitled"}
-                </p>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400 font-mono truncate">{r.estimateNumber}</p>
-                <div className="flex items-center justify-between mt-0.5">
-                  <span className="text-[9px] text-slate-400">{timeAgo(r.savedAt)}</span>
-                  <span className="text-[9px] font-semibold text-slate-600 dark:text-slate-300">{fmt(r.total)}</span>
-                </div>
-                <span className="text-[8px] text-slate-400">{r.itemCount} item{r.itemCount !== 1 ? "s" : ""}</span>
-              </div>
-              <button onClick={e => { e.stopPropagation(); setMenuId(menuId === r.id ? null : r.id) }}
-                className="p-0.5 rounded text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition shrink-0 mt-0.5">
-                <MoreVertical className="h-3 w-3" />
-              </button>
+      {/* List — History Tab */}
+      {tab === "history" && (
+        <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
+          {filtered.length === 0 ? (
+            <div className="p-4 text-center">
+              <FileText className="h-6 w-6 text-slate-300 dark:text-slate-600 mx-auto mb-1" />
+              <p className="text-[10px] text-slate-400">No estimates yet</p>
             </div>
-            {menuId === r.id && (
-              <div className="absolute right-1 top-8 z-30 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-white/15 py-1 min-w-[100px]">
-                <button onClick={e => { e.stopPropagation(); onDuplicate(r.id); setMenuId(null) }}
-                  className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-1.5">
-                  <Copy className="h-3 w-3" /> Duplicate
-                </button>
-                <button onClick={e => { e.stopPropagation(); if (confirm("Delete this estimate?")) { onDelete(r.id); setMenuId(null) } }}
-                  className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-1.5">
-                  <Trash2 className="h-3 w-3" /> Delete
+          ) : filtered.map(r => (
+            <div key={r.id}
+              onClick={() => { onLoad(r.id); onMobileToggle() }}
+              className={`group relative px-2.5 py-2 cursor-pointer transition border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/3 ${r.id === activeId ? "bg-blue-50 dark:bg-blue-500/10 border-l-2 border-l-blue-500" : ""}`}>
+              <div className="flex items-start justify-between gap-1">
+                <div className="flex-1 min-w-0">
+                  <p className={`text-[11px] font-bold truncate ${r.id === activeId ? "text-blue-700 dark:text-blue-300" : "text-slate-800 dark:text-slate-200"}`}>
+                    {r.clientName || "Untitled"}
+                  </p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 font-mono truncate">{r.estimateNumber}</p>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <span className="text-[9px] text-slate-400">{timeAgo(r.savedAt)}</span>
+                    <span className="text-[9px] font-semibold text-slate-600 dark:text-slate-300">{fmt(r.total)}</span>
+                  </div>
+                  <span className="text-[8px] text-slate-400">{r.itemCount} item{r.itemCount !== 1 ? "s" : ""}</span>
+                </div>
+                <button onClick={e => { e.stopPropagation(); setMenuId(menuId === r.id ? null : r.id) }}
+                  className="p-0.5 rounded text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition shrink-0 mt-0.5">
+                  <MoreVertical className="h-3 w-3" />
                 </button>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              {menuId === r.id && (
+                <div className="absolute right-1 top-8 z-30 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-white/15 py-1 min-w-[100px]">
+                  <button onClick={e => { e.stopPropagation(); onDuplicate(r.id); setMenuId(null) }}
+                    className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-1.5">
+                    <Copy className="h-3 w-3" /> Duplicate
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); if (confirm("Delete this estimate?")) { onDelete(r.id); setMenuId(null) } }}
+                    className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-1.5">
+                    <Trash2 className="h-3 w-3" /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* List — Templates Tab */}
+      {tab === "templates" && (
+        <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
+          {filteredTemplates.length === 0 ? (
+            <div className="p-4 text-center">
+              <BookTemplate className="h-6 w-6 text-slate-300 dark:text-slate-600 mx-auto mb-1" />
+              <p className="text-[10px] text-slate-400">{templates.length === 0 ? "No templates saved yet" : "No matches"}</p>
+              {templates.length === 0 && <p className="text-[9px] text-slate-400 mt-1">Save your estimate settings as a reusable template</p>}
+            </div>
+          ) : filteredTemplates.map(t => (
+            <div key={t.id}
+              className="group relative px-2.5 py-2 cursor-pointer transition border-b border-slate-100 dark:border-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/5"
+              onClick={() => { if (confirm("Apply this template? Your current header, client & pricing info will be replaced. Window/door items stay unchanged.")) { onLoadTemplate(t.id); onMobileToggle() } }}>
+              <div className="flex items-start justify-between gap-1">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 truncate">{t.name}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{t.data.clientName || "No client"} — {t.data.estimateNumber}</p>
+                  <span className="text-[9px] text-slate-400">{timeAgo(t.savedAt)}</span>
+                </div>
+                <button onClick={e => { e.stopPropagation(); setTplMenuId(tplMenuId === t.id ? null : t.id) }}
+                  className="p-0.5 rounded text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition shrink-0 mt-0.5">
+                  <MoreVertical className="h-3 w-3" />
+                </button>
+              </div>
+              {tplMenuId === t.id && (
+                <div className="absolute right-1 top-8 z-30 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-white/15 py-1 min-w-[100px]">
+                  <button onClick={e => { e.stopPropagation(); onLoadTemplate(t.id); setTplMenuId(null) }}
+                    className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-1.5">
+                    <Download className="h-3 w-3" /> Apply
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); if (confirm("Delete this template?")) { onDeleteTemplate(t.id); setTplMenuId(null) } }}
+                    className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-1.5">
+                    <Trash2 className="h-3 w-3" /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Footer */}
       <div className="bg-slate-100 dark:bg-slate-800 lg:rounded-b-xl border lg:border-t-0 border-slate-200 dark:border-white/10 px-3 py-1.5">
-        <p className="text-[9px] text-slate-400 text-center">{records.length} estimate{records.length !== 1 ? "s" : ""} saved</p>
+        <p className="text-[9px] text-slate-400 text-center">
+          {tab === "history"
+            ? `${records.length} estimate${records.length !== 1 ? "s" : ""} saved`
+            : `${templates.length} template${templates.length !== 1 ? "s" : ""} saved`}
+        </p>
       </div>
     </>
   )

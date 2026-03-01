@@ -2,9 +2,9 @@
 
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
 
-interface Props { width: number; height: number; type: string }
+interface Props { width: number; height: number; type: string; flipH?: boolean }
 
-export function EstimateWindowSVG({ width, height, type }: Props) {
+export function EstimateWindowSVG({ width, height, type, flipH = false }: Props) {
   const cfg = WINDOW_TYPES[type]
   const modules = cfg?.modules || ["FIX"]
   const isDoor = isDoorType(type)
@@ -24,7 +24,7 @@ export function EstimateWindowSVG({ width, height, type }: Props) {
   const extY = svgH + 36
 
   return (
-    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full max-h-[320px]">
+    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full max-h-[320px]" style={flipH ? { transform: "scaleX(-1)" } : undefined}>
       <defs>
         <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#b8d4e8" stopOpacity={0.25} />

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2 } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save } from "lucide-react"
 import { useTheme } from "next-themes"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings, useEstimateHistory } from "@/lib/estimate-hooks"
@@ -16,6 +16,7 @@ import {
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
   calcTotals, fmt, getTypeGroups, isDoorType,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
+  perimeterInches, perimeterFeet,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -27,7 +28,7 @@ const C = {
 
 export default function EstimatesPage() {
   const store = useEstimateStore()
-  const { est, setEst, records, activeId, saveStatus, saveNow, newEstimate, loadEstimate, deleteEstimate, duplicateEstimate } = store
+  const { est, setEst, records, activeId, saveStatus, saveNow, newEstimate, loadEstimate, deleteEstimate, duplicateEstimate, templates, saveAsTemplate, loadTemplate, deleteTemplate } = store
   const history = useEstimateHistory(est, setEst)
   const { canUndo, canRedo, undo, redo } = history
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
@@ -227,7 +228,8 @@ export default function EstimatesPage() {
     {/* ═══ LEFT SIDEBAR ═══ */}
     <EstimateLeftSidebar records={records} activeId={activeId} saveStatus={saveStatus}
       onNew={handleNewEstimate} onLoad={loadEstimate} onDelete={deleteEstimate} onDuplicate={duplicateEstimate}
-      mobileOpen={sidebarOpen} onMobileToggle={() => setSidebarOpen(p => !p)} />
+      mobileOpen={sidebarOpen} onMobileToggle={() => setSidebarOpen(p => !p)}
+      templates={templates} onSaveAsTemplate={saveAsTemplate} onLoadTemplate={loadTemplate} onDeleteTemplate={deleteTemplate} />
     <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
@@ -355,8 +357,23 @@ export default function EstimatesPage() {
 
                     {/* Body: SVG | Config */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="flex items-center justify-center bg-slate-50/50 dark:bg-white/3 rounded-xl p-3 min-h-[200px]">
-                        <EstimateWindowSVG width={item.width} height={item.height} type={item.type} />
+                      <div className="bg-slate-50/50 dark:bg-white/3 rounded-xl p-3 min-h-[200px] flex flex-col">
+                        <div className="flex items-center justify-between mb-2 print:hidden">
+                          <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 cursor-pointer">
+                              <input type="radio" name={`hinge_${item.id}`} checked={item.hingeLeft ?? false} onChange={() => updateItem(room.id, item.id, { hingeLeft: true })} className="accent-blue-600 w-3 h-3" /> Left
+                            </label>
+                            <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 cursor-pointer">
+                              <input type="radio" name={`hinge_${item.id}`} checked={!(item.hingeLeft ?? false)} onChange={() => updateItem(room.id, item.id, { hingeLeft: false })} className="accent-blue-600 w-3 h-3" /> Right
+                            </label>
+                          </div>
+                          <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded" title="Perimeter (trim length)">
+                            ⊟ {perimeterInches(item.width, item.height)} in / {perimeterFeet(item.width, item.height).toFixed(1)} ft
+                          </span>
+                        </div>
+                        <div className="flex-1 flex items-center justify-center">
+                          <EstimateWindowSVG width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} />
+                        </div>
                       </div>
                       <div className="space-y-2.5">
                         <div><label className={C.lbl}>{isDoorType(item.type) ? "Door" : "Window"} Type</label>
@@ -404,6 +421,33 @@ export default function EstimatesPage() {
                           </div>
                         </div>
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}</p>
+                        {/* Trim Installation */}
+                        <div className="rounded-lg border border-slate-200 dark:border-white/10 p-2.5 space-y-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={item.trimInstall ?? false} onChange={e => updateItem(room.id, item.id, { trimInstall: e.target.checked })} className="accent-orange-500 w-3.5 h-3.5" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Trim Installation</span>
+                            <span className="text-[9px] text-slate-400 ml-auto">Perimeter: {perimeterInches(item.width, item.height)} in</span>
+                          </label>
+                          {(item.trimInstall ?? false) && (
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                              <div>
+                                <label className={C.lbl}>Trim Style</label>
+                                <div className="flex gap-2">
+                                  <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
+                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "flat"} onChange={() => updateItem(room.id, item.id, { trimStyle: "flat" })} className="accent-orange-500 w-3 h-3" /> Flat
+                                  </label>
+                                  <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
+                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "colonial"} onChange={() => updateItem(room.id, item.id, { trimStyle: "colonial" })} className="accent-orange-500 w-3 h-3" /> Colonial
+                                  </label>
+                                </div>
+                              </div>
+                              <div>
+                                <label className={C.lbl}>Trim Price (per unit)</label>
+                                <input type="number" min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} className={`${C.inp} font-semibold`} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         {/* Notes */}
                         <div><label className={C.lbl}>Notes</label>
                           <textarea rows={2} value={item.notes} onChange={e => updateItem(room.id, item.id, { notes: e.target.value })} placeholder="Special instructions…" className={`${C.inp} resize-none`} />
@@ -483,14 +527,24 @@ export default function EstimatesPage() {
             {estCfg.showInstallation && <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
             {estCfg.showDelivery && <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
+          {/* Itemized Trim Installation Costs */}
+          {t.trimTotal > 0 && (
+            <div className="mt-2 pt-2 border-t border-orange-200 dark:border-orange-500/20">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Trim Installation</p>
+              <div className="space-y-0.5">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; if (!it.trimInstall || !(it.trimPrice > 0)) return null; const peri = perimeterInches(it.width, it.height); const style = (it.trimStyle ?? "flat").charAt(0).toUpperCase() + (it.trimStyle ?? "flat").slice(1); return <div key={it.id} className="flex justify-between text-xs"><span className="text-slate-500">#{gi} Trim ({style}) — {peri} in perimeter (×{it.qty})</span><span className="font-semibold text-orange-600 dark:text-orange-400">{fmt(it.qty * it.trimPrice)}</span></div> })) })()}</div>
+              <div className="flex justify-between text-sm font-bold mt-1"><span className="text-orange-600 dark:text-orange-400">Trim Total</span><span className="text-orange-600 dark:text-orange-400">{fmt(t.trimTotal)}</span></div>
+            </div>
+          )}
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
           {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST ({estCfg.gstRate}%)</span><span>{fmt(t.gst)}</span></div>}
           {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST ({estCfg.qstRate}%)</span><span>{fmt(t.qst)}</span></div>}
           <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
-          {estCfg.showBalance && estCfg.showDeposit && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500 font-semibold">Balance Remaining</span><span className="font-bold">{fmt(t.balance)}</span></div>}
-          {estCfg.showDeposit && <div className="flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 -mb-5 mt-3 px-5 py-3 rounded-b-2xl text-sm items-center">
+          {estCfg.showDeposit && <div className={`flex justify-between font-semibold bg-slate-100 dark:bg-white/5 -mx-5 mt-3 px-5 py-3 text-sm items-center ${estCfg.showBalance ? '' : '-mb-5 rounded-b-2xl'}`}>
             <span>Deposit Required: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</span>
             <span className="font-bold">{fmt(t.deposit)}</span>
+          </div>}
+          {estCfg.showBalance && estCfg.showDeposit && <div className="flex justify-between font-semibold bg-slate-50 dark:bg-white/3 -mx-5 -mb-5 px-5 py-2.5 rounded-b-2xl text-sm items-center border-t border-slate-200 dark:border-white/5">
+            <span className="text-slate-500">Balance Remaining</span><span className="font-bold">{fmt(t.balance)}</span>
           </div>}
         </div>
 
@@ -597,6 +651,9 @@ export default function EstimatesPage() {
         </button>
         <button onClick={resetAll} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
           <RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">Reset</span>
+        </button>
+        <button onClick={saveNow} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Save estimate now">
+          <Save className="h-4 w-4 text-emerald-500" /><span className="hidden sm:inline">Save</span>
         </button>
         <div className="w-px h-6 bg-slate-300 dark:bg-white/15 hidden sm:block" />
         <button onClick={() => setSidePanel(p => p === "preview" ? "none" : "preview")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
