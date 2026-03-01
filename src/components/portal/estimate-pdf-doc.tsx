@@ -5,7 +5,7 @@ import { EstimateWindowSVGPDF } from "./estimate-window-svg-pdf"
 import {
   type EstimateState,
   type GlassPricingSettings,
-  WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice,
+  WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
 } from "@/lib/estimate-config"
 
 const s = StyleSheet.create({
@@ -139,6 +139,12 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     </View>
                     <Text style={s.itemType}>{wt?.label || item.type} • {item.width}"W × {item.height}"H × {item.depth}"D</Text>
                     <Text style={s.itemColors}>Ext: {item.extColor} / Int: {item.intColor}</Text>
+                    <Text style={{ fontSize: 7, color: "#6b7280", marginBottom: 1 }}>
+                      {(item.hingeLeft ?? false) ? "Left Hinge" : "Right Hinge"}
+                      {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some((m: string) => m.startsWith("CAS") || m.startsWith("TT")))
+                        ? ` • ${(item.swingInside ?? true) ? "Inswing" : "Outswing"}` : ""}
+                      {(item.trimInstall) ? ` • Trim: ${(item.trimStyle ?? "flat").charAt(0).toUpperCase() + (item.trimStyle ?? "flat").slice(1)}` : ""}
+                    </Text>
                     <Text style={{ ...s.egress, color: egress ? "#16a34a" : "#ef4444" }}>
                       EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}
                     </Text>

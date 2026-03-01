@@ -361,29 +361,29 @@ export default function EstimatesPage() {
                     {/* Body: SVG | Config */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div className="bg-slate-50/50 dark:bg-white/3 rounded-xl p-3 min-h-[200px] flex flex-col">
-                        <div className="flex items-center justify-between mb-2 print:hidden flex-wrap gap-y-1">
+                        <div className="flex-1 flex items-center justify-center">
+                          <EstimateWindowSVG width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} />
+                        </div>
+                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5 print:hidden flex-wrap gap-y-1">
                           <div className="flex items-center gap-1">
-                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">Hinge</span>
+                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? "Open" : "Hinge"}</span>
                             <button onClick={() => updateItem(room.id, item.id, { hingeLeft: true })}
-                              className={`px-2 py-0.5 rounded-l-md text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>L</button>
+                              className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Left</button>
                             <button onClick={() => updateItem(room.id, item.id, { hingeLeft: false })}
-                              className={`px-2 py-0.5 rounded-r-md text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>R</button>
+                              className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Right</button>
                             {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS") || m.startsWith("TT") || m === "AWNING")) && (
                               <>
                                 <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 ml-2 mr-0.5">Swing</span>
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: true })}
-                                  className={`px-2 py-0.5 rounded-l-md text-[9px] font-bold transition ${(item.swingInside ?? true) ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>In</button>
+                                  className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.swingInside ?? true) ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>In</button>
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: false })}
-                                  className={`px-2 py-0.5 rounded-r-md text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Out</button>
+                                  className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Out</button>
                               </>
                             )}
                           </div>
                           <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded" title="Perimeter (trim length)">
-                            ⊟ {perimeterInches(item.width, item.height)} in / {perimeterFeet(item.width, item.height).toFixed(1)} ft
+                            ⊟ {perimeterInches(item.width, item.height)}&quot; / {perimeterFeet(item.width, item.height).toFixed(1)} ft
                           </span>
-                        </div>
-                        <div className="flex-1 flex items-center justify-center">
-                          <EstimateWindowSVG width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} />
                         </div>
                       </div>
                       <div className="space-y-2.5">

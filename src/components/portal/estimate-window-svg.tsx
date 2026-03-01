@@ -6,12 +6,20 @@ interface Props { width: number; height: number; type: string; flipH?: boolean; 
 
 export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn = true }: Props) {
   const cfg = WINDOW_TYPES[type]
-  const modules = cfg?.modules || ["FIX"]
+  let modules = cfg?.modules || ["FIX"]
   const isDoor = isDoorType(type)
+
+  // For sliding doors: flipH controls which side the sliding panel is on
+  const hasSlideD = modules.includes("SLIDE-D")
+  if (hasSlideD && flipH) {
+    modules = [...modules].reverse() // swap: SLIDE-D moves to opposite side
+  }
+
   const n = modules.length
-  const ratio = isDoor ? Math.max(1.4, Math.min(height / width, 3.0)) : Math.max(0.3, Math.min(height / width, 2.5))
+  // Use true aspect ratio from dimensions — no artificial clamping
+  const ratio = height / (width || 1)
   const svgW = 280
-  const svgH = Math.min(svgW * ratio, isDoor ? 320 : 260)
+  const svgH = svgW * ratio
   const f = 6
   const m = 4
   const sash = 2.5
@@ -41,7 +49,7 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
   }
 
   return (
-    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full max-h-[320px]">
+    <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full">
       <defs>
         <linearGradient id="glassG" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#b8d4e8" stopOpacity={0.22} />
@@ -49,13 +57,13 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
           <stop offset="100%" stopColor="#a8c8de" stopOpacity={0.28} />
         </linearGradient>
         <linearGradient id="doorPanelG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c4a882" stopOpacity={0.85} />
-          <stop offset="30%" stopColor="#b89b72" stopOpacity={0.9} />
-          <stop offset="100%" stopColor="#8b7355" stopOpacity={0.95} />
+          <stop offset="0%" stopColor="#9ca3af" stopOpacity={0.7} />
+          <stop offset="40%" stopColor="#8891a0" stopOpacity={0.8} />
+          <stop offset="100%" stopColor="#6b7280" stopOpacity={0.88} />
         </linearGradient>
         <linearGradient id="doorFrameG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6b5b45" />
-          <stop offset="100%" stopColor="#5a4a38" />
+          <stop offset="0%" stopColor="#64748b" />
+          <stop offset="100%" stopColor="#475569" />
         </linearGradient>
         <filter id="fSh"><feDropShadow dx={0} dy={1} stdDeviation={1.5} floodOpacity={0.12} /></filter>
         <filter id="inset"><feFlood floodColor="#000" floodOpacity={0.08} result="f" /><feComposite in="f" in2="SourceGraphic" operator="in" result="s" /><feGaussianBlur in="s" stdDeviation={1.5} /><feComposite in2="SourceGraphic" operator="atop" /></filter>
