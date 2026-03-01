@@ -141,7 +141,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     </View>
                     <Text style={s.itemType}>{wt?.label || item.type} • {item.width}"W × {item.height}"H × {item.depth}"D</Text>
                     <Text style={s.itemColors}>Ext: {item.extColor} / Int: {item.intColor}</Text>
-                    <Text style={{ fontSize: 7, color: "#475569", fontStyle: "italic", marginBottom: 1 }}>
+                    <Text style={{ fontSize: 8.5, color: "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
                       {getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
                       {(item.trimInstall) ? ` • Trim: ${(item.trimStyle ?? "flat").charAt(0).toUpperCase() + (item.trimStyle ?? "flat").slice(1)}` : ""}
                     </Text>

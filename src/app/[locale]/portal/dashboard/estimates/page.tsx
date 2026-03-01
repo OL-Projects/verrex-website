@@ -407,7 +407,7 @@ export default function EstimatesPage() {
                               )
                             })}
                           </select>
-                          <p className="text-[10px] italic text-slate-400 dark:text-slate-500 mt-0.5 leading-snug capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
+                          <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
                           <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>

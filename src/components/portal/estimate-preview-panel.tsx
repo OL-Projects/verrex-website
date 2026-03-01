@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { X, ZoomIn, ZoomOut } from "lucide-react"
+import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { EstimatePDFDocument } from "./estimate-pdf-doc"
 import { type EstimateState, type GlassPricingSettings, allItems } from "@/lib/estimate-config"
@@ -16,13 +16,14 @@ interface Props {
 
 export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }: Props) {
   const [zoom, setZoom] = useState(100)
+  const [refreshCounter, setRefreshCounter] = useState(0)
 
   // Hash key forces BlobProvider to fully regenerate when any item data changes
   const pdfKey = useMemo(() => {
     const items = allItems(est)
     return items.map(i => `${i.type}:${i.width}:${i.height}:${i.hingeLeft}:${i.swingInside}:${i.trimInstall}:${i.trimStyle}:${i.qty}:${i.unitPrice}:${i.extColor}:${i.intColor}`).join("|")
-      + `|${est.estimateNumber}|${est.clientName}|${est.depositPct}|${est.delivery}|${est.installPerUnit}|${est.rooms.length}`
-  }, [est])
+      + `|${est.estimateNumber}|${est.clientName}|${est.depositPct}|${est.delivery}|${est.installPerUnit}|${est.rooms.length}|${refreshCounter}`
+  }, [est, refreshCounter])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[860px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]">
@@ -33,6 +34,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }
           <button onClick={() => setZoom(z => Math.max(50, z - 10))} className="text-slate-400 hover:text-slate-600"><ZoomOut className="h-3.5 w-3.5" /></button>
           <span className="text-[10px] font-bold text-slate-500 w-8 text-center">{zoom}%</span>
           <button onClick={() => setZoom(z => Math.min(200, z + 10))} className="text-slate-400 hover:text-slate-600"><ZoomIn className="h-3.5 w-3.5" /></button>
+          <button onClick={() => setRefreshCounter(c => c + 1)} className="text-slate-400 hover:text-blue-500 transition" title="Refresh Preview"><RotateCcw className="h-3.5 w-3.5" /></button>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 ml-2"><X className="h-4 w-4" /></button>
         </div>
       </div>
