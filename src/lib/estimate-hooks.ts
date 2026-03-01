@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v6"
+const APP_DEFAULTS_VERSION = "v7"
 const VER_KEY = "VEREX_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -215,7 +215,7 @@ function defaultSettings(): EstimateSettings {
     doubleTemperedRate: 0.50,
     tripleTemperedRate: 0.75,
     enabledDoorTypes: [
-      "SWING-L-IN", "SWING-R-IN", "SWING-L-OUT", "SWING-R-OUT", "SWING-FRENCH",
+      "SWING-DOOR", "SWING-FRENCH",
       "SLIDE-DOOR-2", "SLIDE-DOOR-3", "FOLD-2", "FOLD-4",
     ],
     customDoorTypes: [],

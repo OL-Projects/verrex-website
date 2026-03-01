@@ -14,7 +14,7 @@ import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import {
   type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
-  calcTotals, fmt, getTypeGroups, isDoorType,
+  calcTotals, fmt, getTypeGroups, isDoorType, getItemDescription,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
   perimeterInches, perimeterFeet, perimeterInUnit, getItemTrimCost, getItemInstallCost,
   inToDisplay, displayToIn, dimLabel, TRIM_UNITS,
@@ -324,7 +324,7 @@ export default function EstimatesPage() {
                         <PanelTop className="h-4 w-4 text-blue-500" /> Window
                       </button>
                       <button onClick={() => {
-                        setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === room.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-R-IN", width: 36, height: 80 }] } : r) }))
+                        setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === room.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-DOOR", width: 36, height: 80 }] } : r) }))
                         setAddMenuRoom(null)
                       }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition">
                         <DoorOpen className="h-4 w-4 text-amber-600" /> Door
@@ -407,6 +407,7 @@ export default function EstimatesPage() {
                               )
                             })}
                           </select>
+                          <p className="text-[10px] italic text-slate-400 dark:text-slate-500 mt-0.5 leading-snug capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
                           <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
@@ -547,7 +548,7 @@ export default function EstimatesPage() {
             className="flex-1 py-3 border-2 border-dashed border-blue-300 dark:border-blue-500/30 rounded-2xl text-sm font-semibold text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition flex items-center justify-center gap-1.5">
             <PanelTop className="h-4 w-4" /> Add Window
           </button>
-          <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === last.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-R-IN", width: 36, height: 80 }] } : r) })) }}
+          <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === last.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-DOOR", width: 36, height: 80 }] } : r) })) }}
             className="flex-1 py-3 border-2 border-dashed border-amber-300 dark:border-amber-500/30 rounded-2xl text-sm font-semibold text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition flex items-center justify-center gap-1.5">
             <DoorOpen className="h-4 w-4" /> Add Door
           </button>

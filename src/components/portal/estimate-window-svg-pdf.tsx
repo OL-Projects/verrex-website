@@ -120,30 +120,18 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
               </G>
             )}
 
-            {/* ── DOOR MODULES ── */}
-            {(mod === "SWING-L-IN" || mod === "SWING-R-IN") && (() => {
-              const hingeX = mod === "SWING-L-IN" ? sx : sx + sw
-              const arcX = mod === "SWING-L-IN" ? sx + sw : sx
-              const handleX = mod === "SWING-L-IN" ? sx + sw - 8 : sx + 8
+            {/* ── DOOR MODULES (generic SWING + legacy) ── */}
+            {mod.startsWith("SWING") && (() => {
+              const hingeOnLeft = flipH
+              const isInswing = swingIn
+              const hingeX = hingeOnLeft ? sx : sx + sw
+              const arcX = hingeOnLeft ? sx + sw : sx
+              const handleX = hingeOnLeft ? sx + sw - 8 : sx + 8
+              const arcColor = isInswing ? "#3b82f6" : "#22c55e"
               return (
                 <G>
                   <Rect x={sx + 4} y={sy + 4} width={sw - 8} height={sh * 0.5} fill={GL} opacity={0.4} stroke={LC} strokeWidth={0.3} />
-                  <Path d={`M ${arcX} ${sy + sh} A ${sw} ${sw} 0 0 ${mod === "SWING-L-IN" ? 0 : 1} ${hingeX} ${sy + sh - sw * 0.7}`} fill="none" stroke="#3b82f6" strokeWidth={0.6} strokeDasharray="3 2" />
-                  <Circle cx={hingeX} cy={sy + 8} r={1.5} fill={LC} />
-                  <Circle cx={hingeX} cy={sy + sh - 8} r={1.5} fill={LC} />
-                  <Circle cx={handleX} cy={cy + sh * 0.1} r={3} fill="none" stroke={LC} strokeWidth={1} />
-                </G>
-              )
-            })()}
-
-            {(mod === "SWING-L-OUT" || mod === "SWING-R-OUT") && (() => {
-              const hingeX = mod === "SWING-L-OUT" ? sx : sx + sw
-              const arcX = mod === "SWING-L-OUT" ? sx + sw : sx
-              const handleX = mod === "SWING-L-OUT" ? sx + sw - 8 : sx + 8
-              return (
-                <G>
-                  <Rect x={sx + 4} y={sy + 4} width={sw - 8} height={sh * 0.5} fill={GL} opacity={0.4} stroke={LC} strokeWidth={0.3} />
-                  <Path d={`M ${arcX} ${sy + sh} A ${sw} ${sw} 0 0 ${mod === "SWING-L-OUT" ? 1 : 0} ${hingeX} ${sy + sh - sw * 0.7}`} fill="none" stroke="#22c55e" strokeWidth={0.7} />
+                  <Path d={`M ${arcX} ${sy + sh} A ${sw} ${sw} 0 0 ${hingeOnLeft ? 0 : 1} ${hingeX} ${sy + sh - sw * 0.7}`} fill="none" stroke={arcColor} strokeWidth={isInswing ? 0.6 : 0.7} strokeDasharray={isInswing ? "3 2" : "0"} />
                   <Circle cx={hingeX} cy={sy + 8} r={1.5} fill={LC} />
                   <Circle cx={hingeX} cy={sy + sh - 8} r={1.5} fill={LC} />
                   <Circle cx={handleX} cy={cy + sh * 0.1} r={3} fill="none" stroke={LC} strokeWidth={1} />

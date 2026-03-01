@@ -7,7 +7,7 @@ import {
   type GlassPricingSettings,
   type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
-  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost,
+  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription,
 } from "@/lib/estimate-config"
 
 const s = StyleSheet.create({
@@ -141,10 +141,8 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     </View>
                     <Text style={s.itemType}>{wt?.label || item.type} • {item.width}"W × {item.height}"H × {item.depth}"D</Text>
                     <Text style={s.itemColors}>Ext: {item.extColor} / Int: {item.intColor}</Text>
-                    <Text style={{ fontSize: 7, color: "#6b7280", marginBottom: 1 }}>
-                      {(item.hingeLeft ?? false) ? "Left Hinge" : "Right Hinge"}
-                      {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some((m: string) => m.startsWith("CAS") || m.startsWith("TT")))
-                        ? ` • ${(item.swingInside ?? true) ? "Inswing" : "Outswing"}` : ""}
+                    <Text style={{ fontSize: 7, color: "#475569", fontStyle: "italic", marginBottom: 1 }}>
+                      {getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
                       {(item.trimInstall) ? ` • Trim: ${(item.trimStyle ?? "flat").charAt(0).toUpperCase() + (item.trimStyle ?? "flat").slice(1)}` : ""}
                     </Text>
                     <Text style={{ fontSize: 7, color: "#94a3b8" }}>

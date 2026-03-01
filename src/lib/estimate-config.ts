@@ -1,6 +1,6 @@
 // ── Window & Door Type Configs ──────────────────
 export type TypeCategory = "window" | "door"
-export interface WindowTypeConfig { modules: string[]; label: string; category: TypeCategory; group: string }
+export interface WindowTypeConfig { modules: string[]; label: string; category: TypeCategory; group: string; hidden?: boolean }
 
 export const WINDOW_TYPES: Record<string, WindowTypeConfig> = {
   // ── WINDOWS ──
@@ -20,27 +20,79 @@ export const WINDOW_TYPES: Record<string, WindowTypeConfig> = {
   "FIX+FIX+CAS-R":      { modules: ["FIX", "FIX", "CAS-R"],        label: "2 Fixed + Casement R",        category: "window", group: "Windows — Combo" },
   "CAS-L+FIX+FIX+FIX":  { modules: ["CAS-L", "FIX", "FIX", "FIX"],label: "Casement L + 3 Fixed",        category: "window", group: "Windows — Combo" },
   // ── DOORS ──
-  "SWING-L-IN":         { modules: ["SWING-L-IN"],                   label: "Swing Door — Left Inswing",   category: "door", group: "Doors — Swing" },
-  "SWING-R-IN":         { modules: ["SWING-R-IN"],                   label: "Swing Door — Right Inswing",  category: "door", group: "Doors — Swing" },
-  "SWING-L-OUT":        { modules: ["SWING-L-OUT"],                  label: "Swing Door — Left Outswing",  category: "door", group: "Doors — Swing" },
-  "SWING-R-OUT":        { modules: ["SWING-R-OUT"],                  label: "Swing Door — Right Outswing", category: "door", group: "Doors — Swing" },
-  "SWING-FRENCH":       { modules: ["SWING-L-IN", "SWING-R-IN"],    label: "French Door (Double Swing)",   category: "door", group: "Doors — Swing" },
+  // Generic swing door — L/R + In/Out controlled by card buttons, not by type name
+  "SWING-DOOR":         { modules: ["SWING"],                        label: "Swing Door",                  category: "door", group: "Doors — Swing" },
+  "SWING-FRENCH":       { modules: ["SWING", "SWING"],               label: "French Door (Double)",         category: "door", group: "Doors — Swing" },
+  // Legacy aliases (backward compat for saved estimates)
+  "SWING-L-IN":         { modules: ["SWING"],                        label: "Swing Door",                  category: "door", group: "Doors — Swing", hidden: true },
+  "SWING-R-IN":         { modules: ["SWING"],                        label: "Swing Door",                  category: "door", group: "Doors — Swing", hidden: true },
+  "SWING-L-OUT":        { modules: ["SWING"],                        label: "Swing Door",                  category: "door", group: "Doors — Swing", hidden: true },
+  "SWING-R-OUT":        { modules: ["SWING"],                        label: "Swing Door",                  category: "door", group: "Doors — Swing", hidden: true },
   "SLIDE-DOOR-2":       { modules: ["SLIDE-D", "FIX-D"],            label: "Sliding Door — 2 Panel",      category: "door", group: "Doors — Sliding" },
   "SLIDE-DOOR-3":       { modules: ["SLIDE-D", "FIX-D", "SLIDE-D"], label: "Sliding Door — 3 Panel",      category: "door", group: "Doors — Sliding" },
   "FOLD-2":             { modules: ["FOLD", "FOLD"],                 label: "Folding Door — 2 Panel",      category: "door", group: "Doors — Folding" },
   "FOLD-4":             { modules: ["FOLD", "FOLD", "FOLD", "FOLD"], label: "Folding Door — 4 Panel",      category: "door", group: "Doors — Folding" },
 }
 
-/** Get unique groups for optgroup rendering */
+/** Get unique groups for optgroup rendering (excludes hidden legacy types) */
 export function getTypeGroups(): { group: string; types: [string, WindowTypeConfig][] }[] {
   const map = new Map<string, [string, WindowTypeConfig][]>()
   Object.entries(WINDOW_TYPES).forEach(([k, v]) => {
+    if (v.hidden) return // skip legacy aliases
     const arr = map.get(v.group) || []; arr.push([k, v]); map.set(v.group, arr)
   })
   return Array.from(map.entries()).map(([group, types]) => ({ group, types }))
 }
 
 export function isDoorType(typeKey: string): boolean { return WINDOW_TYPES[typeKey]?.category === "door" }
+
+/** Generate a human-readable description for a window/door item based on type + settings */
+export function getItemDescription(type: string, hingeLeft = false, swingInside = true): string {
+  const cfg = WINDOW_TYPES[type]
+  if (!cfg) return ""
+  const mods = cfg.modules
+  const side = hingeLeft ? "left" : "right"
+  const swing = swingInside ? "inswing" : "outswing"
+
+  // Swing doors
+  if (type === "SWING-DOOR" || type.startsWith("SWING-L") || type.startsWith("SWING-R")) {
+    return `Swing door — opens ${side}, ${swing}`
+  }
+  if (type === "SWING-FRENCH") {
+    return `French double swing door — ${swing}`
+  }
+  // Sliding doors
+  if (type.startsWith("SLIDE-DOOR")) {
+    const panels = mods.length
+    const slideSide = hingeLeft ? "left" : "right"
+    return `${panels}-panel sliding door — sliding panel ${slideSide}`
+  }
+  // Folding doors
+  if (type.startsWith("FOLD")) {
+    return `${mods.length}-panel folding door — opens ${side}`
+  }
+  // Casement windows
+  if (mods.some(m => m.startsWith("CAS"))) {
+    const hasFixed = mods.includes("FIX")
+    if (hasFixed) return `Casement + fixed combo (${mods.length} panel) — hinge ${side}`
+    return `Casement window — hinge ${side}`
+  }
+  // Tilt & Turn
+  if (mods.some(m => m.startsWith("TT"))) {
+    const hasFixed = mods.includes("FIX")
+    if (hasFixed) return `Tilt & turn + fixed combo — hinge ${side}`
+    return `Tilt & turn window — hinge ${side}`
+  }
+  // Awning
+  if (mods.includes("AWNING")) return "Awning (top-hung) window"
+  // Slider
+  if (mods.includes("SLIDE")) return `Horizontal slider window (${mods.length} panel)`
+  // Fixed
+  if (mods.every(m => m === "FIX")) {
+    return mods.length > 1 ? `${mods.length}-panel fixed panoramic window` : "Fixed non-operable window"
+  }
+  return cfg.label
+}
 
 export const PRODUCTS = [
   { id: "double-tempered", label: "Double Tempered Glass", tag: "DTG", cls: "bg-blue-600 dark:bg-blue-700 text-white" },

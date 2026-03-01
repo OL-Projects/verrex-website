@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { X, ZoomIn, ZoomOut } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { EstimatePDFDocument } from "./estimate-pdf-doc"
-import { type EstimateState, type GlassPricingSettings } from "@/lib/estimate-config"
+import { type EstimateState, type GlassPricingSettings, allItems } from "@/lib/estimate-config"
 
 interface Props {
   est: EstimateState
@@ -16,6 +16,13 @@ interface Props {
 
 export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }: Props) {
   const [zoom, setZoom] = useState(100)
+
+  // Hash key forces BlobProvider to fully regenerate when any item data changes
+  const pdfKey = useMemo(() => {
+    const items = allItems(est)
+    return items.map(i => `${i.type}:${i.width}:${i.height}:${i.hingeLeft}:${i.swingInside}:${i.trimInstall}:${i.trimStyle}:${i.qty}:${i.unitPrice}:${i.extColor}:${i.intColor}`).join("|")
+      + `|${est.estimateNumber}|${est.clientName}|${est.depositPct}|${est.delivery}|${est.installPerUnit}|${est.rooms.length}`
+  }, [est])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[860px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]">
@@ -32,7 +39,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, onClose }
 
       {/* PDF iframe — actual rendered PDF */}
       <div className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-950 border-x border-slate-200 dark:border-white/10">
-        <BlobProvider document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} gstRate={glassSettings?.gstRate} qstRate={glassSettings?.qstRate} showInstallation={glassSettings?.showInstallation} showDelivery={glassSettings?.showDelivery} showGST={glassSettings?.showGST} showQST={glassSettings?.showQST} />}>
+        <BlobProvider key={pdfKey} document={<EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={glassSettings} gstRate={glassSettings?.gstRate} qstRate={glassSettings?.qstRate} showInstallation={glassSettings?.showInstallation} showDelivery={glassSettings?.showDelivery} showGST={glassSettings?.showGST} showQST={glassSettings?.showQST} />}>
           {({ url, loading, error }) => {
             if (loading) {
               return (

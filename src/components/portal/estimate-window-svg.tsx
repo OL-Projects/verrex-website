@@ -31,22 +31,20 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
   const dimY = svgH + 24
   const extY = svgH + 36
 
-  // Resolve effective hinge side per module from type name + flipH override
+  // Resolve effective hinge side per module from flipH (hingeLeft from card)
   const resolveHinge = (mod: string): boolean => {
-    // For swing doors, use flipH (hingeLeft from card)
-    if (mod.startsWith("SWING")) return mod.includes("-L") ? !flipH : flipH
-    // For casement / TT, the module has L/R baked in, but flipH overrides
+    // Generic SWING module — directly use flipH
+    if (mod === "SWING") return flipH
+    // Legacy SWING-L/R modules (backward compat) — flipH overrides
+    if (mod.startsWith("SWING")) return flipH
+    // Casement / TT — flipH overrides the baked-in L/R
     if (mod === "CAS-L" || mod === "TT-L") return !flipH
     if (mod === "CAS-R" || mod === "TT-R") return flipH
     return flipH
   }
 
-  // Resolve inswing/outswing for swing doors
-  const resolveSwing = (mod: string): boolean => {
-    if (mod.includes("-IN")) return swingIn
-    if (mod.includes("-OUT")) return !swingIn
-    return swingIn
-  }
+  // Resolve inswing/outswing — swingIn from card is the source of truth
+  const resolveSwing = (): boolean => swingIn
 
   return (
     <svg viewBox={`0 0 ${svgW} ${svgH + 40}`} className="w-full" style={{ maxHeight: isDoor ? 360 : 220 }}>
@@ -84,7 +82,7 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
         const dimW = moduleWidth(width, n)
         const sx = mx + sash, sy = my + sash, sw = mw - 2 * sash, sh = innerH - 2 * sash
         const hingeOnLeft = resolveHinge(mod)
-        const isInswing = resolveSwing(mod)
+        const isInswing = resolveSwing()
 
         return (
           <g key={i}>
