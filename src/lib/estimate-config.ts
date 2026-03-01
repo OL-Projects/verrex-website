@@ -70,7 +70,8 @@ export interface EstimateItem {
   unitPrice: number
   notes: string
   attachmentNames: string[] // file names only (not uploaded)
-  hingeLeft: boolean    // flip SVG render left/right
+  hingeLeft: boolean    // hinge side: true=left, false=right
+  swingInside: boolean  // swing direction: true=inswing, false=outswing
   trimInstall: boolean  // enable trim for this item
   trimStyle: "flat" | "colonial"  // trim profile style
   trimPrice: number     // trim price override (0 = use global rate)
@@ -131,7 +132,7 @@ export function createItem(): EstimateItem {
     width: 48, height: 48, depth: 5.75, thickness: 4,
     customLabel: "", location: "", qty: 1, unitPrice: 0,
     notes: "", attachmentNames: [],
-    hingeLeft: false, trimInstall: false, trimStyle: "flat", trimPrice: 0,
+    hingeLeft: false, swingInside: true, trimInstall: false, trimStyle: "flat", trimPrice: 0,
     installOverride: false, installPrice: 0,
   }
 }
