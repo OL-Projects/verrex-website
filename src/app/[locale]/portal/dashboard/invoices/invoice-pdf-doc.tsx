@@ -2,6 +2,7 @@
 
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer"
 import type { Invoice } from "@/types/portal"
+import { getPortalT } from "@/lib/portal-i18n"
 
 const blue = "#1e3a8a"
 const blueFaint = "#eff6ff"
@@ -100,7 +101,8 @@ function amountToWords(n: number): string {
 
 function fmt(n: number) { return "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 
-export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
+export function InvoicePDFDocument({ invoice: inv, locale = "en" }: { invoice: Invoice; locale?: string }) {
+  const L = getPortalT(locale)
   return (
     <Document>
       <Page size="LETTER" style={s.page}>
@@ -115,7 +117,7 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
               <Text style={s.companyInfo}>1234 Boulevard Industriel{"\n"}Montréal, QC H2X 3K6{"\n"}Tél: (514) 555-0100 · info@verexindustries.ca</Text>
             </View>
             <View>
-              <Text style={s.invLabel}>Facture / Invoice</Text>
+              <Text style={s.invLabel}>{locale === "fr" ? "FACTURE" : "INVOICE"}</Text>
               <View style={s.invNumBox}><Text style={s.invNum}>{inv.invoiceNumber}</Text></View>
               <Text style={s.regNums}>GST/TPS: 123 456 789 RT0001{"\n"}QST/TVQ: 1234 5678 9012 TQ0001{"\n"}RBQ: 5678-9012-34</Text>
             </View>
@@ -125,25 +127,25 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         {/* Billing + Dates */}
         <View style={s.billingRow}>
           <View>
-            <Text style={s.sectionLabel}>Billed To / Facturé à</Text>
+            <Text style={s.sectionLabel}>{locale === "fr" ? "FACTURÉ À" : "BILLED TO"}</Text>
             <Text style={s.clientName}>{inv.clientName}</Text>
             <Text style={s.clientAddr}>{inv.clientAddress}</Text>
             <Text style={s.clientAddr}>{inv.clientCity}</Text>
           </View>
           <View style={s.dateGrid}>
-            <View style={s.dateItem}><Text style={s.dateLabel}>Issue Date</Text><Text style={s.dateVal}>{inv.issueDate}</Text></View>
-            <View style={s.dateItem}><Text style={s.dateLabel}>Due Date</Text><Text style={s.dateVal}>{inv.dueDate}</Text></View>
-            <View style={s.dateItem}><Text style={s.dateLabel}>Terms</Text><Text style={s.dateVal}>{inv.paymentTerms}</Text></View>
-            <View style={s.dateItem}><Text style={s.dateLabel}>Status</Text><Text style={s.dateVal}>{inv.status.toUpperCase()}</Text></View>
+            <View style={s.dateItem}><Text style={s.dateLabel}>{locale === "fr" ? "DATE D'ÉMISSION" : "ISSUE DATE"}</Text><Text style={s.dateVal}>{inv.issueDate}</Text></View>
+            <View style={s.dateItem}><Text style={s.dateLabel}>{locale === "fr" ? "DATE D'ÉCHÉANCE" : "DUE DATE"}</Text><Text style={s.dateVal}>{inv.dueDate}</Text></View>
+            <View style={s.dateItem}><Text style={s.dateLabel}>{locale === "fr" ? "MODALITÉS" : "TERMS"}</Text><Text style={s.dateVal}>{inv.paymentTerms}</Text></View>
+            <View style={s.dateItem}><Text style={s.dateLabel}>{L.status.toUpperCase()}</Text><Text style={s.dateVal}>{inv.status.toUpperCase()}</Text></View>
           </View>
         </View>
 
         {/* Line Items */}
         <View style={s.tableHeader}>
           <Text style={[s.th, { flex: 1 }]}>Description</Text>
-          <Text style={[s.th, { width: 40, textAlign: "center" }]}>Qty</Text>
-          <Text style={[s.th, { width: 65, textAlign: "right" }]}>Unit Price</Text>
-          <Text style={[s.th, { width: 70, textAlign: "right" }]}>Amount</Text>
+          <Text style={[s.th, { width: 40, textAlign: "center" }]}>{L.qty}</Text>
+          <Text style={[s.th, { width: 65, textAlign: "right" }]}>{L.unitPrice}</Text>
+          <Text style={[s.th, { width: 70, textAlign: "right" }]}>{locale === "fr" ? "Montant" : "Amount"}</Text>
         </View>
         {inv.items.map((item, i) => (
           <View key={i} style={[s.tableRow, i % 2 === 0 ? s.tableRowAlt : {}]}>
@@ -157,16 +159,16 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         {/* Totals */}
         <View style={s.totalsWrap}>
           <View style={s.totalsBox}>
-            <View style={s.totalLine}><Text style={s.totalLabel}>Subtotal</Text><Text style={s.totalVal}>{fmt(inv.subtotal)}</Text></View>
+            <View style={s.totalLine}><Text style={s.totalLabel}>{L.subtotal}</Text><Text style={s.totalVal}>{fmt(inv.subtotal)}</Text></View>
             <View style={s.totalLine}><Text style={s.totalLabel}>GST / TPS (5%)</Text><Text style={s.totalVal}>{fmt(inv.taxGST)}</Text></View>
             <View style={s.totalLine}><Text style={s.totalLabel}>QST / TVQ (9.975%)</Text><Text style={s.totalVal}>{fmt(inv.taxQST)}</Text></View>
             <View style={s.divider} />
             <View style={s.totalLine}><Text style={s.totalBoldLabel}>TOTAL</Text><Text style={s.totalBoldVal}>{fmt(inv.total)}</Text></View>
             {inv.depositPaid > 0 && (
               <>
-                <View style={s.totalLine}><Text style={s.greenVal}>Deposit Applied</Text><Text style={s.greenVal}>−{fmt(inv.depositPaid)}</Text></View>
+                <View style={s.totalLine}><Text style={s.greenVal}>{locale === "fr" ? "Dépôt appliqué" : "Deposit Applied"}</Text><Text style={s.greenVal}>−{fmt(inv.depositPaid)}</Text></View>
                 <View style={s.divider} />
-                <View style={s.balanceLine}><Text style={s.balanceLabel}>BALANCE DUE</Text><Text style={s.balanceVal}>{fmt(inv.balanceDue)}</Text></View>
+                <View style={s.balanceLine}><Text style={s.balanceLabel}>{L.inv.balanceDue.toUpperCase()}</Text><Text style={s.balanceVal}>{fmt(inv.balanceDue)}</Text></View>
               </>
             )}
           </View>
@@ -174,14 +176,14 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
 
         {/* Amount in words */}
         <View style={s.wordsBox}>
-          <Text style={s.wordsLabel}>Amount in Words / Montant en lettres</Text>
+          <Text style={s.wordsLabel}>{locale === "fr" ? "MONTANT EN LETTRES" : "AMOUNT IN WORDS"}</Text>
           <Text style={s.wordsText}>{amountToWords(inv.balanceDue > 0 ? inv.balanceDue : inv.total)}</Text>
         </View>
 
         {/* Notes */}
         {inv.notes ? (
           <View style={s.notesBox}>
-            <Text style={s.notesLabel}>Notes / Remarques</Text>
+            <Text style={s.notesLabel}>{locale === "fr" ? "REMARQUES" : "NOTES"}</Text>
             <Text style={s.notesText}>{inv.notes}</Text>
           </View>
         ) : null}
@@ -189,12 +191,12 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
         {/* Signature */}
         <View style={s.sigRow}>
           <View style={s.sigBlock}>
-            <Text style={s.sigLabel}>Authorized Signature / Signature autorisée</Text>
+            <Text style={s.sigLabel}>{locale === "fr" ? "SIGNATURE AUTORISÉE" : "AUTHORIZED SIGNATURE"}</Text>
             <View style={s.sigLine} />
-            <Text style={s.sigSub}>Name / Date</Text>
+            <Text style={s.sigSub}>{locale === "fr" ? "Nom / Date" : "Name / Date"}</Text>
           </View>
           <View style={s.sigBlock}>
-            <Text style={s.sigLabel}>Client Acknowledgement</Text>
+            <Text style={s.sigLabel}>{locale === "fr" ? "ACCUSÉ DE RÉCEPTION CLIENT" : "CLIENT ACKNOWLEDGEMENT"}</Text>
             <View style={s.sigLine} />
             <Text style={s.sigSub}>Signature / Date</Text>
           </View>
@@ -202,7 +204,7 @@ export function InvoicePDFDocument({ invoice: inv }: { invoice: Invoice }) {
 
         {/* Payment Info */}
         <View style={s.payBox}>
-          <Text style={s.payLabel}>Payment Information / Modalités de paiement</Text>
+          <Text style={s.payLabel}>{locale === "fr" ? "MODALITÉS DE PAIEMENT" : "PAYMENT INFORMATION"}</Text>
           <Text style={s.payText}>Interac E-Transfer: <Text style={s.payBold}>payments@verexindustries.ca</Text></Text>
           <Text style={s.payText}>Cheque payable to: <Text style={s.payBold}>Verex Industries Inc.</Text></Text>
           <Text style={s.payText}>Reference: <Text style={s.payBold}>{inv.invoiceNumber}</Text></Text>

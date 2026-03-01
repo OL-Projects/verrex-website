@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useLocale } from "next-intl"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings, useEstimateHistory } from "@/lib/estimate-hooks"
 import { useEstimateStore } from "@/lib/estimate-store"
@@ -42,6 +43,7 @@ export default function EstimatesPage() {
   const { logo, uploadLogo, clearLogo } = useLogo()
   const { remember, suggestions } = useAutocomplete()
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
+  const locale = useLocale()
   const logoRef = useRef<HTMLInputElement>(null)
   const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -112,7 +114,7 @@ export default function EstimatesPage() {
   const exportPDF = useCallback(async () => {
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || est.company.logoUrl || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} locale={locale} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -143,7 +145,7 @@ export default function EstimatesPage() {
     // Auto-generate and download PDF
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} />
+      const doc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} locale={locale} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -670,7 +672,7 @@ export default function EstimatesPage() {
     </div>
 
     {/* ═══ PREVIEW PANEL (right side, desktop only) ═══ */}
-    {showPreview && <EstimatePreviewPanel est={est} logo={logo || est.company.logoUrl} sigs={sigs} glassSettings={estCfg} onClose={() => setSidePanel("none")} />}
+    {showPreview && <EstimatePreviewPanel est={est} logo={logo || est.company.logoUrl} sigs={sigs} glassSettings={estCfg} locale={locale} onClose={() => setSidePanel("none")} />}
     {showCustomize && <EstimateCustomizePanel
       onClose={() => setSidePanel("none")}
       style={estStyle} onUpdateStyle={updateStyle}

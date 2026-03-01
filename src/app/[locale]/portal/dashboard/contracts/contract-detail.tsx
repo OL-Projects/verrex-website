@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { Download, Send, CheckCircle2, Ban, Printer, Loader2, Play, Flag } from "lucide-react"
 import type { Contract } from "@/types/portal"
 import { ContractPDFDocument } from "./contract-pdf-doc"
+import { useLocale } from "next-intl"
 
 interface Props {
   contract: Contract
@@ -25,6 +26,7 @@ const statusBadge: Record<string, string> = {
 }
 
 export default function ContractDetail({ contract: c, onSend, onSign, onActivate, onComplete, onVoid }: Props) {
+  const locale = useLocale()
   const fmt = (n: number) => `$${n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   const isVoid = c.status === "void"
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -34,7 +36,7 @@ export default function ContractDetail({ contract: c, onSend, onSign, onActivate
     setPdfLoading(true)
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const blob = await pdf(<ContractPDFDocument contract={c} />).toBlob()
+      const blob = await pdf(<ContractPDFDocument contract={c} locale={locale} />).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
@@ -47,7 +49,7 @@ export default function ContractDetail({ contract: c, onSend, onSign, onActivate
     setPrintLoading(true)
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const blob = await pdf(<ContractPDFDocument contract={c} />).toBlob()
+      const blob = await pdf(<ContractPDFDocument contract={c} locale={locale} />).toBlob()
       window.open(URL.createObjectURL(blob), "_blank")
     } catch { alert("Print preview failed.") } finally { setPrintLoading(false) }
   }, [c])

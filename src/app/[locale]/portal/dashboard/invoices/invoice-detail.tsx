@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react"
 import { Download, Send, CheckCircle2, Ban, Printer, Loader2 } from "lucide-react"
 import type { Invoice } from "@/types/portal"
 import { InvoicePDFDocument } from "./invoice-pdf-doc"
+import { useLocale } from "next-intl"
 
 interface Props {
   invoice: Invoice
@@ -40,6 +41,7 @@ function amountToWords(n: number): string {
 }
 
 export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, onVoid, onDownloadPdf }: Props) {
+  const locale = useLocale()
   const fmt = (n: number) => `$${n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   const isVoid = inv.status === "void"
   const [pdfLoading, setPdfLoading] = useState(false)
@@ -50,7 +52,7 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
     setPdfLoading(true)
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <InvoicePDFDocument invoice={inv} />
+      const doc = <InvoicePDFDocument invoice={inv} locale={locale} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -74,7 +76,7 @@ export default function InvoiceDetail({ invoice: inv, onClose, onSend, onPay, on
     setPrintLoading(true)
     try {
       const { pdf } = await import("@react-pdf/renderer")
-      const doc = <InvoicePDFDocument invoice={inv} />
+      const doc = <InvoicePDFDocument invoice={inv} locale={locale} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       window.open(url, "_blank")

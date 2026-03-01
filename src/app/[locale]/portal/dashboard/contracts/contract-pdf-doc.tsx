@@ -2,6 +2,7 @@
 
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer"
 import type { Contract } from "@/types/portal"
+import { getPortalT } from "@/lib/portal-i18n"
 
 const blue = "#1e3a5f"
 const lightBlue = "#e8f0fe"
@@ -62,7 +63,8 @@ const s = StyleSheet.create({
 
 const fmt = (n: number) => `$${n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
+export function ContractPDFDocument({ contract: c, locale = "en" }: { contract: Contract; locale?: string }) {
+  const L = getPortalT(locale)
   return (
     <Document>
       <Page size="LETTER" style={s.page}>
@@ -71,7 +73,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
           <View style={s.headerRow}>
             <View>
               <Text style={s.companyName}>VEREX INDUSTRIES</Text>
-              <Text style={s.subtitle}>CONTRAT DE SERVICE / SERVICE AGREEMENT</Text>
+              <Text style={s.subtitle}>{locale === "fr" ? "CONTRAT DE SERVICE" : "SERVICE AGREEMENT"}</Text>
               <View style={s.companyInfo}>
                 <Text>1234 Boulevard Industriel</Text>
                 <Text>Montréal, QC H2X 3K6</Text>
@@ -79,7 +81,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
               </View>
             </View>
             <View>
-              <Text style={s.contNumLabel}>CONTRACT</Text>
+              <Text style={s.contNumLabel}>{locale === "fr" ? "CONTRAT" : "CONTRACT"}</Text>
               <View style={s.contNumBox}><Text style={s.contNum}>{c.contractNumber}</Text></View>
               <View style={s.regNums}>
                 <Text>RBQ: 5678-9012-34</Text>
@@ -94,7 +96,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
         <View style={s.section}>
           <View style={s.partiesRow}>
             <View style={s.partyCol}>
-              <Text style={s.partyLabel}>CONTRACTOR / ENTREPRENEUR</Text>
+              <Text style={s.partyLabel}>{locale === "fr" ? "ENTREPRENEUR" : "CONTRACTOR"}</Text>
               <Text style={s.partyName}>Verex Industries Inc.</Text>
               <Text style={s.partyAddr}>1234 Boulevard Industriel, Montréal, QC H2X 3K6</Text>
             </View>
@@ -105,21 +107,21 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
             </View>
           </View>
           <View style={s.metaRow}>
-            <View style={s.metaItem}><Text style={s.metaLabel}>START DATE</Text><Text style={s.metaVal}>{c.startDate}</Text></View>
-            <View style={s.metaItem}><Text style={s.metaLabel}>COMPLETION</Text><Text style={s.metaVal}>{c.completionDate}</Text></View>
-            <View style={s.metaItem}><Text style={s.metaLabel}>WARRANTY</Text><Text style={s.metaVal}>{c.warrantyYears} Years</Text></View>
-            <View style={s.metaItem}><Text style={s.metaLabel}>STATUS</Text><Text style={s.metaVal}>{c.status.toUpperCase()}{c.signedDate ? ` — ${c.signedDate}` : ""}</Text></View>
+            <View style={s.metaItem}><Text style={s.metaLabel}>{locale === "fr" ? "DATE DÉBUT" : "START DATE"}</Text><Text style={s.metaVal}>{c.startDate}</Text></View>
+            <View style={s.metaItem}><Text style={s.metaLabel}>{locale === "fr" ? "FIN PRÉVUE" : "COMPLETION"}</Text><Text style={s.metaVal}>{c.completionDate}</Text></View>
+            <View style={s.metaItem}><Text style={s.metaLabel}>{locale === "fr" ? "GARANTIE" : "WARRANTY"}</Text><Text style={s.metaVal}>{c.warrantyYears} {locale === "fr" ? "ans" : "Years"}</Text></View>
+            <View style={s.metaItem}><Text style={s.metaLabel}>{L.status.toUpperCase()}</Text><Text style={s.metaVal}>{c.status.toUpperCase()}{c.signedDate ? ` — ${c.signedDate}` : ""}</Text></View>
           </View>
         </View>
         <View style={s.divider} />
 
         {/* Scope */}
         <View style={s.section}>
-          <Text style={s.sectionLabel}>SCOPE OF WORK / ÉTENDUE DES TRAVAUX</Text>
+          <Text style={s.sectionLabel}>{locale === "fr" ? "ÉTENDUE DES TRAVAUX" : "SCOPE OF WORK"}</Text>
           <View style={s.tableHeader}>
             <Text style={[s.tableHeaderCell, { flex: 5 }]}>DESCRIPTION</Text>
-            <Text style={[s.tableHeaderCell, { width: 30, textAlign: "center" }]}>QTY</Text>
-            <Text style={[s.tableHeaderCell, { flex: 5 }]}>SPECIFICATIONS</Text>
+            <Text style={[s.tableHeaderCell, { width: 30, textAlign: "center" }]}>{L.qty.toUpperCase()}</Text>
+            <Text style={[s.tableHeaderCell, { flex: 5 }]}>{locale === "fr" ? "SPÉCIFICATIONS" : "SPECIFICATIONS"}</Text>
           </View>
           {c.scopeItems.map((item, i) => (
             <View key={i} style={[s.tableRow, i % 2 === 0 ? s.tableRowAlt : {}]}>
@@ -133,10 +135,10 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
         {/* Total + Payment */}
         <View style={s.section}>
           <View style={s.totalBox}>
-            <Text style={s.totalLabel}>TOTAL CONTRACT VALUE</Text>
+            <Text style={s.totalLabel}>{locale === "fr" ? "VALEUR TOTALE DU CONTRAT" : "TOTAL CONTRACT VALUE"}</Text>
             <Text style={s.totalVal}>{fmt(c.totalValue)}</Text>
           </View>
-          <Text style={s.sectionLabel}>PAYMENT SCHEDULE / ÉCHÉANCIER DE PAIEMENT</Text>
+          <Text style={s.sectionLabel}>{locale === "fr" ? "ÉCHÉANCIER DE PAIEMENT" : "PAYMENT SCHEDULE"}</Text>
           {c.paymentSchedule.map((p, i) => (
             <View key={i} style={s.payRow}>
               <Text style={s.payMilestone}>{p.status === "paid" ? "✓ " : "○ "}{p.milestone}</Text>
@@ -151,7 +153,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
 
         {/* Terms */}
         <View style={s.section}>
-          <Text style={s.sectionLabel}>TERMS &amp; CONDITIONS / TERMES ET CONDITIONS</Text>
+          <Text style={s.sectionLabel}>{locale === "fr" ? "TERMES ET CONDITIONS" : "TERMS & CONDITIONS"}</Text>
           <View style={s.termsList}>
             {c.terms.map((term, i) => (
               <Text key={i} style={s.termItem}>{i + 1}. {term}</Text>
@@ -162,7 +164,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
         {/* Notes */}
         {c.notes ? (
           <View style={s.section}>
-            <Text style={s.sectionLabel}>NOTES / REMARQUES</Text>
+            <Text style={s.sectionLabel}>{locale === "fr" ? "REMARQUES" : "NOTES"}</Text>
             <Text style={s.notes}>{c.notes}</Text>
           </View>
         ) : null}
@@ -171,7 +173,7 @@ export function ContractPDFDocument({ contract: c }: { contract: Contract }) {
         <View style={s.section}>
           <View style={s.sigRow}>
             <View style={s.sigCol}>
-              <Text style={s.sigLabel}>CONTRACTOR / ENTREPRENEUR</Text>
+              <Text style={s.sigLabel}>{locale === "fr" ? "ENTREPRENEUR" : "CONTRACTOR"}</Text>
               <View style={s.sigLine} />
               <Text style={s.sigName}>Verex Industries Inc. — Date</Text>
             </View>
