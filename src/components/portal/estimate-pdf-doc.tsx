@@ -146,6 +146,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     </View>
                     <Text style={s.itemType}>{wt?.label || item.type} • {item.width}"W × {item.height}"H × {item.depth}"D</Text>
                     <Text style={s.itemColors}>{L.est.exterior}: {item.extColor} / {L.est.interior}: {item.intColor}</Text>
+                    <Text style={{ fontSize: 6, color: "#3b82f6", marginBottom: 2 }}>{[item.thermal && `Thermal: ${item.thermal}`, item.lowE && `Low-E: ${item.lowE}`, item.glassThickness && `Glass: ${item.glassThickness}`, item.argonGas && `Argon: ${item.argonGas}`, item.glassType && `Type: ${item.glassType}`, item.glassFinish && `Finish: ${item.glassFinish}`, item.screen && `Screen: ${item.screen}`].filter(Boolean).join(" | ")}</Text>
                     <Text style={{ fontSize: 8.5, color: "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
                       {getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
                       {(item.trimInstall) ? ` • ${L.est.trim}: ${(item.trimStyle ?? "flat") === "colonial" ? L.est.colonial : L.est.flat}` : ""}
