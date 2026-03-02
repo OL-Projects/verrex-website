@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
+import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, type InstallMethod, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
 const APP_DEFAULTS_VERSION = "v8"
@@ -168,6 +168,9 @@ export interface EstimateSettings {
   doorGlassRateUnit: "sqin" | "sqft" | "sqm"
   doorDoubleTemperedRate: number
   doorTripleTemperedRate: number
+  // Installation pricing method
+  installMethod: InstallMethod
+  installRate: number
   // Pricing summary
   showInstallation: boolean
   showDelivery: boolean
@@ -223,6 +226,8 @@ function defaultSettings(): EstimateSettings {
     doorGlassRateUnit: "sqin",
     doorDoubleTemperedRate: 0.50,
     doorTripleTemperedRate: 0.75,
+    installMethod: "per-unit" as InstallMethod,
+    installRate: 25,
     showInstallation: true, showDelivery: true,
     showGST: true, showQST: true, showDeposit: true, showTerms: true, showBalance: true,
     gstRate: 5, qstRate: 9.975,

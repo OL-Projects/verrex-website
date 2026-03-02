@@ -19,7 +19,7 @@ import {
   calcTotals, fmt, getTypeGroups, isDoorType, getItemDescription,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
   perimeterInches, perimeterFeet, perimeterInUnit, getItemTrimCost, getItemInstallCost,
-  inToDisplay, displayToIn, dimLabel, TRIM_UNITS, tl,
+  inToDisplay, displayToIn, dimLabel, TRIM_UNITS, tl, getInstallFormula, INSTALL_METHODS, type InstallPricingSettings,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -133,8 +133,9 @@ export default function EstimatesPage() {
     }
   }, [est, logo, sigs])
 
+  const installS: InstallPricingSettings = useMemo(() => ({ installMethod: estCfg.installMethod ?? "per-unit", installRate: estCfg.installRate ?? 25 }), [estCfg.installMethod, estCfg.installRate])
   const trimS: TrimRateSettings = useMemo(() => ({ trimUnit: estCfg.trimUnit ?? "in", flatTrimRate: estCfg.flatTrimRate ?? 0.50, colonialTrimRate: estCfg.colonialTrimRate ?? 0.75 }), [estCfg.trimUnit, estCfg.flatTrimRate, estCfg.colonialTrimRate])
-  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate, estCfg, { showInstallation: estCfg.showInstallation, showDelivery: estCfg.showDelivery, showGST: estCfg.showGST, showQST: estCfg.showQST }, trimS), [est, estCfg, trimS])
+  const t = useMemo(() => calcTotals(est, estCfg.gstRate, estCfg.qstRate, estCfg, { showInstallation: estCfg.showInstallation, showDelivery: estCfg.showDelivery, showGST: estCfg.showGST, showQST: estCfg.showQST }, trimS, installS), [est, estCfg, trimS])
   const dU = estCfg.dimensionUnit ?? "in"
 
   // ═══ SEND — 2-step: PDF download + email modal ═══
@@ -478,8 +479,9 @@ export default function EstimatesPage() {
                         <div className="rounded-lg border border-blue-200 dark:border-blue-500/20 p-2.5 space-y-1">
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{T.est.installation}</span>
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">{fmt(getItemInstallCost(item, est.installPerUnit))}</span>
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">{fmt(getItemInstallCost(item, est.installPerUnit, installS))}</span>
                           </div>
+                          {getInstallFormula(item, installS) && <p className="text-[8px] text-blue-400 mt-0.5">{getInstallFormula(item, installS)}</p>}
                           <label className="flex items-center gap-2 cursor-pointer print:hidden">
                             <input type="checkbox" checked={item.installOverride ?? false} onChange={e => updateItem(room.id, item.id, { installOverride: e.target.checked })} className="accent-blue-500 w-3 h-3" />
                             <span className="text-[9px] text-slate-500">{T.est.overrideGlobalRate} (${est.installPerUnit}/{T.est.unit})</span>

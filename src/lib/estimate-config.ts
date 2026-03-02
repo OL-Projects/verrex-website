@@ -316,6 +316,25 @@ export function defaultPaymentStages(): PaymentStageConfig[] {
 }
 
 // ── Trim Rate Units ─────────────────────────────
+// ── Installation Pricing ─────────────────────────
+export type InstallMethod = "per-unit" | "per-sqin" | "per-sqft" | "per-sqm" | "pct-price" | "per-lin-in" | "per-lin-ft" | "per-lin-cm"
+
+export const INSTALL_METHODS: { id: InstallMethod; label: string; short: string }[] = [
+  { id: "per-unit",   label: "Per Unit (flat)",    short: "/unit" },
+  { id: "per-sqin",   label: "Per Square Inch",    short: "/sq in" },
+  { id: "per-sqft",   label: "Per Square Foot",    short: "/sq ft" },
+  { id: "per-sqm",    label: "Per Square Meter",   short: "/sq m" },
+  { id: "pct-price",  label: "% of Product Price", short: "%" },
+  { id: "per-lin-in", label: "Per Linear Inch (perimeter)",  short: "/lin in" },
+  { id: "per-lin-ft", label: "Per Linear Foot (perimeter)",  short: "/lin ft" },
+  { id: "per-lin-cm", label: "Per Linear CM (perimeter)",    short: "/lin cm" },
+]
+
+export interface InstallPricingSettings {
+  installMethod: InstallMethod
+  installRate: number
+}
+
 export type TrimUnit = "in" | "lft" | "m" | "cm"
 export const TRIM_UNITS = [
   { id: "in" as const, label: "per inch", short: "/in" },
@@ -524,12 +543,42 @@ export function getItemTrimCost(it: EstimateItem, trimSettings?: TrimRateSetting
 }
 
 /** Get the effective installation cost for one item (qty×1) */
-export function getItemInstallCost(it: EstimateItem, globalInstallPerUnit: number): number {
+export function getItemInstallCost(it: EstimateItem, globalInstallPerUnit: number, installSettings?: InstallPricingSettings): number {
   if (it.installOverride && it.installPrice > 0) return it.installPrice
-  return globalInstallPerUnit
+  if (!installSettings) return globalInstallPerUnit
+  const { installMethod, installRate } = installSettings
+  const w = it.width, h = it.height
+  switch (installMethod) {
+    case "per-unit":   return installRate || globalInstallPerUnit
+    case "per-sqin":   return w * h * installRate
+    case "per-sqft":   return (w / 12) * (h / 12) * installRate
+    case "per-sqm":    return (w * 0.0254) * (h * 0.0254) * installRate
+    case "pct-price":  return it.unitPrice * (installRate / 100)
+    case "per-lin-in": return perimeterInches(w, h) * installRate
+    case "per-lin-ft": return perimeterFeet(w, h) * installRate
+    case "per-lin-cm": return perimeterInches(w, h) * 2.54 * installRate
+    default:           return globalInstallPerUnit
+  }
 }
 
-export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags, trimSettings?: TrimRateSettings) {
+/** Get a human-readable install formula description */
+export function getInstallFormula(it: EstimateItem, installSettings?: InstallPricingSettings): string {
+  if (!installSettings || installSettings.installMethod === "per-unit") return ""
+  const w = it.width, h = it.height, r = installSettings.installRate
+  const m = installSettings.installMethod
+  switch (m) {
+    case "per-sqin":   return `${w}×${h} = ${w*h} sq in × ${r.toFixed(2)}`
+    case "per-sqft":   { const sf = ((w/12)*(h/12)); return `${sf.toFixed(1)} sq ft × ${r.toFixed(2)}` }
+    case "per-sqm":    { const sm = ((w*0.0254)*(h*0.0254)); return `${sm.toFixed(2)} sq m × ${r.toFixed(2)}` }
+    case "pct-price":  return `${fmt(it.unitPrice)} × ${r}%`
+    case "per-lin-in": return `${perimeterInches(w,h)}" perim × ${r.toFixed(2)}`
+    case "per-lin-ft": return `${perimeterFeet(w,h).toFixed(1)} ft perim × ${r.toFixed(2)}`
+    case "per-lin-cm": return `${(perimeterInches(w,h)*2.54).toFixed(0)} cm perim × ${r.toFixed(2)}`
+    default: return ""
+  }
+}
+
+export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, glassSettings?: GlassPricingSettings, flags?: CalcTotalsFlags, trimSettings?: TrimRateSettings, installSettings?: InstallPricingSettings) {
   const { showInstallation = true, showDelivery = true, showGST = true, showQST = true } = flags || {}
   const items = allItems(est)
   let prodTotal = 0, totalUnits = 0, trimTotal = 0, installTotal = 0
@@ -539,7 +588,7 @@ export function calcTotals(est: EstimateState, gstRate = 5, qstRate = 9.975, gla
     totalUnits += it.qty
     trimTotal += it.qty * getItemTrimCost(it, trimSettings)
     if (showInstallation) {
-      installTotal += it.qty * getItemInstallCost(it, est.installPerUnit)
+      installTotal += it.qty * getItemInstallCost(it, est.installPerUnit, installSettings)
     }
   })
   const install = installTotal

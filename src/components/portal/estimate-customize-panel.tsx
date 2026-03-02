@@ -5,7 +5,7 @@ import { useLocale } from "next-intl"
 import { usePortalT } from "@/lib/portal-i18n"
 import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X, Ruler, CreditCard } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
-import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, type PaymentStageConfig , tl } from "@/lib/estimate-config"
+import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, INSTALL_METHODS, type PaymentStageConfig , tl } from "@/lib/estimate-config"
 
 const CLS = {
   lbl: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5",
