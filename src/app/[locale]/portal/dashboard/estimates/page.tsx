@@ -442,8 +442,8 @@ export default function EstimatesPage() {
                         </div>
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>{T.est.egress}: {egress ? T.est.egressCompliant : T.est.egressNonCompliant}</p>
                         {/* Glass Specifications */}
-                        <div className="rounded-lg border border-slate-200 dark:border-white/10 p-2.5 space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Glass Specifications</p>
+                        <div className="rounded-lg border border-violet-200 dark:border-violet-500/20 p-2.5 space-y-2">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">Glass Specifications</p>
                           {([
                             ["thermal", "Thermal", estCfg.thermalOptions ?? ["Double", "Triple"]],
                             ["lowE", "Low E", estCfg.lowEOptions ?? ["1 Side", "2 Sides"]],
@@ -457,7 +457,7 @@ export default function EstimatesPage() {
                               <div className="flex gap-0.5 flex-1">
                                 {options.map(opt => (
                                   <button key={opt} onClick={() => updateItem(room.id, item.id, { [field]: opt })}
-                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition ${(item as any)[field] === opt || (!(item as any)[field] && opt === options[0]) ? "bg-slate-800 dark:bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>
+                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition ${(item as any)[field] === opt || (!(item as any)[field] && opt === options[0]) ? "bg-violet-600 dark:bg-violet-500 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>
                                     {opt}
                                   </button>
                                 ))}
