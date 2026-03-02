@@ -444,8 +444,8 @@ export default function EstimatesPage() {
                           </div>
                         </div>
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>{T.est.egress}: {egress ? T.est.egressCompliant : T.est.egressNonCompliant}</p>
-                        {/* Glass Specifications */}
-                        <div className="rounded-lg border border-cyan-300/50 dark:border-cyan-500/20 p-2.5 space-y-2">
+                        {/* Glass Specifications (windows only) */}
+                        {!isDoorType(item.type) && <div className="rounded-lg border border-cyan-300/50 dark:border-cyan-500/20 p-2.5 space-y-2">
                           <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Glass Specifications</p>
                           {([
                             ["thermal", "Thermal", estCfg.thermalOptions ?? ["Double", "Triple"]],
@@ -468,7 +468,7 @@ export default function EstimatesPage() {
                               </div>
                             </div>
                           ))}
-                        </div>
+                        </div>}
                         {/* Trim */}
                         <div className="rounded-lg border border-orange-200 dark:border-orange-500/20 p-2.5 space-y-2">
                           <label className="flex items-center gap-2 cursor-pointer">

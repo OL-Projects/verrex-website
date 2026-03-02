@@ -146,20 +146,14 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     </View>
                     <Text style={s.itemType}>{wt?.label || item.type} • {item.width}"W × {item.height}"H × {item.depth}"D</Text>
                     <Text style={s.itemColors}>{L.est.exterior}: {item.extColor} / {L.est.interior}: {item.intColor}</Text>
+                    {!isDoorType(item.type) && (
                     <View style={{ backgroundColor: "#f0f9ff", borderWidth: 0.5, borderColor: "#bae6fd", borderRadius: 3, padding: "3 5", marginBottom: 3 }}>
                       <Text style={{ fontSize: 6, fontWeight: "bold", fontFamily: "Helvetica-Bold", color: "#0369a1", marginBottom: 2 }}>GLASS SPECIFICATIONS</Text>
-                      <Text style={{ fontSize: 6.5, color: "#334155", lineHeight: 1.5 }}>
-                        {[
-                          item.thermal && `Thermal: ${item.thermal}`,
-                          item.lowE && `Low-E: ${item.lowE}`,
-                          item.glassThickness && `Glass: ${item.glassThickness}`,
-                          item.argonGas && `Argon: ${item.argonGas}`,
-                          item.glassType && `Type: ${item.glassType}`,
-                          item.glassFinish && `Finish: ${item.glassFinish}`,
-                          item.screen && `Screen: ${item.screen}`,
-                        ].filter(Boolean).join("  •  ")}
-                      </Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Thermal: {item.thermal || "—"}  •  Low-E: {item.lowE || "—"}  •  Glass: {item.glassThickness || "—"}</Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Argon: {item.argonGas || "—"}  •  Type: {item.glassType || "—"}  •  Finish: {item.glassFinish || "—"}</Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Screen: {item.screen || "—"}</Text>
                     </View>
+                    )}
                     <Text style={{ fontSize: 8.5, color: "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
                       {getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
                       {(item.trimInstall) ? ` • ${L.est.trim}: ${(item.trimStyle ?? "flat") === "colonial" ? L.est.colonial : L.est.flat}` : ""}
