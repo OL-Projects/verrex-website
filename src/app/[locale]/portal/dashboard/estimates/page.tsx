@@ -458,7 +458,7 @@ export default function EstimatesPage() {
                               <div className="flex gap-0.5 flex-1">
                                 {options.map(opt => (
                                   <button key={opt} onClick={() => updateItem(room.id, item.id, { [field]: opt })}
-                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition ${(item as any)[field] === opt || (!(item as any)[field] && opt === options[0]) ? "bg-transparent text-cyan-500 dark:text-cyan-400 ring-2 ring-cyan-400 dark:ring-cyan-500 shadow-[0_0_6px_rgba(34,211,238,0.3)]" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>
+                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition ${(item as any)[field] === opt || (!(item as any)[field] && opt === options[0]) ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-400/30" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>
                                     {opt}
                                   </button>
                                 ))}

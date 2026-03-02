@@ -56,7 +56,26 @@ function deleteEstData(id: string) {
 }
 
 function metaFromEst(id: string, est: EstimateState): EstimateRecord {
-  const t = calcTotals(est)
+  // Read actual user settings so the stored total matches what's on screen
+  const cfg = readLS<Record<string, unknown>>("VEREX_estimate_settings", {})
+  const gstRate = (cfg.gstRate as number) ?? 5
+  const qstRate = (cfg.qstRate as number) ?? 9.975
+  const flags = {
+    showInstallation: (cfg.showInstallation as boolean) ?? true,
+    showDelivery: (cfg.showDelivery as boolean) ?? true,
+    showGST: (cfg.showGST as boolean) ?? true,
+    showQST: (cfg.showQST as boolean) ?? true,
+  }
+  const trimS = {
+    trimUnit: (cfg.trimUnit as "in") ?? "in",
+    flatTrimRate: (cfg.flatTrimRate as number) ?? 0.50,
+    colonialTrimRate: (cfg.colonialTrimRate as number) ?? 0.75,
+  }
+  const installS = {
+    installMethod: (cfg.installMethod as "per-unit") ?? "per-unit",
+    installRate: (cfg.installRate as number) ?? 25,
+  }
+  const t = calcTotals(est, gstRate, qstRate, cfg as any, flags, trimS, installS)
   return {
     id,
     savedAt: new Date().toISOString(),
