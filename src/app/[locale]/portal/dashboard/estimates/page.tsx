@@ -19,7 +19,7 @@ import {
   calcTotals, fmt, getTypeGroups, isDoorType, getItemDescription,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
   perimeterInches, perimeterFeet, perimeterInUnit, getItemTrimCost, getItemInstallCost,
-  inToDisplay, displayToIn, dimLabel, TRIM_UNITS,
+  inToDisplay, displayToIn, dimLabel, TRIM_UNITS, tl,
 } from "@/lib/estimate-config"
 
 const C = {
@@ -405,8 +405,8 @@ export default function EstimatesPage() {
                               )
                               if (filtered.length === 0) return null
                               return (
-                                <optgroup key={g.group} label={g.group}>
-                                  {filtered.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                                <optgroup key={g.group} label={tl(g.group, locale)}>
+                                  {filtered.map(([k, v]) => <option key={k} value={k}>{tl(v.label, locale)}</option>)}
                                 </optgroup>
                               )
                             })}
@@ -421,18 +421,18 @@ export default function EstimatesPage() {
                         </div>
                         <div><label className={C.lbl}>{T.est.product}</label>
                           <select value={item.product} onChange={e => updateItem(room.id, item.id, { product: e.target.value })} className={C.sel}>
-                            {PRODUCTS.filter(p => estCfg.enabledProducts.includes(p.id)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                            {PRODUCTS.filter(p => estCfg.enabledProducts.includes(p.id)).map(p => <option key={p.id} value={p.id}>{tl(p.label, locale)}</option>)}
                           </select>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div><label className={C.lbl}>{T.est.exterior}</label>
                             <select value={item.extColor} onChange={e => updateItem(room.id, item.id, { extColor: e.target.value })} className={C.sel}>
-                              {extNames.map(c => <option key={c}>{c}</option>)}
+                              {extNames.map(c => <option key={c}>{tl(c, locale)}</option>)}
                             </select>
                           </div>
                           <div><label className={C.lbl}>{T.est.interior}</label>
                             <select value={item.intColor} onChange={e => updateItem(room.id, item.id, { intColor: e.target.value })} className={C.sel}>
-                              {intNames.map(c => <option key={c}>{c}</option>)}
+                              {intNames.map(c => <option key={c}>{tl(c, locale)}</option>)}
                             </select>
                           </div>
                         </div>

@@ -8,7 +8,7 @@ import {
   type TrimRateSettings,
   type PaymentStageConfig,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
-  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription,
+  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription, tl,
 } from "@/lib/estimate-config"
 import { getPortalT } from "@/lib/portal-i18n"
 

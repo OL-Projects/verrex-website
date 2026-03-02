@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useLocale } from "next-intl"
 import { usePortalT } from "@/lib/portal-i18n"
 import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X, Ruler, CreditCard } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
-import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, type PaymentStageConfig } from "@/lib/estimate-config"
+import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, type PaymentStageConfig , tl } from "@/lib/estimate-config"
 
 const CLS = {
   lbl: "block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5",
@@ -106,6 +107,7 @@ interface Props {
 
 export function EstimateCustomizePanel(props: Props) {
   const T = usePortalT()
+  const locale = useLocale()
   const { onClose, style, onUpdateStyle: uS, settings: s, onUpdateSettings: uSet, onReset } = props
   const [open, setOpen] = useState<Record<string, boolean>>({ header: true })
   const t = (id: string) => setOpen(p => ({ ...p, [id]: !p[id] }))
@@ -215,7 +217,7 @@ export function EstimateCustomizePanel(props: Props) {
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Products</p>
           {PRODUCTS.map(p => (
             <div key={p.id} className="flex items-center justify-between p-1 rounded-lg bg-slate-50/30 dark:bg-white/2 mb-0.5">
-              <span className="text-[10px]">{p.label}</span>
+              <span className="text-[10px]">{tl(p.label, locale)}</span>
               <Toggle on={s.enabledProducts.includes(p.id)} onToggle={() => props.onToggleProduct(p.id)} />
             </div>
           ))}
@@ -237,7 +239,7 @@ export function EstimateCustomizePanel(props: Props) {
                 {GLASS_RATE_UNITS.map(u => (
                   <button key={u.id} onClick={() => uSet({ glassRateUnit: u.id })}
                     className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.glassRateUnit ?? "sqin") === u.id ? "bg-emerald-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
-                    {u.label}
+                    {tl(u.label, locale)}
                   </button>
                 ))}
               </div>
@@ -289,7 +291,7 @@ export function EstimateCustomizePanel(props: Props) {
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Products</p>
           {PRODUCTS.map(p => (
             <div key={p.id} className="flex items-center justify-between p-1 rounded-lg bg-slate-50/30 dark:bg-white/2 mb-0.5">
-              <span className="text-[10px]">{p.label}</span>
+              <span className="text-[10px]">{tl(p.label, locale)}</span>
               <Toggle on={s.enabledProducts.includes(p.id)} onToggle={() => props.onToggleProduct(p.id)} />
             </div>
           ))}
@@ -306,7 +308,7 @@ export function EstimateCustomizePanel(props: Props) {
                 {GLASS_RATE_UNITS.map(u => (
                   <button key={u.id} onClick={() => uSet({ doorGlassRateUnit: u.id })}
                     className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.doorGlassRateUnit ?? "sqin") === u.id ? "bg-emerald-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
-                    {u.label}
+                    {tl(u.label, locale)}
                   </button>
                 ))}
               </div>
@@ -375,7 +377,7 @@ export function EstimateCustomizePanel(props: Props) {
               {TRIM_UNITS.map(u => (
                 <button key={u.id} onClick={() => uSet({ trimUnit: u.id })}
                   className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.trimUnit ?? "in") === u.id ? "bg-orange-500 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
-                  {u.label}
+                  {tl(u.label, locale)}
                 </button>
               ))}
             </div>

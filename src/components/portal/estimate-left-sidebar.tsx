@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useLocale } from "next-intl"
 import { usePortalT } from "@/lib/portal-i18n"
 import { Plus, Search, FileText, MoreVertical, Copy, Trash2, Check, Loader2, PanelLeftOpen, PanelLeftClose, X, BookTemplate, Save, Download } from "lucide-react"
 import { type EstimateRecord, type EstimateTemplate } from "@/lib/estimate-store"
@@ -25,19 +26,20 @@ interface Props {
   onDeleteTemplate: (id: string) => void
 }
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, loc = "en"): string {
   const d = new Date(iso)
   const now = Date.now()
   const diff = now - d.getTime()
-  if (diff < 60000) return "Just now"
+  if (diff < 60000) return loc === "fr" ? "À l'instant" : "Just now"
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
-  if (diff < 172800000) return "Yesterday"
+  if (diff < 172800000) return loc === "fr" ? "Hier" : "Yesterday"
   return d.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
 }
 
 export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLoad, onDelete, onDuplicate, mobileOpen, onMobileToggle, templates, onSaveAsTemplate, onLoadTemplate, onDeleteTemplate }: Props) {
   const T = usePortalT()
+  const locale = useLocale()
   const [search, setSearch] = useState("")
   const [menuId, setMenuId] = useState<string | null>(null)
   const [tab, setTab] = useState<SidebarTab>("history")

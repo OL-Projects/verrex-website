@@ -352,6 +352,120 @@ export function perimeterFeet(w: number, h: number): number { return perimeterIn
 
 export function fmt(n: number) { return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") }
 
+// ── Translation Engine ──────────────────────────
+// Maps English labels → French for all data-driven strings
+const FR_LABELS: Record<string, string> = {
+  // ── Window Types ──
+  "Fixed": "Fixe",
+  "Top Hung (Awning)": "Auvent (haut)",
+  "Horizontal Slider": "Coulissant horizontal",
+  "Casement Left — Crank Out": "Battant gauche — manivelle",
+  "Casement Right — Crank Out": "Battant droit — manivelle",
+  "Tilt & Turn Left (Inswing)": "Oscillo-battant gauche",
+  "Tilt & Turn Right (Inswing)": "Oscillo-battant droit",
+  "Casement L + Fixed": "Battant G + Fixe",
+  "Fixed + Casement R": "Fixe + Battant D",
+  "Tilt & Turn L + Fixed": "Oscillo-battant G + Fixe",
+  "Fixed + Tilt & Turn R": "Fixe + Oscillo-battant D",
+  "Casement L + 2 Fixed": "Battant G + 2 Fixes",
+  "3 Fixed Panoramic": "3 Fixes panoramiques",
+  "2 Fixed + Casement R": "2 Fixes + Battant D",
+  "Casement L + 3 Fixed": "Battant G + 3 Fixes",
+  // ── Door Types ──
+  "Swing Door": "Porte battante",
+  "French Door (Double)": "Porte française (double)",
+  "Sliding Door — 2 Panel": "Porte coulissante — 2 panneaux",
+  "Sliding Door — 3 Panel": "Porte coulissante — 3 panneaux",
+  "Folding Door — 2 Panel": "Porte pliante — 2 panneaux",
+  "Folding Door — 4 Panel": "Porte pliante — 4 panneaux",
+  // ── Type Groups ──
+  "Windows": "Fenêtres",
+  "Windows — Combo": "Fenêtres — Combo",
+  "Doors — Swing": "Portes — Battantes",
+  "Doors — Sliding": "Portes — Coulissantes",
+  "Doors — Folding": "Portes — Pliantes",
+  // ── Products ──
+  "Double Tempered Glass": "Verre double trempé",
+  "Triple Tempered Glass": "Verre triple trempé",
+  '4600 Hybrid PVC/ALU 5¾"': '4600 Hybride PVC/ALU 5¾"',
+  '4600 PVC 5¼"': '4600 PVC 5¼"',
+  '4000 PVC 5¼" — Slider': '4000 PVC 5¼" — Coulissant',
+  // ── Colors ──
+  "White": "Blanc",
+  "Grey": "Gris",
+  "Wood Grain": "Grain de bois",
+  "Walnut Wood": "Bois de noyer",
+  "Cherry": "Cerisier",
+  "Black": "Noir",
+  "Bronze": "Bronze",
+  "Clay": "Argile",
+  "Beige": "Beige",
+  "Sand": "Sable",
+  "Cream": "Crème",
+  "Brown": "Brun",
+  "Custom": "Personnalisé",
+  // ── Payment Stages ──
+  "Deposit Required": "Dépôt requis",
+  "Balance Remaining": "Solde restant",
+  "After Installation Complete": "Après l'installation complétée",
+  // ── Glass Rate Units ──
+  "per sq inch": "par po²",
+  "per sq foot": "par pi²",
+  "per sq meter": "par m²",
+  // ── Trim Units ──
+  "per inch": "par pouce",
+  "per linear foot": "par pied linéaire",
+  "per meter": "par mètre",
+  "per cm": "par cm",
+  // ── Trim Styles ──
+  "Flat": "Plat",
+  "flat": "plat",
+  "Colonial": "Colonial",
+  "colonial": "colonial",
+  // ── Ship Methods ──
+  "PICKUP": "RAMASSAGE",
+  "DELIVERY": "LIVRAISON",
+  // ── Labels ──
+  "Sold To": "VENDU À",
+  "Ship To": "LIVRÉ À",
+  "Room": "Pièce",
+  "GROUND FLOOR": "REZ-DE-CHAUSSÉE",
+  "NEW ROOM": "NOUVELLE PIÈCE",
+  // ── Dimension Units ──
+  "Inches (in)": "Pouces (po)",
+  "Centimeters (cm)": "Centimètres (cm)",
+  // ── Misc ──
+  "Standard": "Standard",
+  "Window": "Fenêtre",
+  "Door": "Porte",
+  "Left": "Gauche",
+  "Right": "Droite",
+  "In": "Intérieur",
+  "Out": "Extérieur",
+  "Hinge": "Charnière",
+  "Swing": "Ouverture",
+}
+
+/**
+ * Translate a label from English to French (or return as-is for English).
+ * This is the universal "translator engine" for all data-driven strings.
+ * Usage: tl("Double Tempered Glass", locale) → "Verre double trempé"
+ */
+export function tl(label: string, locale: string): string {
+  if (locale !== "fr") return label
+  return FR_LABELS[label] ?? label
+}
+
+export const DEFAULT_TERMS_FR = [
+  "Cette soumission est valide 30 jours à compter de la date d'émission.",
+  "Un dépôt de 30 % est requis à la signature du contrat. Le solde de 70 % est dû 24 heures avant la livraison.",
+  "Livraison approximative selon la date requise — sous réserve des délais du fabricant.",
+  "Tous les produits bénéficient de la garantie complète du fabricant. Garantie d'installation fournie séparément.",
+  "Toute modification doit être soumise par écrit et peut affecter les prix et les délais de livraison.",
+  "La valeur des produits livrés/installés doit être payée à la réception de la marchandise.",
+  "Les prix incluent tous les produits et services énumérés. Travaux supplémentaires cotés séparément.",
+]
+
 export function allItems(est: EstimateState): EstimateItem[] {
   return est.rooms.flatMap(r => r.items)
 }
