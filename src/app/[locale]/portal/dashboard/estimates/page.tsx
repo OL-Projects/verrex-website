@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useLocale } from "next-intl"
+import { usePortalT } from "@/lib/portal-i18n"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings, useEstimateHistory } from "@/lib/estimate-hooks"
 import { useEstimateStore } from "@/lib/estimate-store"
@@ -44,6 +45,7 @@ export default function EstimatesPage() {
   const { remember, suggestions } = useAutocomplete()
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const locale = useLocale()
+  const T = usePortalT()
   const logoRef = useRef<HTMLInputElement>(null)
   const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -97,7 +99,7 @@ export default function EstimatesPage() {
   const delItem = useCallback((rid: string, iid: string) => {
     setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === rid ? { ...r, items: r.items.length <= 1 ? r.items : r.items.filter(it => it.id !== iid) } : r) }))
   }, [])
-  const resetAll = useCallback(() => { if (confirm("Reset all data?")) setEst(createBlankEstimate()) }, [])
+  const resetAll = useCallback(() => { if (confirm(T.est.resetConfirm)) setEst(createBlankEstimate()) }, [T])
 
   // Wrap newEstimate to apply saved default T&C clauses
   const handleNewEstimate = useCallback(() => {
@@ -196,7 +198,7 @@ export default function EstimatesPage() {
     ``,
     `  Items:          ${t.items} (${t.totalUnits} units)`,
     `  Subtotal:       ${fmt(t.prodTotal)}`,
-    ...(estCfg.showInstallation ? [`  Installation:   ${fmt(t.install)}`] : []),
+    ...(estCfg.showInstallation ? [`  ${T.est.installation}:   ${fmt(t.install)}`] : []),
     ...(estCfg.showDelivery ? [`  Delivery:       ${fmt(t.delivery)}`] : []),
     `  ─────────────────────`,
     `  Before Tax:     ${fmt(t.subtax)}`,
@@ -238,8 +240,8 @@ export default function EstimatesPage() {
     <div className={`flex-1 space-y-5 ${sidePanel !== "none" ? "max-w-3xl" : "max-w-4xl"}`}>
       {/* Title */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="print:hidden">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText className="h-6 w-6 text-blue-500" /> Estimate Creator</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Professional window & door estimates with live diagrams</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><FileText className="h-6 w-6 text-blue-500" /> {T.est.title}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{T.est.subtitle}</p>
       </motion.div>
 
       <div ref={pdfRef} className="space-y-5 print:space-y-3">
@@ -265,19 +267,19 @@ export default function EstimatesPage() {
                 <input value={est.company.name} onChange={e => setCompany("name", e.target.value)} className="text-2xl font-extrabold text-slate-900 dark:text-white bg-transparent outline-none w-full" />
                 <input value={est.company.tagline} onChange={e => setCompany("tagline", e.target.value)} className="text-xs tracking-widest text-slate-500 bg-transparent outline-none w-full mt-0.5" />
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
-                  <input placeholder="Address" value={est.company.address} onChange={e => setCompany("address", e.target.value)} className="bg-transparent outline-none" />
-                  <input placeholder="City" value={est.company.city} onChange={e => setCompany("city", e.target.value)} className="bg-transparent outline-none" />
-                  <input placeholder="Phone" value={est.company.phone} onChange={e => setCompany("phone", e.target.value)} className="bg-transparent outline-none" />
-                  <input placeholder="Website" value={est.company.website} onChange={e => setCompany("website", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder={T.address} value={est.company.address} onChange={e => setCompany("address", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder={T.city} value={est.company.city} onChange={e => setCompany("city", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder={T.phone} value={est.company.phone} onChange={e => setCompany("phone", e.target.value)} className="bg-transparent outline-none" />
+                  <input placeholder={T.website} value={est.company.website} onChange={e => setCompany("website", e.target.value)} className="bg-transparent outline-none" />
                 </div>
               </div>
             </div>
             <div className="text-right space-y-1.5 w-full sm:min-w-[200px] sm:w-auto overflow-hidden">
-              <p className={C.lbl}>Estimate #</p>
+              <p className={C.lbl}>{T.est.estimateNum}</p>
               <input value={est.estimateNumber} onChange={e => set("estimateNumber", e.target.value)} className="text-lg font-extrabold text-slate-900 dark:text-white bg-transparent outline-none text-right w-full border-b border-dashed border-slate-300 dark:border-white/20 focus:border-blue-500 print:border-none" />
-              {estCfg.showDate && <div className="overflow-hidden"><label className={C.lbl}>Date</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
-              {estCfg.showValidUntil && <div className="overflow-hidden"><label className={C.lbl}>Valid Until</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
-              {estCfg.showRequiredBy && <div className="overflow-hidden"><label className={C.lbl}>Required By</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
+              {estCfg.showDate && <div className="overflow-hidden"><label className={C.lbl}>{T.date}</label><input type="date" value={est.date} onChange={e => set("date", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
+              {estCfg.showValidUntil && <div className="overflow-hidden"><label className={C.lbl}>{T.validUntil}</label><input type="date" value={est.validUntil} onChange={e => set("validUntil", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
+              {estCfg.showRequiredBy && <div className="overflow-hidden"><label className={C.lbl}>{T.requiredBy}</label><input type="date" value={est.requiredBy} onChange={e => set("requiredBy", e.target.value)} className={`${C.inp} w-full max-w-full box-border`} /></div>}
             </div>
           </div>
 
@@ -294,14 +296,14 @@ export default function EstimatesPage() {
             </div>
             <div className="space-y-2">
               <input value={est.shipToLabel} onChange={e => set("shipToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
-              <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={C.sel}><option>PICKUP</option><option>DELIVERY</option></select>
-              <input placeholder="Address" value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={C.inp} />
-              <input placeholder="Phone" value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={C.inp} />
+              <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={C.sel}><option>{T.est.pickup}</option><option>{T.est.delivery}</option></select>
+              <input placeholder={T.address} value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={C.inp} />
+              <input placeholder={T.phone} value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={C.inp} />
               {estCfg.showRepSection && (<>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-2">Representative</p>
-                <input list="dl_rep" placeholder="Rep Name" value={est.repName} onChange={e => set("repName", e.target.value)} onBlur={e => handleBlur("repName", e.target.value)} className={C.inp} />
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pt-2">{T.est.representative}</p>
+                <input list="dl_rep" placeholder={T.rep} value={est.repName} onChange={e => set("repName", e.target.value)} onBlur={e => handleBlur("repName", e.target.value)} className={C.inp} />
                 <datalist id="dl_rep">{suggestions("repName").map(s => <option key={s} value={s} />)}</datalist>
-                <input placeholder="Reference" value={est.repRef} onChange={e => set("repRef", e.target.value)} className={C.inp} />
+                <input placeholder={T.reference} value={est.repRef} onChange={e => set("repRef", e.target.value)} className={C.inp} />
               </>)}
             </div>
           </div>
@@ -319,22 +321,22 @@ export default function EstimatesPage() {
                 </button>
                 <input value={room.name} onChange={e => updateRoom(room.id, { name: e.target.value })} className="text-xs font-extrabold uppercase tracking-[3px] text-slate-700 dark:text-slate-300 bg-transparent outline-none flex-1 border-b-2 border-slate-800 dark:border-white/20 pb-1" />
                 <div className="relative print:hidden">
-                  <button onClick={() => setAddMenuRoom(addMenuRoom === room.id ? null : room.id)} className="text-xs text-blue-600 font-semibold hover:underline">+ Add Item</button>
+                  <button onClick={() => setAddMenuRoom(addMenuRoom === room.id ? null : room.id)} className="text-xs text-blue-600 font-semibold hover:underline">{T.est.addItem}</button>
                   {addMenuRoom === room.id && (
                     <div className="absolute right-0 top-7 z-30 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-white/15 p-1.5 flex gap-1">
                       <button onClick={() => { addItemToRoom(room.id); setAddMenuRoom(null) }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
-                        <PanelTop className="h-4 w-4 text-blue-500" /> Window
+                        <PanelTop className="h-4 w-4 text-blue-500" /> {T.est.window}
                       </button>
                       <button onClick={() => {
                         setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === room.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-DOOR", width: 36, height: 80 }] } : r) }))
                         setAddMenuRoom(null)
                       }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition">
-                        <DoorOpen className="h-4 w-4 text-amber-600" /> Door
+                        <DoorOpen className="h-4 w-4 text-amber-600" /> {T.est.door}
                       </button>
                     </div>
                   )}
                 </div>
-                <button onClick={() => delRoom(room.id)} className="text-xs text-red-400 hover:text-red-600 transition print:hidden">Remove</button>
+                <button onClick={() => delRoom(room.id)} className="text-xs text-red-400 hover:text-red-600 transition print:hidden">{T.remove}</button>
               </div>
 
               {!isCollapsed && room.items.map((item) => {
@@ -352,11 +354,11 @@ export default function EstimatesPage() {
                     {/* Header row */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-extrabold text-slate-900 dark:text-white">Item #{globalIdx}</span>
+                        <span className="text-sm font-extrabold text-slate-900 dark:text-white">{T.est.item} #{globalIdx}</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${prod?.cls}`}>{prod?.tag}</span>
                         <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{item.width}&quot;W × {item.height}&quot;H × {item.depth}&quot;D</span>
                       </div>
-                      <input placeholder="Custom Label" value={item.customLabel} onChange={e => updateItem(room.id, item.id, { customLabel: e.target.value })}
+                      <input placeholder={T.est.customLabel} value={item.customLabel} onChange={e => updateItem(room.id, item.id, { customLabel: e.target.value })}
                         className="text-right text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-transparent outline-none w-36" />
                     </div>
 
@@ -368,18 +370,18 @@ export default function EstimatesPage() {
                         </div>
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5 print:hidden flex-wrap gap-y-1">
                           <div className="flex items-center gap-1">
-                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? "Open" : "Hinge"}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? T.est.open : T.est.hinge}</span>
                             <button onClick={() => updateItem(room.id, item.id, { hingeLeft: true })}
-                              className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Left</button>
+                              className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.left}</button>
                             <button onClick={() => updateItem(room.id, item.id, { hingeLeft: false })}
-                              className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Right</button>
+                              className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.right}</button>
                             {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS") || m.startsWith("TT") || m === "AWNING")) && (
                               <>
-                                <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 ml-2 mr-0.5">Swing</span>
+                                <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 ml-2 mr-0.5">{T.est.swing}</span>
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: true })}
-                                  className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.swingInside ?? true) ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>In</button>
+                                  className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.swingInside ?? true) ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.inSwing}</button>
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: false })}
-                                  className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Out</button>
+                                  className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.outSwing}</button>
                               </>
                             )}
                           </div>
@@ -389,7 +391,7 @@ export default function EstimatesPage() {
                         </div>
                       </div>
                       <div className="space-y-2.5">
-                        <div><label className={C.lbl}>{isDoorType(item.type) ? "Door" : "Window"} Type</label>
+                        <div><label className={C.lbl}>{isDoorType(item.type) ? T.est.doorType : T.est.windowType}</label>
                           <select value={item.type} onChange={e => {
                             const newType = e.target.value
                             const patch: Partial<EstimateItem> = { type: newType }
@@ -412,29 +414,29 @@ export default function EstimatesPage() {
                           <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
-                          <div><label className={C.lbl}>Width</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
-                          <div><label className={C.lbl}>Height</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
-                          {(estCfg.showThickness ?? true) && <div><label className={C.lbl}>Thickness</label><input type="number" min={1} max={20} step={0.5} value={item.thickness ?? 4} onChange={e => updateItem(room.id, item.id, { thickness: +e.target.value })} className={C.inp} /></div>}
-                          {estCfg.showDepth && <div><label className={C.lbl}>Depth</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
+                          <div><label className={C.lbl}>{T.est.width}</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
+                          <div><label className={C.lbl}>{T.est.height}</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
+                          {(estCfg.showThickness ?? true) && <div><label className={C.lbl}>{T.est.thickness}</label><input type="number" min={1} max={20} step={0.5} value={item.thickness ?? 4} onChange={e => updateItem(room.id, item.id, { thickness: +e.target.value })} className={C.inp} /></div>}
+                          {estCfg.showDepth && <div><label className={C.lbl}>{T.est.depth}</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
                         </div>
-                        <div><label className={C.lbl}>Product</label>
+                        <div><label className={C.lbl}>{T.est.product}</label>
                           <select value={item.product} onChange={e => updateItem(room.id, item.id, { product: e.target.value })} className={C.sel}>
                             {PRODUCTS.filter(p => estCfg.enabledProducts.includes(p.id)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
                           </select>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                          <div><label className={C.lbl}>Exterior</label>
+                          <div><label className={C.lbl}>{T.est.exterior}</label>
                             <select value={item.extColor} onChange={e => updateItem(room.id, item.id, { extColor: e.target.value })} className={C.sel}>
                               {extNames.map(c => <option key={c}>{c}</option>)}
                             </select>
                           </div>
-                          <div><label className={C.lbl}>Interior</label>
+                          <div><label className={C.lbl}>{T.est.interior}</label>
                             <select value={item.intColor} onChange={e => updateItem(room.id, item.id, { intColor: e.target.value })} className={C.sel}>
                               {intNames.map(c => <option key={c}>{c}</option>)}
                             </select>
                           </div>
                         </div>
-                        <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>EGRESS: {egress ? "Compliant ✓" : "Non-compliant"}</p>
+                        <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>{T.est.egress}: {egress ? T.est.egressCompliant : T.est.egressNonCompliant}</p>
                         {/* Trim */}
                         <div className="rounded-lg border border-orange-200 dark:border-orange-500/20 p-2.5 space-y-2">
                           <label className="flex items-center gap-2 cursor-pointer">
@@ -445,22 +447,22 @@ export default function EstimatesPage() {
                           {(item.trimInstall ?? false) && (
                             <div className="grid grid-cols-3 gap-2 pt-1">
                               <div>
-                                <label className={C.lbl}>Style</label>
+                                <label className={C.lbl}>{T.est.trimStyle}</label>
                                 <div className="flex gap-2">
                                   <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
-                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "flat"} onChange={() => updateItem(room.id, item.id, { trimStyle: "flat" })} className="accent-orange-500 w-3 h-3" /> Flat
+                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "flat"} onChange={() => updateItem(room.id, item.id, { trimStyle: "flat" })} className="accent-orange-500 w-3 h-3" /> {T.est.flat}
                                   </label>
                                   <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300 cursor-pointer">
-                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "colonial"} onChange={() => updateItem(room.id, item.id, { trimStyle: "colonial" })} className="accent-orange-500 w-3 h-3" /> Colonial
+                                    <input type="radio" name={`trim_${item.id}`} checked={(item.trimStyle ?? "flat") === "colonial"} onChange={() => updateItem(room.id, item.id, { trimStyle: "colonial" })} className="accent-orange-500 w-3 h-3" /> {T.est.colonial}
                                   </label>
                                 </div>
                               </div>
                               <div>
-                                <label className={C.lbl}>Override $</label>
+                                <label className={C.lbl}>{T.est.trimOverride}</label>
                                 <input type="number" min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} placeholder="0=auto" className={`${C.inp} font-semibold text-xs`} />
                               </div>
                               <div>
-                                <label className={C.lbl}>Trim Cost</label>
+                                <label className={C.lbl}>{T.est.trimCost}</label>
                                 <div className="px-2 py-2 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 text-xs font-bold text-orange-600 dark:text-orange-400">
                                   {fmt(getItemTrimCost(item, trimS))}
                                 </div>
@@ -472,27 +474,27 @@ export default function EstimatesPage() {
                         {estCfg.showInstallation && (
                         <div className="rounded-lg border border-blue-200 dark:border-blue-500/20 p-2.5 space-y-1">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Installation</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{T.est.installation}</span>
                             <span className="text-xs font-bold text-blue-600 dark:text-blue-400">{fmt(getItemInstallCost(item, est.installPerUnit))}</span>
                           </div>
                           <label className="flex items-center gap-2 cursor-pointer print:hidden">
                             <input type="checkbox" checked={item.installOverride ?? false} onChange={e => updateItem(room.id, item.id, { installOverride: e.target.checked })} className="accent-blue-500 w-3 h-3" />
-                            <span className="text-[9px] text-slate-500">Override global rate (${est.installPerUnit}/unit)</span>
+                            <span className="text-[9px] text-slate-500">{T.est.overrideGlobalRate} (${est.installPerUnit}/{T.est.unit})</span>
                           </label>
                           {(item.installOverride ?? false) && (
                             <div className="pt-1">
-                              <input type="number" min={0} step={0.01} value={item.installPrice ?? 0} onChange={e => updateItem(room.id, item.id, { installPrice: +e.target.value })} placeholder="Custom install price" className={`${C.inp} font-semibold text-xs`} />
+                              <input type="number" min={0} step={0.01} value={item.installPrice ?? 0} onChange={e => updateItem(room.id, item.id, { installPrice: +e.target.value })} placeholder={T.est.customInstallPrice} className={`${C.inp} font-semibold text-xs`} />
                             </div>
                           )}
                         </div>
                         )}
                         {/* Notes */}
-                        <div><label className={C.lbl}>Notes</label>
-                          <textarea rows={2} value={item.notes} onChange={e => updateItem(room.id, item.id, { notes: e.target.value })} placeholder="Special instructions…" className={`${C.inp} resize-none`} />
+                        <div><label className={C.lbl}>{T.notes}</label>
+                          <textarea rows={2} value={item.notes} onChange={e => updateItem(room.id, item.id, { notes: e.target.value })} placeholder={T.est.specialInstructions} className={`${C.inp} resize-none`} />
                         </div>
                         {/* Attachments (hidden in PDF) */}
                         <div className="print:hidden">
-                          <label className={C.lbl}>Attachments</label>
+                          <label className={C.lbl}>{T.est.attachments}</label>
                           <div className="flex flex-wrap gap-1.5">
                             {item.attachmentNames.map((name, ai) => (
                               <span key={ai} className="text-[10px] bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded flex items-center gap-1">
@@ -501,7 +503,7 @@ export default function EstimatesPage() {
                               </span>
                             ))}
                             <label className="text-[10px] text-blue-600 cursor-pointer hover:underline">
-                              + Attach
+                              + {T.attach}
                               <input type="file" className="hidden" onChange={e => { if (e.target.files?.[0]) updateItem(room.id, item.id, { attachmentNames: [...item.attachmentNames, e.target.files[0].name] }) }} />
                             </label>
                           </div>
@@ -512,8 +514,8 @@ export default function EstimatesPage() {
                     {/* Footer: qty + unit price + calculated price + line total + delete */}
                     <div className="flex items-end justify-between mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex-wrap gap-y-2">
                       <div className="flex items-end gap-3 flex-wrap">
-                        <div className="w-16"><label className={C.lbl}>Qty</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
-                        <div className="w-28"><label className={C.lbl}>Unit Price</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
+                        <div className="w-16"><label className={C.lbl}>{T.qty}</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
+                        <div className="w-28"><label className={C.lbl}>{T.unitPrice}</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
                         {(() => {
                           const glassInfo = getGlassRateForItem(item, estCfg)
                           if (!glassInfo.show) return null
@@ -521,7 +523,7 @@ export default function EstimatesPage() {
                           const unitLabel = GLASS_RATE_UNITS.find(u => u.id === glassInfo.unit)?.short || "/sq in"
                           return (
                             <div className="w-36 print:hidden">
-                              <label className={C.lbl}>Calculated Price</label>
+                              <label className={C.lbl}>{T.est.calculatedPrice}</label>
                               <div className="px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-sm font-bold text-emerald-700 dark:text-emerald-400" title={`${item.width}×${item.height} @ ${fmt(glassInfo.rate)}${unitLabel}`}>
                                 {fmt(calcPrice)}
                               </div>
@@ -544,15 +546,15 @@ export default function EstimatesPage() {
         {/* Add buttons: Room / Window / Door */}
         <div className="flex gap-2 print:hidden">
           <button onClick={addRoom} className="flex-1 py-3 border-2 border-dashed border-slate-300 dark:border-white/15 rounded-2xl text-sm font-semibold text-slate-500 hover:border-blue-500 hover:text-blue-500 transition flex items-center justify-center gap-1.5">
-            <Plus className="h-4 w-4" /> Add Room
+            <Plus className="h-4 w-4" /> {T.addRoom}
           </button>
           <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) addItemToRoom(last.id) }}
             className="flex-1 py-3 border-2 border-dashed border-blue-300 dark:border-blue-500/30 rounded-2xl text-sm font-semibold text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition flex items-center justify-center gap-1.5">
-            <PanelTop className="h-4 w-4" /> Add Window
+            <PanelTop className="h-4 w-4" /> {T.addWindow}
           </button>
           <button onClick={() => { const last = est.rooms[est.rooms.length - 1]; if (last) setEst(p => ({ ...p, rooms: p.rooms.map(r => r.id === last.id ? { ...r, items: [...r.items, { ...createItem(), type: "SWING-DOOR", width: 36, height: 80 }] } : r) })) }}
             className="flex-1 py-3 border-2 border-dashed border-amber-300 dark:border-amber-500/30 rounded-2xl text-sm font-semibold text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition flex items-center justify-center gap-1.5">
-            <DoorOpen className="h-4 w-4" /> Add Door
+            <DoorOpen className="h-4 w-4" /> {T.addDoor}
           </button>
         </div>
 
@@ -560,20 +562,20 @@ export default function EstimatesPage() {
         <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{estCfg.summaryTitle} — {t.items} Items ({t.totalUnits} Units)</h2>
           <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); const eff = getEffectiveUnitPrice(it, estCfg); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * eff)}</span></div> })) })()}</div>
-          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Products Subtotal</span><span>{fmt(t.prodTotal)}</span></div>
+          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>{T.est.productsSubtotal}</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
-            {estCfg.showInstallation && <div className="flex justify-between items-center"><span>Installation ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
-            {estCfg.showDelivery && <div className="flex justify-between items-center"><span>Delivery $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
+            {estCfg.showInstallation && <div className="flex justify-between items-center"><span>{T.est.installation} ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
+            {estCfg.showDelivery && <div className="flex justify-between items-center"><span>{T.est.deliveryLabel} $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
           {/* Itemized Trim Costs */}
           {t.trimTotal > 0 && (
             <div className="mt-2 pt-2 border-t border-orange-200 dark:border-orange-500/20">
               <p className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Trim</p>
               <div className="space-y-0.5">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; if (!it.trimInstall) return null; const tc = getItemTrimCost(it, trimS); if (tc <= 0) return null; const style = (it.trimStyle ?? "flat").charAt(0).toUpperCase() + (it.trimStyle ?? "flat").slice(1); const periU = perimeterInUnit(it.width, it.height, estCfg.trimUnit ?? "in").toFixed(1); const uLbl = TRIM_UNITS.find(u => u.id === (estCfg.trimUnit ?? "in"))?.short?.slice(1) ?? "in"; return <div key={it.id} className="flex justify-between text-xs"><span className="text-slate-500">#{gi} {style} — {periU} {uLbl} (×{it.qty})</span><span className="font-semibold text-orange-600 dark:text-orange-400">{fmt(it.qty * tc)}</span></div> })) })()}</div>
-              <div className="flex justify-between text-sm font-bold mt-1"><span className="text-orange-600 dark:text-orange-400">Trim Total</span><span className="text-orange-600 dark:text-orange-400">{fmt(t.trimTotal)}</span></div>
+              <div className="flex justify-between text-sm font-bold mt-1"><span className="text-orange-600 dark:text-orange-400">{T.est.trimTotal}</span><span className="text-orange-600 dark:text-orange-400">{fmt(t.trimTotal)}</span></div>
             </div>
           )}
-          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>Subtotal Before Tax</span><span>{fmt(t.subtax)}</span></div>
+          <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>{T.est.subtotalBeforeTax}</span><span>{fmt(t.subtax)}</span></div>
           {estCfg.showGST && <div className="flex justify-between text-sm mt-1"><span className="text-slate-500">TPS / GST ({estCfg.gstRate}%)</span><span>{fmt(t.gst)}</span></div>}
           {estCfg.showQST && <div className="flex justify-between text-sm"><span className="text-slate-500">TVQ / QST ({estCfg.qstRate}%)</span><span>{fmt(t.qst)}</span></div>}
           <div className="flex justify-between text-2xl font-extrabold border-t-2 border-slate-800 dark:border-white/20 pt-3 mt-3"><span>TOTAL</span><span>{fmt(t.total)}</span></div>
@@ -612,11 +614,11 @@ export default function EstimatesPage() {
               <li key={i}><textarea rows={2} value={line} onChange={e => { const next = [...est.termsLines]; next[i] = e.target.value; set("termsLines", next) }} className="w-full bg-transparent outline-none resize-none text-xs print:bg-transparent" /></li>
             ))}
           </ol>
-          <button onClick={() => set("termsLines", [...est.termsLines, ""])} className="text-blue-600 text-xs font-semibold mt-2 print:hidden">+ Add clause</button>
+          <button onClick={() => set("termsLines", [...est.termsLines, ""])} className="text-blue-600 text-xs font-semibold mt-2 print:hidden">{T.est.addClause}</button>
 
           {(estCfg.showSignatures ?? true) && <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
-            <p className={C.lbl}>Acceptance & Signatures</p>
-            <p className="mb-6 text-xs">By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.</p>
+            <p className={C.lbl}>{T.est.acceptanceSignatures}</p>
+            <p className="mb-6 text-xs">{T.est.signatureDisclaimer}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-12 mt-8">
               {(["client", "rep"] as const).map(who => (
                 <div key={who}>
@@ -654,7 +656,7 @@ export default function EstimatesPage() {
                       <img src={sigs[who]} alt={`${who} signature`} className="h-[76px] w-full object-contain" />
                     ) : (
                       <div className="h-[76px] flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition">
-                        <span className="text-xs font-medium print:hidden">Click to sign</span>
+                        <span className="text-xs font-medium print:hidden">{T.est.clickToSign}</span>
                       </div>
                     )}
                   </div>
@@ -703,23 +705,23 @@ export default function EstimatesPage() {
           <Redo2 className="h-4 w-4 text-slate-500" />
         </button>
         <button onClick={() => setSidePanel(p => p === "settings" ? "none" : "settings")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showCustomize ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`} title="Settings">
-          <Settings className="h-4 w-4" /><span className="hidden sm:inline">Settings</span>
+          <Settings className="h-4 w-4" /><span className="hidden sm:inline">{T.settings}</span>
         </button>
         <button onClick={resetAll} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5">
-          <RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">Reset</span>
+          <RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">{T.est.resetAll}</span>
         </button>
         <button onClick={saveNow} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5" title="Save estimate now">
-          <Save className="h-4 w-4 text-emerald-500" /><span className="hidden sm:inline">Save</span>
+          <Save className="h-4 w-4 text-emerald-500" /><span className="hidden sm:inline">{T.save}</span>
         </button>
         <div className="w-px h-6 bg-slate-300 dark:bg-white/15 hidden sm:block" />
         <button onClick={() => setSidePanel(p => p === "preview" ? "none" : "preview")} className={`p-2 sm:px-3 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${showPreview ? "bg-blue-600 text-white" : "border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
-          <Eye className="h-4 w-4" /><span className="hidden sm:inline">Preview</span>
+          <Eye className="h-4 w-4" /><span className="hidden sm:inline">{T.preview}</span>
         </button>
         <button onClick={exportPDF} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold hover:bg-slate-700 dark:hover:bg-blue-500 transition flex items-center gap-1.5" title="Export / Save as PDF">
-          <Download className="h-4 w-4" /><span className="hidden sm:inline">Export PDF</span>
+          <Download className="h-4 w-4" /><span className="hidden sm:inline">{T.est.exportPdf}</span>
         </button>
         <button onClick={sendEstimate} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition flex items-center gap-1.5" title="Send estimate via email">
-          <Send className="h-4 w-4" /><span className="hidden sm:inline">Send</span>
+          <Send className="h-4 w-4" /><span className="hidden sm:inline">{T.est.send}</span>
         </button>
       </div>
     </div>
@@ -732,7 +734,7 @@ export default function EstimatesPage() {
           <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-white/10">
             <div className="flex items-center gap-2">
               <Send className="h-4 w-4 text-emerald-500" />
-              <span className="text-sm font-bold text-slate-900 dark:text-white">Send Estimate</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-white">{T.est.sendEstimate}</span>
             </div>
             <button onClick={() => setShowSendModal(false)} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
           </div>
@@ -740,16 +742,16 @@ export default function EstimatesPage() {
           {/* PDF status */}
           <div className={`mx-5 mt-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${pdfReady ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400"}`}>
             {pdfReady ? (
-              <><Download className="h-4 w-4" /> PDF downloaded — please attach it to your outgoing email</>
+              <><Download className="h-4 w-4" /> {T.est.pdfDownloaded}</>
             ) : (
-              <><div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" /> Generating and downloading PDF…</>
+              <><div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" /> {T.est.generatingPdf}</>
             )}
           </div>
 
           {/* Email info */}
           <div className="px-5 mt-3 space-y-2">
-            <div><span className="text-[10px] font-bold text-slate-400 uppercase">To:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{est.clientEmail || "(no email)"}</span></div>
-            <div><span className="text-[10px] font-bold text-slate-400 uppercase">Subject:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{emailSubject}</span></div>
+            <div><span className="text-[10px] font-bold text-slate-400 uppercase">{T.est.to}:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{est.clientEmail || `(${T.est.noEmail})`}</span></div>
+            <div><span className="text-[10px] font-bold text-slate-400 uppercase">{T.est.subject}:</span> <span className="text-sm text-slate-700 dark:text-slate-200">{emailSubject}</span></div>
           </div>
 
           {/* Email body preview */}
@@ -760,10 +762,10 @@ export default function EstimatesPage() {
           {/* Actions */}
           <div className="flex gap-2 px-5 py-4 border-t border-slate-200 dark:border-white/10 mt-3">
             <button onClick={copyEmail} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-center justify-center gap-1.5">
-              📋 Copy Email Text
+              {T.est.copyEmailText}
             </button>
             <button onClick={openMailto} disabled={!pdfReady} className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-1.5">
-              <Send className="h-3.5 w-3.5" /> Open Email Client
+              <Send className="h-3.5 w-3.5" /> {T.est.openEmailClient}
             </button>
           </div>
         </div>

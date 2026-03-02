@@ -37,10 +37,12 @@ export interface PortalT {
     gst: string; qst: string; tps: string; tvq: string
     depositRequired: string; balanceRemaining: string; remainder: string
     termsTitle: string; addClause: string
-    signaturesTitle: string; clientSig: string; repSig: string; clickToSign: string
-    exportPdf: string; sendEstimate: string; pdfPreview: string
+    signaturesTitle: string; acceptanceSignatures: string; signatureDisclaimer: string
+    clientSig: string; repSig: string; clickToSign: string
+    overrideGlobalRate: string; customInstallPrice: string
+    exportPdf: string; sendEstimate: string; send: string; pdfPreview: string
     resetAll: string; undo: string; redo: string
-    items: string; units: string; exteriorView: string; exteriorDoor: string
+    items: string; units: string; unit: string; exteriorView: string; exteriorDoor: string
     item: string; std: string
     pdfDownloaded: string; generatingPdf: string; attachPdf: string
     emailSubject: string; emailGreeting: string; emailIntro: string
@@ -51,6 +53,36 @@ export interface PortalT {
     saveTemplate: string; loadTemplate: string
     newEstimate: string
     lightMode: string; darkMode: string
+    // ── Sidebar ──
+    history: string; templates: string; saving: string; saved: string
+    searchEstimates: string; searchTemplates: string
+    noEstimatesYet: string; noTemplatesYet: string; noTemplatesDesc: string; noMatches: string
+    templateName: string; apply: string; untitled: string; noClient: string; new_: string
+    deleteEstimateConfirm: string; deleteTemplateConfirm: string; applyTemplateConfirm: string
+    estimatesSaved: string; templatesSaved: string
+    justNow: string; yesterday: string
+    // ── Settings panel ──
+    settingsTitle: string; headerSection: string; windowCardSection: string; doorCardSection: string
+    pricingSection: string; measureSection: string; paymentSection: string; termsSection: string
+    resetAllSettings: string
+    // ── Misc page ──
+    noEmail: string; resetConfirm: string; specialInstructions: string
+    clientFields: string; shippingFields: string; documentStyle: string; accentColor: string
+    fontSize: string; layout_: string; printPdf: string; paper: string; margins: string
+    diagram: string; windowTypes: string; doorTypes: string; products: string
+    customWindowTypes: string; customDoorTypes: string; customProducts: string
+    exteriorColors: string; interiorColors: string; calculatedPriceLabel: string
+    measUnit: string; showCalcPrice: string; colorsNote: string
+    dimUnit: string; trimPricing: string; trimRateUnit: string
+    flatTrimRate: string; colonialTrimRate: string
+    showSection: string; sectionTitle: string; signatures: string; signatureDate: string
+    defaultClauses: string; addPaymentStage: string; newPaymentStage: string
+    paymentStagesDesc: string; ofTotal: string; remainder_: string; usesDepositPct: string
+    moduleLabels: string; egressBadge: string; dimensions: string; exteriorLabel: string
+    doubleTemperedRate: string; tripleTemperedRate: string
+    name_: string; address_: string; city_: string; phone_: string; email_: string
+    shipMethod: string; shipAddress: string; shipPhone: string
+    company: string; to: string; subject: string
   }
   // ── Contracts ──
   ctr: {
@@ -110,10 +142,13 @@ const en: PortalT = {
     depositRequired: "Deposit Required", balanceRemaining: "Balance Remaining", remainder: "remainder",
     termsTitle: "Terms & Conditions", addClause: "+ Add clause",
     signaturesTitle: "Acceptance & Signatures",
+    acceptanceSignatures: "Acceptance & Signatures",
+    signatureDisclaimer: "By signing below, the client accepts the terms, specifications, and pricing outlined in this estimate.",
     clientSig: "Client Signature & Date", repSig: "Representative Signature & Date", clickToSign: "Click to sign",
-    exportPdf: "Export PDF", sendEstimate: "Send Estimate", pdfPreview: "PDF Preview",
+    overrideGlobalRate: "Override global rate", customInstallPrice: "Custom install price",
+    exportPdf: "Export PDF", sendEstimate: "Send Estimate", send: "Send", pdfPreview: "PDF Preview",
     resetAll: "Reset", undo: "Undo", redo: "Redo",
-    items: "Items", units: "Units", exteriorView: "Exterior View", exteriorDoor: "Exterior — Door",
+    items: "Items", units: "Units", unit: "Unit", exteriorView: "Exterior View", exteriorDoor: "Exterior — Door",
     item: "Item", std: "STD",
     pdfDownloaded: "PDF downloaded — please attach it to your outgoing email",
     generatingPdf: "Generating and downloading PDF…",
@@ -128,6 +163,49 @@ const en: PortalT = {
     saveTemplate: "Save as Template", loadTemplate: "Load Template",
     newEstimate: "New Estimate",
     lightMode: "Light Mode", darkMode: "Dark Mode",
+    // ── Sidebar ──
+    history: "History", templates: "Templates", saving: "Saving…", saved: "Saved",
+    searchEstimates: "Search estimates…", searchTemplates: "Search templates…",
+    noEstimatesYet: "No estimates yet", noTemplatesYet: "No templates saved yet",
+    noTemplatesDesc: "Save your estimate settings as a reusable template",
+    noMatches: "No matches", templateName: "Template name…",
+    apply: "Apply", untitled: "Untitled", noClient: "No client", new_: "New",
+    deleteEstimateConfirm: "Delete this estimate?", deleteTemplateConfirm: "Delete this template?",
+    applyTemplateConfirm: "Apply this template? Your current header, client & pricing info will be replaced. Window/door items stay unchanged.",
+    estimatesSaved: "estimate(s) saved", templatesSaved: "template(s) saved",
+    justNow: "Just now", yesterday: "Yesterday",
+    // ── Settings panel ──
+    settingsTitle: "Estimate Settings", headerSection: "Estimate Header",
+    windowCardSection: "Window Card", doorCardSection: "Door Card",
+    pricingSection: "Pricing Summary", measureSection: "Measurements & Trim",
+    paymentSection: "Payment Stages", termsSection: "Terms & Conditions",
+    resetAllSettings: "Reset All",
+    // ── Misc page ──
+    noEmail: "no email", resetConfirm: "Reset all data?", specialInstructions: "Special instructions…",
+    clientFields: "Client Fields", shippingFields: "Shipping Fields",
+    documentStyle: "Document Style", accentColor: "Accent Color",
+    fontSize: "Font Size", layout_: "Layout", printPdf: "Print / PDF",
+    paper: "Paper", margins: "Margins",
+    diagram: "Diagram", windowTypes: "Window Types", doorTypes: "Door Types", products: "Products",
+    customWindowTypes: "Custom Window Types", customDoorTypes: "Custom Door Types", customProducts: "Custom Products",
+    exteriorColors: "Exterior Colors", interiorColors: "Interior Colors",
+    calculatedPriceLabel: "Calculated Price", measUnit: "Measurement Unit",
+    showCalcPrice: "Show Calculated Price",
+    colorsNote: "Door colors share the same Exterior/Interior presets as windows. Edit them in the Window Card section above.",
+    dimUnit: "Dimension Unit", trimPricing: "Trim Pricing", trimRateUnit: "Trim Rate Unit",
+    flatTrimRate: "Flat Trim Rate", colonialTrimRate: "Colonial Trim Rate",
+    showSection: "Show T&C Section", sectionTitle: "Section Title",
+    signatures: "Signatures", signatureDate: "Signature Date",
+    defaultClauses: "Default Clauses (for new estimates)",
+    addPaymentStage: "+ Add Payment Stage", newPaymentStage: "New Payment Stage",
+    paymentStagesDesc: "Configure the payment breakdown shown below the total. Stages with 0% auto-fill the remainder.",
+    ofTotal: "% of total", remainder_: "(remainder)", usesDepositPct: "Uses deposit % set on each estimate",
+    moduleLabels: "Module Labels", egressBadge: "Egress Badge",
+    dimensions: "Dimensions", exteriorLabel: "Exterior Label",
+    doubleTemperedRate: "Double Tempered Glass Rate", tripleTemperedRate: "Triple Tempered Glass Rate",
+    name_: "Name", address_: "Address", city_: "City", phone_: "Phone", email_: "Email",
+    shipMethod: "Ship Method", shipAddress: "Ship Address", shipPhone: "Ship Phone",
+    company: "Company", to: "To", subject: "Subject",
   },
   // ── Contracts ──
   ctr: {
@@ -191,10 +269,13 @@ const fr: PortalT = {
     depositRequired: "Dépôt requis", balanceRemaining: "Solde restant", remainder: "restant",
     termsTitle: "Conditions générales", addClause: "+ Ajouter une clause",
     signaturesTitle: "Acceptation et signatures",
+    acceptanceSignatures: "Acceptation et signatures",
+    signatureDisclaimer: "En signant ci-dessous, le client accepte les conditions, spécifications et tarifs décrits dans cette soumission.",
     clientSig: "Signature du client et date", repSig: "Signature du représentant et date", clickToSign: "Cliquez pour signer",
-    exportPdf: "Exporter PDF", sendEstimate: "Envoyer la soumission", pdfPreview: "Aperçu PDF",
+    overrideGlobalRate: "Remplacer le taux global", customInstallPrice: "Prix d'installation personnalisé",
+    exportPdf: "Exporter PDF", sendEstimate: "Envoyer la soumission", send: "Envoyer", pdfPreview: "Aperçu PDF",
     resetAll: "Réinitialiser", undo: "Annuler", redo: "Rétablir",
-    items: "Articles", units: "Unités", exteriorView: "Vue extérieure", exteriorDoor: "Extérieur — Porte",
+    items: "Articles", units: "Unités", unit: "Unité", exteriorView: "Vue extérieure", exteriorDoor: "Extérieur — Porte",
     item: "Article", std: "STD",
     pdfDownloaded: "PDF téléchargé — veuillez le joindre à votre courriel",
     generatingPdf: "Génération et téléchargement du PDF…",
@@ -209,6 +290,49 @@ const fr: PortalT = {
     saveTemplate: "Sauvegarder comme modèle", loadTemplate: "Charger un modèle",
     newEstimate: "Nouvelle soumission",
     lightMode: "Mode clair", darkMode: "Mode sombre",
+    // ── Sidebar ──
+    history: "Historique", templates: "Modèles", saving: "Sauvegarde…", saved: "Sauvegardé",
+    searchEstimates: "Rechercher des soumissions…", searchTemplates: "Rechercher des modèles…",
+    noEstimatesYet: "Aucune soumission", noTemplatesYet: "Aucun modèle sauvegardé",
+    noTemplatesDesc: "Sauvegardez vos paramètres comme modèle réutilisable",
+    noMatches: "Aucun résultat", templateName: "Nom du modèle…",
+    apply: "Appliquer", untitled: "Sans titre", noClient: "Aucun client", new_: "Nouveau",
+    deleteEstimateConfirm: "Supprimer cette soumission ?", deleteTemplateConfirm: "Supprimer ce modèle ?",
+    applyTemplateConfirm: "Appliquer ce modèle ? Vos informations d'en-tête, client et tarification seront remplacées. Les articles de fenêtres/portes restent inchangés.",
+    estimatesSaved: "soumission(s) sauvegardée(s)", templatesSaved: "modèle(s) sauvegardé(s)",
+    justNow: "À l'instant", yesterday: "Hier",
+    // ── Settings panel ──
+    settingsTitle: "Paramètres de soumission", headerSection: "En-tête de soumission",
+    windowCardSection: "Carte de fenêtre", doorCardSection: "Carte de porte",
+    pricingSection: "Résumé tarifaire", measureSection: "Mesures et moulures",
+    paymentSection: "Étapes de paiement", termsSection: "Conditions générales",
+    resetAllSettings: "Tout réinitialiser",
+    // ── Misc page ──
+    noEmail: "sans courriel", resetConfirm: "Réinitialiser toutes les données ?", specialInstructions: "Instructions spéciales…",
+    clientFields: "Champs client", shippingFields: "Champs d'expédition",
+    documentStyle: "Style du document", accentColor: "Couleur d'accent",
+    fontSize: "Taille de police", layout_: "Disposition", printPdf: "Impression / PDF",
+    paper: "Papier", margins: "Marges",
+    diagram: "Diagramme", windowTypes: "Types de fenêtres", doorTypes: "Types de portes", products: "Produits",
+    customWindowTypes: "Types de fenêtres personnalisés", customDoorTypes: "Types de portes personnalisés", customProducts: "Produits personnalisés",
+    exteriorColors: "Couleurs extérieures", interiorColors: "Couleurs intérieures",
+    calculatedPriceLabel: "Prix calculé", measUnit: "Unité de mesure",
+    showCalcPrice: "Afficher le prix calculé",
+    colorsNote: "Les couleurs de porte partagent les mêmes préréglages extérieur/intérieur que les fenêtres. Modifiez-les dans la section Carte de fenêtre ci-dessus.",
+    dimUnit: "Unité de dimension", trimPricing: "Tarification des moulures", trimRateUnit: "Unité de taux de moulure",
+    flatTrimRate: "Taux moulure plate", colonialTrimRate: "Taux moulure coloniale",
+    showSection: "Afficher la section C.G.", sectionTitle: "Titre de section",
+    signatures: "Signatures", signatureDate: "Date de signature",
+    defaultClauses: "Clauses par défaut (pour nouvelles soumissions)",
+    addPaymentStage: "+ Ajouter une étape", newPaymentStage: "Nouvelle étape de paiement",
+    paymentStagesDesc: "Configurez la répartition des paiements affichée sous le total. Les étapes à 0 % remplissent automatiquement le solde.",
+    ofTotal: "% du total", remainder_: "(restant)", usesDepositPct: "Utilise le % de dépôt défini sur chaque soumission",
+    moduleLabels: "Étiquettes de modules", egressBadge: "Badge de sortie",
+    dimensions: "Dimensions", exteriorLabel: "Étiquette extérieure",
+    doubleTemperedRate: "Taux verre double trempé", tripleTemperedRate: "Taux verre triple trempé",
+    name_: "Nom", address_: "Adresse", city_: "Ville", phone_: "Téléphone", email_: "Courriel",
+    shipMethod: "Mode d'expédition", shipAddress: "Adresse d'expédition", shipPhone: "Téléphone d'expédition",
+    company: "Entreprise", to: "À", subject: "Objet",
   },
   // ── Contracts ──
   ctr: {
