@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePortalT } from "@/lib/portal-i18n"
 import { ChevronDown, Trash2, Plus, RotateCcw, FileText, PanelTop, DoorOpen, Receipt, ScrollText, X, Ruler, CreditCard } from "lucide-react"
 import type { EstimateStyle, EstimateSettings, ColorPreset, CustomOption } from "@/lib/estimate-hooks"
 import { WINDOW_TYPES, PRODUCTS, GLASS_RATE_UNITS, TRIM_UNITS, type PaymentStageConfig } from "@/lib/estimate-config"
@@ -104,6 +105,7 @@ interface Props {
 }
 
 export function EstimateCustomizePanel(props: Props) {
+  const T = usePortalT()
   const { onClose, style, onUpdateStyle: uS, settings: s, onUpdateSettings: uSet, onReset } = props
   const [open, setOpen] = useState<Record<string, boolean>>({ header: true })
   const t = (id: string) => setOpen(p => ({ ...p, [id]: !p[id] }))
@@ -120,14 +122,14 @@ export function EstimateCustomizePanel(props: Props) {
 
       <div className="flex-1 overflow-y-auto lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900" style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
         {/* ═══ SECTION 1: HEADER ═══ */}
-        <Section icon={FileText} title="Estimate Header" open={!!open.header} onToggle={() => t("header")}>
+        <Section icon={FileText} title={T.est.headerSection} open={!!open.header} onToggle={() => t("header")}>
           <div className={CLS.row}><span className="text-[11px]">Date</span><Toggle on={s.showDate} onToggle={() => uSet({ showDate: !s.showDate })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Valid Until</span><Toggle on={s.showValidUntil} onToggle={() => uSet({ showValidUntil: !s.showValidUntil })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Required By</span><Toggle on={s.showRequiredBy} onToggle={() => uSet({ showRequiredBy: !s.showRequiredBy })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Representative</span><Toggle on={s.showRepSection} onToggle={() => uSet({ showRepSection: !s.showRepSection })} /></div>
 
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Client Fields</p>
-          {([["showClientName","Name"],["showClientAddress","Address"],["showClientCity","City"],["showClientPhone","Phone"],["showClientEmail","Email"]] as const).map(([k,l]) => (
+          {([["showClientName", T.est.name_],["showClientAddress", T.est.address_],["showClientCity", T.est.city_],["showClientPhone", T.est.phone_],["showClientEmail", T.est.email_]] as const).map(([k,l]) => (
             <div key={k} className={CLS.row}><span className="text-[11px]">{l}</span><Toggle on={s[k]} onToggle={() => uSet({ [k]: !s[k] })} /></div>
           ))}
 
@@ -185,7 +187,7 @@ export function EstimateCustomizePanel(props: Props) {
         </Section>
 
         {/* ═══ SECTION 2: WINDOW CARD ═══ */}
-        <Section icon={PanelTop} title="Window Card" open={!!open.window} onToggle={() => t("window")}>
+        <Section icon={PanelTop} title={T.est.windowCardSection} open={!!open.window} onToggle={() => t("window")}>
           <div className={CLS.row}><span className="text-[11px]">Thickness Field</span><Toggle on={s.showThickness ?? true} onToggle={() => uSet({ showThickness: !(s.showThickness ?? true) })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Depth Field</span><Toggle on={s.showDepth} onToggle={() => uSet({ showDepth: !s.showDepth })} /></div>
 
@@ -195,7 +197,7 @@ export function EstimateCustomizePanel(props: Props) {
               <button key={sz} onClick={() => uS({ cardSize: sz })} className={`flex-1 py-1 rounded-lg text-[10px] font-bold ${style.cardSize === sz ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>{sz.toUpperCase()}</button>
             ))}
           </div>
-          {([["showModuleLabels","Module Labels"],["showEgressBadge","Egress Badge"],["showDimensions","Dimensions"],["showExteriorLabel","Exterior Label"]] as const).map(([k,l]) => (
+          {([["showModuleLabels", T.est.moduleLabels],["showEgressBadge", T.est.egressBadge],["showDimensions", T.est.dimensions],["showExteriorLabel", T.est.exteriorLabel]] as const).map(([k,l]) => (
             <div key={k} className={CLS.row}><span className="text-[11px]">{l}</span><Toggle on={style[k]} onToggle={() => uS({ [k]: !style[k] })} /></div>
           ))}
 
@@ -208,7 +210,7 @@ export function EstimateCustomizePanel(props: Props) {
               </div>
             ))}
           </div>
-          <AddRemoveList label="Custom Window Types" items={s.customWindowTypes} onAdd={props.onAddCustomWindowType} onRemove={props.onRemoveCustomWindowType} />
+          <AddRemoveList label={T.est.customWindowTypes} items={s.customWindowTypes} onAdd={props.onAddCustomWindowType} onRemove={props.onRemoveCustomWindowType} />
 
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Products</p>
           {PRODUCTS.map(p => (
@@ -217,13 +219,13 @@ export function EstimateCustomizePanel(props: Props) {
               <Toggle on={s.enabledProducts.includes(p.id)} onToggle={() => props.onToggleProduct(p.id)} />
             </div>
           ))}
-          <AddRemoveList label="Custom Products" items={s.customProducts} onAdd={props.onAddCustomProduct} onRemove={props.onRemoveCustomProduct} />
+          <AddRemoveList label={T.est.customProducts} items={s.customProducts} onAdd={props.onAddCustomProduct} onRemove={props.onRemoveCustomProduct} />
 
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
-            <ColorManager label="Exterior Colors" colors={props.extColors} onAdd={props.onAddExt} onRemove={props.onRemoveExt} />
+            <ColorManager label={T.est.exteriorColors} colors={props.extColors} onAdd={props.onAddExt} onRemove={props.onRemoveExt} />
           </div>
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
-            <ColorManager label="Interior Colors" colors={props.intColors} onAdd={props.onAddInt} onRemove={props.onRemoveInt} />
+            <ColorManager label={T.est.interiorColors} colors={props.intColors} onAdd={props.onAddInt} onRemove={props.onRemoveInt} />
           </div>
 
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
@@ -262,14 +264,14 @@ export function EstimateCustomizePanel(props: Props) {
         </Section>
 
         {/* ═══ SECTION 3: DOOR CARD ═══ */}
-        <Section icon={DoorOpen} title="Door Card" open={!!open.door} onToggle={() => t("door")}>
+        <Section icon={DoorOpen} title={T.est.doorCardSection} open={!!open.door} onToggle={() => t("door")}>
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Diagram</p>
           <div className="flex gap-1.5 mb-1">
             {(["sm","md","lg"] as const).map(sz => (
               <button key={sz} onClick={() => uS({ cardSize: sz })} className={`flex-1 py-1 rounded-lg text-[10px] font-bold ${style.cardSize === sz ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>{sz.toUpperCase()}</button>
             ))}
           </div>
-          {([["showModuleLabels","Module Labels"],["showDimensions","Dimensions"]] as const).map(([k,l]) => (
+          {([["showModuleLabels", T.est.moduleLabels],["showDimensions", T.est.dimensions]] as const).map(([k,l]) => (
             <div key={k} className={CLS.row}><span className="text-[11px]">{l}</span><Toggle on={style[k]} onToggle={() => uS({ [k]: !style[k] })} /></div>
           ))}
 
@@ -282,7 +284,7 @@ export function EstimateCustomizePanel(props: Props) {
               </div>
             ))}
           </div>
-          <AddRemoveList label="Custom Door Types" items={s.customDoorTypes} onAdd={props.onAddCustomDoorType} onRemove={props.onRemoveCustomDoorType} />
+          <AddRemoveList label={T.est.customDoorTypes} items={s.customDoorTypes} onAdd={props.onAddCustomDoorType} onRemove={props.onRemoveCustomDoorType} />
 
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-2 mb-1">Products</p>
           {PRODUCTS.map(p => (
@@ -331,7 +333,7 @@ export function EstimateCustomizePanel(props: Props) {
         </Section>
 
         {/* ═══ SECTION 4: PRICING SUMMARY ═══ */}
-        <Section icon={Receipt} title="Pricing Summary" open={!!open.pricing} onToggle={() => t("pricing")}>
+        <Section icon={Receipt} title={T.est.pricingSection} open={!!open.pricing} onToggle={() => t("pricing")}>
           <div className="mb-2">
             <label className={CLS.lbl}>Section Title</label>
             <input value={s.summaryTitle} onChange={e => uSet({ summaryTitle: e.target.value })} className={CLS.inp + " w-full"} />
@@ -357,7 +359,7 @@ export function EstimateCustomizePanel(props: Props) {
         </Section>
 
         {/* ═══ SECTION 4B: MEASUREMENTS ═══ */}
-        <Section icon={Ruler} title="Measurements & Trim" open={!!open.measure} onToggle={() => t("measure")}>
+        <Section icon={Ruler} title={T.est.measureSection} open={!!open.measure} onToggle={() => t("measure")}>
           <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Dimension Unit</p>
           <div className="flex gap-1.5 mb-3">
             {([["in","Inches (″)"],["cm","Centimeters (cm)"]] as const).map(([k,l]) => (
@@ -399,7 +401,7 @@ export function EstimateCustomizePanel(props: Props) {
         </Section>
 
         {/* ═══ SECTION 4C: PAYMENT STAGES ═══ */}
-        <Section icon={CreditCard} title="Payment Stages" open={!!open.payments} onToggle={() => t("payments")}>
+        <Section icon={CreditCard} title={T.est.paymentSection} open={!!open.payments} onToggle={() => t("payments")}>
           <p className="text-[9px] text-slate-400 mb-2">Configure the payment breakdown shown below the total. Stages with 0% auto-fill the remainder.</p>
           <div className="space-y-1.5">
             {(s.paymentStages ?? []).map((stage, i) => (
@@ -432,16 +434,16 @@ export function EstimateCustomizePanel(props: Props) {
           </div>
           <button onClick={() => {
             const id = `ps_${Date.now()}`
-            uSet({ paymentStages: [...(s.paymentStages ?? []), { id, label: "New Payment Stage", pct: 0, show: true }] })
+            uSet({ paymentStages: [...(s.paymentStages ?? []), { id, label: T.est.newPaymentStage, pct: 0, show: true }] })
           }} className="text-blue-600 text-[10px] font-semibold mt-2 hover:underline">+ Add Payment Stage</button>
         </Section>
 
         {/* ═══ SECTION 5: TERMS & CONDITIONS ═══ */}
-        <Section icon={ScrollText} title="Terms & Conditions" open={!!open.terms} onToggle={() => t("terms")}>
+        <Section icon={ScrollText} title={T.est.termsSection} open={!!open.terms} onToggle={() => t("terms")}>
           <div className={CLS.row}><span className="text-[11px]">Show T&C Section</span><Toggle on={s.showTerms} onToggle={() => uSet({ showTerms: !s.showTerms })} /></div>
           <div className="mt-1.5">
             <label className={CLS.lbl}>Section Title</label>
-            <input value={s.termsTitle ?? "Terms & Conditions"} onChange={e => uSet({ termsTitle: e.target.value })} className={CLS.inp + " w-full"} />
+            <input value={s.termsTitle ?? T.est.termsSection} onChange={e => uSet({ termsTitle: e.target.value })} className={CLS.inp + " w-full"} />
           </div>
           <div className={CLS.row}><span className="text-[11px]">Signatures</span><Toggle on={s.showSignatures ?? true} onToggle={() => uSet({ showSignatures: !(s.showSignatures ?? true) })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Signature Date</span><Toggle on={s.showSignatureDate ?? true} onToggle={() => uSet({ showSignatureDate: !(s.showSignatureDate ?? true) })} /></div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePortalT } from "@/lib/portal-i18n"
 import { Plus, Search, FileText, MoreVertical, Copy, Trash2, Check, Loader2, PanelLeftOpen, PanelLeftClose, X, BookTemplate, Save, Download } from "lucide-react"
 import { type EstimateRecord, type EstimateTemplate } from "@/lib/estimate-store"
 import { fmt } from "@/lib/estimate-config"
@@ -36,6 +37,7 @@ function timeAgo(iso: string): string {
 }
 
 export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLoad, onDelete, onDuplicate, mobileOpen, onMobileToggle, templates, onSaveAsTemplate, onLoadTemplate, onDeleteTemplate }: Props) {
+  const T = usePortalT()
   const [search, setSearch] = useState("")
   const [menuId, setMenuId] = useState<string | null>(null)
   const [tab, setTab] = useState<SidebarTab>("history")
@@ -95,7 +97,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
       {/* Save Template Prompt */}
       {showSaveTPL && (
         <div className="px-2 py-2 lg:border-x border-slate-200 dark:border-white/10 bg-emerald-50 dark:bg-emerald-500/10">
-          <input value={tplName} onChange={e => setTplName(e.target.value)} placeholder="Template name…" autoFocus
+          <input value={tplName} onChange={e => setTplName(e.target.value)} placeholder={T.est.templateName} autoFocus
             className="w-full px-2 py-1 rounded-lg bg-white dark:bg-white/10 border border-emerald-200 dark:border-emerald-500/30 text-[10px] outline-none mb-1.5" />
           <div className="flex gap-1">
             <button onClick={() => { if (tplName.trim()) { onSaveAsTemplate(tplName.trim()); setTplName(""); setShowSaveTPL(false) } }}
@@ -110,7 +112,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
       <div className="px-2 py-1.5 lg:border-x border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tab === "history" ? "Search estimates…" : "Search templates…"}
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tab === "history" ? T.est.searchEstimates : T.est.searchTemplates}
             className="w-full pl-6 pr-2 py-1 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] outline-none" />
         </div>
       </div>
@@ -130,7 +132,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
                   <p className={`text-[11px] font-bold truncate ${r.id === activeId ? "text-blue-700 dark:text-blue-300" : "text-slate-800 dark:text-slate-200"}`}>
-                    {r.clientName || "Untitled"}
+                    {r.clientName || T.est.untitled}
                   </p>
                   <p className="text-[9px] text-slate-500 dark:text-slate-400 font-mono truncate">{r.estimateNumber}</p>
                   <div className="flex items-center justify-between mt-0.5">
@@ -150,7 +152,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
                     className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center gap-1.5">
                     <Copy className="h-3 w-3" /> Duplicate
                   </button>
-                  <button onClick={e => { e.stopPropagation(); if (confirm("Delete this estimate?")) { onDelete(r.id); setMenuId(null) } }}
+                  <button onClick={e => { e.stopPropagation(); if (confirm(T.est.deleteEstimateConfirm)) { onDelete(r.id); setMenuId(null) } }}
                     className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-1.5">
                     <Trash2 className="h-3 w-3" /> Delete
                   </button>
@@ -167,17 +169,17 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
           {filteredTemplates.length === 0 ? (
             <div className="p-4 text-center">
               <BookTemplate className="h-6 w-6 text-slate-300 dark:text-slate-600 mx-auto mb-1" />
-              <p className="text-[10px] text-slate-400">{templates.length === 0 ? "No templates saved yet" : "No matches"}</p>
+              <p className="text-[10px] text-slate-400">{templates.length === 0 ? T.est.noTemplatesYet : T.est.noMatches}</p>
               {templates.length === 0 && <p className="text-[9px] text-slate-400 mt-1">Save your estimate settings as a reusable template</p>}
             </div>
           ) : filteredTemplates.map(t => (
             <div key={t.id}
               className="group relative px-2.5 py-2 cursor-pointer transition border-b border-slate-100 dark:border-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/5"
-              onClick={() => { if (confirm("Apply this template? Your current header, client & pricing info will be replaced. Window/door items stay unchanged.")) { onLoadTemplate(t.id); onMobileToggle() } }}>
+              onClick={() => { if (confirm(T.est.applyTemplateConfirm)) { onLoadTemplate(t.id); onMobileToggle() } }}>
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 truncate">{t.name}</p>
-                  <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{t.data.clientName || "No client"} — {t.data.estimateNumber}</p>
+                  <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate">{t.data.clientName || T.est.noClient} — {t.data.estimateNumber}</p>
                   <span className="text-[9px] text-slate-400">{timeAgo(t.savedAt)}</span>
                 </div>
                 <button onClick={e => { e.stopPropagation(); setTplMenuId(tplMenuId === t.id ? null : t.id) }}
@@ -191,7 +193,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
                     className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center gap-1.5">
                     <Download className="h-3 w-3" /> Apply
                   </button>
-                  <button onClick={e => { e.stopPropagation(); if (confirm("Delete this template?")) { onDeleteTemplate(t.id); setTplMenuId(null) } }}
+                  <button onClick={e => { e.stopPropagation(); if (confirm(T.est.deleteTemplateConfirm)) { onDeleteTemplate(t.id); setTplMenuId(null) } }}
                     className="w-full px-3 py-1.5 text-left text-[10px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-1.5">
                     <Trash2 className="h-3 w-3" /> Delete
                   </button>
@@ -221,7 +223,7 @@ export function EstimateLeftSidebar({ records, activeId, saveStatus, onNew, onLo
           {mobileOpen ? <PanelLeftClose className="h-4 w-4 text-blue-500" /> : <PanelLeftOpen className="h-4 w-4 text-slate-500" />}
         </button>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{activeRecord?.clientName || "Untitled"}</p>
+          <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">{activeRecord?.clientName || T.est.untitled}</p>
           <p className="text-[9px] text-slate-500 font-mono truncate">{activeRecord?.estimateNumber || ""}</p>
         </div>
         <div className="shrink-0">

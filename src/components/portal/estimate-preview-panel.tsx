@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { usePortalT } from "@/lib/portal-i18n"
 import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { EstimatePDFDocument } from "./estimate-pdf-doc"
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, locale = "en", onClose }: Props) {
+  const T = usePortalT()
   const [zoom, setZoom] = useState(100)
   const [refreshCounter, setRefreshCounter] = useState(0)
 
@@ -35,7 +37,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, locale = 
           <button onClick={() => setZoom(z => Math.max(50, z - 10))} className="text-slate-400 hover:text-slate-600"><ZoomOut className="h-3.5 w-3.5" /></button>
           <span className="text-[10px] font-bold text-slate-500 w-8 text-center">{zoom}%</span>
           <button onClick={() => setZoom(z => Math.min(200, z + 10))} className="text-slate-400 hover:text-slate-600"><ZoomIn className="h-3.5 w-3.5" /></button>
-          <button onClick={() => setRefreshCounter(c => c + 1)} className="text-slate-400 hover:text-blue-500 transition" title="Refresh Preview"><RotateCcw className="h-3.5 w-3.5" /></button>
+          <button onClick={() => setRefreshCounter(c => c + 1)} className="text-slate-400 hover:text-blue-500 transition" title={"Refresh"}><RotateCcw className="h-3.5 w-3.5" /></button>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 ml-2"><X className="h-4 w-4" /></button>
         </div>
       </div>
@@ -66,7 +68,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, locale = 
               <iframe
                 src={`${url}#zoom=${zoom}`}
                 className="w-full h-full border-0"
-                title="Estimate PDF Preview"
+                title={T.est.pdfPreview}
                 style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top left", width: `${10000 / zoom}%`, height: `${10000 / zoom}%` }}
               />
             )
