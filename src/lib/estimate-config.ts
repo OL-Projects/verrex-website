@@ -48,49 +48,50 @@ export function getTypeGroups(): { group: string; types: [string, WindowTypeConf
 export function isDoorType(typeKey: string): boolean { return WINDOW_TYPES[typeKey]?.category === "door" }
 
 /** Generate a human-readable description for a window/door item based on type + settings */
-export function getItemDescription(type: string, hingeLeft = false, swingInside = true): string {
+export function getItemDescription(type: string, hingeLeft = false, swingInside = true, locale = "en"): string {
   const cfg = WINDOW_TYPES[type]
   if (!cfg) return ""
   const mods = cfg.modules
-  const side = hingeLeft ? "left" : "right"
-  const swing = swingInside ? "inswing" : "outswing"
+  const fr = locale === "fr"
+  const side = hingeLeft ? (fr ? "gauche" : "left") : (fr ? "droite" : "right")
+  const swing = swingInside ? (fr ? "ouverture int." : "inswing") : (fr ? "ouverture ext." : "outswing")
 
   // Swing doors
   if (type === "SWING-DOOR" || type.startsWith("SWING-L") || type.startsWith("SWING-R")) {
-    return `Swing door — opens ${side}, ${swing}`
+    return fr ? `Porte battante — ouvre ${side}, ${swing}` : `Swing door — opens ${side}, ${swing}`
   }
   if (type === "SWING-FRENCH") {
-    return `French double swing door — ${swing}`
+    return fr ? `Porte double battante — ${swing}` : `French double swing door — ${swing}`
   }
   // Sliding doors
   if (type.startsWith("SLIDE-DOOR")) {
     const panels = mods.length
     const slideSide = hingeLeft ? "left" : "right"
-    return `${panels}-panel sliding door — sliding panel ${slideSide}`
+    return fr ? `Porte coulissante ${panels} panneaux — panneau coulissant ${slideSide}` : `${panels}-panel sliding door — sliding panel ${slideSide}`
   }
   // Folding doors
   if (type.startsWith("FOLD")) {
-    return `${mods.length}-panel folding door — opens ${side}`
+    return fr ? `Porte pliante ${mods.length} panneaux — ouvre ${side}` : `${mods.length}-panel folding door — opens ${side}`
   }
   // Casement windows
   if (mods.some(m => m.startsWith("CAS"))) {
     const hasFixed = mods.includes("FIX")
-    if (hasFixed) return `Casement + fixed combo (${mods.length} panel) — hinge ${side}`
-    return `Casement window — hinge ${side}`
+    if (hasFixed) return fr ? `Battant + fixe combo (${mods.length} panneaux) — charnière ${side}` : `Casement + fixed combo (${mods.length} panel) — hinge ${side}`
+    return fr ? `Fenêtre à battant — charnière ${side}` : `Casement window — hinge ${side}`
   }
   // Tilt & Turn
   if (mods.some(m => m.startsWith("TT"))) {
     const hasFixed = mods.includes("FIX")
-    if (hasFixed) return `Tilt & turn + fixed combo — hinge ${side}`
-    return `Tilt & turn window — hinge ${side}`
+    if (hasFixed) return fr ? `Oscillo-battant + fixe combo — charnière ${side}` : `Tilt & turn + fixed combo — hinge ${side}`
+    return fr ? `Fenêtre oscillo-battante — charnière ${side}` : `Tilt & turn window — hinge ${side}`
   }
   // Awning
-  if (mods.includes("AWNING")) return "Awning (top-hung) window"
+  if (mods.includes("AWNING")) return fr ? "Fenêtre auvent (ouverture par le haut)" : "Awning (top-hung) window"
   // Slider
-  if (mods.includes("SLIDE")) return `Horizontal slider window (${mods.length} panel)`
+  if (mods.includes("SLIDE")) return fr ? `Fenêtre coulissante horizontale (${mods.length} panneaux)` : `Horizontal slider window (${mods.length} panel)`
   // Fixed
   if (mods.every(m => m === "FIX")) {
-    return mods.length > 1 ? `${mods.length}-panel fixed panoramic window` : "Fixed non-operable window"
+    return mods.length > 1 ? (fr ? `Fenêtre fixe panoramique ${mods.length} panneaux` : `${mods.length}-panel fixed panoramic window`) : (fr ? "Fenêtre fixe non-ouvrable" : "Fixed non-operable window")
   }
   return cfg.label
 }
@@ -309,11 +310,12 @@ export function toFraction(dec: number): string {
 }
 
 /** Smart description generator for custom module layouts — reads the modules[] array and infers window type name */
-export function describeCustomLayout(modules: string[], hingeLeft = false, swingInside = true): string {
-  if (!modules.length) return "Window"
+export function describeCustomLayout(modules: string[], hingeLeft = false, swingInside = true, locale = "en"): string {
+  const fr = locale === "fr"
+  if (!modules.length) return fr ? "Fenêtre" : "Window"
   const n = modules.length
-  const side = hingeLeft ? "left" : "right"
-  const swing = swingInside ? "inswing" : "outswing"
+  const side = hingeLeft ? (fr ? "gauche" : "left") : (fr ? "droite" : "right")
+  const swing = swingInside ? (fr ? "ouverture int." : "inswing") : (fr ? "ouverture ext." : "outswing")
 
   // Count by type
   const c: Record<string, number> = {}
@@ -330,59 +332,59 @@ export function describeCustomLayout(modules: string[], hingeLeft = false, swing
   const ops = cas + tt + awn + sld
 
   // ── Pure types (all panels same) ──
-  if (fix === n) return n === 1 ? "Fixed picture window" : `${n}-panel fixed panoramic window`
-  if (cas === n && casL > 0 && casR > 0) return `${n}-panel French casement — ${swing}`
-  if (cas === n) return n === 1 ? `Casement window — hinge ${side}, ${swing}` : `${n}-panel casement — hinge ${side}, ${swing}`
-  if (tt === n && ttL > 0 && ttR > 0) return `${n}-panel French tilt & turn — ${swing}`
-  if (tt === n) return n === 1 ? `Tilt & turn window — hinge ${side}, ${swing}` : `${n}-panel tilt & turn — ${swing}`
-  if (awn === n) return n === 1 ? "Awning (top-hung) window" : `${n}-panel awning stack`
-  if (sld === n) return `${n}-panel horizontal slider`
+  if (fix === n) return n === 1 ? (fr ? "Fenêtre fixe panoramique" : "Fixed picture window") : (fr ? `Fenêtre fixe panoramique ${n} panneaux` : `${n}-panel fixed panoramic window`)
+  if (cas === n && casL > 0 && casR > 0) return fr ? `Battant français ${n} panneaux — ${swing}` : `${n}-panel French casement — ${swing}`
+  if (cas === n) return n === 1 ? (fr ? `Fenêtre à battant — charnière ${side}, ${swing}` : `Casement window — hinge ${side}, ${swing}`) : (fr ? `Battant ${n} panneaux — charnière ${side}, ${swing}` : `${n}-panel casement — hinge ${side}, ${swing}`)
+  if (tt === n && ttL > 0 && ttR > 0) return fr ? `Oscillo-battant français ${n} panneaux — ${swing}` : `${n}-panel French tilt & turn — ${swing}`
+  if (tt === n) return n === 1 ? (fr ? `Fenêtre oscillo-battante — charnière ${side}, ${swing}` : `Tilt & turn window — hinge ${side}, ${swing}`) : (fr ? `Oscillo-battant ${n} panneaux — ${swing}` : `${n}-panel tilt & turn — ${swing}`)
+  if (awn === n) return n === 1 ? (fr ? "Fenêtre auvent" : "Awning (top-hung) window") : (fr ? `Auvent empilé ${n} panneaux` : `${n}-panel awning stack`)
+  if (sld === n) return fr ? `Coulissante horizontale ${n} panneaux` : `${n}-panel horizontal slider`
 
   // ── Mixed with fixed panels ──
   // Picture window pattern: FIX + operable + FIX (operable in center)
   if (n >= 3 && modules[0] === "FIX" && modules[n - 1] === "FIX" && ops === 1) {
     const ventType = cas > 0 ? "casement" : tt > 0 ? "tilt & turn" : awn > 0 ? "awning" : "slider"
-    return `Picture window with centre ${ventType} vent (${n} panel) — hinge ${side}`
+    return fr ? `Fenêtre panoramique avec ${ventType} central (${n} panneaux) — charnière ${side}` : `Picture window with centre ${ventType} vent (${n} panel) — hinge ${side}`
   }
 
   // Single operable + rest fixed
   if (ops === 1 && fix === n - 1) {
-    const ventType = cas > 0 ? "casement" : tt > 0 ? "tilt & turn" : awn > 0 ? "awning" : "slider"
-    const pos = modules.indexOf(modules.find(m => m !== "FIX")!) === 0 ? "left" : modules.lastIndexOf(modules.find(m => m !== "FIX")!) === n - 1 ? "right" : "centre"
-    return `${ventType.charAt(0).toUpperCase() + ventType.slice(1)} + ${fix} fixed ${fix === 1 ? "panel" : "panels"} (${n} panel) — vent ${pos}`
+    const ventType = cas > 0 ? (fr ? "battant" : "casement") : tt > 0 ? (fr ? "oscillo-battant" : "tilt & turn") : awn > 0 ? (fr ? "auvent" : "awning") : (fr ? "coulissant" : "slider")
+    const pos = modules.indexOf(modules.find(m => m !== "FIX")!) === 0 ? (fr ? "gauche" : "left") : modules.lastIndexOf(modules.find(m => m !== "FIX")!) === n - 1 ? (fr ? "droite" : "right") : (fr ? "centre" : "centre")
+    return fr ? `${ventType.charAt(0).toUpperCase() + ventType.slice(1)} + ${fix} fixe${fix > 1 ? "s" : ""} (${n} panneaux) — ventilation ${pos}` : `${ventType.charAt(0).toUpperCase() + ventType.slice(1)} + ${fix} fixed ${fix === 1 ? "panel" : "panels"} (${n} panel) — vent ${pos}`
   }
 
   // Casement + fixed combos (multiple operables)
   if (cas > 0 && tt === 0 && awn === 0 && sld === 0) {
-    if (casL > 0 && casR > 0 && fix > 0) return `Casement combo with ${fix} fixed ${fix === 1 ? "panel" : "panels"} (${n} panel) — flanking vents, ${swing}`
-    if (casL > 0 && casR > 0) return `${n}-panel French casement — ${swing}`
-    return `Casement + fixed combo (${n} panel) — hinge ${side}, ${swing}`
+    if (casL > 0 && casR > 0 && fix > 0) return fr ? `Battant combo avec ${fix} fixe${fix > 1 ? "s" : ""} (${n} panneaux) — ventilations latérales, ${swing}` : `Casement combo with ${fix} fixed ${fix === 1 ? "panel" : "panels"} (${n} panel) — flanking vents, ${swing}`
+    if (casL > 0 && casR > 0) return fr ? `Battant français ${n} panneaux — ${swing}` : `${n}-panel French casement — ${swing}`
+    return fr ? `Battant + fixe combo (${n} panneaux) — charnière ${side}, ${swing}` : `Casement + fixed combo (${n} panel) — hinge ${side}, ${swing}`
   }
 
   // Tilt & turn + fixed
   if (tt > 0 && cas === 0 && awn === 0 && sld === 0) {
-    return `Tilt & turn + fixed combo (${n} panel) — ${swing}`
+    return fr ? `Oscillo-battant + fixe combo (${n} panneaux) — ${swing}` : `Tilt & turn + fixed combo (${n} panel) — ${swing}`
   }
 
   // Awning + fixed
   if (awn > 0 && cas === 0 && tt === 0 && sld === 0) {
-    return `Awning + fixed combo (${n} panel)`
+    return fr ? `Auvent + fixe combo (${n} panneaux)` : `Awning + fixed combo (${n} panel)`
   }
 
   // Slider + fixed (sidelights)
   if (sld > 0 && cas === 0 && tt === 0 && awn === 0) {
-    if (n >= 3 && modules[0] === "FIX" && modules[n - 1] === "FIX") return `Slider with flanking sidelights (${n} panel)`
-    return `Slider + fixed combo (${n} panel)`
+    if (n >= 3 && modules[0] === "FIX" && modules[n - 1] === "FIX") return fr ? `Coulissante avec impostes latérales (${n} panneaux)` : `Slider with flanking sidelights (${n} panel)`
+    return fr ? `Coulissante + fixe combo (${n} panneaux)` : `Slider + fixed combo (${n} panel)`
   }
 
   // ── Complex mixed (multiple operable types) ──
   const parts: string[] = []
-  if (cas > 0) parts.push(`${cas} casement`)
-  if (tt > 0) parts.push(`${tt} tilt & turn`)
-  if (awn > 0) parts.push(`${awn} awning`)
-  if (sld > 0) parts.push(`${sld} slider`)
-  if (fix > 0) parts.push(`${fix} fixed`)
-  return `Custom ${n}-panel window (${parts.join(" + ")})`
+  if (cas > 0) parts.push(fr ? `${cas} battant${cas > 1 ? "s" : ""}` : `${cas} casement`)
+  if (tt > 0) parts.push(fr ? `${tt} oscillo-battant${tt > 1 ? "s" : ""}` : `${tt} tilt & turn`)
+  if (awn > 0) parts.push(fr ? `${awn} auvent${awn > 1 ? "s" : ""}` : `${awn} awning`)
+  if (sld > 0) parts.push(fr ? `${sld} coulissant${sld > 1 ? "s" : ""}` : `${sld} slider`)
+  if (fix > 0) parts.push(fr ? `${fix} fixe${fix > 1 ? "s" : ""}` : `${fix} fixed`)
+  return fr ? `Fenêtre personnalisée ${n} panneaux (${parts.join(" + ")})` : `Custom ${n}-panel window (${parts.join(" + ")})`
 }
 
 export function moduleWidth(totalW: number, n: number) { return totalW / n - 1 / 16 }

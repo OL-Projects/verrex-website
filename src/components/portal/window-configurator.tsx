@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import { EstimateWindowSVG } from "./estimate-window-svg"
 import { WINDOW_TYPES, isDoorType, describeCustomLayout, type EstimateItem } from "@/lib/estimate-config"
+import { useLocale } from "next-intl"
 import { usePortalT } from "@/lib/portal-i18n"
 import { Pencil, Plus, X, Check, RotateCcw } from "lucide-react"
 
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function WindowConfigurator({ item, onSave, onClear, editTrigger, onSwingChange }: Props) {
+  const locale = useLocale()
   const [isEditing, setIsEditing] = useState(false)
   const [draftModules, setDraftModules] = useState<string[]>([])
   const [selectedIdx, setSelectedIdx] = useState<number>(-1)
@@ -143,7 +145,7 @@ export function WindowConfigurator({ item, onSave, onClear, editTrigger, onSwing
       {/* Live description preview (edit mode) */}
       {isEditing && draftModules.length > 0 && (
         <p className="mt-1 px-2 py-0.5 rounded-md text-[9px] font-semibold text-center text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 w-full truncate">
-          {describeCustomLayout(draftModules, item.hingeLeft ?? false, item.swingInside ?? true)}
+          {describeCustomLayout(draftModules, item.hingeLeft ?? false, item.swingInside ?? true, locale)}
         </p>
       )}
 

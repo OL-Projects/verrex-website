@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Pencil } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Pencil, Globe } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useLocale } from "next-intl"
+import { useRouter, usePathname } from "@/i18n/navigation"
 import { usePortalT } from "@/lib/portal-i18n"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { WindowConfigurator } from "@/components/portal/window-configurator"
@@ -46,6 +47,8 @@ export default function EstimatesPage() {
   const { remember, suggestions } = useAutocomplete()
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const locale = useLocale()
+  const i18nRouter = useRouter()
+  const i18nPathname = usePathname()
   const T = usePortalT()
   const logoRef = useRef<HTMLInputElement>(null)
   const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
@@ -443,8 +446,8 @@ export default function EstimatesPage() {
                           </select>
                           <p className={`text-xs font-semibold mt-1 px-2 py-1 rounded-md border capitalize ${item.customModules?.length ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20" : "text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 border-slate-200 dark:border-white/10"}`}>
                             {item.customModules?.length
-                              ? describeCustomLayout(item.customModules, item.hingeLeft ?? false, item.swingInside ?? true)
-                              : getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
+                              ? describeCustomLayout(item.customModules, item.hingeLeft ?? false, item.swingInside ?? true, locale)
+                              : getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true, locale)}
                           </p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
@@ -752,6 +755,9 @@ export default function EstimatesPage() {
       <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-4xl mx-auto">
         <button onClick={() => setTheme(isDark ? "light" : "dark")} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition" title={isDark ? "Light Mode" : "Dark Mode"}>
           {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
+        </button>
+        <button onClick={() => i18nRouter.replace(i18nPathname, { locale: locale === "fr" ? "en" : "fr" })} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5 text-xs font-bold" title={locale === "fr" ? "Switch to English" : "Passer au français"}>
+          <Globe className="h-4 w-4 text-blue-500" /><span className="hidden sm:inline">{locale === "fr" ? "EN" : "FR"}</span>
         </button>
         <button onClick={undo} disabled={!canUndo} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">
           <Undo2 className="h-4 w-4 text-slate-500" />
