@@ -80,8 +80,6 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
               <G>
                 <Rect x={sx} y={sy} width={sw} height={sh} fill="url(#gl)" />
                 <Rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke={ML} strokeWidth={sash} />
-                <Line x1={sx} y1={cy} x2={sx + sw} y2={cy} stroke={LC} strokeWidth={0.3} opacity={0.4} />
-                <Line x1={cx} y1={sy} x2={cx} y2={sy + sh} stroke={LC} strokeWidth={0.3} opacity={0.4} />
               </G>
             )}
 
@@ -93,13 +91,12 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                 <G>
                   <Rect x={sx} y={sy} width={sw} height={sh} fill="url(#gl)" />
                   <Rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke={ML} strokeWidth={sash} />
-                  <Line x1={hx} y1={sy + 1} x2={ohx} y2={cy} stroke={FC} strokeWidth={0.5} />
-                  <Line x1={hx} y1={sy + sh - 1} x2={ohx} y2={cy} stroke={FC} strokeWidth={0.5} />
                   {/* Hinge markers */}
-                  <Rect x={hx - 1.5} y={sy + 6} width={3} height={4} rx={0.5} fill={LC} opacity={0.5} />
-                  <Rect x={hx - 1.5} y={sy + sh - 10} width={3} height={4} rx={0.5} fill={LC} opacity={0.5} />
-                  {/* Handle */}
-                  <Circle cx={ohx} cy={cy} r={2} fill={LC} />
+                  <Rect x={hx - 1.5} y={sy + 6} width={3} height={5} rx={1} fill={FC} opacity={0.6} />
+                  <Rect x={hx - 1.5} y={sy + sh - 11} width={3} height={5} rx={1} fill={FC} opacity={0.6} />
+                  {/* Prominent T-handle */}
+                  <Rect x={ohx - 1.5} y={cy - 8} width={3} height={16} rx={1.5} fill={FC} opacity={0.8} />
+                  <Rect x={ohx - 1} y={cy - 1} width={hingeOnLeft ? 8 : -8} height={2} rx={1} fill={FC} opacity={0.8} />
                 </G>
               )
             })()}
@@ -112,17 +109,12 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                 <G>
                   <Rect x={sx} y={sy} width={sw} height={sh} fill="url(#gl)" />
                   <Rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke={ML} strokeWidth={sash} />
-                  {/* Tilt triangle (blue dashed) */}
-                  <Line x1={cx} y1={sy + sh - 1} x2={sx + 1} y2={sy + 1} stroke="#3b82f6" strokeWidth={0.5} strokeDasharray="3 1" />
-                  <Line x1={cx} y1={sy + sh - 1} x2={sx + sw - 1} y2={sy + 1} stroke="#3b82f6" strokeWidth={0.5} strokeDasharray="3 1" />
-                  {/* Turn triangle (red) */}
-                  <Line x1={hx} y1={cy} x2={ohx} y2={sy + 1} stroke="#ef4444" strokeWidth={0.5} />
-                  <Line x1={hx} y1={cy} x2={ohx} y2={sy + sh - 1} stroke="#ef4444" strokeWidth={0.5} />
                   {/* Hinge markers */}
-                  <Rect x={hx - 1.5} y={sy + 6} width={3} height={4} rx={0.5} fill={LC} opacity={0.5} />
-                  <Rect x={hx - 1.5} y={sy + sh - 10} width={3} height={4} rx={0.5} fill={LC} opacity={0.5} />
-                  {/* Handle */}
-                  <Circle cx={ohx} cy={cy} r={2} fill={LC} />
+                  <Rect x={hx - 1.5} y={sy + 6} width={3} height={5} rx={1} fill={FC} opacity={0.6} />
+                  <Rect x={hx - 1.5} y={sy + sh - 11} width={3} height={5} rx={1} fill={FC} opacity={0.6} />
+                  {/* Prominent T-handle */}
+                  <Rect x={ohx - 1.5} y={cy - 8} width={3} height={16} rx={1.5} fill={FC} opacity={0.8} />
+                  <Rect x={ohx - 1} y={cy - 1} width={hingeOnLeft ? 8 : -8} height={2} rx={1} fill={FC} opacity={0.8} />
                 </G>
               )
             })()}
@@ -132,9 +124,10 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
               <G>
                 <Rect x={sx} y={sy} width={sw} height={sh} fill="url(#gl)" />
                 <Rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke={ML} strokeWidth={sash} />
-                <Line x1={sx + 1} y1={sy + 1} x2={cx} y2={sy + sh - 1} stroke={FC} strokeWidth={0.5} />
-                <Line x1={sx + sw - 1} y1={sy + 1} x2={cx} y2={sy + sh - 1} stroke={FC} strokeWidth={0.5} />
-                <Rect x={sx + 3} y={sy + 1} width={sw - 6} height={2} fill={LC} rx={1} />
+                {/* Top hinge bar */}
+                <Rect x={sx + 3} y={sy + 1} width={sw - 6} height={2.5} rx={1} fill={FC} opacity={0.7} />
+                {/* Prominent bottom handle */}
+                <Rect x={cx - 5} y={sy + sh - 5} width={10} height={3} rx={1.5} fill={FC} opacity={0.8} />
               </G>
             )}
 
@@ -222,12 +215,6 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                     <Line x1={sx + 8} y1={cy + sh * 0.15} x2={sx + sw - 8} y2={cy + sh * 0.15} stroke={FC} strokeWidth={0.8} />
                     <Path d={`M ${sx + sw - 12} ${cy + sh * 0.15 - 3} L ${sx + sw - 8} ${cy + sh * 0.15} L ${sx + sw - 12} ${cy + sh * 0.15 + 3}`} fill="none" stroke={FC} strokeWidth={0.8} />
                     <Line x1={sx + 3} y1={sy + sh - 3} x2={sx + sw - 3} y2={sy + sh - 3} stroke={LC} strokeWidth={0.4} strokeDasharray="2 1" />
-                  </G>
-                )}
-                {mod === "FIX-D" && (
-                  <G>
-                    <Line x1={sx} y1={cy} x2={sx + sw} y2={cy} stroke={LC} strokeWidth={0.3} opacity={0.3} />
-                    <Line x1={cx} y1={sy} x2={cx} y2={sy + sh} stroke={LC} strokeWidth={0.3} opacity={0.3} />
                   </G>
                 )}
               </G>

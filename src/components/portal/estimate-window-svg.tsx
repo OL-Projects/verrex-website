@@ -94,8 +94,6 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
               <>
                 <rect x={sx} y={sy} width={sw} height={sh} fill="url(#glassG)" rx={0.5} />
                 <rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke="currentColor" className="text-slate-600 dark:text-slate-400" strokeWidth={sash} rx={0.5} />
-                <line x1={sx} y1={cy} x2={sx + sw} y2={cy} stroke="currentColor" className="text-slate-400" strokeWidth={0.5} opacity={0.3} />
-                <line x1={cx} y1={sy} x2={cx} y2={sy + sh} stroke="currentColor" className="text-slate-400" strokeWidth={0.5} opacity={0.3} />
               </>
             )}
 
@@ -103,19 +101,18 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
             {(mod === "CAS-L" || mod === "CAS-R") && (() => {
               const hx = hingeOnLeft ? sx : sx + sw
               const ohx = hingeOnLeft ? sx + sw : sx
+              const leverDir = hingeOnLeft ? 1 : -1
               return (
                 <>
                   <rect x={sx} y={sy} width={sw} height={sh} fill="url(#glassG)" rx={0.5} />
                   <rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke="currentColor" className="text-slate-600 dark:text-slate-400" strokeWidth={sash} rx={0.5} />
-                  {/* Diagonal lines from hinge to opposite corners */}
-                  <line x1={hx} y1={sy + 1} x2={ohx} y2={cy} stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth={0.7} />
-                  <line x1={hx} y1={sy + sh - 1} x2={ohx} y2={cy} stroke="currentColor" className="text-slate-500 dark:text-slate-400" strokeWidth={0.7} />
                   {/* Hinge markers */}
-                  <rect x={hx - 2} y={sy + 8} width={4} height={6} rx={1} fill="currentColor" className="text-slate-500" opacity={0.5} />
-                  <rect x={hx - 2} y={sy + sh - 14} width={4} height={6} rx={1} fill="currentColor" className="text-slate-500" opacity={0.5} />
-                  {/* Handle on opposite side */}
-                  <rect x={ohx - 2} y={cy - 10} width={4} height={20} rx={2} fill="currentColor" className="text-slate-500 dark:text-slate-400" opacity={0.7} />
-                  <circle cx={ohx} cy={cy} r={3} fill="currentColor" className="text-slate-600 dark:text-slate-400" />
+                  <rect x={hx - 2.5} y={sy + 8} width={5} height={8} rx={1.5} fill="currentColor" className="text-slate-600 dark:text-slate-400" opacity={0.6} />
+                  <rect x={hx - 2.5} y={sy + sh - 16} width={5} height={8} rx={1.5} fill="currentColor" className="text-slate-600 dark:text-slate-400" opacity={0.6} />
+                  {/* ★ Prominent T-handle on opposite side */}
+                  <rect x={ohx - 3} y={cy - 16} width={6} height={32} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
+                  <rect x={ohx - 2} y={cy - 12} width={4} height={24} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
+                  <rect x={ohx - 2} y={cy - 2} width={leverDir * 14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
                 </>
               )
             })()}
@@ -124,22 +121,20 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
             {(mod === "TT-L" || mod === "TT-R") && (() => {
               const hx = hingeOnLeft ? sx : sx + sw
               const ohx = hingeOnLeft ? sx + sw : sx
+              const leverDir = hingeOnLeft ? 1 : -1
               return (
                 <>
                   <rect x={sx} y={sy} width={sw} height={sh} fill="url(#glassG)" rx={0.5} />
                   <rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke="currentColor" className="text-slate-600 dark:text-slate-400" strokeWidth={sash} rx={0.5} />
-                  {/* Tilt triangle (blue dashed) from bottom-center to top corners */}
-                  <line x1={cx} y1={sy + sh - 1} x2={sx + 1} y2={sy + 1} stroke="currentColor" className="text-blue-500" strokeWidth={0.8} strokeDasharray="4 2" />
-                  <line x1={cx} y1={sy + sh - 1} x2={sx + sw - 1} y2={sy + 1} stroke="currentColor" className="text-blue-500" strokeWidth={0.8} strokeDasharray="4 2" />
-                  {/* Turn triangle (red) from hinge side to opposite corners */}
-                  <line x1={hx} y1={cy} x2={ohx} y2={sy + 1} stroke="currentColor" className="text-red-500" strokeWidth={0.7} />
-                  <line x1={hx} y1={cy} x2={ohx} y2={sy + sh - 1} stroke="currentColor" className="text-red-500" strokeWidth={0.7} />
-                  {/* Handle on opposite side */}
-                  <rect x={ohx - 2} y={cy - 10} width={4} height={20} rx={2} fill="currentColor" className="text-slate-500" opacity={0.7} />
-                  <circle cx={ohx} cy={cy} r={3} fill="currentColor" className="text-slate-600" />
                   {/* Hinge markers */}
-                  <rect x={hx - 2} y={sy + 8} width={4} height={6} rx={1} fill="currentColor" className="text-slate-500" opacity={0.5} />
-                  <rect x={hx - 2} y={sy + sh - 14} width={4} height={6} rx={1} fill="currentColor" className="text-slate-500" opacity={0.5} />
+                  <rect x={hx - 2.5} y={sy + 8} width={5} height={8} rx={1.5} fill="currentColor" className="text-slate-600 dark:text-slate-400" opacity={0.6} />
+                  <rect x={hx - 2.5} y={sy + sh - 16} width={5} height={8} rx={1.5} fill="currentColor" className="text-slate-600 dark:text-slate-400" opacity={0.6} />
+                  {/* ★ Prominent T-handle on opposite side */}
+                  <rect x={ohx - 3} y={cy - 16} width={6} height={32} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
+                  <rect x={ohx - 2} y={cy - 12} width={4} height={24} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
+                  <rect x={ohx - 2} y={cy - 2} width={leverDir * 14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
+                  {/* TT label */}
+                  <text x={cx} y={cy + 4} textAnchor="middle" fontSize={9} fontWeight={700} fill="currentColor" className="text-slate-400 dark:text-slate-500" opacity={0.5}>T&amp;T</text>
                 </>
               )
             })()}
@@ -149,10 +144,11 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
               <>
                 <rect x={sx} y={sy} width={sw} height={sh} fill="url(#glassG)" rx={0.5} />
                 <rect x={sx} y={sy} width={sw} height={sh} fill="none" stroke="currentColor" className="text-slate-600 dark:text-slate-400" strokeWidth={sash} rx={0.5} />
-                <line x1={sx + 1} y1={sy + 1} x2={cx} y2={sy + sh - 1} stroke="currentColor" className="text-slate-500" strokeWidth={0.7} />
-                <line x1={sx + sw - 1} y1={sy + 1} x2={cx} y2={sy + sh - 1} stroke="currentColor" className="text-slate-500" strokeWidth={0.7} />
-                <rect x={sx + 4} y={sy + 1} width={sw - 8} height={3} rx={1} fill="currentColor" className="text-slate-500" opacity={0.7} />
-                <rect x={cx - 6} y={sy + sh - 8} width={12} height={4} rx={2} fill="currentColor" className="text-slate-500" opacity={0.7} />
+                {/* Top hinge bar */}
+                <rect x={sx + 6} y={sy + 1} width={sw - 12} height={4} rx={1.5} fill="currentColor" className="text-slate-600 dark:text-slate-400" opacity={0.7} />
+                {/* ★ Prominent bottom handle */}
+                <rect x={cx - 10} y={sy + sh - 10} width={20} height={6} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
+                <rect x={cx - 7} y={sy + sh - 9} width={14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
               </>
             )}
 
@@ -246,12 +242,6 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
                     <polyline points={`${sx + sw - 22},${cy + sh * 0.15 - 5} ${sx + sw - 16},${cy + sh * 0.15} ${sx + sw - 22},${cy + sh * 0.15 + 5}`} fill="none" stroke="currentColor" className="text-slate-600" strokeWidth={1.2} />
                     <line x1={sx + 4} y1={sy + sh - 6} x2={sx + sw - 4} y2={sy + sh - 6} stroke="currentColor" className="text-slate-400" strokeWidth={0.8} strokeDasharray="4 2" />
                     <rect x={sx + sw - 14} y={cy + sh * 0.08} width={4} height={16} rx={2} fill="currentColor" className="text-slate-600" opacity={0.7} />
-                  </>
-                )}
-                {mod === "FIX-D" && (
-                  <>
-                    <line x1={sx} y1={cy} x2={sx + sw} y2={cy} stroke="currentColor" className="text-slate-400" strokeWidth={0.4} opacity={0.25} />
-                    <line x1={cx} y1={sy} x2={cx} y2={sy + sh} stroke="currentColor" className="text-slate-400" strokeWidth={0.4} opacity={0.25} />
                   </>
                 )}
               </>
