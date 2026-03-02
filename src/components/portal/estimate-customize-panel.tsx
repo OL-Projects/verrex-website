@@ -341,6 +341,20 @@ export function EstimateCustomizePanel(props: Props) {
             <input value={s.summaryTitle} onChange={e => uSet({ summaryTitle: e.target.value })} className={CLS.inp + " w-full"} />
           </div>
           <div className={CLS.row}><span className="text-[11px]">Installation</span><Toggle on={s.showInstallation} onToggle={() => uSet({ showInstallation: !s.showInstallation })} /></div>
+          {s.showInstallation && (
+            <div className="ml-4 mb-2 space-y-2 border-l-2 border-blue-200 dark:border-blue-500/20 pl-3">
+              <div>
+                <label className={CLS.lbl}>Install Pricing Method</label>
+                <select value={s.installMethod ?? "per-unit"} onChange={e => uSet({ installMethod: e.target.value as any })} className={CLS.sel}>
+                  {INSTALL_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={CLS.lbl}>Rate {INSTALL_METHODS.find(m => m.id === (s.installMethod ?? "per-unit"))?.short}</label>
+                <input type="number" min={0} step={0.01} value={s.installRate ?? 25} onChange={e => uSet({ installRate: +e.target.value })} className={CLS.inp} />
+              </div>
+            </div>
+          )}
           <div className={CLS.row}><span className="text-[11px]">Delivery</span><Toggle on={s.showDelivery} onToggle={() => uSet({ showDelivery: !s.showDelivery })} /></div>
           <div className={CLS.row}>
             <span className="text-[11px]">GST / TPS</span>
