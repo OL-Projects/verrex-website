@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { EstimateWindowSVG } from "./estimate-window-svg"
 import { WINDOW_TYPES, isDoorType, describeCustomLayout, type EstimateItem } from "@/lib/estimate-config"
 import { Pencil, Plus, X, Check, RotateCcw } from "lucide-react"
@@ -12,9 +12,11 @@ interface Props {
   item: EstimateItem
   onSave: (modules: string[]) => void
   onClear: () => void
+  editTrigger?: number
+  onSwingChange?: (swingInside: boolean) => void
 }
 
-export function WindowConfigurator({ item, onSave, onClear }: Props) {
+export function WindowConfigurator({ item, onSave, onClear, editTrigger, onSwingChange }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [draftModules, setDraftModules] = useState<string[]>([])
   const [selectedIdx, setSelectedIdx] = useState<number>(-1)
@@ -66,6 +68,19 @@ export function WindowConfigurator({ item, onSave, onClear }: Props) {
     onClear()
   }, [onClear])
 
+  // External trigger to start editing (from parent bottom strip)
+  const prevTrigger = useRef(editTrigger ?? 0)
+  useEffect(() => {
+    if (editTrigger !== undefined && editTrigger !== prevTrigger.current) {
+      prevTrigger.current = editTrigger
+      if (!isEditing) startEditing()
+    }
+  }, [editTrigger, isEditing, startEditing])
+
+  // Check if current modules have operable panels (for swing control)
+  const currentModules = activeModules ?? defaultModules
+  const hasOperable = currentModules.some(m => m.startsWith("CAS") || m.startsWith("TT") || m === "AWNING")
+
   // ── Doors: render SVG directly, no configurator ──
   if (isDoor) {
     return (
@@ -93,6 +108,15 @@ export function WindowConfigurator({ item, onSave, onClear }: Props) {
             <Plus className="w-3 h-3" /> Panel
           </button>
           <span className="text-[9px] font-bold text-slate-400 tabular-nums">{draftModules.length} panel{draftModules.length !== 1 ? "s" : ""}</span>
+          {hasOperable && onSwingChange && (
+            <div className="flex items-center gap-0.5 ml-2">
+              <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">Swing</span>
+              <button onClick={() => onSwingChange(true)}
+                className={`px-2 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.swingInside ?? true) ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>In</button>
+              <button onClick={() => onSwingChange(false)}
+                className={`px-2 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>Out</button>
+            </div>
+          )}
           <div className="flex-1" />
           <button onClick={cancel}
             className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition">

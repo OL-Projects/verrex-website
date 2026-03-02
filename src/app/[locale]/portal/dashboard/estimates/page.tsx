@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Globe } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Globe, Pencil } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useLocale } from "next-intl"
 import { useRouter, usePathname } from "@/i18n/navigation"
@@ -67,6 +67,7 @@ export default function EstimatesPage() {
   const [addMenuRoom, setAddMenuRoom] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
+  const [cfgTriggers, setCfgTriggers] = useState<Record<string, number>>({})
 
   // Keyboard shortcuts: Ctrl+Z / Ctrl+Y
   useEffect(() => {
@@ -377,16 +378,22 @@ export default function EstimatesPage() {
                             item={item}
                             onSave={(modules) => updateItem(room.id, item.id, { customModules: modules })}
                             onClear={() => updateItem(room.id, item.id, { customModules: undefined })}
+                            editTrigger={cfgTriggers[item.id] ?? 0}
+                            onSwingChange={(v) => updateItem(room.id, item.id, { swingInside: v })}
                           />
                         </div>
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5 print:hidden flex-wrap gap-y-1">
                           <div className="flex items-center gap-1">
-                            <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? T.est.open : T.est.hinge}</span>
-                            <button onClick={() => updateItem(room.id, item.id, { hingeLeft: true })}
-                              className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.left}</button>
-                            <button onClick={() => updateItem(room.id, item.id, { hingeLeft: false })}
-                              className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.right}</button>
-                            {(isDoorType(item.type) || (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("CAS") || m.startsWith("TT") || m === "AWNING")) && (
+                            {/* Hinge: show for doors always, hide for windows with custom layout */}
+                            {(isDoorType(item.type) || !item.customModules?.length) && (<>
+                              <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? T.est.open : T.est.hinge}</span>
+                              <button onClick={() => updateItem(room.id, item.id, { hingeLeft: true })}
+                                className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.left}</button>
+                              <button onClick={() => updateItem(room.id, item.id, { hingeLeft: false })}
+                                className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.right}</button>
+                            </>)}
+                            {/* Swing: keep for doors only in strip (windows get it in configurator toolbar) */}
+                            {isDoorType(item.type) && (WINDOW_TYPES[item.type]?.modules || []).some(m => m.startsWith("SWING")) && (
                               <>
                                 <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 ml-2 mr-0.5">{T.est.swing}</span>
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: true })}
@@ -394,6 +401,20 @@ export default function EstimatesPage() {
                                 <button onClick={() => updateItem(room.id, item.id, { swingInside: false })}
                                   className={`px-2.5 py-1 rounded-r-lg text-[9px] font-bold transition ${!(item.swingInside ?? true) ? "bg-green-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.outSwing}</button>
                               </>
+                            )}
+                            {/* Customize Layout trigger (windows only) */}
+                            {!isDoorType(item.type) && (
+                              <button onClick={() => setCfgTriggers(p => ({ ...p, [item.id]: (p[item.id] ?? 0) + 1 }))}
+                                className="flex items-center gap-1 ml-1 px-2.5 py-1 rounded-lg text-[9px] font-bold text-violet-500 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 transition">
+                                <Pencil className="w-3 h-3" /> Customize
+                              </button>
+                            )}
+                            {/* Reset (windows only, when custom) */}
+                            {!isDoorType(item.type) && !!item.customModules?.length && (
+                              <button onClick={() => updateItem(room.id, item.id, { customModules: undefined })}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-bold text-orange-500 hover:text-orange-700 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 transition">
+                                <RotateCcw className="w-3 h-3" /> Reset
+                              </button>
                             )}
                           </div>
                           <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded" title="Perimeter (trim length)">
