@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v7"
+const APP_DEFAULTS_VERSION = "v8"
 const VER_KEY = "VEREX_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -205,7 +205,7 @@ function defaultSettings(): EstimateSettings {
     showThickness: true,
     enabledWindowTypes: [
       "FIX", "TOP-HUNG", "SLIDER", "CAS-L", "CAS-R", "TT-L", "TT-R",
-      "CAS-L+FIX", "FIX+CAS-R", "TT-L+FIX", "FIX+TT-R",
+      "CAS-L+FIX", "CAS-R+FIX", "FIX+CAS-R", "TT-L+FIX", "FIX+TT-R",
       "CAS-L+FIX+FIX", "FIX+FIX+FIX", "FIX+FIX+CAS-R", "CAS-L+FIX+FIX+FIX",
     ],
     enabledProducts: ["double-tempered", "triple-tempered"],

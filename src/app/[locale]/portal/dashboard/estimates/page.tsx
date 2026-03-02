@@ -402,8 +402,9 @@ export default function EstimatesPage() {
                             updateItem(room.id, item.id, patch)
                           }} className={C.sel}>
                             {getTypeGroups().map(g => {
+                              const itemCat = isDoorType(item.type) ? "door" : "window"
                               const filtered = g.types.filter(([k, v]) =>
-                                v.category === "window" ? estCfg.enabledWindowTypes.includes(k) : estCfg.enabledDoorTypes.includes(k)
+                                v.category === itemCat && (v.category === "window" ? estCfg.enabledWindowTypes.includes(k) : estCfg.enabledDoorTypes.includes(k))
                               )
                               if (filtered.length === 0) return null
                               return (
@@ -416,10 +417,10 @@ export default function EstimatesPage() {
                           <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
-                          <div><label className={C.lbl}>{T.est.width}</label><input type="number" min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
-                          <div><label className={C.lbl}>{T.est.height}</label><input type="number" min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
-                          {(estCfg.showThickness ?? true) && <div><label className={C.lbl}>{T.est.thickness}</label><input type="number" min={1} max={20} step={0.5} value={item.thickness ?? 4} onChange={e => updateItem(room.id, item.id, { thickness: +e.target.value })} className={C.inp} /></div>}
-                          {estCfg.showDepth && <div><label className={C.lbl}>{T.est.depth}</label><input type="number" min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
+                          <div><label className={C.lbl}>{T.est.width}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>
+                          <div><label className={C.lbl}>{T.est.height}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={8} max={120} value={item.height} onChange={e => updateItem(room.id, item.id, { height: +e.target.value })} className={C.inp} /></div>
+                          {(estCfg.showThickness ?? true) && <div><label className={C.lbl}>{T.est.thickness}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={1} max={20} step={0.5} value={item.thickness ?? 4} onChange={e => updateItem(room.id, item.id, { thickness: +e.target.value })} className={C.inp} /></div>}
+                          {estCfg.showDepth && <div><label className={C.lbl}>{T.est.depth}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={1} max={12} step={0.25} value={item.depth} onChange={e => updateItem(room.id, item.id, { depth: +e.target.value })} className={C.inp} /></div>}
                         </div>
                         <div><label className={C.lbl}>{T.est.product}</label>
                           <select value={item.product} onChange={e => updateItem(room.id, item.id, { product: e.target.value })} className={C.sel}>
@@ -461,7 +462,7 @@ export default function EstimatesPage() {
                               </div>
                               <div>
                                 <label className={C.lbl}>{T.est.trimOverride}</label>
-                                <input type="number" min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} placeholder="0=auto" className={`${C.inp} font-semibold text-xs`} />
+                                <input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={0} step={0.01} value={item.trimPrice ?? 0} onChange={e => updateItem(room.id, item.id, { trimPrice: +e.target.value })} placeholder="0=auto" className={`${C.inp} font-semibold text-xs`} />
                               </div>
                               <div>
                                 <label className={C.lbl}>{T.est.trimCost}</label>
@@ -485,7 +486,7 @@ export default function EstimatesPage() {
                           </label>
                           {(item.installOverride ?? false) && (
                             <div className="pt-1">
-                              <input type="number" min={0} step={0.01} value={item.installPrice ?? 0} onChange={e => updateItem(room.id, item.id, { installPrice: +e.target.value })} placeholder={T.est.customInstallPrice} className={`${C.inp} font-semibold text-xs`} />
+                              <input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={0} step={0.01} value={item.installPrice ?? 0} onChange={e => updateItem(room.id, item.id, { installPrice: +e.target.value })} placeholder={T.est.customInstallPrice} className={`${C.inp} font-semibold text-xs`} />
                             </div>
                           )}
                         </div>
@@ -516,8 +517,8 @@ export default function EstimatesPage() {
                     {/* Footer: qty + unit price + calculated price + line total + delete */}
                     <div className="flex items-end justify-between mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex-wrap gap-y-2">
                       <div className="flex items-end gap-3 flex-wrap">
-                        <div className="w-16"><label className={C.lbl}>{T.qty}</label><input type="number" min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
-                        <div className="w-28"><label className={C.lbl}>{T.unitPrice}</label><input type="number" min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
+                        <div className="w-16"><label className={C.lbl}>{T.qty}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={1} max={99} value={item.qty} onChange={e => updateItem(room.id, item.id, { qty: +e.target.value })} className={C.inp} /></div>
+                        <div className="w-28"><label className={C.lbl}>{T.unitPrice}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={0} step={0.01} value={item.unitPrice} onChange={e => updateItem(room.id, item.id, { unitPrice: +e.target.value })} className={`${C.inp} font-semibold`} /></div>
                         {(() => {
                           const glassInfo = getGlassRateForItem(item, estCfg)
                           if (!glassInfo.show) return null
@@ -566,8 +567,8 @@ export default function EstimatesPage() {
           <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); const eff = getEffectiveUnitPrice(it, estCfg); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * eff)}</span></div> })) })()}</div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>{T.est.productsSubtotal}</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
-            {estCfg.showInstallation && <div className="flex justify-between items-center"><span>{T.est.installation} ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
-            {estCfg.showDelivery && <div className="flex justify-between items-center"><span>{T.est.deliveryLabel} $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
+            {estCfg.showInstallation && <div className="flex justify-between items-center"><span>{T.est.installation} ({t.totalUnits} × $<input type="number" value={est.installPerUnit} min={0} onChange={e => set("installPerUnit", +e.target.value)} onFocus={e => { if (+e.target.value === 0) e.target.select() }} className="w-16 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" />)</span><span className="font-semibold">{fmt(t.install)}</span></div>}
+            {estCfg.showDelivery && <div className="flex justify-between items-center"><span>{T.est.deliveryLabel} $<input type="number" value={est.delivery} min={0} onChange={e => set("delivery", +e.target.value)} onFocus={e => { if (+e.target.value === 0) e.target.select() }} className="w-20 bg-transparent border-b border-slate-300 text-center font-semibold outline-none print:border-none" /></span><span className="font-semibold">{fmt(t.delivery)}</span></div>}
           </div>
           {/* Itemized Trim Costs */}
           {t.trimTotal > 0 && (
@@ -596,7 +597,7 @@ export default function EstimatesPage() {
               return (
                 <div key={s.id} className={`flex justify-between font-semibold ${i === 0 ? 'bg-slate-100 dark:bg-white/5 -mx-5 mt-3 px-5 py-3' : 'bg-slate-50 dark:bg-white/3 -mx-5 px-5 py-2.5 border-t border-slate-200 dark:border-white/5'} text-sm items-center ${isLast ? '-mb-5 rounded-b-2xl' : ''}`}>
                   <span className={i === 0 ? '' : 'text-slate-500'}>
-                    {tl(s.label, locale)}{isDeposit && (<>: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</>)}
+                    {tl(s.label, locale)}{isDeposit && (<>: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} onFocus={e => { if (+e.target.value === 0) e.target.select() }} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</>)}
                     {isRemainder && <span className="text-[9px] text-slate-400 ml-1">(remainder)</span>}
                     {!isDeposit && !isRemainder && pct > 0 && <span className="text-[9px] text-slate-400 ml-1">({pct}%)</span>}
                   </span>
