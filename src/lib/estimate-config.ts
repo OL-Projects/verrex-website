@@ -130,6 +130,7 @@ export interface EstimateItem {
   trimPrice: number     // trim price override (0 = use global rate)
   installOverride: boolean
   installPrice: number
+  customModules?: string[]  // user-built panel layout; overrides type default
   // Glass specifications
   thermal: string
   lowE: string

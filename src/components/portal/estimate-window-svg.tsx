@@ -3,12 +3,17 @@
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
 import { usePortalT } from "@/lib/portal-i18n"
 
-interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean }
+interface Props {
+  width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean
+  customModules?: string[]
+  onPanelClick?: (idx: number) => void
+  selectedPanelIdx?: number
+}
 
-export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn = true }: Props) {
+export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn = true, customModules, onPanelClick, selectedPanelIdx }: Props) {
   const T = usePortalT()
   const cfg = WINDOW_TYPES[type]
-  let modules = cfg?.modules || ["FIX"]
+  let modules = customModules ?? cfg?.modules ?? ["FIX"]
   const isDoor = isDoorType(type)
 
   // For sliding doors: flipH controls which side the sliding panel is on
@@ -273,6 +278,24 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
               {mod.length > 8 ? mod.replace("SWING-", "SW-").replace("-IN", "↙").replace("-OUT", "↗") : mod}
             </text>
             <text x={cx} y={dimY} textAnchor="middle" fontSize={7.5} fill="currentColor" className="text-slate-500 dark:text-slate-400">{toFraction(dimW)}</text>
+          </g>
+        )
+      })}
+
+      {/* Interactive panel hit areas (edit mode only) */}
+      {onPanelClick && modules.map((_, i) => {
+        const mx = f + i * (mw + m)
+        const isSel = selectedPanelIdx === i
+        return (
+          <g key={`hit-${i}`} onClick={() => onPanelClick(i)} style={{ cursor: "pointer" }}>
+            {/* Hover highlight */}
+            <rect x={mx} y={f} width={mw} height={innerH} fill="#3b82f6" opacity={0} rx={1}>
+              <animate attributeName="opacity" from="0" to="0" dur="0.01s" />
+            </rect>
+            <rect x={mx} y={f} width={mw} height={innerH} fill="#3b82f6" opacity={isSel ? 0.12 : 0} rx={1}
+              className="hover:!opacity-10 transition-opacity" style={{ pointerEvents: "all" }} />
+            {/* Selection border */}
+            {isSel && <rect x={mx + 1} y={f + 1} width={mw - 2} height={innerH - 2} fill="none" stroke="#3b82f6" strokeWidth={2.5} rx={1} strokeDasharray="6 3" />}
           </g>
         )
       })}

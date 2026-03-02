@@ -8,6 +8,7 @@ import { useLocale } from "next-intl"
 import { useRouter, usePathname } from "@/i18n/navigation"
 import { usePortalT } from "@/lib/portal-i18n"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
+import { WindowConfigurator } from "@/components/portal/window-configurator"
 import { useColorPresets, useCompanyInfo, useAutocomplete, useLogo, useEstimateStyle, useEstimateSettings, useEstimateHistory } from "@/lib/estimate-hooks"
 import { useEstimateStore } from "@/lib/estimate-store"
 import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-panel"
@@ -372,7 +373,11 @@ export default function EstimatesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div className="bg-slate-50/50 dark:bg-white/3 rounded-xl p-3 min-h-[200px] flex flex-col">
                         <div className="flex-1 flex items-center justify-center">
-                          <EstimateWindowSVG width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} />
+                          <WindowConfigurator
+                            item={item}
+                            onSave={(modules) => updateItem(room.id, item.id, { customModules: modules })}
+                            onClear={() => updateItem(room.id, item.id, { customModules: undefined })}
+                          />
                         </div>
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5 print:hidden flex-wrap gap-y-1">
                           <div className="flex items-center gap-1">
