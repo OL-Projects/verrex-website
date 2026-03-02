@@ -195,6 +195,14 @@ export interface EstimateSettings {
   showSignatures: boolean
   showSignatureDate: boolean
   defaultTermsLines: string[]
+  // Glass spec options (customizable choices)
+  thermalOptions?: string[]
+  lowEOptions?: string[]
+  glassThicknessOptions?: string[]
+  argonGasOptions?: string[]
+  glassTypeOptions?: string[]
+  glassFinishOptions?: string[]
+
 }
 
 function defaultSettings(): EstimateSettings {

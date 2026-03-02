@@ -128,8 +128,15 @@ export interface EstimateItem {
   trimInstall: boolean  // enable trim for this item
   trimStyle: "flat" | "colonial"  // trim profile style
   trimPrice: number     // trim price override (0 = use global rate)
-  installOverride: boolean  // override global install rate for this item
-  installPrice: number      // per-item installation cost (used when installOverride=true)
+  installOverride: boolean
+  installPrice: number
+  // Glass specifications
+  thermal: string
+  lowE: string
+  glassThickness: string
+  argonGas: string
+  glassType: string
+  glassFinish: string
 }
 
 export interface Room {
@@ -187,6 +194,7 @@ export function createItem(): EstimateItem {
     notes: "", attachmentNames: [],
     hingeLeft: false, swingInside: true, trimInstall: false, trimStyle: "flat", trimPrice: 0,
     installOverride: false, installPrice: 0,
+    thermal: "Double", lowE: "1 Side", glassThickness: "5mm", argonGas: "18mm", glassType: "Ultra Clear", glassFinish: "Clear",
   }
 }
 
@@ -318,6 +326,17 @@ export function defaultPaymentStages(): PaymentStageConfig[] {
 // ── Trim Rate Units ─────────────────────────────
 // ── Installation Pricing ─────────────────────────
 export type InstallMethod = "per-unit" | "per-sqin" | "per-sqft" | "per-sqm" | "pct-price" | "per-lin-in" | "per-lin-ft" | "per-lin-cm"
+
+
+// ═══ GLASS SPECIFICATION DEFAULTS ═══
+export const GLASS_SPEC_DEFAULTS = {
+  thermalOptions: ["Double", "Triple"],
+  lowEOptions: ["1 Side", "2 Sides"],
+  glassThicknessOptions: ["5mm", "6mm"],
+  argonGasOptions: ["18mm", "24mm"],
+  glassTypeOptions: ["Ultra Clear", "Other"],
+  glassFinishOptions: ["Clear", "Frosted"],
+} as const
 
 export const INSTALL_METHODS: { id: InstallMethod; label: string; short: string }[] = [
   { id: "per-unit",   label: "Per Unit (flat)",    short: "/unit" },

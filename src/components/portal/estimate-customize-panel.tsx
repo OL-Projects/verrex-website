@@ -230,6 +230,41 @@ export function EstimateCustomizePanel(props: Props) {
             <ColorManager label={T.est.interiorColors} colors={props.intColors} onAdd={props.onAddInt} onRemove={props.onRemoveInt} />
           </div>
 
+
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300 mb-1.5">🔍 Glass Specifications</p>
+            {([
+              ["thermalOptions", "Thermal"],
+              ["lowEOptions", "Low E"],
+              ["glassThicknessOptions", "Glass Thickness"],
+              ["argonGasOptions", "Argon Gas"],
+              ["glassTypeOptions", "Glass Type"],
+              ["glassFinishOptions", "Glass Finish"],
+            ] as [keyof typeof s, string][]).map(([key, label]) => {
+              const opts: string[] = (s as any)[key] ?? []
+              return (
+                <div key={key} className="mb-2">
+                  <label className={CLS.lbl}>{label}</label>
+                  <div className="flex flex-wrap gap-1 mb-1">
+                    {opts.map((opt: string, i: number) => (
+                      <div key={i} className="flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                        <span className="text-[10px] font-medium">{opt}</span>
+                        <button onClick={() => { const next = opts.filter((_: string, j: number) => j !== i); uSet({ [key]: next } as any) }}
+                          className="text-red-400 hover:text-red-600"><Trash2 className="h-2.5 w-2.5" /></button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <input id={`gs_${key}`} placeholder="Add option…" className={CLS.inp}
+                      onKeyDown={e => { if (e.key === "Enter") { const inp = e.target as HTMLInputElement; if (inp.value.trim()) { uSet({ [key]: [...opts, inp.value.trim()] } as any); inp.value = "" } } }} />
+                    <button onClick={() => { const inp = document.getElementById(`gs_${key}`) as HTMLInputElement; if (inp?.value.trim()) { uSet({ [key]: [...opts, inp.value.trim()] } as any); inp.value = "" } }}
+                      className="px-1.5 py-0.5 rounded bg-blue-600 text-white text-[9px] font-bold shrink-0"><Plus className="h-2.5 w-2.5 inline" /></button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
             <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1.5">🔢 Calculated Price</p>
             <div className={CLS.row}><span className="text-[11px]">Show Calculated Price</span><Toggle on={s.showCalculatedPrice ?? true} onToggle={() => uSet({ showCalculatedPrice: !(s.showCalculatedPrice ?? true) })} /></div>

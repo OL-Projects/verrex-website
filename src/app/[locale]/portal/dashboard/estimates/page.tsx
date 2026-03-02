@@ -441,6 +441,30 @@ export default function EstimatesPage() {
                           </div>
                         </div>
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>{T.est.egress}: {egress ? T.est.egressCompliant : T.est.egressNonCompliant}</p>
+                        {/* Glass Specifications */}
+                        <div className="rounded-lg border border-slate-200 dark:border-white/10 p-2.5 space-y-2">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Glass Specifications</p>
+                          {([
+                            ["thermal", "Thermal", estCfg.thermalOptions ?? ["Double", "Triple"]],
+                            ["lowE", "Low E", estCfg.lowEOptions ?? ["1 Side", "2 Sides"]],
+                            ["glassThickness", "Glass Thickness", estCfg.glassThicknessOptions ?? ["5mm", "6mm"]],
+                            ["argonGas", "Argon Gas", estCfg.argonGasOptions ?? ["18mm", "24mm"]],
+                            ["glassType", "Glass Type", estCfg.glassTypeOptions ?? ["Ultra Clear", "Other"]],
+                            ["glassFinish", "Glass Finish", estCfg.glassFinishOptions ?? ["Clear", "Frosted"]],
+                          ] as [string, string, string[]][]).map(([field, label, options]) => (
+                            <div key={field} className="flex items-center gap-2">
+                              <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 w-24 shrink-0">{label}</span>
+                              <div className="flex gap-0.5 flex-1">
+                                {options.map(opt => (
+                                  <button key={opt} onClick={() => updateItem(room.id, item.id, { [field]: opt })}
+                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition ${(item as any)[field] === opt || (!(item as any)[field] && opt === options[0]) ? "bg-slate-800 dark:bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                         {/* Trim */}
                         <div className="rounded-lg border border-orange-200 dark:border-orange-500/20 p-2.5 space-y-2">
                           <label className="flex items-center gap-2 cursor-pointer">
