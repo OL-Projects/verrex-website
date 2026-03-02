@@ -263,6 +263,25 @@ export function EstimateCustomizePanel(props: Props) {
               </div>
             </div>
           </div>
+
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1.5">🔧 Installation Pricing</p>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Pricing Method</label>
+              <select value={s.installMethod ?? "per-unit"} onChange={e => uSet({ installMethod: e.target.value as any })} className={CLS.sel}>
+                {INSTALL_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+              </select>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Rate {INSTALL_METHODS.find(m => m.id === (s.installMethod ?? "per-unit"))?.short}</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">{(s.installMethod ?? "per-unit") === "pct-price" ? "" : "$"}</span>
+                <input type="number" min={0} step={0.01} value={s.installRate ?? 25} onChange={e => uSet({ installRate: +e.target.value })}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{INSTALL_METHODS.find(m => m.id === (s.installMethod ?? "per-unit"))?.short}</span>
+              </div>
+            </div>
+          </div>
         </Section>
 
         {/* ═══ SECTION 3: DOOR CARD ═══ */}
@@ -341,20 +360,6 @@ export function EstimateCustomizePanel(props: Props) {
             <input value={s.summaryTitle} onChange={e => uSet({ summaryTitle: e.target.value })} className={CLS.inp + " w-full"} />
           </div>
           <div className={CLS.row}><span className="text-[11px]">Installation</span><Toggle on={s.showInstallation} onToggle={() => uSet({ showInstallation: !s.showInstallation })} /></div>
-          {s.showInstallation && (
-            <div className="ml-4 mb-2 space-y-2 border-l-2 border-blue-200 dark:border-blue-500/20 pl-3">
-              <div>
-                <label className={CLS.lbl}>Install Pricing Method</label>
-                <select value={s.installMethod ?? "per-unit"} onChange={e => uSet({ installMethod: e.target.value as any })} className={CLS.sel}>
-                  {INSTALL_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={CLS.lbl}>Rate {INSTALL_METHODS.find(m => m.id === (s.installMethod ?? "per-unit"))?.short}</label>
-                <input type="number" min={0} step={0.01} value={s.installRate ?? 25} onChange={e => uSet({ installRate: +e.target.value })} className={CLS.inp} />
-              </div>
-            </div>
-          )}
           <div className={CLS.row}><span className="text-[11px]">Delivery</span><Toggle on={s.showDelivery} onToggle={() => uSet({ showDelivery: !s.showDelivery })} /></div>
           <div className={CLS.row}>
             <span className="text-[11px]">GST / TPS</span>
