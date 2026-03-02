@@ -18,7 +18,7 @@ import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import {
   type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
-  calcTotals, fmt, getTypeGroups, isDoorType, getItemDescription,
+  calcTotals, fmt, getTypeGroups, isDoorType, getItemDescription, describeCustomLayout,
   computeCalculatedPrice, getGlassRateForItem, GLASS_RATE_UNITS, getEffectiveUnitPrice,
   perimeterInches, perimeterFeet, perimeterInUnit, getItemTrimCost, getItemInstallCost,
   inToDisplay, displayToIn, dimLabel, TRIM_UNITS, tl, getInstallFormula, INSTALL_METHODS, type InstallPricingSettings,
@@ -423,7 +423,11 @@ export default function EstimatesPage() {
                               )
                             })}
                           </select>
-                          <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 capitalize">{getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}</p>
+                          <p className={`text-xs font-semibold mt-1 px-2 py-1 rounded-md border capitalize ${item.customModules?.length ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20" : "text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 border-slate-200 dark:border-white/10"}`}>
+                            {item.customModules?.length
+                              ? describeCustomLayout(item.customModules, item.hingeLeft ?? false, item.swingInside ?? true)
+                              : getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
+                          </p>
                         </div>
                         <div className={`grid gap-2 grid-cols-2 ${estCfg.showDepth || (estCfg.showThickness ?? true) ? "sm:grid-cols-3" : ""} ${estCfg.showDepth && (estCfg.showThickness ?? true) ? "sm:grid-cols-4" : ""}`}>
                           <div><label className={C.lbl}>{T.est.width}</label><input type="number" onFocus={e => { if (+e.target.value === 0) e.target.select() }} min={8} max={240} value={item.width} onChange={e => updateItem(room.id, item.id, { width: +e.target.value })} className={C.inp} /></div>

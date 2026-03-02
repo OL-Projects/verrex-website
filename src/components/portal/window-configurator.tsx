@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { EstimateWindowSVG } from "./estimate-window-svg"
-import { WINDOW_TYPES, isDoorType, type EstimateItem } from "@/lib/estimate-config"
+import { WINDOW_TYPES, isDoorType, describeCustomLayout, type EstimateItem } from "@/lib/estimate-config"
 import { Pencil, Plus, X, Check, RotateCcw } from "lucide-react"
 
 const WINDOW_MODULE_TYPES = ["FIX", "CAS-L", "CAS-R", "TT-L", "TT-R", "AWNING", "SLIDE"] as const
@@ -113,6 +113,13 @@ export function WindowConfigurator({ item, onSave, onClear }: Props) {
         onPanelClick={isEditing ? handlePanelClick : undefined}
         selectedPanelIdx={isEditing ? selectedIdx : undefined}
       />
+
+      {/* Live description preview (edit mode) */}
+      {isEditing && draftModules.length > 0 && (
+        <p className="mt-1 px-2 py-0.5 rounded-md text-[9px] font-semibold text-center text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 w-full truncate">
+          {describeCustomLayout(draftModules, item.hingeLeft ?? false, item.swingInside ?? true)}
+        </p>
+      )}
 
       {/* Panel type selector strip (edit mode, when a panel is selected) */}
       {isEditing && selectedIdx >= 0 && selectedIdx < draftModules.length && (
