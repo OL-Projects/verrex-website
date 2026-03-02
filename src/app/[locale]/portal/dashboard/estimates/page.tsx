@@ -2,10 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Globe, Pencil } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Pencil } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useLocale } from "next-intl"
-import { useRouter, usePathname } from "@/i18n/navigation"
 import { usePortalT } from "@/lib/portal-i18n"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { WindowConfigurator } from "@/components/portal/window-configurator"
@@ -47,8 +46,6 @@ export default function EstimatesPage() {
   const { remember, suggestions } = useAutocomplete()
   const { style: estStyle, update: updateStyle, reset: resetStyle } = useEstimateStyle()
   const locale = useLocale()
-  const i18nRouter = useRouter()
-  const i18nPathname = usePathname()
   const T = usePortalT()
   const logoRef = useRef<HTMLInputElement>(null)
   const [sidePanel, setSidePanel] = useState<"none" | "preview" | "settings">("none")
@@ -406,14 +403,14 @@ export default function EstimatesPage() {
                             {!isDoorType(item.type) && (
                               <button onClick={() => setCfgTriggers(p => ({ ...p, [item.id]: (p[item.id] ?? 0) + 1 }))}
                                 className="flex items-center gap-1 ml-1 px-2.5 py-1 rounded-lg text-[9px] font-bold text-violet-500 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 transition">
-                                <Pencil className="w-3 h-3" /> Customize
+                                <Pencil className="w-3 h-3" /> {T.est.customizeLayout}
                               </button>
                             )}
                             {/* Reset (windows only, when custom) */}
                             {!isDoorType(item.type) && !!item.customModules?.length && (
                               <button onClick={() => updateItem(room.id, item.id, { customModules: undefined })}
                                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-bold text-orange-500 hover:text-orange-700 dark:hover:text-orange-300 hover:bg-orange-50 dark:hover:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 transition">
-                                <RotateCcw className="w-3 h-3" /> Reset
+                                <RotateCcw className="w-3 h-3" /> {T.reset}
                               </button>
                             )}
                           </div>
@@ -478,13 +475,13 @@ export default function EstimatesPage() {
                         {!isDoorType(item.type) && <div className="rounded-lg border border-cyan-300/50 dark:border-cyan-500/20 p-2.5 space-y-2">
                           <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">{T.est.glassSpecs}</p>
                           {([
-                            ["thermal", "Thermal", estCfg.thermalOptions ?? ["Double", "Triple"]],
-                            ["lowE", "Low E", estCfg.lowEOptions ?? ["1 Side", "2 Sides"]],
-                            ["glassThickness", "Glass Thickness", estCfg.glassThicknessOptions ?? ["5mm", "6mm"]],
-                            ["argonGas", "Argon Gas", estCfg.argonGasOptions ?? ["18mm", "24mm"]],
-                            ["glassType", "Glass Type", estCfg.glassTypeOptions ?? ["Ultra Clear", "Other"]],
-                            ["glassFinish", "Glass Finish", estCfg.glassFinishOptions ?? ["Clear", "Frosted"]],
-                            ["screen", "Screen", estCfg.screenOptions ?? ["Included", "Not Included"]],
+                            ["thermal", T.est.thermal, estCfg.thermalOptions ?? ["Double", "Triple"]],
+                            ["lowE", T.est.lowELabel, estCfg.lowEOptions ?? ["1 Side", "2 Sides"]],
+                            ["glassThickness", T.est.glassLabel, estCfg.glassThicknessOptions ?? ["5mm", "6mm"]],
+                            ["argonGas", T.est.argonLabel, estCfg.argonGasOptions ?? ["18mm", "24mm"]],
+                            ["glassType", T.est.typeLabel, estCfg.glassTypeOptions ?? ["Ultra Clear", "Other"]],
+                            ["glassFinish", T.est.finishLabel, estCfg.glassFinishOptions ?? ["Clear", "Frosted"]],
+                            ["screen", T.est.screenLabel, estCfg.screenOptions ?? ["Included", "Not Included"]],
                           ] as [string, string, string[]][]).map(([field, label, options]) => (
                             <div key={field} className="flex items-center gap-2">
                               <span className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 w-24 shrink-0">{label}</span>
@@ -755,9 +752,6 @@ export default function EstimatesPage() {
       <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap max-w-4xl mx-auto">
         <button onClick={() => setTheme(isDark ? "light" : "dark")} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition" title={isDark ? "Light Mode" : "Dark Mode"}>
           {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-slate-500" />}
-        </button>
-        <button onClick={() => i18nRouter.replace(i18nPathname, { locale: locale === "fr" ? "en" : "fr" })} className="p-2 sm:px-3 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition flex items-center gap-1.5 text-xs font-bold" title={locale === "fr" ? "Switch to English" : "Passer au français"}>
-          <Globe className="h-4 w-4 text-blue-500" /><span className="hidden sm:inline">{locale === "fr" ? "EN" : "FR"}</span>
         </button>
         <button onClick={undo} disabled={!canUndo} className="p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">
           <Undo2 className="h-4 w-4 text-slate-500" />

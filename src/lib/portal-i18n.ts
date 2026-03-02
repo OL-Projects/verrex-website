@@ -103,6 +103,9 @@ export interface PortalT {
     notIncluded: string
     // ── SVG labels ──
     inLabel: string; outLabel: string
+    // ── Configurator ──
+    customLayout: string; addPanel: string; removePanel: string; customizeLayout: string
+    panelCount: string; panelsCount: string
   }
   // ── Contracts ──
   ctr: {
@@ -243,6 +246,9 @@ const en: PortalT = {
     notIncluded: "Not Included",
     // ── SVG labels ──
     inLabel: "IN", outLabel: "OUT",
+    // ── Configurator ──
+    customLayout: "Custom Layout", addPanel: "+ Panel", removePanel: "Remove Panel",
+    customizeLayout: "Customize Layout", panelCount: "panel", panelsCount: "panels",
   },
   // ── Contracts ──
   ctr: {
@@ -387,6 +393,9 @@ const fr: PortalT = {
     notIncluded: "Non inclus",
     // ── SVG labels ──
     inLabel: "INT", outLabel: "EXT",
+    // ── Configurator ──
+    customLayout: "Configuration personnalisée", addPanel: "+ Panneau", removePanel: "Retirer le panneau",
+    customizeLayout: "Personnaliser", panelCount: "panneau", panelsCount: "panneaux",
   },
   // ── Contracts ──
   ctr: {

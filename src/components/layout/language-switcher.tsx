@@ -15,7 +15,7 @@ export function LanguageSwitcher() {
   const [isPending, startTransition] = useTransition()
 
   const nextLocale = locale === 'en' ? 'fr' : 'en'
-  const label = locale === 'en' ? 'EN' : 'FR'
+  const label = nextLocale === 'en' ? 'EN' : 'FR'
 
   function switchLocale() {
     startTransition(() => {
