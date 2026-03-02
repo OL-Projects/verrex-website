@@ -286,16 +286,18 @@ export default function EstimatesPage() {
           {/* Client + Ship */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-slate-200 dark:border-white/10">
             <div className="space-y-2">
-              <input value={est.soldToLabel} onChange={e => set("soldToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
-              {(["clientName", "clientAddress", "clientCity", "clientPhone", "clientEmail"] as const).map(f => (
+              <input value={tl(est.soldToLabel, locale)} onChange={e => set("soldToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
+              {(["clientName", "clientAddress", "clientCity", "clientPhone", "clientEmail"] as const).map(f => {
+                const ph: Record<string, string> = { clientName: T.est.name_, clientAddress: T.est.address_, clientCity: T.est.city_, clientPhone: T.est.phone_, clientEmail: T.est.email_ }
+                return (
                 <div key={f} className="relative">
-                  <input list={`dl_${f}`} placeholder={f.replace("client", "")} value={est[f]} onChange={e => set(f, e.target.value)} onBlur={e => handleBlur(f, e.target.value)} className={C.inp} />
+                  <input list={`dl_${f}`} placeholder={ph[f] || f.replace("client", "")} value={est[f]} onChange={e => set(f, e.target.value)} onBlur={e => handleBlur(f, e.target.value)} className={C.inp} />
                   <datalist id={`dl_${f}`}>{suggestions(f).map(s => <option key={s} value={s} />)}</datalist>
                 </div>
-              ))}
+              )})}
             </div>
             <div className="space-y-2">
-              <input value={est.shipToLabel} onChange={e => set("shipToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
+              <input value={tl(est.shipToLabel, locale)} onChange={e => set("shipToLabel", e.target.value)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-transparent outline-none" />
               <select value={est.shipMethod} onChange={e => set("shipMethod", e.target.value)} className={C.sel}><option>{T.est.pickup}</option><option>{T.est.delivery}</option></select>
               <input placeholder={T.address} value={est.shipAddress} onChange={e => set("shipAddress", e.target.value)} className={C.inp} />
               <input placeholder={T.phone} value={est.shipPhone} onChange={e => set("shipPhone", e.target.value)} className={C.inp} />
@@ -560,7 +562,7 @@ export default function EstimatesPage() {
 
         {/* ═══ SUMMARY ═══ */}
         <div className={`${C.card} border-t-4 border-t-slate-800 dark:border-t-blue-500`}>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{estCfg.summaryTitle} — {t.items} Items ({t.totalUnits} Units)</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">{estCfg.summaryTitle} — {t.items} {T.est.items} ({t.totalUnits} {T.est.units})</h2>
           <div className="space-y-1">{(() => { let gi = 0; return est.rooms.flatMap(r => r.items.map(it => { gi++; const p = PRODUCTS.find(x => x.id === it.product); const eff = getEffectiveUnitPrice(it, estCfg); return <div key={it.id} className="flex justify-between text-sm"><span className="text-slate-600 dark:text-slate-300">#{gi} {p?.tag} {it.width}×{it.height} (×{it.qty}) {it.customLabel && `— ${it.customLabel}`}</span><span className="font-semibold">{fmt(it.qty * eff)}</span></div> })) })()}</div>
           <div className="flex justify-between font-bold border-t border-slate-200 dark:border-white/10 pt-2 mt-3 text-sm"><span>{T.est.productsSubtotal}</span><span>{fmt(t.prodTotal)}</span></div>
           <div className="mt-3 space-y-1.5 text-sm">
@@ -594,7 +596,7 @@ export default function EstimatesPage() {
               return (
                 <div key={s.id} className={`flex justify-between font-semibold ${i === 0 ? 'bg-slate-100 dark:bg-white/5 -mx-5 mt-3 px-5 py-3' : 'bg-slate-50 dark:bg-white/3 -mx-5 px-5 py-2.5 border-t border-slate-200 dark:border-white/5'} text-sm items-center ${isLast ? '-mb-5 rounded-b-2xl' : ''}`}>
                   <span className={i === 0 ? '' : 'text-slate-500'}>
-                    {s.label}{isDeposit && (<>: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</>)}
+                    {tl(s.label, locale)}{isDeposit && (<>: <input type="number" min={0} max={100} value={est.depositPct} onChange={e => set("depositPct", +e.target.value)} className="w-12 bg-transparent border-b border-slate-300 text-center font-bold outline-none print:border-none" />%</>)}
                     {isRemainder && <span className="text-[9px] text-slate-400 ml-1">(remainder)</span>}
                     {!isDeposit && !isRemainder && pct > 0 && <span className="text-[9px] text-slate-400 ml-1">({pct}%)</span>}
                   </span>
@@ -608,7 +610,7 @@ export default function EstimatesPage() {
 
         {/* ═══ TERMS (editable) ═══ */}
         {estCfg.showTerms && <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">{estCfg.termsTitle ?? "Terms & Conditions"}</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">{estCfg.termsTitle ?? T.est.termsTitle}</h2>
           <ol className="list-decimal pl-5 space-y-1.5">
             {est.termsLines.map((line, i) => (
               <li key={i}><textarea rows={2} value={line} onChange={e => { const next = [...est.termsLines]; next[i] = e.target.value; set("termsLines", next) }} className="w-full bg-transparent outline-none resize-none text-xs print:bg-transparent" /></li>
@@ -661,7 +663,7 @@ export default function EstimatesPage() {
                     )}
                   </div>
                   <div className="flex items-center justify-between mt-1">
-                    <p className="text-[11px]">{who === "client" ? "Client" : "Representative"} Signature & Date</p>
+                    <p className="text-[11px]">{who === "client" ? T.est.clientSig : T.est.repSig}</p>
                     {sigs[who] && <button onClick={(e) => { e.stopPropagation(); saveSig(who, "") }} className="text-[10px] text-red-400 hover:text-red-600 print:hidden">Clear</button>}
                   </div>
                 </div>
