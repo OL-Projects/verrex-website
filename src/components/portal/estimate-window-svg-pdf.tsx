@@ -1,9 +1,11 @@
 import { Svg, Rect, Line, Circle, Path, G, Text as SvgText, Defs, LinearGradient, Stop } from "@react-pdf/renderer"
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
+import { getPortalT } from "@/lib/portal-i18n"
 
-interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean }
+interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean; locale?: string }
 
-export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swingIn = true }: Props) {
+export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swingIn = true, locale = "en" }: Props) {
+  const L = getPortalT(locale)
   const cfg = WINDOW_TYPES[type]
   let modules = cfg?.modules || ["FIX"]
   const isDoor = isDoorType(type)
@@ -194,7 +196,7 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                     y={sy + sh - arcR * 0.35}
                     style={{ fontSize: 5, fontWeight: 700, fill: arcColor, textAnchor: "middle" }}
                   >
-                    {swingIn ? "IN" : "OUT"}
+                    {swingIn ? L.est.inLabel : L.est.outLabel}
                   </SvgText>
                 </G>
               )
@@ -253,7 +255,7 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
       {!isDoor && <Rect x={0} y={svgH - 1.5} width={svgW} height={2} fill={ML} rx={1} />}
 
       <SvgText x={svgW / 2} y={svgH + 19} style={{ fontSize: 4, fill: LC, textAnchor: "middle", fontStyle: "italic" }}>
-        {isDoor ? "Exterior — Door" : "Exterior View"}
+        {isDoor ? L.est.exteriorDoor : L.est.exteriorView}
       </SvgText>
     </Svg>
   )

@@ -232,7 +232,7 @@ export function EstimateCustomizePanel(props: Props) {
 
 
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300 mb-1.5">🔍 Glass Specifications</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300 mb-1.5">🔍 {T.est.glassSpecs}</p>
             {([
               ["thermalOptions", "Thermal"],
               ["lowEOptions", "Low E"],

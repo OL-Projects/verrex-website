@@ -97,6 +97,12 @@ export interface PortalT {
     name_: string; address_: string; city_: string; phone_: string; email_: string
     shipMethod: string; shipAddress: string; shipPhone: string
     company: string; to: string; subject: string
+    // ── Glass Specifications ──
+    glassSpecs: string; thermal: string; lowELabel: string; glassLabel: string
+    argonLabel: string; typeLabel: string; finishLabel: string; screenLabel: string
+    notIncluded: string
+    // ── SVG labels ──
+    inLabel: string; outLabel: string
   }
   // ── Contracts ──
   ctr: {
@@ -231,6 +237,12 @@ const en: PortalT = {
     name_: "Name", address_: "Address", city_: "City", phone_: "Phone", email_: "Email",
     shipMethod: "Ship Method", shipAddress: "Ship Address", shipPhone: "Ship Phone",
     company: "Company", to: "To", subject: "Subject",
+    // ── Glass Specifications ──
+    glassSpecs: "Glass Specifications", thermal: "Thermal", lowELabel: "Low-E", glassLabel: "Glass",
+    argonLabel: "Argon", typeLabel: "Type", finishLabel: "Finish", screenLabel: "Screen",
+    notIncluded: "Not Included",
+    // ── SVG labels ──
+    inLabel: "IN", outLabel: "OUT",
   },
   // ── Contracts ──
   ctr: {
@@ -369,6 +381,12 @@ const fr: PortalT = {
     name_: "Nom", address_: "Adresse", city_: "Ville", phone_: "Téléphone", email_: "Courriel",
     shipMethod: "Mode d'expédition", shipAddress: "Adresse d'expédition", shipPhone: "Téléphone d'expédition",
     company: "Entreprise", to: "À", subject: "Objet",
+    // ── Glass Specifications ──
+    glassSpecs: "Spécifications du verre", thermal: "Thermique", lowELabel: "Low-E", glassLabel: "Verre",
+    argonLabel: "Argon", typeLabel: "Type", finishLabel: "Fini", screenLabel: "Moustiquaire",
+    notIncluded: "Non inclus",
+    // ── SVG labels ──
+    inLabel: "INT", outLabel: "EXT",
   },
   // ── Contracts ──
   ctr: {

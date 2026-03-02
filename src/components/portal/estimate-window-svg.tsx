@@ -1,10 +1,12 @@
 "use client"
 
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
+import { usePortalT } from "@/lib/portal-i18n"
 
 interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean }
 
 export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn = true }: Props) {
+  const T = usePortalT()
   const cfg = WINDOW_TYPES[type]
   let modules = cfg?.modules || ["FIX"]
   const isDoor = isDoorType(type)
@@ -220,7 +222,7 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
                     fill="currentColor"
                     className={isInswing ? "text-blue-500" : "text-green-500"}
                   >
-                    {isInswing ? "IN" : "OUT"}
+                    {isInswing ? T.est.inLabel : T.est.outLabel}
                   </text>
                 </>
               )
@@ -279,7 +281,7 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
       {!isDoor && <rect x={0} y={svgH - 2} width={svgW} height={3} fill="currentColor" className="text-slate-600 dark:text-slate-500" rx={1} />}
 
       <text x={svgW / 2} y={extY} textAnchor="middle" fontSize={8} fontStyle="italic" fill="currentColor" className="text-slate-400">
-        {isDoor ? "Exterior View — Door" : "Exterior View"}
+        {isDoor ? T.est.exteriorDoor : T.est.exteriorView}
       </text>
     </svg>
   )

@@ -446,7 +446,7 @@ export default function EstimatesPage() {
                         <p className={`text-xs font-bold ${egress ? "text-green-600" : "text-red-500"}`}>{T.est.egress}: {egress ? T.est.egressCompliant : T.est.egressNonCompliant}</p>
                         {/* Glass Specifications (windows only) */}
                         {!isDoorType(item.type) && <div className="rounded-lg border border-cyan-300/50 dark:border-cyan-500/20 p-2.5 space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Glass Specifications</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">{T.est.glassSpecs}</p>
                           {([
                             ["thermal", "Thermal", estCfg.thermalOptions ?? ["Double", "Triple"]],
                             ["lowE", "Low E", estCfg.lowEOptions ?? ["1 Side", "2 Sides"]],
