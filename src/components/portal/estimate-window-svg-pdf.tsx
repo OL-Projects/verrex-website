@@ -2,12 +2,12 @@ import { Svg, Rect, Line, Circle, Path, G, Text as SvgText, Defs, LinearGradient
 import { WINDOW_TYPES, toFraction, moduleWidth, isDoorType } from "@/lib/estimate-config"
 import { getPortalT } from "@/lib/portal-i18n"
 
-interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean; locale?: string }
+interface Props { width: number; height: number; type: string; flipH?: boolean; swingIn?: boolean; locale?: string; customModules?: string[] }
 
-export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swingIn = true, locale = "en" }: Props) {
+export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swingIn = true, locale = "en", customModules }: Props) {
   const L = getPortalT(locale)
   const cfg = WINDOW_TYPES[type]
-  let modules = cfg?.modules || ["FIX"]
+  let modules = customModules?.length ? [...customModules] : (cfg?.modules || ["FIX"])
   const isDoor = isDoorType(type)
 
   // Sliding doors: flipH controls which side the sliding panel is on

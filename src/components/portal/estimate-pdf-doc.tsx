@@ -8,7 +8,7 @@ import {
   type TrimRateSettings,
   type PaymentStageConfig,
   WINDOW_TYPES, PRODUCTS, calcTotals, fmt, getEffectiveUnitPrice, isDoorType,
-  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription, tl,
+  perimeterInches, perimeterFeet, getItemTrimCost, getItemInstallCost, getItemDescription, describeCustomLayout, tl,
 } from "@/lib/estimate-config"
 import { getPortalT } from "@/lib/portal-i18n"
 
@@ -137,7 +137,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
               return (
                 <View key={item.id} style={s.itemRow} wrap={false}>
                   <View style={{ width: 110, minHeight: 80, alignItems: "center", justifyContent: "center" }}>
-                    <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} locale={locale} />
+                    <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} locale={locale} customModules={item.customModules} />
                   </View>
                   <View style={s.itemRight}>
                     <View style={s.itemHeader}>
@@ -154,8 +154,10 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                       <Text style={{ fontSize: 6.5, color: "#334155" }}>{L.est.screenLabel}: {item.screen || L.est.notIncluded}</Text>
                     </View>
                     )}
-                    <Text style={{ fontSize: 8.5, color: "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
-                      {getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
+                    <Text style={{ fontSize: 8.5, color: item.customModules?.length ? "#6d28d9" : "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: item.customModules?.length ? "#f5f3ff" : "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
+                      {item.customModules?.length
+                        ? describeCustomLayout(item.customModules, item.hingeLeft ?? false, item.swingInside ?? true)
+                        : getItemDescription(item.type, item.hingeLeft ?? false, item.swingInside ?? true)}
                       {(item.trimInstall) ? ` • ${L.est.trim}: ${(item.trimStyle ?? "flat") === "colonial" ? L.est.colonial : L.est.flat}` : ""}
                     </Text>
                     <Text style={{ fontSize: 7, color: "#94a3b8" }}>
