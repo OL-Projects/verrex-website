@@ -240,6 +240,7 @@ export function EstimateCustomizePanel(props: Props) {
               ["argonGasOptions", "Argon Gas"],
               ["glassTypeOptions", "Glass Type"],
               ["glassFinishOptions", "Glass Finish"],
+              ["screenOptions", "Screen"],
             ] as [keyof typeof s, string][]).map(([key, label]) => {
               const opts: string[] = (s as any)[key] ?? []
               return (

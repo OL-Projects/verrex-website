@@ -202,7 +202,7 @@ export interface EstimateSettings {
   argonGasOptions?: string[]
   glassTypeOptions?: string[]
   glassFinishOptions?: string[]
-
+  screenOptions?: string[]
 }
 
 function defaultSettings(): EstimateSettings {

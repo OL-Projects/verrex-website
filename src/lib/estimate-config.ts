@@ -137,6 +137,7 @@ export interface EstimateItem {
   argonGas: string
   glassType: string
   glassFinish: string
+  screen: string
 }
 
 export interface Room {
@@ -194,7 +195,7 @@ export function createItem(): EstimateItem {
     notes: "", attachmentNames: [],
     hingeLeft: false, swingInside: true, trimInstall: false, trimStyle: "flat", trimPrice: 0,
     installOverride: false, installPrice: 0,
-    thermal: "Double", lowE: "1 Side", glassThickness: "5mm", argonGas: "18mm", glassType: "Ultra Clear", glassFinish: "Clear",
+    thermal: "Double", lowE: "1 Side", glassThickness: "5mm", argonGas: "18mm", glassType: "Ultra Clear", glassFinish: "Clear", screen: "Not Included",
   }
 }
 
