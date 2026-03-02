@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { Link as IntlLink } from "@/i18n/navigation"
 import { usePathname } from "next/navigation"
+import { usePortalT } from "@/lib/portal-i18n"
 import { motion, AnimatePresence } from "framer-motion"
 import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { SIDEBAR_NAV } from "@/types/portal"
@@ -21,15 +22,23 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3, Activity, Clock, FileText, ClipboardSignature,
 }
 
-// Navigation groups for visual organization
-const NAV_GROUPS = [
-  { label: "Overview", items: ["Dashboard"] },
-  { label: "CRM", items: ["Leads", "Projects"] },
-  { label: "Operations", items: ["Appointments", "Measurements", "Orders"] },
-  { label: "Communication", items: ["Messages"] },
-  { label: "Financial Documents", items: ["Estimates", "Invoices", "Contracts", "Commissions"] },
-  { label: "Insights", items: ["Analytics", "Timeline"] },
+// Navigation group keys (labels are translated at render time)
+const NAV_GROUP_KEYS = [
+  { key: "overview", items: ["Dashboard"] },
+  { key: "crm", items: ["Leads", "Projects"] },
+  { key: "operations", items: ["Appointments", "Measurements", "Orders"] },
+  { key: "communication", items: ["Messages"] },
+  { key: "financialDocs", items: ["Estimates", "Invoices", "Contracts", "Commissions"] },
+  { key: "insights", items: ["Analytics", "Timeline"] },
 ]
+
+// Map SIDEBAR_NAV English labels → portal-i18n nav keys
+const NAV_LABEL_MAP: Record<string, string> = {
+  Dashboard: "dashboard", Leads: "leads", Projects: "projects", Appointments: "appointments",
+  Measurements: "measurements", Estimates: "estimates", Contracts: "contracts", Orders: "orders",
+  Messages: "messages", Invoices: "invoices", Commissions: "commissions", Analytics: "analytics",
+  Timeline: "timeline", Settings: "settings",
+}
 
 const roleColors: Record<string, string> = {
   admin: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400 border-blue-200 dark:border-blue-500/20",
@@ -57,6 +66,7 @@ interface SidebarProps {
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
+  const T = usePortalT()
   const [collapsed, setCollapsed] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const userRole = (session?.user?.role || "client") as UserRole
@@ -67,9 +77,20 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     item.roles.includes(userRole)
   )
 
+  // Translate a nav item label
+  const navAny = T.nav as unknown as Record<string, string>
+  const tLabel = (engLabel: string) => {
+    const key = NAV_LABEL_MAP[engLabel]
+    return key ? navAny[key] || engLabel : engLabel
+  }
+
+  // Translate a group key
+  const tGroup = (key: string) => navAny[key] || key
+
   // Group navigation items
-  const groupedNav = NAV_GROUPS.map(group => ({
+  const groupedNav = NAV_GROUP_KEYS.map(group => ({
     ...group,
+    label: tGroup(group.key),
     navItems: filteredNav.filter(item => group.items.includes(item.label)),
   })).filter(group => group.navItems.length > 0)
 
@@ -136,7 +157,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               <p className="text-sm font-semibold text-slate-900 dark:text-white truncate leading-tight">{userName}</p>
               <span className={`inline-flex items-center gap-1 mt-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${roleColors[userRole]}`}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
-                {roleLabels[userRole]}
+                {(T.nav.roles as Record<string, string>)[userRole] || userRole}
               </span>
             </div>
           </div>
@@ -198,7 +219,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                       }`} />
 
                       {!collapsed && (
-                        <span className="truncate">{item.label}</span>
+                        <span className="truncate">{tLabel(item.label)}</span>
                       )}
 
                       {!collapsed && item.badge && item.badge > 0 && (
@@ -212,7 +233,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                     {collapsed && isHovered && (
                       <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[60] pointer-events-none">
                         <div className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
-                          {item.label}
+                          {tLabel(item.label)}
                           <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-white" />
                         </div>
                       </div>
@@ -249,13 +270,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                   ? "text-blue-600 dark:text-blue-400"
                   : "text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-white"
               }`} />
-              {!collapsed && <span className="truncate">Settings</span>}
+              {!collapsed && <span className="truncate">{tLabel("Settings")}</span>}
             </IntlLink>
 
             {collapsed && hoveredItem === "settings" && (
               <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[60] pointer-events-none">
                 <div className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
-                  Settings
+                  {tLabel("Settings")}
                   <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-white" />
                 </div>
               </div>
@@ -273,13 +294,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             ${collapsed ? "justify-center" : ""}`}
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
+          {!collapsed && <span>{T.nav.signOut}</span>}
         </button>
 
         {collapsed && hoveredItem === "signout" && (
           <div className="absolute left-full ml-3 bottom-3 z-[60] pointer-events-none">
             <div className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
-              Sign Out
+              {T.nav.signOut}
               <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-white" />
             </div>
           </div>

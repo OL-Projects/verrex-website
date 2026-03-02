@@ -3,6 +3,8 @@
 import { useSession, signOut } from "next-auth/react"
 import { motion } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { LanguageSwitcher } from "@/components/layout/language-switcher"
+import { usePortalT } from "@/lib/portal-i18n"
 import { getNotificationsByUser } from "@/lib/portal-data"
 import { Link as IntlLink } from "@/i18n/navigation"
 import {
@@ -20,6 +22,7 @@ interface PortalTopbarProps {
 
 export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
   const { data: session } = useSession()
+  const T = usePortalT()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -29,14 +32,7 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
   const notifications = getNotificationsByUser(userId)
   const unreadCount = notifications.filter(n => !n.read).length
 
-  const roleLabels: Record<string, string> = {
-    admin: "Admin / Sales",
-    client: "Client",
-    contractor: "Contractor",
-    supplier: "Supplier",
-    partner: "Partner",
-    inspector: "Inspector",
-  }
+  const roleLabels = T.nav.roles as Record<string, string>
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -59,7 +55,7 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
           <Menu className="h-5 w-5" />
         </button>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white hidden sm:block">
-          Dashboard
+          {T.nav.dashboard}
         </h2>
       </div>
 
@@ -87,11 +83,11 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
               className="absolute right-0 top-12 w-80 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xl z-50 overflow-hidden"
             >
               <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h3>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{T.nav.notifications}</h3>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="px-4 py-6 text-center text-sm text-slate-400">No notifications</div>
+                  <div className="px-4 py-6 text-center text-sm text-slate-400">{T.nav.noNotifications}</div>
                 ) : (
                   notifications.slice(0, 5).map((n) => (
                     <div key={n.id} className={`px-4 py-3 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!n.read ? "bg-blue-50/50 dark:bg-blue-500/5" : ""}`}>
@@ -110,6 +106,7 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
           )}
         </div>
 
+        <LanguageSwitcher />
         <ThemeToggle />
 
         {/* User dropdown */}
@@ -149,14 +146,14 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                 >
                   <User className="h-4 w-4" />
-                  Profile Settings
+                  {T.nav.profileSettings}
                 </IntlLink>
                 <button
                   onClick={() => signOut({ callbackUrl: "/portal" })}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/5 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  Sign Out
+                  {T.nav.signOut}
                 </button>
               </div>
             </motion.div>

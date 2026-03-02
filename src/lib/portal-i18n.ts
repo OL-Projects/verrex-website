@@ -19,6 +19,20 @@ export interface PortalT {
   export_: string; preview: string; settings: string; addRoom: string; addWindow: string; addDoor: string
   remove: string; attach: string; clear: string; back: string; actions: string; status: string
   all: string; none: string; yes: string; no: string; ok: string; loading: string
+  // ── Navigation / Layout ──
+  nav: {
+    dashboard: string; leads: string; projects: string; appointments: string
+    measurements: string; estimates: string; contracts: string; orders: string
+    messages: string; invoices: string; commissions: string; analytics: string
+    timeline: string; settings: string; signOut: string
+    // Groups
+    overview: string; crm: string; operations: string; communication: string
+    financialDocs: string; insights: string
+    // Topbar
+    notifications: string; noNotifications: string; profileSettings: string
+    // Roles
+    roles: { admin: string; client: string; contractor: string; supplier: string; partner: string; inspector: string }
+  }
   // ── Estimates ──
   est: {
     title: string; subtitle: string; estimateNum: string; creator: string
@@ -120,6 +134,17 @@ const en: PortalT = {
   export_: "Export PDF", preview: "Preview", settings: "Settings", addRoom: "Add Room", addWindow: "Add Window", addDoor: "Add Door",
   remove: "Remove", attach: "Attach", clear: "Clear", back: "Back", actions: "Actions", status: "Status",
   all: "All", none: "None", yes: "Yes", no: "No", ok: "OK", loading: "Loading…",
+  // ── Navigation / Layout ──
+  nav: {
+    dashboard: "Dashboard", leads: "Leads", projects: "Projects", appointments: "Appointments",
+    measurements: "Measurements", estimates: "Estimates", contracts: "Contracts", orders: "Orders",
+    messages: "Messages", invoices: "Invoices", commissions: "Commissions", analytics: "Analytics",
+    timeline: "Timeline", settings: "Settings", signOut: "Sign Out",
+    overview: "Overview", crm: "CRM", operations: "Operations", communication: "Communication",
+    financialDocs: "Financial Documents", insights: "Insights",
+    notifications: "Notifications", noNotifications: "No notifications", profileSettings: "Profile Settings",
+    roles: { admin: "Admin / Sales", client: "Client", contractor: "Contractor", supplier: "Supplier", partner: "Partner", inspector: "Inspector" },
+  },
   // ── Estimates ──
   est: {
     title: "Estimate Creator", subtitle: "Professional window & door estimates with live diagrams",
@@ -247,6 +272,17 @@ const fr: PortalT = {
   export_: "Exporter PDF", preview: "Aperçu", settings: "Paramètres", addRoom: "Ajouter une pièce", addWindow: "Ajouter fenêtre", addDoor: "Ajouter porte",
   remove: "Retirer", attach: "Joindre", clear: "Effacer", back: "Retour", actions: "Actions", status: "Statut",
   all: "Tous", none: "Aucun", yes: "Oui", no: "Non", ok: "OK", loading: "Chargement…",
+  // ── Navigation / Layout ──
+  nav: {
+    dashboard: "Tableau de bord", leads: "Prospects", projects: "Projets", appointments: "Rendez-vous",
+    measurements: "Mesures", estimates: "Soumissions", contracts: "Contrats", orders: "Commandes",
+    messages: "Messages", invoices: "Factures", commissions: "Commissions", analytics: "Analytiques",
+    timeline: "Chronologie", settings: "Paramètres", signOut: "Déconnexion",
+    overview: "Aperçu", crm: "CRM", operations: "Opérations", communication: "Communication",
+    financialDocs: "Documents financiers", insights: "Perspectives",
+    notifications: "Notifications", noNotifications: "Aucune notification", profileSettings: "Paramètres du profil",
+    roles: { admin: "Admin / Ventes", client: "Client", contractor: "Entrepreneur", supplier: "Fournisseur", partner: "Partenaire", inspector: "Inspecteur" },
+  },
   // ── Estimates ──
   est: {
     title: "Créateur de soumission", subtitle: "Soumissions professionnelles de fenêtres et portes avec diagrammes",
