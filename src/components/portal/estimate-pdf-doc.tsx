@@ -149,9 +149,9 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                     {!isDoorType(item.type) && (
                     <View style={{ backgroundColor: "#f0f9ff", borderWidth: 0.5, borderColor: "#bae6fd", borderRadius: 3, padding: "3 5", marginBottom: 3 }}>
                       <Text style={{ fontSize: 6, fontWeight: "bold", fontFamily: "Helvetica-Bold", color: "#0369a1", marginBottom: 2 }}>GLASS SPECIFICATIONS</Text>
-                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Thermal: {item.thermal || "—"}  •  Low-E: {item.lowE || "—"}  •  Glass: {item.glassThickness || "—"}</Text>
-                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Argon: {item.argonGas || "—"}  •  Type: {item.glassType || "—"}  •  Finish: {item.glassFinish || "—"}</Text>
-                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Screen: {item.screen || "—"}</Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Thermal: {item.thermal || "Double"}  •  Low-E: {item.lowE || "1 Side"}  •  Glass: {item.glassThickness || "5mm"}</Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Argon: {item.argonGas || "18mm"}  •  Type: {item.glassType || "Ultra Clear"}  •  Finish: {item.glassFinish || "Clear"}</Text>
+                      <Text style={{ fontSize: 6.5, color: "#334155" }}>Screen: {item.screen || "Not Included"}</Text>
                     </View>
                     )}
                     <Text style={{ fontSize: 8.5, color: "#0f172a", fontWeight: "bold", fontFamily: "Helvetica-Bold", marginBottom: 1, backgroundColor: "#f1f5f9", padding: "2 4", borderRadius: 2 }}>
