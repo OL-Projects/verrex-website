@@ -265,6 +265,39 @@ export function EstimateCustomizePanel(props: Props) {
           </div>
 
           <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-orange-500 mb-1.5">🔸 Trim Pricing</p>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Trim Rate Unit</label>
+              <div className="flex gap-1">
+                {TRIM_UNITS.map(u => (
+                  <button key={u.id} onClick={() => uSet({ trimUnit: u.id })}
+                    className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.trimUnit ?? "in") === u.id ? "bg-orange-500 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
+                    {tl(u.label, locale)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Flat Trim Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.flatTrimRate ?? 0.50} onChange={e => uSet({ flatTrimRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <label className={CLS.lbl}>Colonial Trim Rate</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400">$</span>
+                <input type="number" value={s.colonialTrimRate ?? 0.75} onChange={e => uSet({ colonialTrimRate: +e.target.value })} step={0.01} min={0}
+                  className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
+                <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
             <p className="text-[9px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1.5">🔧 Installation Pricing</p>
             <div className="mt-1.5">
               <label className={CLS.lbl}>Pricing Method</label>
@@ -389,36 +422,6 @@ export function EstimateCustomizePanel(props: Props) {
             ))}
           </div>
 
-          <p className="text-[9px] font-bold uppercase tracking-widest text-orange-500 mb-1">🔸 Trim Pricing</p>
-          <div className="mt-1.5">
-            <label className={CLS.lbl}>Trim Rate Unit</label>
-            <div className="flex gap-1">
-              {TRIM_UNITS.map(u => (
-                <button key={u.id} onClick={() => uSet({ trimUnit: u.id })}
-                  className={`flex-1 py-1 rounded-lg text-[9px] font-bold ${(s.trimUnit ?? "in") === u.id ? "bg-orange-500 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"}`}>
-                  {tl(u.label, locale)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="mt-1.5">
-            <label className={CLS.lbl}>Flat Trim Rate</label>
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] text-slate-400">$</span>
-              <input type="number" value={s.flatTrimRate ?? 0.50} onChange={e => uSet({ flatTrimRate: +e.target.value })} step={0.01} min={0}
-                className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
-              <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
-            </div>
-          </div>
-          <div className="mt-1.5">
-            <label className={CLS.lbl}>Colonial Trim Rate</label>
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] text-slate-400">$</span>
-              <input type="number" value={s.colonialTrimRate ?? 0.75} onChange={e => uSet({ colonialTrimRate: +e.target.value })} step={0.01} min={0}
-                className="w-20 px-1 py-0.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] text-center outline-none" />
-              <span className="text-[9px] text-slate-400">{TRIM_UNITS.find(u => u.id === (s.trimUnit ?? "in"))?.short}</span>
-            </div>
-          </div>
         </Section>
 
         {/* ═══ SECTION 4C: PAYMENT STAGES ═══ */}
