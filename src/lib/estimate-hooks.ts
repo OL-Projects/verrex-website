@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { type CompanyInfo, type EstimateState, type PaymentStageConfig, type TrimUnit, type DimensionUnit, type InstallMethod, defaultCompany, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS, DEFAULT_TERMS, defaultPaymentStages } from "./estimate-config"
 
 // ── App Version Migration ───────────────────────
-const APP_DEFAULTS_VERSION = "v10"
+const APP_DEFAULTS_VERSION = "v11"
 const VER_KEY = "VEREX_app_version"
 if (typeof window !== "undefined") {
   try {
@@ -194,7 +194,7 @@ export interface EstimateSettings {
   termsTitle: string
   showSignatures: boolean
   showSignatureDate: boolean
-  defaultTermsLines: string[]
+  defaultTermsText: string
   // Glass spec options (customizable choices)
   thermalOptions?: string[]
   lowEOptions?: string[]
@@ -248,7 +248,7 @@ function defaultSettings(): EstimateSettings {
     termsTitle: "Terms & Conditions",
     showSignatures: true,
     showSignatureDate: true,
-    defaultTermsLines: [...DEFAULT_TERMS],
+    defaultTermsText: DEFAULT_TERMS,
   }
 }
 

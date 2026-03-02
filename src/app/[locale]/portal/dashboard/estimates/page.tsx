@@ -104,11 +104,11 @@ export default function EstimatesPage() {
   // Wrap newEstimate to apply saved default T&C clauses
   const handleNewEstimate = useCallback(() => {
     newEstimate()
-    const defaults = estCfg.defaultTermsLines
-    if (defaults && defaults.length > 0) {
-      setTimeout(() => set("termsLines", [...defaults]), 50)
+    const defaults = estCfg.defaultTermsText
+    if (defaults) {
+      setTimeout(() => set("termsText", defaults), 50)
     }
-  }, [newEstimate, estCfg.defaultTermsLines])
+  }, [newEstimate, estCfg.defaultTermsText])
 
   const handleBlur = useCallback((field: string, value: string) => remember(field, value), [remember])
 
@@ -639,12 +639,7 @@ export default function EstimatesPage() {
         {/* ═══ TERMS (editable) ═══ */}
         {estCfg.showTerms && <div className={`${C.card} text-xs text-slate-500 leading-relaxed`}>
           <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">{estCfg.termsTitle ?? T.est.termsTitle}</h2>
-          <ol className="list-decimal pl-5 space-y-1.5">
-            {est.termsLines.map((line, i) => (
-              <li key={i}><textarea rows={2} value={line} onChange={e => { const next = [...est.termsLines]; next[i] = e.target.value; set("termsLines", next) }} className="w-full bg-transparent outline-none resize-none text-xs print:bg-transparent" /></li>
-            ))}
-          </ol>
-          <button onClick={() => set("termsLines", [...est.termsLines, ""])} className="text-blue-600 text-xs font-semibold mt-2 print:hidden">{T.est.addClause}</button>
+          <textarea rows={12} value={est.termsText} onChange={e => set("termsText", e.target.value)} className="w-full bg-transparent outline-none resize-y text-xs leading-relaxed print:bg-transparent whitespace-pre-wrap" placeholder="Enter terms, conditions, or notes..." />
 
           {(estCfg.showSignatures ?? true) && <div className="mt-8 pt-5 border-t border-slate-200 dark:border-white/10">
             <p className={C.lbl}>{T.est.acceptanceSignatures}</p>

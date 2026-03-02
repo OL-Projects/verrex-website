@@ -179,7 +179,7 @@ export interface EstimateState {
   installPerUnit: number
   delivery: number
   depositPct: number
-  termsLines: string[]
+  termsText: string
 }
 
 // ── Defaults / Factories ────────────────────────
@@ -203,17 +203,15 @@ export function createRoom(name = "Room"): Room {
   return { id: uid("rm"), name, items: [createItem()] }
 }
 
-export const DEFAULT_TERMS = [
-  "This estimate is valid for 30 days from issue date.",
-  "A deposit of 35% is required at contract signing. The remaining 65% is due on installation day.",
-  "Approximate delivery 90 days after deposit payment.",
-  "All products carry a full manufacturer warranty: 15 years on color, 25 years on frame structure, and 10 years on thermal glazing. Installation warranty of 5 years. (All argon-filled glazing loses 1–2% of its thermal R-value per year).",
-  "Interior finishes (e.g. interior casing) are not included and cost $4.50/linear foot.",
-  "The value of delivered/installed products must be paid upon receipt of merchandise before installation.",
-  "Installation must be paid on the day it is completed.",
-  "Prices include all listed products and services. Additional work is quoted separately.",
-  "Window and door flashing is covered by Blueskin membrane, a self-adhesive rubberized asphalt compound (Blueskin membrane is part of the installation).",
-]
+export const DEFAULT_TERMS = `1. Ce devis est valable pendant 30 jours à compter de la date d'émission.
+2. Un acompte de 35% est exigé à la signature du contrat. Les 65% restants sont dus le jour de l'installation.
+3. Livraison approximative 90 jours après le versement de l'acompte.
+4. Tous les produits bénéficient d'une garantie constructeur complète de 15 ans sur la couleur. 25 ans sur la structure du cadre et de 10 ans sur le vitrage thermique. Garantie d'installation de 5 ans. (Tous les vitrages remplis d'argon perdent 1 à 2% par an de leur valeur R thermique).
+5. Les finitions intérieures (ex: carriage intérieur) ne sont pas incluses et coûtent 4,5 $/pied linéaire.
+6. La valeur des produits livrés/installés doit être payée à la réception de la marchandise avant l'installation.
+7. L'installation doit être payée le jour où elle est terminée.
+8. Les prix comprennent tous les produits et services indiqués. Les travaux supplémentaires sont facturés séparément.
+9. Le solin des fenêtres et de portes sont couverts par la membrane Blueskin qui est auto-adhésive composée d'un composé d'asphalte caoutchouté (la membrane Blueskin fait partie de l'installation).`
 
 export function defaultCompany(): CompanyInfo {
   return { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "VEREX-website.vercel.app", logoUrl: "" }
@@ -230,7 +228,7 @@ export function createBlankEstimate(): EstimateState {
     repName: "", repRef: "",
     rooms: [createRoom("GROUND FLOOR")],
     installPerUnit: 275, delivery: 850, depositPct: 30,
-    termsLines: [...DEFAULT_TERMS],
+    termsText: DEFAULT_TERMS,
   }
 }
 
@@ -499,17 +497,6 @@ export function tl(label: string, locale: string): string {
   return FR_LABELS[label] ?? label
 }
 
-export const DEFAULT_TERMS_FR = [
-  "Ce devis est valable pendant 30 jours à compter de la date d'émission.",
-  "Un acompte de 35% est exigé à la signature du contrat. Les 65% restants sont dus le jour de l'installation.",
-  "Livraison approximative 90 jours après le versement de l'acompte.",
-  "Tous les produits bénéficient d'une garantie constructeur complète de 15 ans sur la couleur. 25 ans sur la structure du cadre et de 10 ans sur le vitrage thermique. Garantie d'installation de 5 ans. (Tous les vitrages remplis d'argon perdent 1 à 2% par an de leur valeur R thermique).",
-  "Les finitions intérieures (ex: carriage intérieur) ne sont pas incluses et coûtent 4,5 $/pied linéaire.",
-  "La valeur des produits livrés/installés doit être payée à la réception de la marchandise avant l'installation.",
-  "L'installation doit être payée le jour où elle est terminée.",
-  "Les prix comprennent tous les produits et services indiqués. Les travaux supplémentaires sont facturés séparément.",
-  "Le solin des fenêtres et de portes sont couverts par la membrane Blueskin qui est auto-adhésive composée d'un composé d'asphalte caoutchouté (la membrane Blueskin fait partie de l'installation).",
-]
 
 export function allItems(est: EstimateState): EstimateItem[] {
   return est.rooms.flatMap(r => r.items)

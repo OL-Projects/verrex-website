@@ -508,24 +508,10 @@ export function EstimateCustomizePanel(props: Props) {
           <div className={CLS.row}><span className="text-[11px]">Signatures</span><Toggle on={s.showSignatures ?? true} onToggle={() => uSet({ showSignatures: !(s.showSignatures ?? true) })} /></div>
           <div className={CLS.row}><span className="text-[11px]">Signature Date</span><Toggle on={s.showSignatureDate ?? true} onToggle={() => uSet({ showSignatureDate: !(s.showSignatureDate ?? true) })} /></div>
 
-          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-3 mb-1">Default Clauses (for new estimates)</p>
-          <div className="space-y-1.5">
-            {(s.defaultTermsLines ?? []).map((line, i) => (
-              <div key={i} className="flex gap-1 items-start">
-                <span className="text-[9px] text-slate-400 mt-1 shrink-0">{i + 1}.</span>
-                <textarea rows={2} value={line} onChange={e => {
-                  const next = [...(s.defaultTermsLines ?? [])]; next[i] = e.target.value
-                  uSet({ defaultTermsLines: next })
-                }} className={CLS.inp + " w-full resize-none text-[10px]"} />
-                <button onClick={() => {
-                  const next = (s.defaultTermsLines ?? []).filter((_, j) => j !== i)
-                  uSet({ defaultTermsLines: next })
-                }} className="text-red-400 hover:text-red-600 shrink-0 mt-1"><Trash2 className="h-3 w-3" /></button>
-              </div>
-            ))}
-          </div>
-          <button onClick={() => uSet({ defaultTermsLines: [...(s.defaultTermsLines ?? []), ""] })}
-            className="text-blue-600 text-[10px] font-semibold mt-1.5 hover:underline">+ Add clause</button>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-3 mb-1">Default Terms (for new estimates)</p>
+          <textarea rows={10} value={s.defaultTermsText ?? ""} onChange={e => uSet({ defaultTermsText: e.target.value })}
+            className={CLS.inp + " w-full resize-y text-[10px] whitespace-pre-wrap leading-relaxed"}
+            placeholder="Enter default terms, conditions, or notes..." />
         </Section>
       </div>
 

@@ -208,8 +208,8 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
         {/* ── Terms ── */}
         <View style={s.termsBox}>
           <Text style={s.termsTitle}>{L.est.termsTitle}</Text>
-          {est.termsLines.map((l, i) => (
-            <Text key={i} style={s.termsLine}>{i + 1}. {l}</Text>
+          {(est.termsText || "").split("\n").map((line, i) => (
+            <Text key={i} style={s.termsLine}>{line}</Text>
           ))}
         </View>
 
