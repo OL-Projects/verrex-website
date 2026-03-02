@@ -384,9 +384,9 @@ export default function EstimatesPage() {
                         </div>
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 dark:border-white/5 print:hidden flex-wrap gap-y-1">
                           <div className="flex items-center gap-1">
-                            {/* Hinge: show for doors always, hide for windows with custom layout */}
-                            {(isDoorType(item.type) || !item.customModules?.length) && (<>
-                              <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{isDoorType(item.type) ? T.est.open : T.est.hinge}</span>
+                            {/* Hinge/Open: doors only */}
+                            {isDoorType(item.type) && (<>
+                              <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mr-0.5">{T.est.open}</span>
                               <button onClick={() => updateItem(room.id, item.id, { hingeLeft: true })}
                                 className={`px-2.5 py-1 rounded-l-lg text-[9px] font-bold transition ${(item.hingeLeft ?? false) ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10"}`}>{T.est.left}</button>
                               <button onClick={() => updateItem(room.id, item.id, { hingeLeft: false })}
