@@ -56,9 +56,9 @@ export default function EstimatesPage() {
   const showPreview = sidePanel === "preview"
   const showCustomize = sidePanel === "settings"
 
-  // Lock body scroll when mobile overlay panels are open
+  // Lock body scroll only on mobile — desktop panels are sticky side columns
   useEffect(() => {
-    if (sidePanel !== "none") {
+    if (sidePanel !== "none" && window.innerWidth < 1024) {
       document.body.style.overflow = "hidden"
       return () => { document.body.style.overflow = "" }
     }
