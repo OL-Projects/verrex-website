@@ -279,7 +279,7 @@ export default function MeasurementsPage() {
       <div className="flex flex-col lg:flex-row gap-4 items-start">
         {/* LEFT PANEL — hidden in compile mode */}
         {!compileMode && (
-          <div className="w-full lg:w-72 lg:shrink-0 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+          <div className="w-full lg:w-96 lg:shrink-0 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
             {/* Scale / Real Dimensions */}
             <div className={C.card}>
               <div className="flex items-center justify-between mb-2">
@@ -330,15 +330,30 @@ export default function MeasurementsPage() {
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                     <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10">
                       <input value={cLabel} onChange={e => setCLabel(e.target.value)} className={C.inp} placeholder="Label (e.g. Bedroom #1)" />
-                      {/* Type — grouped like estimate */}
-                      <div><label className={C.lbl}>Type</label>
-                        <select value={cTypeKey} onChange={e => setCTypeKey(e.target.value)} className={C.sel}>
+                      {/* Type — visual cards like estimate creator */}
+                      <div>
+                        <label className={C.lbl}>Type</label>
+                        <div className="max-h-[200px] overflow-y-auto space-y-2 pr-1">
                           {typeGroups.map(g => (
-                            <optgroup key={g.group} label={g.group}>
-                              {g.types.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-                            </optgroup>
+                            <div key={g.group}>
+                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">{g.group}</p>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                {g.types.map(([k, v]) => {
+                                  const sel = cTypeKey === k
+                                  return (
+                                    <button key={k} type="button" onClick={() => setCTypeKey(k)}
+                                      className={`flex flex-col items-center p-1.5 rounded-xl border-2 transition text-center ${sel ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10 ring-1 ring-blue-400/50" : "border-slate-200 dark:border-white/10 hover:border-blue-300"}`}>
+                                      <div className="w-full aspect-square rounded-lg bg-slate-50 dark:bg-white/5 p-1 mb-1 overflow-hidden">
+                                        <EstimateWindowSVG width={48} height={48} type={k} flipH={false} swingIn={true} />
+                                      </div>
+                                      <span className="text-[8px] font-bold leading-tight text-slate-700 dark:text-slate-300 line-clamp-2">{v.label}</span>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
                           ))}
-                        </select>
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div><label className={C.lbl}>Width &quot;</label><input type="number" value={cW} onChange={e => setCW(+e.target.value)} min={6} max={200} className={C.inp} /></div>
@@ -410,10 +425,10 @@ export default function MeasurementsPage() {
           </div>
         )}
 
-        {/* CENTER: FACE PHOTO CARDS + 3D VIEWER */}
-        <div className="flex-1 min-w-0 flex gap-3">
-          {/* ── Face Photo Drop Cards ── */}
-          <div className="hidden lg:flex flex-col gap-2.5 shrink-0 pt-1">
+        {/* CENTER: FACE PHOTO CARDS (above) + 3D VIEWER */}
+        <div className="flex-1 min-w-0 flex flex-col gap-3">
+          {/* ── Face Photo Drop Cards (horizontal row above canvas) ── */}
+          <div className="hidden lg:flex flex-row gap-2.5 shrink-0">
             {FACE_META.map(fm => {
               const count = facePhotos[fm.key].length
               const isActive = activeFace === fm.key
