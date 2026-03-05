@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,6 +17,26 @@ import { Link as IntlLink } from '@/i18n/navigation'
 export default function ContactPage() {
   const t = useTranslations('ContactPage')
   const [submitted, setSubmitted] = useState(false)
+  const [messageGlow, setMessageGlow] = useState(false)
+  const searchParams = useSearchParams()
+  const messageRef = useRef<HTMLTextAreaElement>(null)
+  const fromEmail = searchParams.get("focus") === "message"
+
+  useEffect(() => {
+    if (fromEmail && messageRef.current) {
+      // Small delay to let page render, then scroll + focus + glow
+      const timer = setTimeout(() => {
+        messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        setTimeout(() => {
+          messageRef.current?.focus()
+          setMessageGlow(true)
+          // Remove glow after 3 seconds
+          setTimeout(() => setMessageGlow(false), 3000)
+        }, 600)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [fromEmail])
 
   if (submitted) {
     return (
@@ -133,8 +154,23 @@ export default function ContactPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="message">{t('message')} *</Label>
-                      <Textarea id="message" placeholder={t('messagePlaceholder')} rows={5} required />
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="message">{t('message')} *</Label>
+                        {fromEmail && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                            <Mail className="h-3 w-3" />
+                            To: admin@verex.ca
+                          </span>
+                        )}
+                      </div>
+                      <Textarea
+                        ref={messageRef}
+                        id="message"
+                        placeholder={t('messagePlaceholder')}
+                        rows={5}
+                        required
+                        className={messageGlow ? "ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all duration-500" : "transition-all duration-500"}
+                      />
                     </div>
                     <div>
                       <Label>Attachments</Label>

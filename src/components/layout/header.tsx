@@ -61,7 +61,7 @@ export function Header() {
                 {companyInfo.phone}
               </a>
               <IntlLink
-                href="/contact"
+                href="/contact?focus=message"
                 className="hidden sm:flex items-center gap-1.5 hover:text-blue-300 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
