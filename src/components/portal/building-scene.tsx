@@ -383,7 +383,7 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
 
   return (
     <Canvas style={{ width: "100%", height: "100%" }} shadows dpr={[1, 1.5]} flat
-      performance={{ min: 0.5 }} frameloop="demand">
+      performance={{ min: 0.5 }}>
       <PerspectiveCamera makeDefault position={[camDist * 0.7, camDist * 0.5, camDist * 0.7]} fov={45} />
       <OrbitControls makeDefault enableDamping dampingFactor={0.08}
         enabled={!moveMode}
