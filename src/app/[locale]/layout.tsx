@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://VEREX.com",
+    canonical: "https://verex.ca",
   },
   category: "business",
 }

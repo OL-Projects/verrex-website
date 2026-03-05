@@ -42,7 +42,7 @@ export const mockPartners: Partner[] = [
 // --- Users ---
 
 export const mockUsers: PortalUser[] = [
-  { id: 'usr_admin_001', email: 'admin@VEREX.com', name: 'Sarah Mitchell', role: 'admin', phone: '(514) 555-0100', createdAt: '2025-01-15', lastLogin: '2026-02-25' },
+  { id: 'usr_admin_001', email: 'admin@verex.ca', name: 'Sarah Mitchell', role: 'admin', phone: '(514) 555-0100', createdAt: '2025-01-15', lastLogin: '2026-02-25' },
   { id: 'usr_client_001', email: 'client@demo.com', name: 'Jean-Pierre Tremblay', role: 'client', phone: '(514) 555-0201', createdAt: '2025-06-20', lastLogin: '2026-02-24' },
   { id: 'usr_contractor_001', email: 'contractor@demo.com', name: 'Mike Thompson', role: 'contractor', phone: '(514) 555-0301', createdAt: '2025-03-10', lastLogin: '2026-02-25' },
   { id: 'usr_supplier_001', email: 'supplier@demo.com', name: 'Lisa Chen', role: 'supplier', phone: '(416) 555-0401', createdAt: '2025-02-01', lastLogin: '2026-02-23' },

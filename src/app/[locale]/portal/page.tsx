@@ -126,7 +126,7 @@ export default function PortalWelcomePage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
             {[
-              { role: "Admin", email: "admin@VEREX.com" },
+              { role: "Admin", email: "admin@verex.ca" },
               { role: "Client", email: "client@demo.com" },
               { role: "Contractor", email: "contractor@demo.com" },
               { role: "Supplier", email: "supplier@demo.com" },

@@ -11,7 +11,7 @@ import type { UserRole } from '@/types/portal';
 const DEMO_USERS = [
   {
     id: 'usr_admin_001',
-    email: 'admin@VEREX.com',
+    email: 'admin@verex.ca',
     password: 'admin123',
     name: 'Sarah Mitchell',
     role: 'admin' as UserRole,

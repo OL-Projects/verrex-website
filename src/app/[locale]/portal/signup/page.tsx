@@ -120,7 +120,7 @@ export default function SignupPage() {
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
                   className="mt-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/15 text-sm text-amber-800 dark:text-amber-300">
                   <p className="font-medium mb-1">This role requires admin approval</p>
-                  <p className="text-xs text-amber-700 dark:text-amber-400/70">Contact your VEREX representative or email admin@VEREX.com to request access.</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400/70">Contact your VEREX representative or email admin@verex.ca to request access.</p>
                 </motion.div>
               )}
               <div className="pt-4 text-center">

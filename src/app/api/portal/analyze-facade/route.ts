@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       Authorization: `Bearer ${apiKey}`,
     }
     if (provider === "openrouter") {
-      headers["HTTP-Referer"] = "https://verrex.vercel.app"
+      headers["HTTP-Referer"] = "https://verex.ca"
       headers["X-Title"] = "Verrex Measurements"
     }
 

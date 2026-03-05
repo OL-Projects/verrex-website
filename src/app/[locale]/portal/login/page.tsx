@@ -191,7 +191,7 @@ function LoginContent() {
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Admin", email: "admin@VEREX.com", pass: "admin123" },
+              { label: "Admin", email: "admin@verex.ca", pass: "admin123" },
               { label: "Client", email: "client@demo.com", pass: "client123" },
               { label: "Contractor", email: "contractor@demo.com", pass: "contractor123" },
               { label: "Supplier", email: "supplier@demo.com", pass: "supplier123" },

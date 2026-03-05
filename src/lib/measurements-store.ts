@@ -367,7 +367,7 @@ export function exportToEstimate(proj: MeasurementProjectData): string | null {
 
     // Build EstimateState
     const estState = {
-      company: { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "VEREX-website.vercel.app", logoUrl: "" },
+      company: { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "verex.ca", logoUrl: "" },
       estimateNumber: `VX-${new Date().getFullYear()}-MEAS`,
       date: new Date().toISOString().slice(0, 10),
       validUntil: "", requiredBy: "",

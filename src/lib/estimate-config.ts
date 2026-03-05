@@ -216,7 +216,7 @@ export const DEFAULT_TERMS = `1. Ce devis est valable pendant 30 jours à compte
 9. Le solin des fenêtres et de portes sont couverts par la membrane Blueskin qui est auto-adhésive composée d'un composé d'asphalte caoutchouté (la membrane Blueskin fait partie de l'installation).`
 
 export function defaultCompany(): CompanyInfo {
-  return { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "VEREX-website.vercel.app", logoUrl: "" }
+  return { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "verex.ca", logoUrl: "" }
 }
 
 export function createBlankEstimate(): EstimateState {
