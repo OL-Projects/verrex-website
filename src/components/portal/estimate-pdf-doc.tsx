@@ -75,15 +75,18 @@ interface Props {
   showQST?: boolean
   paymentStages?: PaymentStageConfig[]
   locale?: string
+  mode?: "estimate" | "manufacturer"
 }
 
-export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975, showInstallation = true, showDelivery = true, showGST = true, showQST = true, paymentStages, locale = "en" }: Props) {
+export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 5, qstRate = 9.975, showInstallation = true, showDelivery = true, showGST = true, showQST = true, paymentStages, locale = "en", mode = "estimate" }: Props) {
+  const isMfr = mode === "manufacturer"
   const t = calcTotals(est, gstRate, qstRate, glassSettings, { showInstallation, showDelivery, showGST, showQST })
   const L = getPortalT(locale)
   let gi = 0
+  const totalUnits = isMfr ? est.rooms.reduce((sum, r) => sum + r.items.reduce((s, it) => s + it.qty, 0), 0) : 0
 
   return (
-    <Document title={`${est.company.name} - ${L.est.estimateNum} ${est.estimateNumber}`} author={est.company.name}>
+    <Document title={`${est.company.name} - ${isMfr ? "Production Order" : L.est.estimateNum} ${est.estimateNumber}`} author={est.company.name}>
       <Page size="LETTER" style={s.page}>
         {/* Page number footer */}
         <Text style={{ position: "absolute", bottom: 20, left: 0, right: 0, textAlign: "center", fontSize: 7, color: "#94a3b8" }} render={({ pageNumber, totalPages }) => `${L.page} ${pageNumber} ${L.of} ${totalPages}`} fixed />
@@ -99,7 +102,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
             </View>
           </View>
           <View style={s.hdrRight}>
-            <Text style={s.estLabel}>{L.est.estimateNum}</Text>
+            <Text style={s.estLabel}>{isMfr ? "PRODUCTION ORDER" : L.est.estimateNum}</Text>
             <Text style={s.estNum}>{est.estimateNumber}</Text>
             <Text style={s.estDate}>{L.date}: {est.date}{est.validUntil && ` • ${L.validUntil}: ${est.validUntil}`}</Text>
             {est.requiredBy && <Text style={s.estDate}>{L.requiredBy}: {est.requiredBy}</Text>}
@@ -112,8 +115,8 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
             <Text style={s.secLabel}>{est.soldToLabel}</Text>
             <Text style={s.val}>{est.clientName || "—"}</Text>
             <Text style={s.sub}>{est.clientAddress} {est.clientCity}</Text>
-            <Text style={s.sub}>{est.clientPhone}</Text>
-            <Text style={s.sub}>{est.clientEmail}</Text>
+            {!isMfr && <Text style={s.sub}>{est.clientPhone}</Text>}
+            {!isMfr && <Text style={s.sub}>{est.clientEmail}</Text>}
           </View>
           <View style={s.half}>
             <Text style={s.secLabel}>{est.shipToLabel}</Text>
@@ -136,7 +139,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
               const egress = hasCas && item.height >= 24
               return (
                 <View key={item.id} style={s.itemRow} wrap={false}>
-                  <View style={{ width: 110, minHeight: 80, alignItems: "center", justifyContent: "center" }}>
+                  <View style={{ width: isMfr ? 140 : 110, minHeight: isMfr ? 100 : 80, alignItems: "center", justifyContent: "center" }}>
                     <EstimateWindowSVGPDF width={item.width} height={item.height} type={item.type} flipH={item.hingeLeft ?? false} swingIn={item.swingInside ?? true} locale={locale} customModules={item.customModules} />
                   </View>
                   <View style={s.itemRight}>
@@ -167,7 +170,10 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
                       {L.est.egress}: {egress ? L.est.egressCompliant : L.est.egressNonCompliant}
                     </Text>
                     {item.notes ? <Text style={s.itemNotes}>{item.notes}</Text> : null}
-                    <Text style={s.itemPrice}>×{item.qty} — {fmt(item.qty * getEffectiveUnitPrice(item, glassSettings))}</Text>
+                    {isMfr
+                      ? <Text style={{ fontSize: 9, fontWeight: "bold", textAlign: "right", marginTop: 2, fontFamily: "Helvetica-Bold" }}>QTY: {item.qty}</Text>
+                      : <Text style={s.itemPrice}>×{item.qty} — {fmt(item.qty * getEffectiveUnitPrice(item, glassSettings))}</Text>
+                    }
                   </View>
                 </View>
               )
@@ -176,6 +182,14 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
         ))}
 
         {/* ── Summary ── */}
+        {isMfr ? (
+          <View style={s.summaryBox}>
+            <View style={s.sumRow}><Text style={s.sumBold}>PRODUCTION SUMMARY</Text><Text style={s.sumBold}>{totalUnits} units</Text></View>
+            <View style={s.sumRow}><Text style={s.sumSub}>Rooms: {est.rooms.length}</Text><Text style={s.sumSub}>Items: {est.rooms.reduce((s, r) => s + r.items.length, 0)}</Text></View>
+            {est.shipAddress && <View style={s.sumRow}><Text style={s.sumSub}>Deliver to: {est.shipAddress}</Text></View>}
+            {est.requiredBy && <View style={s.sumRow}><Text style={s.sumSub}>Required by: {est.requiredBy}</Text></View>}
+          </View>
+        ) : (
         <View style={s.summaryBox}>
           <View style={s.sumRow}><Text style={s.sumBold}>{L.est.productsSubtotal}</Text><Text style={s.sumBold}>{fmt(t.prodTotal)}</Text></View>
           {showInstallation && <View style={s.sumRow}><Text style={s.sumSub}>{L.est.installationUnits} ({t.totalUnits} {L.est.units.toLowerCase()})</Text><Text style={s.sumSub}>{fmt(t.install)}</Text></View>}
@@ -213,16 +227,20 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
             })
           })()}
         </View>
+        )}
 
         {/* ── Terms ── */}
+        {!isMfr && (
         <View style={s.termsBox}>
           <Text style={s.termsTitle}>{L.est.termsTitle}</Text>
           {(est.termsText || "").split("\n").map((line, i) => (
             <Text key={i} style={s.termsLine}>{line}</Text>
           ))}
         </View>
+        )}
 
         {/* ── Signatures ── */}
+        {!isMfr && (
         <View style={s.sigGrid}>
           <View style={{ flex: 1 }}>
             <View style={s.sigBox}>
@@ -237,6 +255,7 @@ export function EstimatePDFDocument({ est, logo, sigs, glassSettings, gstRate = 
             <Text style={s.sigLabel}>{L.est.repSig}</Text>
           </View>
         </View>
+        )}
       </Page>
     </Document>
   )
