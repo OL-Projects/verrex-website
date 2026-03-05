@@ -24,7 +24,7 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, locale = 
   // Hash key forces BlobProvider to fully regenerate when any item data changes
   const pdfKey = useMemo(() => {
     const items = allItems(est)
-    return items.map(i => `${i.type}:${i.width}:${i.height}:${i.hingeLeft}:${i.swingInside}:${i.trimInstall}:${i.trimStyle}:${i.qty}:${i.unitPrice}:${i.extColor}:${i.intColor}`).join("|")
+    return items.map(i => `${i.type}:${i.width}:${i.height}:${i.hingeLeft}:${i.swingInside}:${i.trimInstall}:${i.trimStyle}:${i.qty}:${i.unitPrice}:${i.extColor}:${i.intColor}:${(i.customModules || []).join(",")}`).join("|")
       + `|${est.estimateNumber}|${est.clientName}|${est.depositPct}|${est.delivery}|${est.installPerUnit}|${est.rooms.length}|${refreshCounter}`
   }, [est, refreshCounter])
 
