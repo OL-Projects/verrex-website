@@ -169,8 +169,7 @@ export default function MeasurementsPage() {
     setCLabel(""); setCNotes(""); setShowCreator(false)
   }, [cLabel, cTypeKey, cW, cH, cProd, cExtC, cIntC, cGlass, cGlassT, cHingeL, cSwingIn, cNotes, cLowE, cGlassThick, cArgonGas, cGlassFinish, cScreen])
 
-  // ─── Click-to-select + explicit Move ───
-  // First click = select for details. Move initiated via button or second click.
+  // ─── Click-to-grab: click a placed window → auto-enter move mode → drop on next click ───
   const handlePlacedWindowClick = useCallback((windowId: string) => {
     if (compileMode) {
       setSelectedPlacedId(windowId)
@@ -181,14 +180,12 @@ export default function MeasurementsPage() {
       setMoveMode(false); setSelectedPlacedId(null)
       return
     }
-    if (moveMode && selectedPlacedId) {
-      // Already moving a different window — cancel and select new one
-      setMoveMode(false)
-    }
-    // Select for detail view (side panel shows Move button)
+    // Auto-grab: enter move mode immediately
+    pushHistory(floors)
+    setMoveMode(true)
     setSelectedPlacedId(windowId)
-    setActiveWindowId(null) // clear any basket selection
-  }, [compileMode, moveMode, selectedPlacedId])
+    setActiveWindowId(null)
+  }, [compileMode, moveMode, selectedPlacedId, floors, pushHistory])
 
   // Explicit move: called from side panel "Move" button or double-click
   const startMoveWindow = useCallback((windowId: string) => {

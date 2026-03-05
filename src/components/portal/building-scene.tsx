@@ -249,6 +249,17 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
     onFaceClick(floor.id, hit.face, hit.u, hit.v)
   }, [canPlace, moveMode, selectedPlacedId, computeFaceHit, onFaceClick, floor.id, findWindowAtPosition, onPlacedWindowClick])
 
+  /* ─── PointerUp: handles DROP during move mode ─── */
+  /* onClick can be suppressed by R3F if the pointer moved between mousedown/mouseup.
+     onPointerUp ALWAYS fires, so we use it specifically for the move-mode drop. */
+  const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
+    if (!moveMode || !selectedPlacedId) return // Only active during move mode
+    e.stopPropagation()
+    const hit = computeFaceHit(e)
+    if (!hit) return
+    onFaceClick(floor.id, hit.face, hit.u, hit.v)
+  }, [moveMode, selectedPlacedId, computeFaceHit, onFaceClick, floor.id])
+
   const wc = solidMode ? "#ffffff" : floor.color
   const wo = solidMode ? 1 : (hoveredFace ? 0.5 : 0.25)
   const ec = hoveredFace ? (moveMode ? "#a855f7" : "#3b82f6") : (solidMode ? "#d1d5db" : "#475569")
@@ -261,7 +272,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
 
   return (
     <group position={[0, yOffset, 0]}>
-      <mesh ref={boxRef} position={[0, h / 2, 0]} onClick={handleClick}
+      <mesh ref={boxRef} position={[0, h / 2, 0]} onClick={handleClick} onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove} onPointerOut={() => { setHoveredFace(null); setHoveredWindowId(null); setGhostHit(null) }}>
         <boxGeometry args={[w, h, d]} />
         <meshStandardMaterial color={hoveredFace ? (moveMode ? "#c084fc" : "#60a5fa") : wc}
