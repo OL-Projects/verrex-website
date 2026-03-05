@@ -120,6 +120,9 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
                   <rect x={ohx - 3} y={cy - 16} width={6} height={32} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
                   <rect x={ohx - 2} y={cy - 12} width={4} height={24} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
                   <rect x={ohx - 2} y={cy - 2} width={leverDir * 14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
+                  {/* ★ Fenestration: casement opening-direction triangle */}
+                  <line x1={hx} y1={cy} x2={ohx} y2={sy} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
+                  <line x1={hx} y1={cy} x2={ohx} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
                 </>
               )
             })()}
@@ -140,8 +143,12 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
                   <rect x={ohx - 3} y={cy - 16} width={6} height={32} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
                   <rect x={ohx - 2} y={cy - 12} width={4} height={24} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
                   <rect x={ohx - 2} y={cy - 2} width={leverDir * 14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
-                  {/* TT label */}
-                  <text x={cx} y={cy + 4} textAnchor="middle" fontSize={9} fontWeight={700} fill="currentColor" className="text-slate-400 dark:text-slate-500" opacity={0.5}>T&amp;T</text>
+                  {/* ★ Fenestration: tilt & turn — casement triangle (side-hung turn) */}
+                  <line x1={hx} y1={cy} x2={ohx} y2={sy} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
+                  <line x1={hx} y1={cy} x2={ohx} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
+                  {/* ★ Fenestration: tilt & turn — awning triangle (top-hung tilt) */}
+                  <line x1={sx + sw / 2} y1={sy} x2={sx} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.35} strokeDasharray="4 3" />
+                  <line x1={sx + sw / 2} y1={sy} x2={sx + sw} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.35} strokeDasharray="4 3" />
                 </>
               )
             })()}
@@ -156,6 +163,9 @@ export function EstimateWindowSVG({ width, height, type, flipH = false, swingIn 
                 {/* ★ Prominent bottom handle */}
                 <rect x={cx - 10} y={sy + sh - 10} width={20} height={6} rx={3} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.35} />
                 <rect x={cx - 7} y={sy + sh - 9} width={14} height={4} rx={2} fill="currentColor" className="text-slate-800 dark:text-slate-300" opacity={0.85} />
+                {/* ★ Fenestration: awning (top-hung) opening-direction triangle */}
+                <line x1={sx + sw / 2} y1={sy} x2={sx} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
+                <line x1={sx + sw / 2} y1={sy} x2={sx + sw} y2={sy + sh} stroke="currentColor" className="text-slate-700 dark:text-slate-400" strokeWidth={1.2} opacity={0.45} />
               </>
             )}
 
