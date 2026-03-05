@@ -102,8 +102,8 @@ function renderModule(mod: string, mx: number, my: number, mw: number, mh: numbe
 }
 
 /* ─── Window card on face ─── */
-const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, solidMode }: {
-  pw: PlacedWindow; isSelected: boolean; winW: number; winH: number
+const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isDragging, winW, winH, onClick, compileMode, solidMode }: {
+  pw: PlacedWindow; isSelected: boolean; isDragging?: boolean; winW: number; winH: number
   onClick: () => void; compileMode: boolean; solidMode: boolean
 }) {
   const ratio = (pw.hInches || 48) / (pw.wInches || 48)
@@ -114,10 +114,13 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH
 
   return (
     <group>
-      <mesh onClick={e => { e.stopPropagation(); onClick() }}>
-        <planeGeometry args={[adjW + 0.1, adjH + 0.1]} />
-        <meshStandardMaterial color="transparent" transparent opacity={0} side={THREE.DoubleSide} />
-      </mesh>
+      {/* Only render intercept mesh when NOT dragging another window */}
+      {!isDragging && (
+        <mesh onClick={e => { e.stopPropagation(); onClick() }}>
+          <planeGeometry args={[adjW + 0.1, adjH + 0.1]} />
+          <meshStandardMaterial color="transparent" transparent opacity={0} side={THREE.DoubleSide} />
+        </mesh>
+      )}
       <Html position={[0, 0, 0.02]} center transform
         occlude={solidMode ? true : undefined}
         style={{ pointerEvents: compileMode ? "auto" : "none" }}
@@ -142,10 +145,11 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH
 })
 
 /* ─── Single Floor ─── */
-function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, liveMovePos, setLiveMovePos, unit }: {
+function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, liveMovePos, setLiveMovePos, unit, movingWindow }: {
   floor: BuildingFloor; yOffset: number; solidMode: boolean; moveMode: boolean; compileMode: boolean; unit: "ft" | "m"
   activeWindowConfig?: ActiveWindowConfig | null
   liveMovePos: LiveMovePos | null; setLiveMovePos: (p: LiveMovePos | null) => void
+  movingWindow?: PlacedWindow | null
 } & Pick<SceneProps, "activeWindowId" | "onFaceClick" | "onPlacedWindowClick" | "selectedPlacedId">) {
   const [hoveredFace, setHoveredFace] = useState<string | null>(null)
   const [ghostHit, setGhostHit] = useState<{ face: "front"|"back"|"left"|"right"; u: number; v: number } | null>(null)
@@ -207,20 +211,14 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
   const wo = solidMode ? 1 : (hoveredFace ? 0.5 : 0.25)
   const ec = hoveredFace ? (moveMode ? "#a855f7" : "#3b82f6") : (solidMode ? "#d1d5db" : "#475569")
 
-  // Compute windows to render — filter out the one being live-moved (it renders at liveMovePos instead)
+  // Remove selected window from scene immediately when in move mode (so its invisible plane doesn't block pointer events)
   const windowsToRender = floor.windows.filter(pw => {
-    if (moveMode && liveMovePos && pw.id === liveMovePos.windowId) return false
+    if (moveMode && selectedPlacedId === pw.id) return false
     return true
   })
 
-  // Render the live-move window on this floor if liveMovePos.floorId matches
-  const liveWindow = (moveMode && liveMovePos && liveMovePos.floorId === floor.id)
-    ? floor.windows.find(pw => pw.id === liveMovePos.windowId)
-      || (selectedPlacedId ? (() => {
-        // Window might be from another floor — search all floors later
-        return null
-      })() : null)
-    : null
+  // Is a drag in progress? (used to disable intercept meshes on all other windows)
+  const dragInProgress = moveMode && !!selectedPlacedId
 
   return (
     <group position={[0, yOffset, 0]}>
@@ -245,19 +243,19 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
         const wp = toWorldPos(pw.face, pw.posU, pw.posV)
         return (
           <group key={pw.id} position={wp.pos} rotation={wp.rot}>
-            <FaceWindowCard pw={pw} isSelected={isSelected} winW={winW} winH={winH}
+            <FaceWindowCard pw={pw} isSelected={isSelected} isDragging={dragInProgress} winW={winW} winH={winH}
               onClick={() => onPlacedWindowClick(pw.id)} compileMode={compileMode} solidMode={solidMode} />
           </group>
         )
       })}
-      {/* Live-moving window on this floor */}
-      {liveWindow && liveMovePos && liveMovePos.floorId === floor.id && (() => {
-        const winW = (liveWindow.wInches || 48) * inchToUnit
-        const winH = (liveWindow.hInches || 48) * inchToUnit
+      {/* Live-moving window preview on this floor */}
+      {movingWindow && liveMovePos && liveMovePos.floorId === floor.id && (() => {
+        const winW = (movingWindow.wInches || 48) * inchToUnit
+        const winH = (movingWindow.hInches || 48) * inchToUnit
         const wp = toWorldPos(liveMovePos.face, liveMovePos.posU, liveMovePos.posV)
         return (
           <group position={wp.pos} rotation={wp.rot}>
-            <FaceWindowCard pw={liveWindow} isSelected={true} winW={winW} winH={winH}
+            <FaceWindowCard pw={movingWindow} isSelected={true} winW={winW} winH={winH}
               onClick={() => {}} compileMode={compileMode} solidMode={solidMode} />
           </group>
         )
@@ -371,9 +369,9 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
   const camDist = Math.max(maxW, maxD, totalH) * 1.8
   const offsets = useMemo(() => { const o: number[] = []; let y = 0; for (const f of floors) { o.push(y); y += f.ceilingHeight }; return o }, [floors])
 
-  // Find the window being moved across all floors (for cross-floor moves)
+  // Find the window being moved across all floors (available as soon as selectedPlacedId is set)
   const allWindows = useMemo(() => floors.flatMap(f => f.windows), [floors])
-  const movingWindow = moveMode && liveMovePos ? allWindows.find(w => w.id === liveMovePos.windowId) : null
+  const movingWindow = moveMode && selectedPlacedId ? allWindows.find(w => w.id === selectedPlacedId) ?? null : null
 
   // Enhanced face click that clears liveMovePos
   const handleFaceClick = useCallback((floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => {
@@ -408,7 +406,7 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
           moveMode={moveMode} compileMode={compileMode}
           onFaceClick={handleFaceClick} onPlacedWindowClick={onPlacedWindowClick}
           selectedPlacedId={selectedPlacedId} solidMode={isSolid}
-          liveMovePos={liveMovePos} setLiveMovePos={setLiveMovePos} unit={unit} />
+          liveMovePos={liveMovePos} setLiveMovePos={setLiveMovePos} unit={unit} movingWindow={movingWindow} />
       ))}
       {/* Cross-floor live-move: render moving window on target floor */}
       {movingWindow && liveMovePos && (() => {
