@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw } from "lucide-react"
+import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling } from "lucide-react"
 import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
@@ -50,6 +50,8 @@ export default function MeasurementsPage() {
   const [solidMode, setSolidMode] = useState(false)
   const [compileMode, setCompileMode] = useState(false)
   const [showCreator, setShowCreator] = useState(false)
+  const [unit, setUnit] = useState<"ft" | "m">("ft")
+  const [showScale, setShowScale] = useState(false)
 
   // Creator form
   const [cLabel, setCLabel] = useState("")
@@ -210,6 +212,43 @@ export default function MeasurementsPage() {
               </div>
             </div>
 
+            {/* Scale / Real Dimensions */}
+            <div className={C.card}>
+              <div className="flex items-center justify-between mb-2">
+                <p className={C.lbl + " mb-0"}>Scale & Dimensions</p>
+                <button onClick={() => setShowScale(p => !p)} className="text-[10px] font-bold text-blue-600 flex items-center gap-0.5">
+                  <Scaling className="h-3 w-3" /> {showScale ? "Hide" : "Setup"}
+                </button>
+              </div>
+              <AnimatePresence>
+                {showScale && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                      <div>
+                        <label className={C.lbl}>Unit</label>
+                        <div className="flex gap-1">
+                          <button onClick={() => setUnit("ft")} className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition ${unit === "ft" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400"}`}>Feet (ft)</button>
+                          <button onClick={() => setUnit("m")} className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition ${unit === "m" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400"}`}>Meters (m)</button>
+                        </div>
+                      </div>
+                      <p className="text-[9px] text-slate-400">Set floor W×D×H in {unit === "ft" ? "feet" : "meters"}. Windows use their inch measurements for proportional sizing.</p>
+                      {floors.map(f => (
+                        <div key={f.id} className="rounded-lg bg-slate-50 dark:bg-white/3 border border-slate-200/50 dark:border-white/5 p-2">
+                          <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300 mb-1">{f.name}</p>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            <div><label className={C.lbl}>W ({unit})</label><input type="number" min={2} max={100} step={0.5} value={f.width} onChange={e => updateFloor(f.id, { width: +e.target.value })} className={C.inp + " text-xs"} /></div>
+                            <div><label className={C.lbl}>D ({unit})</label><input type="number" min={2} max={100} step={0.5} value={f.depth} onChange={e => updateFloor(f.id, { depth: +e.target.value })} className={C.inp + " text-xs"} /></div>
+                            <div><label className={C.lbl}>H ({unit})</label><input type="number" min={1} max={20} step={0.5} value={f.ceilingHeight} onChange={e => updateFloor(f.id, { ceilingHeight: +e.target.value })} className={C.inp + " text-xs"} /></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {!showScale && <p className="text-[9px] text-slate-400">1 unit = 1 {unit} • Click Setup to configure</p>}
+            </div>
+
             {/* Window Creator */}
             <div className={C.card}>
               <div className="flex items-center justify-between mb-2">
@@ -309,7 +348,7 @@ export default function MeasurementsPage() {
             <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
               <Building3DCanvas floors={floors} activeWindowId={activeWindowId} moveMode={moveMode} compileMode={compileMode}
                 onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
-                selectedPlacedId={selectedPlacedId} solidMode={solidMode} />
+                selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
             </div>
           </div>
 

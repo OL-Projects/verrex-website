@@ -24,6 +24,7 @@ interface Props {
   onPlacedWindowClick: (windowId: string) => void
   selectedPlacedId: string | null
   solidMode: boolean
+  unit?: "ft" | "m"
 }
 
 export function Building3DCanvas(props: Props) {
