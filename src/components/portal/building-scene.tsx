@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useRef } from "react"
+import { useState, useMemo, useCallback, useRef, memo } from "react"
 import { Canvas, ThreeEvent } from "@react-three/fiber"
 import { OrbitControls, Html, Grid, PerspectiveCamera, Edges } from "@react-three/drei"
 import * as THREE from "three"
@@ -102,7 +102,7 @@ function renderModule(mod: string, mx: number, my: number, mw: number, mh: numbe
 }
 
 /* ─── Window card on face ─── */
-function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, solidMode }: {
+const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, solidMode }: {
   pw: PlacedWindow; isSelected: boolean; winW: number; winH: number
   onClick: () => void; compileMode: boolean; solidMode: boolean
 }) {
@@ -128,16 +128,18 @@ function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, soli
           <FenestrationSVG typeKey={pw.typeKey} w={pw.wInches || 48} h={pw.hInches || 48} />
         </div>
       </Html>
-      <Html position={[0, -adjH / 2 - 0.18, 0]} center transform
-        occlude={solidMode ? true : undefined}
-        style={{ pointerEvents: compileMode ? "auto" : "none" }}>
-        <div className={`text-[7px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm ${isSelected ? "bg-amber-500 text-white" : "bg-slate-800 text-white"}`}>
-          {pw.label} — {pw.dims}
-        </div>
-      </Html>
+      {(solidMode || compileMode || isSelected) && (
+        <Html position={[0, -adjH / 2 - 0.18, 0]} center transform
+          occlude={solidMode ? true : undefined}
+          style={{ pointerEvents: compileMode ? "auto" : "none" }}>
+          <div className={`text-[7px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm ${isSelected ? "bg-amber-500 text-white" : "bg-slate-800 text-white"}`}>
+            {pw.label} — {pw.dims}
+          </div>
+        </Html>
+      )}
     </group>
   )
-}
+})
 
 /* ─── Single Floor ─── */
 function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, liveMovePos, setLiveMovePos, unit }: {
@@ -380,12 +382,13 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
   }, [onFaceClick])
 
   return (
-    <Canvas style={{ width: "100%", height: "100%" }} shadows>
+    <Canvas style={{ width: "100%", height: "100%" }} shadows dpr={[1, 1.5]} flat
+      performance={{ min: 0.5 }} frameloop="demand">
       <PerspectiveCamera makeDefault position={[camDist * 0.7, camDist * 0.5, camDist * 0.7]} fov={45} />
       <OrbitControls makeDefault enableDamping dampingFactor={0.08}
         enabled={!moveMode}
-        minPolarAngle={Math.PI * 0.1} maxPolarAngle={Math.PI * 0.42}
-        minDistance={4} maxDistance={camDist * 3} target={[0, totalH / 2, 0]} />
+        minPolarAngle={Math.PI * 0.05} maxPolarAngle={Math.PI * 0.485}
+        minDistance={3} maxDistance={camDist * 3} target={[0, totalH / 2, 0]} />
       {/* Lighting */}
       <ambientLight intensity={isSolid ? 0.85 : 0.6} />
       <directionalLight position={[10, 15, 10]} intensity={isSolid ? 0.5 : 0.8} castShadow={isSolid} />

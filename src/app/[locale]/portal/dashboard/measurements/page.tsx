@@ -250,7 +250,7 @@ export default function MeasurementsPage() {
             })}
           </div>
           {!compileMode && <>
-            <button onClick={() => { setMoveMode(p => !p); if (moveMode) setSelectedPlacedId(null) }}
+            <button onClick={() => { setMoveMode(p => !p); setSelectedPlacedId(null) }}
               className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
               {moveMode ? <><Unlock className="h-4 w-4" /> Reposition</> : <><Lock className="h-4 w-4" /> Locked</>}
             </button>
