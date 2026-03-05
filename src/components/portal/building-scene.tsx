@@ -114,11 +114,11 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isDragging
 
   return (
     <group>
-      {/* Only render intercept mesh when NOT dragging another window */}
+      {/* Clickable intercept mesh — positioned forward to reliably win raycast vs building face */}
       {!isDragging && (
-        <mesh onClick={e => { e.stopPropagation(); onClick() }}>
-          <planeGeometry args={[adjW + 0.1, adjH + 0.1]} />
-          <meshStandardMaterial color="transparent" transparent opacity={0} side={THREE.DoubleSide} />
+        <mesh position={[0, 0, 0.08]} onClick={e => { e.stopPropagation(); onClick() }}>
+          <planeGeometry args={[adjW + 0.2, adjH + 0.2]} />
+          <meshBasicMaterial transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
         </mesh>
       )}
       <Html position={[0, 0, 0.02]} center transform
@@ -200,8 +200,8 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
   }, [canPlace, moveMode, selectedPlacedId, activeWindowId, activeWindowConfig, computeFaceHit, setLiveMovePos, floor.id])
 
   const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
+    if (!canPlace) return          // let clicks pass through to window intercept meshes
     e.stopPropagation()
-    if (!canPlace) return
     const hit = computeFaceHit(e)
     if (!hit) return
     onFaceClick(floor.id, hit.face, hit.u, hit.v)
