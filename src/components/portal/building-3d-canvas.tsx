@@ -18,9 +18,11 @@ const BuildingScene = dynamic(
 interface Props {
   floors: BuildingFloor[]
   activeWindowId: string | null
+  moveMode: boolean
   onFaceClick: (floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => void
   onPlacedWindowClick: (windowId: string) => void
   selectedPlacedId: string | null
+  solidMode: boolean
 }
 
 export function Building3DCanvas(props: Props) {
