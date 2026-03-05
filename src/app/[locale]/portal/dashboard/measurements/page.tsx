@@ -189,6 +189,25 @@ export default function MeasurementsPage() {
     setActiveWindowId(null); setSelectedPlacedId(null); setMoveMode(false); setCompileMode(false)
   }, [newProject])
 
+  // ─── Drag & Drop for face photos ───
+  const [dragOverFace, setDragOverFace] = useState<FaceKey | null>(null)
+  const handleFaceDrop = useCallback((face: FaceKey, e: React.DragEvent) => {
+    e.preventDefault(); setDragOverFace(null)
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"))
+    files.forEach(file => {
+      const r = new FileReader()
+      r.onload = () => { if (typeof r.result === "string") setFacePhotos(p => ({ ...p, [face]: [...p[face], r.result as string] })) }
+      r.readAsDataURL(file)
+    })
+  }, [setFacePhotos])
+
+  const FACE_META: { key: FaceKey; label: string; color: string; border: string; bg: string }[] = [
+    { key: "front", label: "Front", color: "#3b82f6", border: "border-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
+    { key: "back", label: "Back", color: "#8b5cf6", border: "border-purple-400", bg: "bg-purple-50 dark:bg-purple-500/10" },
+    { key: "left", label: "Left", color: "#10b981", border: "border-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
+    { key: "right", label: "Right", color: "#f59e0b", border: "border-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10" },
+  ]
+
   // ─── Active window config for ghost preview ───
   const activeWindowConfig = useMemo(() => {
     if (!activeWindowId) return null
@@ -243,20 +262,6 @@ export default function MeasurementsPage() {
             className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30`}>
             <Redo2 className="h-4 w-4" />
           </button>
-          {/* Face Photo Attachments */}
-          <div className="flex gap-0.5 border border-slate-200 dark:border-white/15 rounded-xl overflow-hidden">
-            {(["front", "back", "left", "right"] as const).map(face => {
-              const count = facePhotos[face].length
-              const colors: Record<string, string> = { front: "text-blue-500", back: "text-purple-500", left: "text-emerald-500", right: "text-amber-500" }
-              return (
-                <button key={face} onClick={() => setActiveFace(p => p === face ? null : face)}
-                  className={`relative px-2 py-1.5 text-[9px] font-bold uppercase transition ${activeFace === face ? "bg-blue-600 text-white" : `hover:bg-slate-50 dark:hover:bg-white/5 ${colors[face]}`}`}>
-                  <Camera className="h-3 w-3 inline mr-0.5" />{face.slice(0, 1)}
-                  {count > 0 && <span className="absolute -top-1 -right-1 h-3.5 min-w-3.5 bg-blue-600 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{count}</span>}
-                </button>
-              )
-            })}
-          </div>
           {!compileMode && <>
             <button onClick={() => { setMoveMode(p => !p); setSelectedPlacedId(null) }}
               className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
@@ -270,42 +275,6 @@ export default function MeasurementsPage() {
           </>}
         </div>
       </motion.div>
-
-      {/* Face Photo Panel — slides down when a face is active */}
-      <AnimatePresence>
-        {activeFace && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <div className={`${C.card} flex items-center gap-3`}>
-              <div className="shrink-0">
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: { front: "#3b82f6", back: "#8b5cf6", left: "#10b981", right: "#f59e0b" }[activeFace] }}>
-                  📷 {activeFace} Face Photos
-                </p>
-              </div>
-              <div className="flex gap-2 flex-wrap flex-1">
-                {facePhotos[activeFace].map((ph, i) => (
-                  <div key={i} className="relative group">
-                    <img src={ph} alt="" className="h-12 w-12 rounded-lg object-cover border border-slate-200 dark:border-white/10" />
-                    <button onClick={() => setFacePhotos(p => ({ ...p, [activeFace!]: p[activeFace!].filter((_, j) => j !== i) }))}
-                      className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-[8px] hidden group-hover:flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
-                  </div>
-                ))}
-                <label className="h-12 w-12 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex items-center justify-center text-slate-400 hover:border-blue-500 cursor-pointer transition">
-                  <Camera className="h-4 w-4" />
-                  <input type="file" accept="image/*" className="hidden" onChange={e => handleFacePhotoUpload(activeFace!, e)} />
-                </label>
-              </div>
-              {facePhotos[activeFace].length > 0 && (
-                <button onClick={() => analyzeFacade(activeFace!)} disabled={analyzing}
-                  className={`${C.btn} bg-purple-600 text-white border-purple-700 hover:bg-purple-700 disabled:opacity-50 shrink-0`}>
-                  {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Brain className="h-4 w-4" />}
-                  {analyzing ? "Analyzing…" : "AI Analyze"}
-                </button>
-              )}
-              <button onClick={() => setActiveFace(null)} className="text-slate-400 hover:text-slate-600 shrink-0"><X className="h-4 w-4" /></button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="flex flex-col lg:flex-row gap-4 items-start">
         {/* LEFT PANEL — hidden in compile mode */}
@@ -441,31 +410,94 @@ export default function MeasurementsPage() {
           </div>
         )}
 
-        {/* CENTER: 3D VIEWER */}
-        <div className="flex-1 min-w-0">
-          <div className={`${C.card} p-0 overflow-hidden relative`}>
-            {/* Left panel collapse toggle (non-compile) */}
-            {!compileMode && (
-              <button onClick={() => setLeftPanelOpen(p => !p)}
-                className="absolute top-3 left-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm transition lg:hidden">
-                {leftPanelOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-              </button>
-            )}
-            {/* Right panel toggle (compile mode OR edit mode with selected window) */}
-            {(compileMode || (!compileMode && selectedPlacedId)) && (
-              <button onClick={() => setRightPanelOpen(p => !p)}
-                className="absolute top-3 right-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-emerald-600 shadow-sm transition">
-                {rightPanelOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-              </button>
-            )}
-            <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
-              <Building3DCanvas floors={floors} activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
-                moveMode={moveMode} compileMode={compileMode}
-                onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
-                selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
-            </div>
+        {/* CENTER: FACE PHOTO CARDS + 3D VIEWER */}
+        <div className="flex-1 min-w-0 flex gap-3">
+          {/* ── Face Photo Drop Cards ── */}
+          <div className="hidden lg:flex flex-col gap-2.5 shrink-0 pt-1">
+            {FACE_META.map(fm => {
+              const count = facePhotos[fm.key].length
+              const isActive = activeFace === fm.key
+              const isDragOver = dragOverFace === fm.key
+              const thumb = count > 0 ? facePhotos[fm.key][0] : null
+              return (
+                <div key={fm.key} className="relative group">
+                  <label
+                    className={`relative w-[88px] h-[88px] rounded-2xl border-2 flex flex-col items-center justify-center cursor-pointer transition-all
+                      ${isDragOver ? `border-dashed ${fm.border} ring-2 ring-offset-1 scale-105 ${fm.bg}` : isActive ? `${fm.border} ring-2 ring-offset-1 ${fm.bg}` : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 bg-white/60 dark:bg-white/3"}
+                    `}
+                    onClick={e => { e.preventDefault(); setActiveFace(p => p === fm.key ? null : fm.key) }}
+                    onDragOver={e => { e.preventDefault(); setDragOverFace(fm.key) }}
+                    onDragLeave={() => setDragOverFace(null)}
+                    onDrop={e => handleFaceDrop(fm.key, e)}
+                  >
+                    {thumb ? (
+                      <img src={thumb} alt={fm.label} className="absolute inset-0 w-full h-full object-cover rounded-2xl opacity-60" />
+                    ) : (
+                      <Camera className="h-6 w-6 mb-1" style={{ color: fm.color }} />
+                    )}
+                    <span className="relative text-[11px] font-black uppercase tracking-wide" style={{ color: fm.color }}>{fm.label}</span>
+                    {!thumb && <span className="relative text-[8px] text-slate-400 mt-0.5">Drop photo</span>}
+                    <input type="file" accept="image/*" className="hidden" onChange={e => handleFacePhotoUpload(fm.key, e)} />
+                  </label>
+                  {/* Photo count badge */}
+                  {count > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 rounded-full text-[9px] font-bold flex items-center justify-center text-white shadow-sm"
+                      style={{ background: fm.color }}>{count}</span>
+                  )}
+                  {/* Expanded photo strip when active */}
+                  <AnimatePresence>
+                    {isActive && count > 0 && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden mt-1.5">
+                        <div className="flex flex-col gap-1">
+                          {facePhotos[fm.key].map((ph, i) => (
+                            <div key={i} className="relative group/ph">
+                              <img src={ph} alt="" className="w-[88px] h-14 rounded-xl object-cover border border-slate-200 dark:border-white/10" />
+                              <button onClick={() => setFacePhotos(p => ({ ...p, [fm.key]: p[fm.key].filter((_, j) => j !== i) }))}
+                                className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-[8px] hidden group-hover/ph:flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
+                            </div>
+                          ))}
+                          {count > 0 && (
+                            <button onClick={() => analyzeFacade(fm.key)} disabled={analyzing}
+                              className="w-[88px] py-1.5 rounded-xl text-[9px] font-bold flex items-center justify-center gap-1 text-white transition"
+                              style={{ background: fm.color }}>
+                              {analyzing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Brain className="h-3 w-3" />}
+                              AI
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )
+            })}
           </div>
 
+          {/* ── 3D Canvas ── */}
+          <div className="flex-1 min-w-0">
+            <div className={`${C.card} p-0 overflow-hidden relative`}>
+              {!compileMode && (
+                <button onClick={() => setLeftPanelOpen(p => !p)}
+                  className="absolute top-3 left-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm transition lg:hidden">
+                  {leftPanelOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                </button>
+              )}
+              {(compileMode || (!compileMode && selectedPlacedId)) && (
+                <button onClick={() => setRightPanelOpen(p => !p)}
+                  className="absolute top-3 right-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-emerald-600 shadow-sm transition">
+                  {rightPanelOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                </button>
+              )}
+              <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
+                <Building3DCanvas floors={floors} activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
+                  moveMode={moveMode} compileMode={compileMode}
+                  onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
+                  selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
+              </div>
+            </div>
+          </div>
+        </div>
 
           {/* Compile mode detail popup */}
           {compileMode && compileDetail && (
@@ -497,7 +529,6 @@ export default function MeasurementsPage() {
               </div>
             </motion.div>
           )}
-        </div>
 
         {/* RIGHT PANEL — edit detail OR compile dashboard */}
         <AnimatePresence>

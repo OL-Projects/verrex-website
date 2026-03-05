@@ -51,7 +51,7 @@ function uid() { return `meas_${Date.now().toString(36)}_${Math.random().toStrin
 const FLOOR_COLORS = ["#e2e8f0", "#bfdbfe", "#c7d2fe", "#ddd6fe", "#fbcfe8", "#fde68a", "#bbf7d0"]
 
 export function createFloor(name: string, idx: number): BuildingFloor {
-  return { id: uid(), name, width: 10, depth: 8, ceilingHeight: 3, color: FLOOR_COLORS[idx % FLOOR_COLORS.length], windows: [] }
+  return { id: uid(), name, width: 50, depth: 75, ceilingHeight: 15, color: FLOOR_COLORS[idx % FLOOR_COLORS.length], windows: [] }
 }
 
 export function createBlankProject(): MeasurementProjectData {
@@ -61,7 +61,7 @@ export function createBlankProject(): MeasurementProjectData {
     projectNotes: "",
     photos: [],
     floors: [
-      { ...createFloor("Basement", 0), ceilingHeight: 2.5, color: "#cbd5e1" },
+      { ...createFloor("Basement", 0), ceilingHeight: 10, color: "#cbd5e1" },
       { ...createFloor("Ground Floor", 1), color: "#bfdbfe" },
     ],
     basket: [],
