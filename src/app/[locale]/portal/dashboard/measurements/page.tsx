@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling, Lock, Unlock, ChevronLeft, ChevronRight } from "lucide-react"
+import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling, Lock, Unlock, ChevronLeft, ChevronRight, Undo2, Redo2, Camera, Brain, Loader2 } from "lucide-react"
 import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
@@ -54,6 +54,63 @@ export default function MeasurementsPage() {
   const [showScale, setShowScale] = useState(false)
   const [leftPanelOpen, setLeftPanelOpen] = useState(true)
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
+
+  // Undo/Redo
+  const [history, setHistory] = useState<BuildingFloor[][]>([])
+  const [future, setFuture] = useState<BuildingFloor[][]>([])
+  const pushHistory = useCallback((prev: BuildingFloor[]) => {
+    setHistory(h => [...h.slice(-30), prev]); setFuture([])
+  }, [])
+  const undo = useCallback(() => {
+    setHistory(h => { if (h.length === 0) return h; const prev = h[h.length - 1]; setFuture(f => [...f, floors]); setFloors(prev); return h.slice(0, -1) })
+  }, [floors])
+  const redo = useCallback(() => {
+    setFuture(f => { if (f.length === 0) return f; const next = f[f.length - 1]; setHistory(h => [...h, floors]); setFloors(next); return f.slice(0, -1) })
+  }, [floors])
+
+  // Face Photos
+  type FaceKey = "front" | "back" | "left" | "right"
+  const [facePhotos, setFacePhotos] = useState<Record<FaceKey, string[]>>({ front: [], back: [], left: [], right: [] })
+  const [activeFace, setActiveFace] = useState<FaceKey | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+
+  const handleFacePhotoUpload = useCallback((face: FaceKey, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return
+    const r = new FileReader(); r.onload = () => { if (typeof r.result === "string") setFacePhotos(p => ({ ...p, [face]: [...p[face], r.result as string] })) }; r.readAsDataURL(file)
+  }, [])
+
+  const analyzeFacade = useCallback(async (face: FaceKey) => {
+    const imgs = facePhotos[face]; if (imgs.length === 0) return
+    const aiCfg = localStorage.getItem("vx_ai_config"); if (!aiCfg) { alert("Set up AI in Settings → AI Settings first"); return }
+    const { provider, apiKey, model } = JSON.parse(aiCfg)
+    if (!apiKey) { alert("No API key configured"); return }
+    setAnalyzing(true)
+    try {
+      const res = await fetch("/api/portal/analyze-facade", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: imgs[0], provider, apiKey, model, face }),
+      })
+      const data = await res.json()
+      if (data.error) { alert(`AI Error: ${data.error}`); return }
+      if (data.suggestions?.length > 0) {
+        const confirmed = confirm(`AI detected ${data.suggestions.length} window(s)/door(s). Add to basket & place on ${face} face?`)
+        if (confirmed) {
+          const TYPE_MAP: Record<string, string> = { "casement-left": "CAS-L", "casement-right": "CAS-R", "fixed": "FIX", "awning": "AWN", "sliding": "SLD-2", "double-hung": "DH", "picture": "PIC", "entry-door": "ENTRY", "patio-door": "PATIO-SLD", "french-door": "FRENCH" }
+          const firstFloor = floors[floors.length > 1 ? 1 : 0]
+          pushHistory(floors)
+          data.suggestions.forEach((s: any) => {
+            const tk = TYPE_MAP[s.type] || "FIX"
+            const bw: BasketWindow = { id: uid(), label: s.label || `AI ${s.type}`, typeKey: tk, width: s.estimatedWidth || 36, height: s.estimatedHeight || 48, product: "double-tempered", extColor: "White", intColor: "White", glass: "Double", glassType: "Low-E", hingeLeft: s.type.includes("left"), swingIn: true, notes: `AI detected (${Math.round(s.confidence * 100)}% confidence)` }
+            setBasket(p => [...p, bw])
+            const cfg = WINDOW_TYPES[tk]
+            const pw: PlacedWindow = { id: uid(), face, posU: s.positionU || 0.5, posV: s.positionV || 0.5, measurementId: bw.id, label: bw.label, dims: `${bw.width}" × ${bw.height}"`, windowType: cfg?.label || tk, typeKey: tk, wInches: bw.width, hInches: bw.height }
+            setFloors(p => p.map(f => f.id === firstFloor.id ? { ...f, windows: [...f.windows, pw] } : f))
+          })
+        }
+      } else { alert("No windows/doors detected in this photo.") }
+    } catch (e: any) { alert(`Analysis failed: ${e.message}`) }
+    finally { setAnalyzing(false) }
+  }, [facePhotos, floors, pushHistory])
 
   // Creator form
   const [cLabel, setCLabel] = useState("")
@@ -169,6 +226,29 @@ export default function MeasurementsPage() {
             className={`${C.btn} ${compileMode ? "bg-emerald-600 text-white border-emerald-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
             <Layers className="h-4 w-4" /> {compileMode ? "Exit Compile" : "Compile"}
           </button>
+          {/* Undo / Redo */}
+          <button onClick={undo} disabled={history.length === 0} title="Undo (Ctrl+Z)"
+            className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30`}>
+            <Undo2 className="h-4 w-4" />
+          </button>
+          <button onClick={redo} disabled={future.length === 0} title="Redo (Ctrl+Y)"
+            className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30`}>
+            <Redo2 className="h-4 w-4" />
+          </button>
+          {/* Face Photo Attachments */}
+          <div className="flex gap-0.5 border border-slate-200 dark:border-white/15 rounded-xl overflow-hidden">
+            {(["front", "back", "left", "right"] as const).map(face => {
+              const count = facePhotos[face].length
+              const colors: Record<string, string> = { front: "text-blue-500", back: "text-purple-500", left: "text-emerald-500", right: "text-amber-500" }
+              return (
+                <button key={face} onClick={() => setActiveFace(p => p === face ? null : face)}
+                  className={`relative px-2 py-1.5 text-[9px] font-bold uppercase transition ${activeFace === face ? "bg-blue-600 text-white" : `hover:bg-slate-50 dark:hover:bg-white/5 ${colors[face]}`}`}>
+                  <Camera className="h-3 w-3 inline mr-0.5" />{face.slice(0, 1)}
+                  {count > 0 && <span className="absolute -top-1 -right-1 h-3.5 min-w-3.5 bg-blue-600 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{count}</span>}
+                </button>
+              )
+            })}
+          </div>
           {!compileMode && <>
             <button onClick={() => { setMoveMode(p => !p); if (moveMode) setSelectedPlacedId(null) }}
               className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
@@ -182,6 +262,42 @@ export default function MeasurementsPage() {
           </>}
         </div>
       </motion.div>
+
+      {/* Face Photo Panel — slides down when a face is active */}
+      <AnimatePresence>
+        {activeFace && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+            <div className={`${C.card} flex items-center gap-3`}>
+              <div className="shrink-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: { front: "#3b82f6", back: "#8b5cf6", left: "#10b981", right: "#f59e0b" }[activeFace] }}>
+                  📷 {activeFace} Face Photos
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap flex-1">
+                {facePhotos[activeFace].map((ph, i) => (
+                  <div key={i} className="relative group">
+                    <img src={ph} alt="" className="h-12 w-12 rounded-lg object-cover border border-slate-200 dark:border-white/10" />
+                    <button onClick={() => setFacePhotos(p => ({ ...p, [activeFace!]: p[activeFace!].filter((_, j) => j !== i) }))}
+                      className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-[8px] hidden group-hover:flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
+                  </div>
+                ))}
+                <label className="h-12 w-12 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex items-center justify-center text-slate-400 hover:border-blue-500 cursor-pointer transition">
+                  <Camera className="h-4 w-4" />
+                  <input type="file" accept="image/*" className="hidden" onChange={e => handleFacePhotoUpload(activeFace!, e)} />
+                </label>
+              </div>
+              {facePhotos[activeFace].length > 0 && (
+                <button onClick={() => analyzeFacade(activeFace!)} disabled={analyzing}
+                  className={`${C.btn} bg-purple-600 text-white border-purple-700 hover:bg-purple-700 disabled:opacity-50 shrink-0`}>
+                  {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Brain className="h-4 w-4" />}
+                  {analyzing ? "Analyzing…" : "AI Analyze"}
+                </button>
+              )}
+              <button onClick={() => setActiveFace(null)} className="text-slate-400 hover:text-slate-600 shrink-0"><X className="h-4 w-4" /></button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex flex-col lg:flex-row gap-4 items-start">
         {/* LEFT PANEL — hidden in compile mode */}
