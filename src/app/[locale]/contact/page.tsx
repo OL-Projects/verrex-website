@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,7 @@ import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Video } 
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 
-export default function ContactPage() {
+function ContactPageContent() {
   const t = useTranslations('ContactPage')
   const [submitted, setSubmitted] = useState(false)
   const [messageGlow, setMessageGlow] = useState(false)
@@ -199,5 +199,13 @@ export default function ContactPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="py-20 text-center text-slate-400">Loading...</div>}>
+      <ContactPageContent />
+    </Suspense>
   )
 }
