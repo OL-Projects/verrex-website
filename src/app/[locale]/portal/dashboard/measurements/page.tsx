@@ -7,6 +7,8 @@ import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { WINDOW_TYPES, getTypeGroups, isDoorType, PRODUCTS as EST_PRODUCTS, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "@/lib/estimate-config"
+import { useMeasurementStore, createFloor, type BasketWindow } from "@/lib/measurements-store"
+import { MeasurementsSidebar } from "@/components/portal/measurements-sidebar"
 
 const C = {
   card: "rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 p-4",
@@ -15,34 +17,40 @@ const C = {
   sel: "w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 transition appearance-none",
   btn: "flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition",
 }
-const FLOOR_COLORS = ["#e2e8f0", "#bfdbfe", "#c7d2fe", "#ddd6fe", "#fbcfe8", "#fde68a", "#bbf7d0"]
 const GLASS_OPTS = ["Double", "Triple"]
 const GLASS_TYPES = ["Clear", "Low-E", "Argon", "Tinted", "Frosted"]
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
-function createFloor(name: string, idx: number): BuildingFloor {
-  return { id: uid(), name, width: 10, depth: 8, ceilingHeight: 3, color: FLOOR_COLORS[idx % FLOOR_COLORS.length], windows: [] }
-}
-
-interface BasketWindow {
-  id: string; label: string; typeKey: string; width: number; height: number
-  product: string; extColor: string; intColor: string; glass: string; glassType: string
-  hingeLeft: boolean; swingIn: boolean; notes: string
-}
-
-const DEFAULT_FLOORS: BuildingFloor[] = [
-  { ...createFloor("Basement", 0), ceilingHeight: 2.5, color: "#cbd5e1" },
-  { ...createFloor("Ground Floor", 1), color: "#bfdbfe" },
-]
-const SK = "vx_measurements_v4"
 
 export default function MeasurementsPage() {
-  const [projectName, setProjectName] = useState("New Project")
-  const [projectAddr, setProjectAddr] = useState("")
-  const [projectNotes, setProjectNotes] = useState("")
-  const [photos, setPhotos] = useState<string[]>([])
-  const [floors, setFloors] = useState<BuildingFloor[]>(DEFAULT_FLOORS)
-  const [basket, setBasket] = useState<BasketWindow[]>([])
+  // ─── Store (multi-project + templates) ───
+  const store = useMeasurementStore()
+  const { project, setProject, records, activeId, saveStatus, saveNow, newProject, loadProject, deleteProject, duplicateProject, templates, saveAsTemplate, loadTemplate, deleteTemplate } = store
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Convenience aliases & wrappers matching old API
+  const projectName = project.projectName
+  const projectAddr = project.projectAddr
+  const projectNotes = project.projectNotes
+  const photos = project.photos
+  const floors = project.floors
+  const basket = project.basket
+  const facePhotos = project.facePhotos
+
+  const setFloors = useCallback((fn: (prev: BuildingFloor[]) => BuildingFloor[]) => {
+    setProject(p => ({ ...p, floors: fn(p.floors) }))
+  }, [setProject])
+  const setBasket = useCallback((fn: (prev: BasketWindow[]) => BasketWindow[]) => {
+    setProject(p => ({ ...p, basket: fn(p.basket) }))
+  }, [setProject])
+  const setPhotos = useCallback((fn: (prev: string[]) => string[]) => {
+    setProject(p => ({ ...p, photos: fn(p.photos) }))
+  }, [setProject])
+  type FaceKey = "front" | "back" | "left" | "right"
+  const setFacePhotos = useCallback((fn: (prev: Record<FaceKey, string[]>) => Record<FaceKey, string[]>) => {
+    setProject(p => ({ ...p, facePhotos: fn(p.facePhotos) }))
+  }, [setProject])
+
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null)
   const [selectedPlacedId, setSelectedPlacedId] = useState<string | null>(null)
   const [expandedFloor, setExpandedFloor] = useState<string | null>(null)
@@ -62,15 +70,12 @@ export default function MeasurementsPage() {
     setHistory(h => [...h.slice(-30), prev]); setFuture([])
   }, [])
   const undo = useCallback(() => {
-    setHistory(h => { if (h.length === 0) return h; const prev = h[h.length - 1]; setFuture(f => [...f, floors]); setFloors(prev); return h.slice(0, -1) })
+    setHistory(h => { if (h.length === 0) return h; const prev = h[h.length - 1]; setFuture(f => [...f, floors]); setFloors(() => prev); return h.slice(0, -1) })
   }, [floors])
   const redo = useCallback(() => {
-    setFuture(f => { if (f.length === 0) return f; const next = f[f.length - 1]; setHistory(h => [...h, floors]); setFloors(next); return f.slice(0, -1) })
+    setFuture(f => { if (f.length === 0) return f; const next = f[f.length - 1]; setHistory(h => [...h, floors]); setFloors(() => next); return f.slice(0, -1) })
   }, [floors])
 
-  // Face Photos
-  type FaceKey = "front" | "back" | "left" | "right"
-  const [facePhotos, setFacePhotos] = useState<Record<FaceKey, string[]>>({ front: [], back: [], left: [], right: [] })
   const [activeFace, setActiveFace] = useState<FaceKey | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
 
@@ -125,16 +130,6 @@ export default function MeasurementsPage() {
   const typeGroups = useMemo(() => getTypeGroups(), [])
   const cIsDoor = isDoorType(cTypeKey)
 
-  useEffect(() => { try { const d = localStorage.getItem(SK); if (d) { const p = JSON.parse(d)
-    if (p.projectName) setProjectName(p.projectName); if (p.projectAddr) setProjectAddr(p.projectAddr)
-    if (p.projectNotes) setProjectNotes(p.projectNotes); if (p.photos) setPhotos(p.photos)
-    if (p.floors?.length) setFloors(p.floors); if (p.basket?.length) setBasket(p.basket)
-  } } catch {} }, [])
-
-  const save = useCallback(() => {
-    localStorage.setItem(SK, JSON.stringify({ projectName, projectAddr, projectNotes, photos, floors, basket }))
-  }, [projectName, projectAddr, projectNotes, photos, floors, basket])
-  useEffect(() => { const t = setTimeout(save, 1500); return () => clearTimeout(t) }, [save])
 
   const addFloor = useCallback(() => setFloors(p => {
     const last = p[p.length - 1]
@@ -189,10 +184,10 @@ export default function MeasurementsPage() {
   }, [])
 
   const reset = useCallback(() => {
-    if (!confirm("Reset project?")) return
-    setProjectName("New Project"); setProjectAddr(""); setProjectNotes(""); setPhotos([]); setFloors(DEFAULT_FLOORS); setBasket([])
-    setActiveWindowId(null); setSelectedPlacedId(null); setMoveMode(false); setCompileMode(false); localStorage.removeItem(SK)
-  }, [])
+    if (!confirm("Create a new empty project?")) return
+    newProject()
+    setActiveWindowId(null); setSelectedPlacedId(null); setMoveMode(false); setCompileMode(false)
+  }, [newProject])
 
   // ─── Active window config for ghost preview ───
   const activeWindowConfig = useMemo(() => {
@@ -213,7 +208,20 @@ export default function MeasurementsPage() {
   }, [compileMode, selectedPlacedId, floors, basket])
 
   return (
-    <div className="space-y-4">
+    <div className="lg:flex gap-4 items-start">
+      {/* ═══ LEFT SIDEBAR (History / Templates / Project) ═══ */}
+      <MeasurementsSidebar
+        records={records} activeId={activeId} saveStatus={saveStatus}
+        onNew={newProject} onLoad={loadProject} onDelete={deleteProject} onDuplicate={duplicateProject}
+        mobileOpen={sidebarOpen} onMobileToggle={() => setSidebarOpen(p => !p)}
+        templates={templates} onSaveAsTemplate={saveAsTemplate} onLoadTemplate={loadTemplate} onDeleteTemplate={deleteTemplate}
+        project={project}
+        onUpdateProject={(patch) => setProject(p => ({ ...p, ...patch }))}
+        onAddFloor={addFloor} onRemoveFloor={removeFloor} onUpdateFloor={updateFloor} onMoveFloor={moveFloor}
+        onPhotoUpload={handlePhotoUpload} onRemovePhoto={(idx) => setPhotos(p => p.filter((_, j) => j !== idx))}
+        expandedFloor={expandedFloor} onToggleFloor={(id) => setExpandedFloor(p => p === id ? null : id)}
+      />
+    <div className="flex-1 min-w-0 space-y-4">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
@@ -257,7 +265,7 @@ export default function MeasurementsPage() {
             <button onClick={() => setSolidMode(p => !p)} className={`${C.btn} ${solidMode ? "bg-slate-900 text-white border-slate-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
               {solidMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />} {solidMode ? "Solid" : "Transparent"}
             </button>
-            <button onClick={save} className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10`}><Save className="h-4 w-4 text-emerald-500" /> Save</button>
+            <button onClick={saveNow} className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10`}><Save className="h-4 w-4 text-emerald-500" /> Save</button>
             <button onClick={reset} className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10`}><RotateCcw className="h-4 w-4" /> Reset</button>
           </>}
         </div>
@@ -302,51 +310,7 @@ export default function MeasurementsPage() {
       <div className="flex flex-col lg:flex-row gap-4 items-start">
         {/* LEFT PANEL — hidden in compile mode */}
         {!compileMode && (
-          <div className="w-full lg:w-80 lg:shrink-0 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-            {/* Project Info */}
-            <div className={C.card}>
-              <p className={C.lbl}>Project Info</p>
-              <input value={projectName} onChange={e => setProjectName(e.target.value)} className={`${C.inp} font-bold`} placeholder="Project Name" />
-              <input value={projectAddr} onChange={e => setProjectAddr(e.target.value)} className={`${C.inp} mt-2`} placeholder="Address" />
-              <textarea value={projectNotes} onChange={e => setProjectNotes(e.target.value)} rows={2} className={`${C.inp} mt-2 resize-none`} placeholder="Notes…" />
-            </div>
-            {/* Photos */}
-            <div className={C.card}>
-              <p className={C.lbl}>Photos</p>
-              <div className="flex flex-wrap gap-2">
-                {photos.map((ph, i) => (
-                  <div key={i} className="relative group"><img src={ph} alt="" className="h-14 w-14 rounded-lg object-cover border border-slate-200 dark:border-white/10" />
-                    <button onClick={() => setPhotos(p => p.filter((_, j) => j !== i))} className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-[8px] hidden group-hover:flex items-center justify-center"><X className="h-2.5 w-2.5" /></button></div>
-                ))}
-                <label className="h-14 w-14 rounded-lg border-2 border-dashed border-slate-300 dark:border-white/20 flex items-center justify-center text-slate-400 hover:border-blue-500 cursor-pointer transition"><ImagePlus className="h-4 w-4" /><input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} /></label>
-              </div>
-            </div>
-            {/* Floors */}
-            <div className={C.card}>
-              <div className="flex items-center justify-between mb-2"><p className={C.lbl + " mb-0"}>Floors ({floors.length})</p>
-                <button onClick={addFloor} className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-0.5"><Plus className="h-3 w-3" /> Add</button></div>
-              <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
-                {floors.map(f => (
-                  <div key={f.id} className={`rounded-xl border p-2 text-xs ${expandedFloor === f.id ? "border-blue-400 bg-blue-50/50 dark:bg-blue-500/10" : "border-slate-200 dark:border-white/10"}`}>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setExpandedFloor(p => p === f.id ? null : f.id)} className="text-slate-400"><GripVertical className="h-3 w-3" /></button>
-                      <div className="h-3 w-3 rounded-sm" style={{ background: f.color }} />
-                      <input value={f.name} onChange={e => updateFloor(f.id, { name: e.target.value })} className="flex-1 bg-transparent text-xs font-bold outline-none text-slate-900 dark:text-white" />
-                      <button onClick={() => moveFloor(f.id, -1)} className="text-slate-400"><ChevronDown className="h-3 w-3" /></button>
-                      <button onClick={() => moveFloor(f.id, 1)} className="text-slate-400"><ChevronUp className="h-3 w-3" /></button>
-                      <button onClick={() => removeFloor(f.id)} className="text-red-400"><Trash2 className="h-3 w-3" /></button>
-                    </div>
-                    {expandedFloor === f.id && (
-                      <div className="grid grid-cols-3 gap-1.5 mt-2 pt-2 border-t border-slate-200 dark:border-white/10">
-                        <div><label className={C.lbl}>W</label><input type="number" min={2} max={50} value={f.width} onChange={e => updateFloor(f.id, { width: +e.target.value })} className={C.inp + " text-xs"} /></div>
-                        <div><label className={C.lbl}>D</label><input type="number" min={2} max={50} value={f.depth} onChange={e => updateFloor(f.id, { depth: +e.target.value })} className={C.inp + " text-xs"} /></div>
-                        <div><label className={C.lbl}>H</label><input type="number" min={1} max={10} step={0.5} value={f.ceilingHeight} onChange={e => updateFloor(f.id, { ceilingHeight: +e.target.value })} className={C.inp + " text-xs"} /></div>
-                      </div>)}
-                    {f.windows.length > 0 && <p className="text-[9px] text-blue-500 mt-1">📐 {f.windows.length} window{f.windows.length > 1 ? "s" : ""}</p>}
-                  </div>))}
-              </div>
-            </div>
-
+          <div className="w-full lg:w-72 lg:shrink-0 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
             {/* Scale / Real Dimensions */}
             <div className={C.card}>
               <div className="flex items-center justify-between mb-2">
@@ -651,6 +615,7 @@ export default function MeasurementsPage() {
           )}
         </AnimatePresence>
       </div>
+    </div>
     </div>
   )
 }
