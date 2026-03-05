@@ -168,15 +168,38 @@ export default function MeasurementsPage() {
     setCLabel(""); setCNotes(""); setShowCreator(false)
   }, [cLabel, cTypeKey, cW, cH, cProd, cExtC, cIntC, cGlass, cGlassT, cHingeL, cSwingIn, cNotes, cLowE, cGlassThick, cArgonGas, cGlassFinish, cScreen])
 
+  // ─── NEW: Click-to-grab repositioning ───
+  // Clicking a placed window auto-grabs it (no toggle needed)
+  const handlePlacedWindowClick = useCallback((windowId: string) => {
+    if (compileMode) {
+      // In compile mode, just select for detail view
+      setSelectedPlacedId(windowId)
+      return
+    }
+    if (moveMode && selectedPlacedId === windowId) {
+      // Clicking same window again = cancel grab
+      setMoveMode(false); setSelectedPlacedId(null)
+      return
+    }
+    // Auto-grab: enter move mode with this window
+    pushHistory(floors)
+    setMoveMode(true)
+    setSelectedPlacedId(windowId)
+    setActiveWindowId(null) // clear any basket selection
+  }, [compileMode, moveMode, selectedPlacedId, floors, pushHistory])
+
   const handleFaceClick = useCallback((floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => {
     if (moveMode && selectedPlacedId) {
+      // DROP the grabbed window at this exact position
       setFloors(p => {
         const pw = p.flatMap(f => f.windows).find(w => w.id === selectedPlacedId)
         if (!pw) return p
         const cleaned = p.map(f => ({ ...f, windows: f.windows.filter(w => w.id !== selectedPlacedId) }))
         return cleaned.map(f => f.id === floorId ? { ...f, windows: [...f.windows, { ...pw, face, posU: u, posV: v }] } : f)
       })
-      setSelectedPlacedId(null); return
+      // Auto-exit move mode after drop
+      setSelectedPlacedId(null); setMoveMode(false)
+      return
     }
     if (!activeWindowId) return
     const bw = basket.find(x => x.id === activeWindowId)
@@ -188,6 +211,17 @@ export default function MeasurementsPage() {
     setFloors(p => p.map(f => f.id === floorId ? { ...f, windows: [...f.windows, pw] } : f))
     setActiveWindowId(null)
   }, [activeWindowId, moveMode, selectedPlacedId, basket])
+
+  // Escape key cancels grab
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && moveMode) {
+        setMoveMode(false); setSelectedPlacedId(null)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [moveMode])
 
   const removePlacedWindow = useCallback((pwId: string) => {
     setFloors(p => p.map(f => ({ ...f, windows: f.windows.filter(w => w.id !== pwId) }))); setSelectedPlacedId(null); setMoveMode(false)
@@ -278,10 +312,6 @@ export default function MeasurementsPage() {
             <Redo2 className="h-4 w-4" />
           </button>
           {!compileMode && <>
-            <button onClick={() => { setMoveMode(p => !p); setSelectedPlacedId(null) }}
-              className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
-              {moveMode ? <><Unlock className="h-4 w-4" /> Reposition</> : <><Lock className="h-4 w-4" /> Locked</>}
-            </button>
             <button onClick={() => setSolidMode(p => !p)} className={`${C.btn} ${solidMode ? "bg-slate-900 text-white border-slate-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
               {solidMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />} {solidMode ? "Solid" : "Transparent"}
             </button>
@@ -292,7 +322,7 @@ export default function MeasurementsPage() {
               if (!confirm(`Export ${basket.length} basket item(s) to a new Estimate?\n\nFloors with placed windows will become rooms. Pricing can be added in the Estimate Creator.`)) return
               saveNow()
               const estId = exportToEstimate(project)
-              if (estId) { setExportedId(estId) } else { alert("Export failed — check console") }
+              if (estId) { setExportedId(estId); try { localStorage.setItem("vx_nav_pulse_estimates", String(Date.now())) } catch {} } else { alert("Export failed — check console") }
             }} disabled={basket.length === 0}
               className={`${C.btn} bg-indigo-600 text-white border-indigo-700 hover:bg-indigo-700 disabled:opacity-40`}>
               <FileOutput className="h-4 w-4" /> Export to Estimate
@@ -542,6 +572,22 @@ export default function MeasurementsPage() {
             })}
           </div>
 
+          {/* Grab status bar */}
+          <AnimatePresence>
+            {moveMode && selectedPlacedId && (() => {
+              const pw = floors.flatMap(f => f.windows).find(w => w.id === selectedPlacedId)
+              return pw ? (
+                <motion.div key="grab-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                  className="rounded-xl bg-purple-600 text-white px-4 py-2 flex items-center gap-3 shadow-lg shadow-purple-500/20">
+                  <Move className="h-4 w-4 animate-pulse" />
+                  <span className="text-xs font-bold flex-1">🎯 Tap any building face to place &quot;{pw.label}&quot; — or press <kbd className="px-1.5 py-0.5 rounded bg-purple-500 text-[10px] font-bold mx-0.5">Esc</kbd> to cancel</span>
+                  <button onClick={() => { setMoveMode(false); setSelectedPlacedId(null) }}
+                    className="px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-[10px] font-bold transition">Cancel</button>
+                </motion.div>
+              ) : null
+            })()}
+          </AnimatePresence>
+
           {/* ── 3D Canvas ── */}
           <div className="flex-1 min-w-0">
             <div className={`${C.card} p-0 overflow-hidden relative`}>
@@ -560,7 +606,7 @@ export default function MeasurementsPage() {
               <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
                 <Building3DCanvas floors={floors} activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
                   moveMode={moveMode} compileMode={compileMode}
-                  onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
+                  onFaceClick={handleFaceClick} onPlacedWindowClick={handlePlacedWindowClick}
                   selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
               </div>
             </div>

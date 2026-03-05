@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { Link as IntlLink } from "@/i18n/navigation"
 import { usePathname } from "next/navigation"
@@ -69,6 +69,27 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const T = usePortalT()
   const [collapsed, setCollapsed] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [pulseEstimates, setPulseEstimates] = useState(false)
+
+  // Detect "export to estimate" pulse signal from measurements page
+  useEffect(() => {
+    const check = () => {
+      try {
+        const ts = localStorage.getItem("vx_nav_pulse_estimates")
+        if (ts && Date.now() - Number(ts) < 8000) {
+          setPulseEstimates(true)
+          localStorage.removeItem("vx_nav_pulse_estimates")
+          setTimeout(() => setPulseEstimates(false), 4000)
+        }
+      } catch {}
+    }
+    check()
+    const onStorage = (e: StorageEvent) => { if (e.key === "vx_nav_pulse_estimates") check() }
+    window.addEventListener("storage", onStorage)
+    // Also poll briefly (same-tab writes don't fire storage event)
+    const interval = setInterval(check, 500)
+    return () => { window.removeEventListener("storage", onStorage); clearInterval(interval) }
+  }, [])
   const userRole = (session?.user?.role || "client") as UserRole
   const userName = session?.user?.name || "User"
   const userEmail = session?.user?.email || ""
@@ -189,6 +210,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 const Icon = iconMap[item.icon] || LayoutDashboard
                 const active = isActive(item.href)
                 const isHovered = hoveredItem === item.href
+                const isPulsing = pulseEstimates && item.label === "Estimates"
 
                 return (
                   <div key={item.href} className="relative">
@@ -198,7 +220,9 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                       onMouseEnter={() => setHoveredItem(item.href)}
                       onMouseLeave={() => setHoveredItem(null)}
                       className={`group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                        active
+                        isPulsing
+                          ? "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500 ring-offset-1 animate-pulse shadow-lg shadow-indigo-500/20"
+                          : active
                           ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
                           : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                       } ${collapsed ? "justify-center" : ""}`}
