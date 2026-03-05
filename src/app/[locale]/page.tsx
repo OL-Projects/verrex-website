@@ -9,7 +9,6 @@ import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { products, services, testimonials, companyInfo } from "@/lib/data"
-import { formatCurrency } from "@/lib/utils"
 import { FadeIn, FadeInLeft, FadeInRight, StaggerContainer, StaggerItem, ScaleIn, RevealSection, AnimatedCounter, HoverCard } from "@/components/ui/motion"
 import {
   ArrowRight,
@@ -260,7 +259,7 @@ export default function HomePage() {
                   <HoverCard>
                     <Card className="group h-full cursor-pointer hover:shadow-lg transition-all duration-300">
                       <div className="aspect-[4/3] rounded-t-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] flex items-center justify-center p-6">
-                        <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[140px] max-h-[105px] opacity-90 group-hover:opacity-100 transition-opacity" />
+                        <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[200px] max-h-[150px] opacity-90 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <CardContent className="p-5">
                         <Badge variant="secondary" className="mb-2 text-xs">{product.category}</Badge>
@@ -268,8 +267,8 @@ export default function HomePage() {
                           {product.name}
                         </h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{product.shortDescription}</p>
-                        <div className="mt-3 text-sm font-medium text-blue-600 dark:text-blue-400">
-                          {t('from')} {formatCurrency(product.priceRange.min)}
+                        <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          View Details <ArrowRight className="h-3 w-3" />
                         </div>
                       </CardContent>
                     </Card>

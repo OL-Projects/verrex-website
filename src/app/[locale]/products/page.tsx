@@ -111,7 +111,7 @@ export default function ProductsPage() {
                           {t('featured')}
                         </Badge>
                       )}
-                      <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[160px] max-h-[120px] opacity-90 group-hover:opacity-100 transition-opacity" />
+                      <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[220px] max-h-[160px] opacity-90 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <CardContent className="p-5">
                       <div className="flex items-center gap-2 mb-2">

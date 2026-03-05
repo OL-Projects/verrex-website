@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { products, services, partners } from "@/lib/data"
-import { formatCurrency } from "@/lib/utils"
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion"
 import {
   Search,
@@ -90,7 +89,7 @@ export default function SearchPage() {
           description: p.shortDescription,
           href: `/products/${p.id}`,
           badge: p.category,
-          meta: `${formatCurrency(p.priceRange.min)} - ${formatCurrency(p.priceRange.max)}`,
+          meta: p.subcategory,
         })
       }
     })

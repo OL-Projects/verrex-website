@@ -375,7 +375,7 @@ export default function CatalogPage() {
                     {filteredProducts.map((product) => (
                       <Card key={product.id} className="group h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                         <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden flex items-center justify-center p-8">
-                          <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[180px] max-h-[120px] opacity-90 group-hover:opacity-100 transition-opacity" />
+                          <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[220px] max-h-[160px] opacity-90 group-hover:opacity-100 transition-opacity" />
                           <div className="absolute top-3 left-3 flex gap-1.5">
                             <Badge variant="secondary" className="text-[10px]">{product.subcategory}</Badge>
                           </div>
