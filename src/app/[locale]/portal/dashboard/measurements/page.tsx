@@ -7,8 +7,11 @@ import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
 import { WINDOW_TYPES, getTypeGroups, isDoorType, PRODUCTS as EST_PRODUCTS, DEFAULT_EXT_COLORS, DEFAULT_INT_COLORS } from "@/lib/estimate-config"
-import { useMeasurementStore, createFloor, type BasketWindow } from "@/lib/measurements-store"
+import { useMeasurementStore, createFloor, exportToEstimate, type BasketWindow } from "@/lib/measurements-store"
+import { GLASS_SPEC_DEFAULTS } from "@/lib/estimate-config"
 import { MeasurementsSidebar } from "@/components/portal/measurements-sidebar"
+import { useRouter, useParams } from "next/navigation"
+import { FileOutput } from "lucide-react"
 
 const C = {
   card: "rounded-2xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 p-4",
@@ -126,6 +129,17 @@ export default function MeasurementsPage() {
   const [cGlass, setCGlass] = useState("Double"); const [cGlassT, setCGlassT] = useState("Low-E")
   const [cHingeL, setCHingeL] = useState(false); const [cSwingIn, setCSwingIn] = useState(true)
   const [cNotes, setCNotes] = useState("")
+  // Glass spec fields (matching estimate creator)
+  const [cLowE, setCLowE] = useState("1 Side")
+  const [cGlassThick, setCGlassThick] = useState("5mm")
+  const [cArgonGas, setCArgonGas] = useState("18mm")
+  const [cGlassFinish, setCGlassFinish] = useState("Clear")
+  const [cScreen, setCScreen] = useState("Not Included")
+  // Export state
+  const router = useRouter()
+  const params = useParams()
+  const locale = (params?.locale as string) || "en"
+  const [exportedId, setExportedId] = useState<string | null>(null)
 
   const typeGroups = useMemo(() => getTypeGroups(), [])
   const cIsDoor = isDoorType(cTypeKey)
@@ -149,9 +163,10 @@ export default function MeasurementsPage() {
     const cfg = WINDOW_TYPES[cTypeKey]
     setBasket(p => [...p, { id: uid(), label: cLabel, typeKey: cTypeKey, width: cW, height: cH,
       product: cProd, extColor: cExtC, intColor: cIntC, glass: cGlass, glassType: cGlassT,
-      hingeLeft: cHingeL, swingIn: cSwingIn, notes: cNotes }])
+      hingeLeft: cHingeL, swingIn: cSwingIn, notes: cNotes,
+      lowE: cLowE, glassThicknessSpec: cGlassThick, argonGas: cArgonGas, glassFinish: cGlassFinish, screen: cScreen }])
     setCLabel(""); setCNotes(""); setShowCreator(false)
-  }, [cLabel, cTypeKey, cW, cH, cProd, cExtC, cIntC, cGlass, cGlassT, cHingeL, cSwingIn, cNotes])
+  }, [cLabel, cTypeKey, cW, cH, cProd, cExtC, cIntC, cGlass, cGlassT, cHingeL, cSwingIn, cNotes, cLowE, cGlassThick, cArgonGas, cGlassFinish, cScreen])
 
   const handleFaceClick = useCallback((floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => {
     if (moveMode && selectedPlacedId) {
@@ -271,10 +286,40 @@ export default function MeasurementsPage() {
               {solidMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />} {solidMode ? "Solid" : "Transparent"}
             </button>
             <button onClick={saveNow} className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10`}><Save className="h-4 w-4 text-emerald-500" /> Save</button>
+            <button onClick={() => {
+              const total = basket.length + floors.reduce((s, f) => s + f.windows.length, 0)
+              if (basket.length === 0) { alert("Add windows to the basket first"); return }
+              if (!confirm(`Export ${basket.length} basket item(s) to a new Estimate?\n\nFloors with placed windows will become rooms. Pricing can be added in the Estimate Creator.`)) return
+              saveNow()
+              const estId = exportToEstimate(project)
+              if (estId) { setExportedId(estId) } else { alert("Export failed — check console") }
+            }} disabled={basket.length === 0}
+              className={`${C.btn} bg-indigo-600 text-white border-indigo-700 hover:bg-indigo-700 disabled:opacity-40`}>
+              <FileOutput className="h-4 w-4" /> Export to Estimate
+            </button>
             <button onClick={reset} className={`${C.btn} border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10`}><RotateCcw className="h-4 w-4" /> Reset</button>
           </>}
         </div>
       </motion.div>
+
+      {/* Export success banner */}
+      <AnimatePresence>
+        {exportedId && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 p-3 flex items-center gap-3">
+            <FileOutput className="h-5 w-5 text-indigo-600 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold text-indigo-900 dark:text-indigo-200">✅ Estimate Created Successfully</p>
+              <p className="text-[11px] text-indigo-600 dark:text-indigo-400">{basket.length} window(s) exported with full specs — pricing can be added in the Estimate Creator</p>
+            </div>
+            <button onClick={() => { router.push(`/${locale}/portal/dashboard/estimates`) }}
+              className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition shrink-0">
+              Open Estimate →
+            </button>
+            <button onClick={() => setExportedId(null)} className="text-indigo-400 hover:text-indigo-600 shrink-0"><X className="h-4 w-4" /></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex flex-col lg:flex-row gap-4 items-start">
         {/* LEFT PANEL — hidden in compile mode */}
@@ -369,8 +414,16 @@ export default function MeasurementsPage() {
                         <div><label className={C.lbl}>Int Color</label><select value={cIntC} onChange={e => setCIntC(e.target.value)} className={C.sel}>{DEFAULT_INT_COLORS.map(c => <option key={c}>{c}</option>)}</select></div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        <div><label className={C.lbl}>Glass</label><select value={cGlass} onChange={e => setCGlass(e.target.value)} className={C.sel}>{GLASS_OPTS.map(t => <option key={t}>{t}</option>)}</select></div>
-                        <div><label className={C.lbl}>Glass Type</label><select value={cGlassT} onChange={e => setCGlassT(e.target.value)} className={C.sel}>{GLASS_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                        <div><label className={C.lbl}>Thermal</label><select value={cGlass} onChange={e => setCGlass(e.target.value)} className={C.sel}>{GLASS_SPEC_DEFAULTS.thermalOptions.map(t => <option key={t}>{t}</option>)}</select></div>
+                        <div><label className={C.lbl}>Low-E</label><select value={cLowE} onChange={e => setCLowE(e.target.value)} className={C.sel}>{GLASS_SPEC_DEFAULTS.lowEOptions.map(t => <option key={t}>{t}</option>)}</select></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div><label className={C.lbl}>Glass Thick.</label><select value={cGlassThick} onChange={e => setCGlassThick(e.target.value)} className={C.sel}>{GLASS_SPEC_DEFAULTS.glassThicknessOptions.map(t => <option key={t}>{t}</option>)}</select></div>
+                        <div><label className={C.lbl}>Argon Gas</label><select value={cArgonGas} onChange={e => setCArgonGas(e.target.value)} className={C.sel}>{GLASS_SPEC_DEFAULTS.argonGasOptions.map(t => <option key={t}>{t}</option>)}</select></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div><label className={C.lbl}>Glass Finish</label><select value={cGlassFinish} onChange={e => setCGlassFinish(e.target.value)} className={C.sel}>{GLASS_SPEC_DEFAULTS.glassFinishOptions.map(t => <option key={t}>{t}</option>)}</select></div>
+                        <div><label className={C.lbl}>Screen</label><select value={cScreen} onChange={e => setCScreen(e.target.value)} className={C.sel}><option>Not Included</option><option>Included</option></select></div>
                       </div>
                       {/* Hinge / Swing toggles */}
                       <div className="flex gap-2">

@@ -8,6 +8,17 @@ export interface BasketWindow {
   id: string; label: string; typeKey: string; width: number; height: number
   product: string; extColor: string; intColor: string; glass: string; glassType: string
   hingeLeft: boolean; swingIn: boolean; notes: string
+  // Full glass spec fields (matching estimate creator)
+  lowE?: string           // "1 Side" | "2 Sides"
+  glassThicknessSpec?: string // "5mm" | "6mm"
+  argonGas?: string       // "18mm" | "24mm"
+  glassFinish?: string    // "Clear" | "Frosted"
+  screen?: string         // "Not Included" | "Included"
+  // Trim
+  trimInstall?: boolean
+  trimStyle?: "flat" | "colonial"
+  // Location context (set from placed position)
+  location?: string
 }
 
 type FaceKey = "front" | "back" | "left" | "right"
@@ -292,5 +303,106 @@ export function useMeasurementStore() {
     saveStatus, saveNow,
     newProject, loadProject, deleteProject, duplicateProject,
     templates, saveAsTemplate, loadTemplate, deleteTemplate,
+  }
+}
+
+// ── Export to Estimate ──────────────────────────
+// Creates a new estimate in localStorage from measurements basket + floors
+export function exportToEstimate(proj: MeasurementProjectData): string | null {
+  try {
+    const estId = `est_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
+
+    // Map BasketWindow → EstimateItem, organized by floor
+    function mapItem(bw: BasketWindow, face?: string, floorName?: string): Record<string, unknown> {
+      return {
+        id: `itm_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+        type: bw.typeKey, product: bw.product,
+        extColor: bw.extColor, intColor: bw.intColor,
+        width: bw.width, height: bw.height, depth: 5.75, thickness: 4,
+        customLabel: bw.label,
+        location: face ? `${face.toUpperCase()} face${floorName ? ` — ${floorName}` : ""}` : bw.location || "",
+        qty: 1, unitPrice: 0, notes: bw.notes, attachmentNames: [],
+        hingeLeft: bw.hingeLeft, swingInside: bw.swingIn,
+        trimInstall: bw.trimInstall || false, trimStyle: bw.trimStyle || "flat", trimPrice: 0,
+        installOverride: false, installPrice: 0,
+        thermal: bw.glass || "Double",
+        lowE: bw.lowE || "1 Side",
+        glassThickness: bw.glassThicknessSpec || "5mm",
+        argonGas: bw.argonGas || "18mm",
+        glassType: bw.glassType || "Ultra Clear",
+        glassFinish: bw.glassFinish || "Clear",
+        screen: bw.screen || "Not Included",
+      }
+    }
+
+    // Group placed windows by floor
+    const placedIds = new Set<string>()
+    const rooms: { id: string; name: string; items: Record<string, unknown>[] }[] = []
+
+    for (const floor of proj.floors) {
+      if (floor.windows.length === 0) continue
+      const items = floor.windows.map(pw => {
+        placedIds.add(pw.measurementId)
+        const bw = proj.basket.find(b => b.id === pw.measurementId)
+        if (!bw) return mapItem({ id: pw.id, label: pw.label, typeKey: pw.typeKey || "FIX", width: pw.wInches || 48, height: pw.hInches || 48, product: "double-tempered", extColor: "White", intColor: "White", glass: "Double", glassType: "Clear", hingeLeft: false, swingIn: true, notes: "" }, pw.face, floor.name)
+        return mapItem(bw, pw.face, floor.name)
+      })
+      rooms.push({ id: `rm_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`, name: floor.name, items })
+    }
+
+    // Unplaced basket items
+    const unplaced = proj.basket.filter(bw => !placedIds.has(bw.id))
+    if (unplaced.length > 0) {
+      rooms.push({
+        id: `rm_${Date.now().toString(36)}_unp`,
+        name: "Unplaced Windows",
+        items: unplaced.map(bw => mapItem(bw)),
+      })
+    }
+
+    // If no rooms at all, create one default room
+    if (rooms.length === 0) {
+      rooms.push({ id: `rm_${Date.now().toString(36)}_def`, name: "GROUND FLOOR", items: [] })
+    }
+
+    // Build EstimateState
+    const estState = {
+      company: { name: "VEREX", tagline: "WINDOWS & DOORS — FENÊTRES & PORTES", address: "", city: "", phone: "", email: "", website: "VEREX-website.vercel.app", logoUrl: "" },
+      estimateNumber: `VX-${new Date().getFullYear()}-MEAS`,
+      date: new Date().toISOString().slice(0, 10),
+      validUntil: "", requiredBy: "",
+      soldToLabel: "Sold To",
+      clientName: proj.projectName || "Measurements Export",
+      clientAddress: proj.projectAddr || "", clientCity: "", clientPhone: "", clientEmail: "",
+      shipToLabel: "Ship To", shipMethod: "PICKUP", shipAddress: "", shipPhone: "",
+      repName: "", repRef: "",
+      rooms,
+      installPerUnit: 275, delivery: 850, depositPct: 30,
+      termsText: "",
+    }
+
+    // Write to localStorage (same format as estimate-store)
+    writeLS(`VEREX_est_data_${estId}`, estState)
+
+    // Add to estimate records
+    const totalItems = rooms.reduce((s, r) => s + r.items.length, 0)
+    const estRecord = {
+      id: estId,
+      savedAt: new Date().toISOString(),
+      clientName: proj.projectName || "Measurements Export",
+      estimateNumber: estState.estimateNumber,
+      total: 0,
+      itemCount: totalItems,
+    }
+    const existingRecords = readLS<unknown[]>("VEREX_est_records", [])
+    writeLS("VEREX_est_records", [estRecord, ...existingRecords])
+
+    // Set as active estimate
+    writeLS("VEREX_est_active_id", estId)
+
+    return estId
+  } catch (e) {
+    console.error("Export to estimate failed:", e)
+    return null
   }
 }
