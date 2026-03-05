@@ -169,25 +169,34 @@ export default function MeasurementsPage() {
     setCLabel(""); setCNotes(""); setShowCreator(false)
   }, [cLabel, cTypeKey, cW, cH, cProd, cExtC, cIntC, cGlass, cGlassT, cHingeL, cSwingIn, cNotes, cLowE, cGlassThick, cArgonGas, cGlassFinish, cScreen])
 
-  // ─── NEW: Click-to-grab repositioning ───
-  // Clicking a placed window auto-grabs it (no toggle needed)
+  // ─── Click-to-select + explicit Move ───
+  // First click = select for details. Move initiated via button or second click.
   const handlePlacedWindowClick = useCallback((windowId: string) => {
     if (compileMode) {
-      // In compile mode, just select for detail view
       setSelectedPlacedId(windowId)
       return
     }
     if (moveMode && selectedPlacedId === windowId) {
-      // Clicking same window again = cancel grab
+      // Clicking same window while already grabbed = cancel
       setMoveMode(false); setSelectedPlacedId(null)
       return
     }
-    // Auto-grab: enter move mode with this window
+    if (moveMode && selectedPlacedId) {
+      // Already moving a different window — cancel and select new one
+      setMoveMode(false)
+    }
+    // Select for detail view (side panel shows Move button)
+    setSelectedPlacedId(windowId)
+    setActiveWindowId(null) // clear any basket selection
+  }, [compileMode, moveMode, selectedPlacedId])
+
+  // Explicit move: called from side panel "Move" button or double-click
+  const startMoveWindow = useCallback((windowId: string) => {
     pushHistory(floors)
     setMoveMode(true)
     setSelectedPlacedId(windowId)
-    setActiveWindowId(null) // clear any basket selection
-  }, [compileMode, moveMode, selectedPlacedId, floors, pushHistory])
+    setActiveWindowId(null)
+  }, [floors, pushHistory])
 
   const handleFaceClick = useCallback((floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => {
     if (moveMode && selectedPlacedId) {
@@ -658,8 +667,8 @@ export default function MeasurementsPage() {
 
         {/* RIGHT PANEL — edit detail OR compile dashboard */}
         <AnimatePresence>
-          {/* Edit mode: selected window detail */}
-          {!compileMode && selectedPlacedId && rightPanelOpen && (() => {
+          {/* Edit mode: selected window detail — HIDDEN during move mode (user should focus on 3D canvas) */}
+          {!compileMode && selectedPlacedId && rightPanelOpen && !moveMode && (() => {
             const pw = floors.flatMap(f => f.windows).find(w => w.id === selectedPlacedId)
             if (!pw) return null
             const bw = basket.find(x => x.id === pw.measurementId)
@@ -692,7 +701,12 @@ export default function MeasurementsPage() {
                     </div>
                     {bw?.notes && <p className="text-[10px] text-slate-500 mt-2 italic border-t border-slate-200 dark:border-white/10 pt-2">📝 {bw.notes}</p>}
                     {moveMode && <p className="text-[10px] text-purple-600 font-bold mt-3 animate-pulse">🔀 Tap a face to drop this window</p>}
-                    <div className="flex gap-2 mt-4">
+                    {/* Primary action: Move this window */}
+                    <button onClick={() => startMoveWindow(selectedPlacedId)}
+                      className="w-full py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition flex items-center justify-center gap-1.5 mt-4">
+                      <Move className="h-3.5 w-3.5" /> Move Window → Click Face to Place
+                    </button>
+                    <div className="flex gap-2 mt-2">
                       <button onClick={() => setSelectedPlacedId(null)} className={`flex-1 ${C.btn} justify-center border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5`}>Deselect</button>
                       <button onClick={() => removePlacedWindow(selectedPlacedId)} className={`flex-1 ${C.btn} justify-center bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600`}><Trash2 className="h-3.5 w-3.5" /> Remove</button>
                     </div>

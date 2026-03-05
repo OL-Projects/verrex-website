@@ -419,7 +419,7 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
   }, [onFaceClick])
 
   return (
-    <Canvas style={{ width: "100%", height: "100%", cursor: selectMode ? "crosshair" : "auto" }} shadows dpr={[1, 1.5]} flat
+    <Canvas style={{ width: "100%", height: "100%", cursor: moveMode ? "grabbing" : selectMode ? "crosshair" : "auto" }} shadows dpr={[1, 1.5]} flat
       performance={{ min: 0.5 }}
       onPointerMissed={() => onDeselect?.()}>
       <PerspectiveCamera makeDefault position={[camDist * 0.7, camDist * 0.5, camDist * 0.7]} fov={45} />
