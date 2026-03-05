@@ -39,9 +39,17 @@ interface LiveMovePos {
   posV: number
 }
 
+interface ActiveWindowConfig {
+  typeKey: string
+  wInches: number
+  hInches: number
+  label: string
+}
+
 interface SceneProps {
   floors: BuildingFloor[]
   activeWindowId: string | null
+  activeWindowConfig?: ActiveWindowConfig | null
   moveMode: boolean
   compileMode: boolean
   onFaceClick: (floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => void
@@ -132,11 +140,13 @@ function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, soli
 }
 
 /* ─── Single Floor ─── */
-function FloorMesh({ floor, yOffset, activeWindowId, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, liveMovePos, setLiveMovePos, unit }: {
+function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, liveMovePos, setLiveMovePos, unit }: {
   floor: BuildingFloor; yOffset: number; solidMode: boolean; moveMode: boolean; compileMode: boolean; unit: "ft" | "m"
+  activeWindowConfig?: ActiveWindowConfig | null
   liveMovePos: LiveMovePos | null; setLiveMovePos: (p: LiveMovePos | null) => void
 } & Pick<SceneProps, "activeWindowId" | "onFaceClick" | "onPlacedWindowClick" | "selectedPlacedId">) {
   const [hoveredFace, setHoveredFace] = useState<string | null>(null)
+  const [ghostHit, setGhostHit] = useState<{ face: "front"|"back"|"left"|"right"; u: number; v: number } | null>(null)
   const boxRef = useRef<THREE.Mesh>(null)
   const { width: w, depth: d, ceilingHeight: h } = floor
   const canPlace = !compileMode && (!!activeWindowId || moveMode)
@@ -174,9 +184,14 @@ function FloorMesh({ floor, yOffset, activeWindowId, moveMode, compileMode, onFa
       setHoveredFace(hit.face)
       if (moveMode && selectedPlacedId) {
         setLiveMovePos({ windowId: selectedPlacedId, floorId: floor.id, face: hit.face, posU: hit.u, posV: hit.v })
+        setGhostHit(null)
+      } else if (activeWindowId && !moveMode && activeWindowConfig) {
+        setGhostHit({ face: hit.face, u: hit.u, v: hit.v })
+      } else {
+        setGhostHit(null)
       }
-    } else { setHoveredFace(null) }
-  }, [canPlace, moveMode, selectedPlacedId, computeFaceHit, setLiveMovePos, floor.id])
+    } else { setHoveredFace(null); setGhostHit(null) }
+  }, [canPlace, moveMode, selectedPlacedId, activeWindowId, activeWindowConfig, computeFaceHit, setLiveMovePos, floor.id])
 
   const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
@@ -208,7 +223,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, moveMode, compileMode, onFa
   return (
     <group position={[0, yOffset, 0]}>
       <mesh ref={boxRef} position={[0, h / 2, 0]} onClick={handleClick}
-        onPointerMove={handlePointerMove} onPointerOut={() => setHoveredFace(null)}>
+        onPointerMove={handlePointerMove} onPointerOut={() => { setHoveredFace(null); setGhostHit(null) }}>
         <boxGeometry args={[w, h, d]} />
         <meshStandardMaterial color={hoveredFace ? (moveMode ? "#c084fc" : "#60a5fa") : wc}
           transparent={!solidMode} opacity={wo} side={solidMode ? THREE.FrontSide : THREE.DoubleSide}
@@ -242,6 +257,32 @@ function FloorMesh({ floor, yOffset, activeWindowId, moveMode, compileMode, onFa
           <group position={wp.pos} rotation={wp.rot}>
             <FaceWindowCard pw={liveWindow} isSelected={true} winW={winW} winH={winH}
               onClick={() => {}} compileMode={compileMode} solidMode={solidMode} />
+          </group>
+        )
+      })()}
+      {/* Ghost preview for initial placement from basket */}
+      {ghostHit && activeWindowConfig && !moveMode && (() => {
+        const gw = activeWindowConfig.wInches * inchToUnit
+        const gh = activeWindowConfig.hInches * inchToUnit
+        const ratio = activeWindowConfig.hInches / activeWindowConfig.wInches
+        const adjH = Math.min(gh, gw * ratio * 1.2)
+        const adjW = adjH / ratio
+        const htmlW = Math.max(50, adjW * 50)
+        const htmlH = htmlW * ratio
+        const wp = toWorldPos(ghostHit.face, ghostHit.u, ghostHit.v)
+        return (
+          <group position={wp.pos} rotation={wp.rot}>
+            <Html position={[0, 0, 0.02]} center transform style={{ pointerEvents: "none" }} distanceFactor={6}>
+              <div style={{ width: htmlW, height: htmlH, opacity: 0.45 }}
+                className="ring-2 ring-amber-400 ring-dashed rounded-sm">
+                <FenestrationSVG typeKey={activeWindowConfig.typeKey} w={activeWindowConfig.wInches} h={activeWindowConfig.hInches} />
+              </div>
+            </Html>
+            <Html position={[0, -adjH / 2 - 0.18, 0]} center transform style={{ pointerEvents: "none" }}>
+              <div className="text-[7px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap bg-amber-500/70 text-white shadow-sm animate-pulse">
+                {activeWindowConfig.label} — Click to place
+              </div>
+            </Html>
           </group>
         )
       })()}
@@ -318,7 +359,7 @@ function ScaleIndicator({ unit }: { unit: "ft" | "m" }) {
 }
 
 /* ─── Main Scene ─── */
-export function BuildingScene({ floors, activeWindowId, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, unit = "ft" }: SceneProps) {
+export function BuildingScene({ floors, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, unit = "ft" }: SceneProps) {
   const isSolid = solidMode || compileMode
   const [liveMovePos, setLiveMovePos] = useState<LiveMovePos | null>(null)
 
@@ -360,7 +401,8 @@ export function BuildingScene({ floors, activeWindowId, moveMode, compileMode, o
       {/* Floors */}
       {floors.map((floor, i) => (
         <FloorMesh key={floor.id} floor={floor} yOffset={offsets[i]}
-          activeWindowId={activeWindowId} moveMode={moveMode} compileMode={compileMode}
+          activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
+          moveMode={moveMode} compileMode={compileMode}
           onFaceClick={handleFaceClick} onPlacedWindowClick={onPlacedWindowClick}
           selectedPlacedId={selectedPlacedId} solidMode={isSolid}
           liveMovePos={liveMovePos} setLiveMovePos={setLiveMovePos} unit={unit} />

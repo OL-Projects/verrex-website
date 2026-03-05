@@ -18,6 +18,7 @@ const BuildingScene = dynamic(
 interface Props {
   floors: BuildingFloor[]
   activeWindowId: string | null
+  activeWindowConfig?: { typeKey: string; wInches: number; hInches: number; label: string } | null
   moveMode: boolean
   compileMode: boolean
   onFaceClick: (floorId: string, face: "front" | "back" | "left" | "right", u: number, v: number) => void

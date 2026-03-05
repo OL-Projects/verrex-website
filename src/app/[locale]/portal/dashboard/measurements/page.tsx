@@ -137,6 +137,14 @@ export default function MeasurementsPage() {
     setActiveWindowId(null); setSelectedPlacedId(null); setMoveMode(false); setCompileMode(false); localStorage.removeItem(SK)
   }, [])
 
+  // ─── Active window config for ghost preview ───
+  const activeWindowConfig = useMemo(() => {
+    if (!activeWindowId) return null
+    const bw = basket.find(x => x.id === activeWindowId)
+    if (!bw) return null
+    return { typeKey: bw.typeKey, wInches: bw.width, hInches: bw.height, label: bw.label }
+  }, [activeWindowId, basket])
+
   // ─── Compile mode detail popup ───
   const compileDetail = useMemo(() => {
     if (!compileMode || !selectedPlacedId) return null
@@ -371,7 +379,8 @@ export default function MeasurementsPage() {
               </button>
             )}
             <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
-              <Building3DCanvas floors={floors} activeWindowId={activeWindowId} moveMode={moveMode} compileMode={compileMode}
+              <Building3DCanvas floors={floors} activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
+                moveMode={moveMode} compileMode={compileMode}
                 onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
                 selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
             </div>
