@@ -36,7 +36,8 @@ export interface Product {
   description: string
   shortDescription: string
   category: ProductCategory
-  subcategory: string
+  subcategory: "Windows" | "Doors"
+  diagramId: string
   images: string[]
   features: string[]
   specifications: Record<string, string>

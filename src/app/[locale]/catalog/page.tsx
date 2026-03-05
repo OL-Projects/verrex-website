@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import Image from "next/image"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
@@ -9,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
+import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import {
   Search, X, ArrowRight, LayoutGrid, List, Check, Sparkles,
   ChevronRight, ChevronDown, AppWindow, DoorOpen, Box, ArrowLeft, Info, SlidersHorizontal,
@@ -49,7 +49,7 @@ export default function CatalogPage() {
     let result = products.filter((product) => {
       const matchesFilter = activeFilter === "all" ||
         (activeFilter === "windows" && product.subcategory === "Windows") ||
-        (activeFilter === "doors" && (product.subcategory === "Doors" || product.subcategory === "Entry Systems")) ||
+        (activeFilter === "doors" && product.subcategory === "Doors") ||
         product.subcategory === activeFilter ||
         product.tags.some(tag => tag === activeFilter)
       const matchesSearch = searchQuery === "" ||
@@ -374,10 +374,9 @@ export default function CatalogPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {filteredProducts.map((product) => (
                       <Card key={product.id} className="group h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                        <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden">
-                          <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
+                        <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] overflow-hidden flex items-center justify-center p-8">
+                          <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[180px] max-h-[120px] opacity-90 group-hover:opacity-100 transition-opacity" />
                           <div className="absolute top-3 left-3 flex gap-1.5">
-                            <Badge variant="primary" className="text-[10px] uppercase tracking-wider">{product.category}</Badge>
                             <Badge variant="secondary" className="text-[10px]">{product.subcategory}</Badge>
                           </div>
                           {product.isFeatured && <Badge variant="primary" className="absolute top-3 right-3 text-[10px] gap-1"><Sparkles className="h-3 w-3" /> {t('featured')}</Badge>}
@@ -402,7 +401,7 @@ export default function CatalogPage() {
                     {filteredProducts.map((product) => (
                       <IntlLink key={product.id} href={`/products/${product.id}`}>
                         <div className="group flex gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all bg-white dark:bg-slate-900/50">
-                          <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800"><Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="96px" /></div>
+                          <div className="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center p-2"><WindowTypeDiagram id={product.diagramId} className="w-full h-full" /></div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">{product.name}</h3>

@@ -7,42 +7,40 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import { products } from "@/lib/data"
-import { ProductCategory } from "@/types"
 import {
   Search,
   SlidersHorizontal,
-  Home,
-  Building2,
-  Factory,
   ArrowRight,
   X,
 } from "lucide-react"
 
+type FilterType = "all" | "Windows" | "Doors"
+
 export default function ProductsPage() {
   const t = useTranslations('ProductsPage')
 
-  const categories: { value: ProductCategory | "all"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { value: "all", label: t('allProducts'), icon: SlidersHorizontal },
-    { value: "residential", label: t('residential'), icon: Home },
-    { value: "commercial", label: t('commercial'), icon: Building2 },
-    { value: "industrial", label: t('industrial'), icon: Factory },
+  const filters: { value: FilterType; label: string }[] = [
+    { value: "all", label: t('allProducts') },
+    { value: "Windows", label: "Windows" },
+    { value: "Doors", label: "Doors" },
   ]
-  const [activeCategory, setActiveCategory] = useState<ProductCategory | "all">("all")
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesCategory =
-        activeCategory === "all" || product.category === activeCategory
+      const matchesFilter =
+        activeFilter === "all" || product.subcategory === activeFilter
       const matchesSearch =
         searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      return matchesCategory && matchesSearch
+      return matchesFilter && matchesSearch
     })
-  }, [activeCategory, searchQuery])
+  }, [activeFilter, searchQuery])
 
   return (
     <div>
@@ -81,16 +79,16 @@ export default function ProductsPage() {
               )}
             </div>
             <div className="flex gap-2 flex-wrap">
-              {categories.map((cat) => (
+              {filters.map((f) => (
                 <Button
-                  key={cat.value}
-                  variant={activeCategory === cat.value ? "primary" : "outline"}
+                  key={f.value}
+                  variant={activeFilter === f.value ? "primary" : "outline"}
                   size="sm"
-                  onClick={() => setActiveCategory(cat.value)}
+                  onClick={() => setActiveFilter(f.value)}
                   className="gap-2"
                 >
-                  <cat.icon className="h-4 w-4" />
-                  {cat.label}
+                  {f.value === "all" && <SlidersHorizontal className="h-4 w-4" />}
+                  {f.label}
                 </Button>
               ))}
             </div>
@@ -107,42 +105,34 @@ export default function ProductsPage() {
               {filteredProducts.map((product) => (
                 <IntlLink key={product.id} href={`/products/${product.id}`}>
                   <Card className="group h-full cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <div className="aspect-[4/3] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-t-xl flex items-center justify-center relative overflow-hidden">
+                    <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-t-xl flex items-center justify-center relative overflow-hidden p-6">
                       {product.isFeatured && (
-                        <Badge variant="primary" className="absolute top-3 right-3 text-xs">
+                        <Badge variant="primary" className="absolute top-3 right-3 text-xs z-10">
                           {t('featured')}
                         </Badge>
                       )}
-                      <div className="text-center p-4">
-                        <div className="h-16 w-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-2xl">🪟</span>
-                        </div>
-                        <span className="text-xs text-slate-500">{t('productImage')}</span>
-                      </div>
+                      <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[160px] max-h-[120px] opacity-90 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <CardContent className="p-5">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className="text-xs">
-                          {product.category}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
                           {product.subcategory}
                         </Badge>
                       </div>
-                      <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {product.name}
                       </h3>
-                      <p className="mt-1 text-sm text-slate-500 line-clamp-2">
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
                         {product.shortDescription}
                       </p>
                       <div className="mt-3 flex items-center justify-between">
                         {product.isCustomizable && (
                           <Badge variant="success" className="text-[10px]">
-                          {t('customizable')}
+                            {t('customizable')}
                           </Badge>
                         )}
                       </div>
-                      <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 font-medium">
+                      <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium">
                         {t('viewDetails')} <ArrowRight className="h-3 w-3" />
                       </div>
                     </CardContent>
@@ -152,12 +142,12 @@ export default function ProductsPage() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="h-16 w-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <div className="h-16 w-16 mx-auto bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-slate-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">{t('noProducts')}</h3>
-              <p className="mt-2 text-slate-500">{t('noProductsDesc')}</p>
-              <Button variant="outline" className="mt-4" onClick={() => { setSearchQuery(""); setActiveCategory("all") }}>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('noProducts')}</h3>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">{t('noProductsDesc')}</p>
+              <Button variant="outline" className="mt-4" onClick={() => { setSearchQuery(""); setActiveFilter("all") }}>
                 {t('clearFilters')}
               </Button>
             </div>

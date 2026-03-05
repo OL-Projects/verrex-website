@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { products } from "@/lib/data"
+import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import {
   ArrowLeft,
   ArrowRight,
@@ -57,13 +58,8 @@ export default async function ProductDetailPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Image */}
             <div>
-              <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-2xl flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="h-32 w-32 mx-auto bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4">
-                    <span className="text-6xl">🪟</span>
-                  </div>
-                  <span className="text-slate-500 dark:text-slate-400">{t("productImage")}</span>
-                </div>
+              <div className="aspect-square bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-2xl flex items-center justify-center p-12">
+                <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[280px] max-h-[280px]" />
               </div>
             </div>
 
@@ -149,11 +145,11 @@ export default async function ProductDetailPage({
                 {relatedProducts.map((rp) => (
                   <IntlLink key={rp.id} href={`/products/${rp.id}`}>
                     <Card className="group h-full cursor-pointer hover:shadow-lg transition-all">
-                      <div className="aspect-[4/3] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-t-xl flex items-center justify-center">
-                        <span className="text-3xl">🪟</span>
+                      <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] rounded-t-xl flex items-center justify-center p-6">
+                        <WindowTypeDiagram id={rp.diagramId} className="w-full h-full max-w-[120px] max-h-[90px]" />
                       </div>
                       <CardContent className="p-5">
-                        <Badge variant="secondary" className="mb-2 text-xs">{rp.category}</Badge>
+                        <Badge variant="secondary" className="mb-2 text-xs">{rp.subcategory}</Badge>
                         <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">{rp.name}</h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{rp.shortDescription}</p>
                       </CardContent>

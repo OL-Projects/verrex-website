@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import Image from "next/image"
+import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import { Button } from "@/components/ui/button"
 import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -258,15 +259,8 @@ export default function HomePage() {
                 <IntlLink href={`/products/${product.id}`}>
                   <HoverCard>
                     <Card className="group h-full cursor-pointer hover:shadow-lg transition-all duration-300">
-                      <div className="aspect-[4/3] relative rounded-t-xl overflow-hidden bg-slate-100 dark:bg-[#0a0f1a]">
-                        <Image
-                          src={product.images[0]}
-                          alt={product.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="aspect-[4/3] rounded-t-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0a0f1a] dark:to-[#060b14] flex items-center justify-center p-6">
+                        <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[140px] max-h-[105px] opacity-90 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <CardContent className="p-5">
                         <Badge variant="secondary" className="mb-2 text-xs">{product.category}</Badge>
