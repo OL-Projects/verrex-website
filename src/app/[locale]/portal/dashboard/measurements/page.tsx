@@ -619,7 +619,7 @@ export default function MeasurementsPage() {
                   moveMode={moveMode} compileMode={compileMode}
                   onFaceClick={handleFaceClick} onPlacedWindowClick={handlePlacedWindowClick}
                   selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit}
-                  selectMode={selectMode} onDeselect={() => { if (!moveMode) { setSelectedPlacedId(null); setSelectMode(false) } }} />
+                  selectMode={selectMode} onDeselect={() => { if (!moveMode) { setSelectedPlacedId(null) } }} />
               </div>
             </div>
           </div>

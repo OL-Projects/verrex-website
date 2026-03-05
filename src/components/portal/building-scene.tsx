@@ -104,8 +104,8 @@ function renderModule(mod: string, mx: number, my: number, mw: number, mh: numbe
 }
 
 /* ─── Window card on face (PURE VISUAL — no intercept mesh, clicks handled by box mesh) ─── */
-const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH, compileMode, solidMode }: {
-  pw: PlacedWindow; isSelected: boolean; winW: number; winH: number
+const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isHovered, winW, winH, compileMode, solidMode }: {
+  pw: PlacedWindow; isSelected: boolean; isHovered?: boolean; winW: number; winH: number
   compileMode: boolean; solidMode: boolean
 }) {
   const ratio = (pw.hInches || 48) / (pw.wInches || 48)
@@ -122,11 +122,11 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH
         style={{ pointerEvents: "none" }}
         distanceFactor={6}>
         <div style={{ width: htmlW, height: htmlH, pointerEvents: "none" }}
-          className={`${isSelected ? "ring-2 ring-amber-400 rounded-sm" : ""}`}>
+          className={`${isSelected ? "ring-2 ring-amber-400 rounded-sm" : isHovered ? "ring-2 ring-cyan-400/80 rounded-sm" : ""}`}>
           <FenestrationSVG typeKey={pw.typeKey} w={pw.wInches || 48} h={pw.hInches || 48} />
         </div>
       </Html>
-      {(solidMode || compileMode || isSelected) && (
+      {(solidMode || compileMode || isSelected || isHovered) && (
         <Html position={[0, -adjH / 2 - 0.18, 0]} center transform
           occlude={solidMode ? true : undefined}
           style={{ pointerEvents: "none" }}>
@@ -147,6 +147,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
   movingWindow?: PlacedWindow | null
 } & Pick<SceneProps, "activeWindowId" | "onFaceClick" | "onPlacedWindowClick" | "selectedPlacedId">) {
   const [hoveredFace, setHoveredFace] = useState<string | null>(null)
+  const [hoveredWindowId, setHoveredWindowId] = useState<string | null>(null)
   const [ghostHit, setGhostHit] = useState<{ face: "front"|"back"|"left"|"right"; u: number; v: number } | null>(null)
   const boxRef = useRef<THREE.Mesh>(null)
   const { width: w, depth: d, ceilingHeight: h } = floor
@@ -177,10 +178,41 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
     return { pos, rot }
   }, [w, d, h])
 
+  /* ─── Hit-test: check if a click at (face, u, v) overlaps a placed window ─── */
+  const findWindowAtPosition = useCallback((face: string, u: number, v: number): PlacedWindow | null => {
+    const faceW = (face === "front" || face === "back") ? w : d
+    const faceH = h
+    let closest: PlacedWindow | null = null
+    let closestDist = Infinity
+    for (const pw of floor.windows) {
+      if (pw.face !== face) continue
+      // Window half-extents in face-UV space — generous tolerance so visual matches clickable area
+      // Use at least ±0.12 in U and ±0.18 in V so the hit zone covers the visible Html card
+      const rawHalfU = ((pw.wInches || 48) * inchToUnit / faceW) / 2
+      const rawHalfV = ((pw.hInches || 48) * inchToUnit / faceH) / 2
+      const halfU = Math.max(rawHalfU + 0.04, 0.12)
+      const halfV = Math.max(rawHalfV + 0.04, 0.18)
+      const du = Math.abs(u - pw.posU)
+      const dv = Math.abs(v - pw.posV)
+      if (du < halfU && dv < halfV) {
+        const dist = du * du + dv * dv
+        if (dist < closestDist) { closest = pw; closestDist = dist }
+      }
+    }
+    return closest
+  }, [floor.windows, w, d, h, inchToUnit])
+
   const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
+    const hit = computeFaceHit(e)
+    // Always detect window hover for visual feedback (cyan ring)
+    if (hit && !moveMode) {
+      const hoverWin = findWindowAtPosition(hit.face, hit.u, hit.v)
+      setHoveredWindowId(hoverWin?.id ?? null)
+    } else {
+      setHoveredWindowId(null)
+    }
     if (!canPlace) { setHoveredFace(null); return }
     e.stopPropagation()
-    const hit = computeFaceHit(e)
     if (hit) {
       setHoveredFace(hit.face)
       if (moveMode && selectedPlacedId) {
@@ -192,40 +224,30 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
         setGhostHit(null)
       }
     } else { setHoveredFace(null); setGhostHit(null) }
-  }, [canPlace, moveMode, selectedPlacedId, activeWindowId, activeWindowConfig, computeFaceHit, setLiveMovePos, floor.id])
-
-  /* ─── Hit-test: check if a click at (face, u, v) overlaps a placed window ─── */
-  const findWindowAtPosition = useCallback((face: string, u: number, v: number): PlacedWindow | null => {
-    const faceW = (face === "front" || face === "back") ? w : d
-    const faceH = h
-    for (const pw of floor.windows) {
-      if (pw.face !== face) continue
-      // Window half-extents in face-UV space (with generous tolerance)
-      const halfU = ((pw.wInches || 48) * inchToUnit / faceW) / 2 + 0.03
-      const halfV = ((pw.hInches || 48) * inchToUnit / faceH) / 2 + 0.03
-      if (Math.abs(u - pw.posU) < halfU && Math.abs(v - pw.posV) < halfV) return pw
-    }
-    return null
-  }, [floor.windows, w, d, h, inchToUnit])
+  }, [canPlace, moveMode, selectedPlacedId, activeWindowId, activeWindowConfig, computeFaceHit, findWindowAtPosition, setLiveMovePos, floor.id])
 
   const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
     const hit = computeFaceHit(e)
     if (!hit) return
 
-    // Priority 1: If NOT in placement/move mode, check for window selection
-    if (!canPlace) {
+    // ALWAYS check for placed window under cursor first (except when dropping in move mode)
+    if (!(moveMode && selectedPlacedId)) {
       const clickedWin = findWindowAtPosition(hit.face, hit.u, hit.v)
       if (clickedWin) {
+        // Found a placed window — select/grab it regardless of basket selection
         onPlacedWindowClick(clickedWin.id)
+        return
       }
-      return
     }
 
-    // Priority 2: In move mode, drop the window at this position
-    // Priority 3: In placement mode, place from basket
+    // No placed window under cursor — proceed with placement/move/drop
+    if (!canPlace) return // Nothing to do if no basket window and not in move mode
+
+    // In move mode: drop the window at this position
+    // In placement mode: place from basket
     onFaceClick(floor.id, hit.face, hit.u, hit.v)
-  }, [canPlace, computeFaceHit, onFaceClick, floor.id, findWindowAtPosition, onPlacedWindowClick])
+  }, [canPlace, moveMode, selectedPlacedId, computeFaceHit, onFaceClick, floor.id, findWindowAtPosition, onPlacedWindowClick])
 
   const wc = solidMode ? "#ffffff" : floor.color
   const wo = solidMode ? 1 : (hoveredFace ? 0.5 : 0.25)
@@ -240,7 +262,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
   return (
     <group position={[0, yOffset, 0]}>
       <mesh ref={boxRef} position={[0, h / 2, 0]} onClick={handleClick}
-        onPointerMove={handlePointerMove} onPointerOut={() => { setHoveredFace(null); setGhostHit(null) }}>
+        onPointerMove={handlePointerMove} onPointerOut={() => { setHoveredFace(null); setHoveredWindowId(null); setGhostHit(null) }}>
         <boxGeometry args={[w, h, d]} />
         <meshStandardMaterial color={hoveredFace ? (moveMode ? "#c084fc" : "#60a5fa") : wc}
           transparent={!solidMode} opacity={wo} side={solidMode ? THREE.FrontSide : THREE.DoubleSide}
@@ -260,7 +282,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
         const wp = toWorldPos(pw.face, pw.posU, pw.posV)
         return (
           <group key={pw.id} position={wp.pos} rotation={wp.rot}>
-            <FaceWindowCard pw={pw} isSelected={isSelected} winW={winW} winH={winH}
+            <FaceWindowCard pw={pw} isSelected={isSelected} isHovered={hoveredWindowId === pw.id} winW={winW} winH={winH}
               compileMode={compileMode} solidMode={solidMode} />
           </group>
         )
