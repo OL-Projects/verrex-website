@@ -60,13 +60,13 @@ export function Header() {
                 <Phone className="h-3.5 w-3.5" />
                 {companyInfo.phone}
               </a>
-              <a
-                href={`mailto:${companyInfo.email}`}
+              <IntlLink
+                href="/contact"
                 className="hidden sm:flex items-center gap-1.5 hover:text-blue-300 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
                 {companyInfo.email}
-              </a>
+              </IntlLink>
             </div>
             <div className="flex items-center gap-4">
               <span className="hidden md:inline text-slate-300/80">
