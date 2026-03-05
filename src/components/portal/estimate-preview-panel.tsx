@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { usePortalT } from "@/lib/portal-i18n"
 import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
 import { BlobProvider } from "@react-pdf/renderer"
@@ -22,11 +22,21 @@ export function EstimatePreviewPanel({ est, logo, sigs, glassSettings, locale = 
   const [refreshCounter, setRefreshCounter] = useState(0)
 
   // Hash key forces BlobProvider to fully regenerate when any item data changes
-  const pdfKey = useMemo(() => {
+  const pdfKeyRaw = useMemo(() => {
     const items = allItems(est)
     return items.map(i => `${i.type}:${i.width}:${i.height}:${i.hingeLeft}:${i.swingInside}:${i.trimInstall}:${i.trimStyle}:${i.qty}:${i.unitPrice}:${i.extColor}:${i.intColor}:${(i.customModules || []).join(",")}`).join("|")
       + `|${est.estimateNumber}|${est.clientName}|${est.depositPct}|${est.delivery}|${est.installPerUnit}|${est.rooms.length}|${refreshCounter}`
   }, [est, refreshCounter])
+
+  // Debounce the PDF key — waits 800ms after last change before regenerating
+  const [pdfKey, setPdfKey] = useState(pdfKeyRaw)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    // Manual refresh (refreshCounter) triggers immediately
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => setPdfKey(pdfKeyRaw), 800)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [pdfKeyRaw])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 lg:static lg:inset-auto lg:z-10 lg:flex lg:flex-col lg:w-[860px] lg:shrink-0 lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)]">
