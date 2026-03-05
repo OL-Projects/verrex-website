@@ -145,40 +145,6 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* Industry Standards & Compliance */}
-      <section className="py-16 bg-slate-50 dark:bg-[#020617]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 mb-4">
-              <Scale className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Regulatory Compliance</span>
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Industry Standards & Compliance</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">All products are manufactured and tested in accordance with applicable national and international standards.</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
-            {[
-              { icon: BookOpen, standard: "National Building Code of Canada (NBC)", detail: "Full compliance with Part 5 — Environmental Separation and Part 9 — Housing & Small Buildings" },
-              { icon: BadgeCheck, standard: "CSA A440 / NAFS — North American Standard", detail: "Tested and rated for air tightness, water penetration, wind load resistance, and forced entry" },
-              { icon: Shield, standard: "ENERGY STAR® Canada — Zone Rated", detail: "Meets or exceeds Natural Resources Canada criteria for climate zones 1 through 3" },
-              { icon: Stamp, standard: "NFRC Certified Ratings", detail: "Independent third-party performance ratings for U-Factor, SHGC, VT, and condensation resistance" },
-              { icon: Building2, standard: "RBQ Licensed — Régie du bâtiment du Québec", detail: "Licensed under the Régie du bâtiment for manufacturing, supply, and installation in Quebec" },
-              { icon: ShieldCheck, standard: "ISO 9001:2015 Quality Management", detail: "Manufacturing processes certified under international quality management standards" },
-            ].map((item) => (
-              <div key={item.standard} className="flex items-start gap-5 px-6 py-5 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
-                  <item.icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">{item.standard}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{item.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Specifications + Certifications Side by Side */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -234,8 +200,42 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* Why Choose This Product */}
+      {/* Industry Standards & Compliance */}
       <section className="py-16 bg-slate-50 dark:bg-[#020617]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 mb-4">
+              <Scale className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Regulatory Compliance</span>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Industry Standards & Compliance</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">All products are manufactured and tested in accordance with applicable national and international standards.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
+            {[
+              { icon: BookOpen, standard: "National Building Code of Canada (NBC)", detail: "Full compliance with Part 5 — Environmental Separation and Part 9 — Housing & Small Buildings" },
+              { icon: BadgeCheck, standard: "CSA A440 / NAFS — North American Standard", detail: "Tested and rated for air tightness, water penetration, wind load resistance, and forced entry" },
+              { icon: Shield, standard: "ENERGY STAR® Canada — Zone Rated", detail: "Meets or exceeds Natural Resources Canada criteria for climate zones 1 through 3" },
+              { icon: Stamp, standard: "NFRC Certified Ratings", detail: "Independent third-party performance ratings for U-Factor, SHGC, VT, and condensation resistance" },
+              { icon: Building2, standard: "RBQ Licensed — Régie du bâtiment du Québec", detail: "Licensed under the Régie du bâtiment for manufacturing, supply, and installation in Quebec" },
+              { icon: ShieldCheck, standard: "ISO 9001:2015 Quality Management", detail: "Manufacturing processes certified under international quality management standards" },
+            ].map((item) => (
+              <div key={item.standard} className="flex items-start gap-5 px-6 py-5 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <item.icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">{item.standard}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{item.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose This Product */}
+      <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Why Choose the {product.name}?</h2>
           <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">Engineered for Canadian climates, built to exceed industry standards, and designed for lasting beauty.</p>
