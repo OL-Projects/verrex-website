@@ -32,7 +32,7 @@ interface Props {
 
 export function Building3DCanvas(props: Props) {
   return (
-    <div className="w-full h-full min-h-[400px]">
+    <div className="w-full h-full min-h-[400px] building-canvas-wrapper">
       <BuildingScene {...props} />
     </div>
   )

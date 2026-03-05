@@ -674,3 +674,17 @@ html {
 .drawer-backdrop {
   animation: fade-in-backdrop 0.2s ease-out forwards;
 }
+
+/* ===== 3D CANVAS: drei Html overlay pointer-events fix ===== */
+/* drei's <Html> creates absolutely-positioned, CSS-transformed divs over the canvas.
+   Even with style={{ pointerEvents: "none" }}, intermediate wrapper divs can block
+   canvas raycasting. This forces ALL overlay descendants to be click-transparent. */
+.building-canvas-wrapper > div > div:not(canvas) {
+  pointer-events: none !important;
+}
+.building-canvas-wrapper div[style*="position"] div[style*="transform"] {
+  pointer-events: none !important;
+}
+.building-canvas-wrapper div[style*="position: absolute"] {
+  pointer-events: none !important;
+}
