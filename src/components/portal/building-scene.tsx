@@ -110,7 +110,7 @@ function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, soli
         <planeGeometry args={[adjW + 0.1, adjH + 0.1]} />
         <meshStandardMaterial color="transparent" transparent opacity={0} side={THREE.DoubleSide} />
       </mesh>
-      <Html position={[0, 0, 0.02]} center
+      <Html position={[0, 0, 0.02]} center transform
         occlude={solidMode ? true : undefined}
         style={{ pointerEvents: compileMode ? "auto" : "none" }}
         distanceFactor={6}>
@@ -120,7 +120,7 @@ function FaceWindowCard({ pw, isSelected, winW, winH, onClick, compileMode, soli
           <FenestrationSVG typeKey={pw.typeKey} w={pw.wInches || 48} h={pw.hInches || 48} />
         </div>
       </Html>
-      <Html position={[0, -adjH / 2 - 0.18, 0]} center
+      <Html position={[0, -adjH / 2 - 0.18, 0]} center transform
         occlude={solidMode ? true : undefined}
         style={{ pointerEvents: compileMode ? "auto" : "none" }}>
         <div className={`text-[7px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm ${isSelected ? "bg-amber-500 text-white" : "bg-slate-800 text-white"}`}>
@@ -269,8 +269,8 @@ function DirectionLabels({ maxW, maxD, solidMode }: { maxW: number; maxD: number
   const labels = useMemo(() => [
     { text: "FRONT", pos: [0, 0.12, maxD / 2 + 1.2] as [number, number, number], arrowPos: [0, 0.03, maxD / 2 + 0.5] as [number, number, number], arrowRot: 0, color: "#3b82f6" },
     { text: "BACK", pos: [0, 0.12, -maxD / 2 - 1.2] as [number, number, number], arrowPos: [0, 0.03, -maxD / 2 - 0.5] as [number, number, number], arrowRot: Math.PI, color: "#8b5cf6" },
-    { text: "LEFT", pos: [-maxW / 2 - 1.2, 0.12, 0] as [number, number, number], arrowPos: [-maxW / 2 - 0.5, 0.03, 0] as [number, number, number], arrowRot: Math.PI / 2, color: "#10b981" },
-    { text: "RIGHT", pos: [maxW / 2 + 1.2, 0.12, 0] as [number, number, number], arrowPos: [maxW / 2 + 0.5, 0.03, 0] as [number, number, number], arrowRot: -Math.PI / 2, color: "#f59e0b" },
+    { text: "LEFT", pos: [-maxW / 2 - 1.2, 0.12, 0] as [number, number, number], arrowPos: [-maxW / 2 - 0.5, 0.03, 0] as [number, number, number], arrowRot: -Math.PI / 2, color: "#10b981" },
+    { text: "RIGHT", pos: [maxW / 2 + 1.2, 0.12, 0] as [number, number, number], arrowPos: [maxW / 2 + 0.5, 0.03, 0] as [number, number, number], arrowRot: Math.PI / 2, color: "#f59e0b" },
   ], [maxW, maxD])
 
   return (

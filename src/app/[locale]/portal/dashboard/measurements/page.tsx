@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling } from "lucide-react"
+import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling, Lock, Unlock, ChevronLeft, ChevronRight } from "lucide-react"
 import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
@@ -52,6 +52,8 @@ export default function MeasurementsPage() {
   const [showCreator, setShowCreator] = useState(false)
   const [unit, setUnit] = useState<"ft" | "m">("ft")
   const [showScale, setShowScale] = useState(false)
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true)
+  const [rightPanelOpen, setRightPanelOpen] = useState(true)
 
   // Creator form
   const [cLabel, setCLabel] = useState("")
@@ -102,7 +104,7 @@ export default function MeasurementsPage() {
         const cleaned = p.map(f => ({ ...f, windows: f.windows.filter(w => w.id !== selectedPlacedId) }))
         return cleaned.map(f => f.id === floorId ? { ...f, windows: [...f.windows, { ...pw, face, posU: u, posV: v }] } : f)
       })
-      setMoveMode(false); setSelectedPlacedId(null); return
+      setSelectedPlacedId(null); return
     }
     if (!activeWindowId) return
     const bw = basket.find(x => x.id === activeWindowId)
@@ -155,6 +157,10 @@ export default function MeasurementsPage() {
             <Layers className="h-4 w-4" /> {compileMode ? "Exit Compile" : "Compile"}
           </button>
           {!compileMode && <>
+            <button onClick={() => { setMoveMode(p => !p); if (moveMode) setSelectedPlacedId(null) }}
+              className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
+              {moveMode ? <><Unlock className="h-4 w-4" /> Reposition</> : <><Lock className="h-4 w-4" /> Locked</>}
+            </button>
             <button onClick={() => setSolidMode(p => !p)} className={`${C.btn} ${solidMode ? "bg-slate-900 text-white border-slate-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
               {solidMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />} {solidMode ? "Solid" : "Transparent"}
             </button>
@@ -342,9 +348,23 @@ export default function MeasurementsPage() {
           </div>
         )}
 
-        {/* RIGHT: 3D VIEWER */}
+        {/* CENTER: 3D VIEWER */}
         <div className="flex-1 min-w-0">
-          <div className={`${C.card} p-0 overflow-hidden`}>
+          <div className={`${C.card} p-0 overflow-hidden relative`}>
+            {/* Left panel collapse toggle (non-compile) */}
+            {!compileMode && (
+              <button onClick={() => setLeftPanelOpen(p => !p)}
+                className="absolute top-3 left-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm transition lg:hidden">
+                {leftPanelOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </button>
+            )}
+            {/* Compile right panel toggle */}
+            {compileMode && (
+              <button onClick={() => setRightPanelOpen(p => !p)}
+                className="absolute top-3 right-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-emerald-600 shadow-sm transition">
+                {rightPanelOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              </button>
+            )}
             <div className={compileMode ? "h-[calc(100vh-10rem)] min-h-[600px]" : "h-[calc(100vh-12rem)] min-h-[500px]"}>
               <Building3DCanvas floors={floors} activeWindowId={activeWindowId} moveMode={moveMode} compileMode={compileMode}
                 onFaceClick={handleFaceClick} onPlacedWindowClick={setSelectedPlacedId}
@@ -368,12 +388,9 @@ export default function MeasurementsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => { setMoveMode(true); setActiveWindowId(null) }}
-                    className={`${C.btn} ${moveMode ? "bg-purple-600 text-white border-purple-600" : "border-slate-200 dark:border-white/10 hover:bg-purple-50 text-purple-600"}`}>
-                    <Move className="h-3.5 w-3.5" /> {moveMode ? "Moving…" : "Move"}
-                  </button>
-                  <button onClick={() => { setSelectedPlacedId(null); setMoveMode(false) }} className={`${C.btn} border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5`}>Deselect</button>
-                  <button onClick={() => removePlacedWindow(selectedPlacedId)} className={`${C.btn} bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600`}>Remove</button>
+                  {moveMode && <p className="text-[10px] text-purple-600 font-bold animate-pulse self-center mr-1">🔀 Tap a face to drop</p>}
+                  <button onClick={() => setSelectedPlacedId(null)} className={`${C.btn} border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5`}>Deselect</button>
+                  <button onClick={() => removePlacedWindow(selectedPlacedId)} className={`${C.btn} bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600`}><Trash2 className="h-3.5 w-3.5" /> Remove</button>
                 </div>
               </motion.div>
             )
@@ -410,6 +427,78 @@ export default function MeasurementsPage() {
             </motion.div>
           )}
         </div>
+
+        {/* RIGHT PANEL — compile mode window dashboard */}
+        <AnimatePresence>
+          {compileMode && rightPanelOpen && (
+            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+              className="hidden lg:block lg:shrink-0 overflow-hidden">
+              <div className="w-80 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+                <div className={C.card}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className={C.lbl + " mb-0"}>Window Dashboard</p>
+                    <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                      {floors.reduce((s, f) => s + f.windows.length, 0)} placed
+                    </span>
+                  </div>
+                  {floors.map(f => (
+                    <div key={f.id} className="mb-3">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <div className="h-2.5 w-2.5 rounded-sm" style={{ background: f.color }} />
+                        <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300">{f.name}</p>
+                        <span className="text-[9px] text-slate-400 ml-auto">{f.windows.length}</span>
+                      </div>
+                      {f.windows.length === 0 && <p className="text-[9px] text-slate-400 italic ml-4">No windows</p>}
+                      <div className="space-y-1">
+                        {f.windows.map(pw => {
+                          const isSelected = pw.id === selectedPlacedId
+                          const bw = basket.find(x => x.id === pw.measurementId)
+                          return (
+                            <div key={pw.id}
+                              onClick={() => setSelectedPlacedId(pw.id)}
+                              className={`flex items-center gap-2 p-2 rounded-xl border transition cursor-pointer ${isSelected ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 ring-1 ring-emerald-400/50" : "border-slate-200 dark:border-white/10 hover:border-emerald-300"}`}>
+                              {bw && (
+                                <div className="h-9 w-9 shrink-0 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden p-0.5">
+                                  <EstimateWindowSVG width={bw.width} height={bw.height} type={bw.typeKey} flipH={bw.hingeLeft} swingIn={bw.swingIn} />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[10px] font-bold text-slate-900 dark:text-white truncate">{pw.label}</p>
+                                <p className="text-[8px] text-slate-500">{pw.dims} • <span className="uppercase">{pw.face}</span></p>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Summary stats */}
+                <div className={C.card}>
+                  <p className={C.lbl}>Summary</p>
+                  <div className="grid grid-cols-2 gap-2 text-[10px]">
+                    <div className="bg-slate-50 dark:bg-white/3 rounded-lg p-2 text-center">
+                      <p className="text-lg font-black text-slate-900 dark:text-white">{floors.length}</p>
+                      <p className="text-slate-500">Floors</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-white/3 rounded-lg p-2 text-center">
+                      <p className="text-lg font-black text-slate-900 dark:text-white">{floors.reduce((s, f) => s + f.windows.length, 0)}</p>
+                      <p className="text-slate-500">Windows</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-white/3 rounded-lg p-2 text-center">
+                      <p className="text-lg font-black text-slate-900 dark:text-white">{basket.length}</p>
+                      <p className="text-slate-500">In Basket</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-white/3 rounded-lg p-2 text-center">
+                      <p className="text-lg font-black text-slate-900 dark:text-white">{new Set(floors.flatMap(f => f.windows.map(w => w.face))).size}</p>
+                      <p className="text-slate-500">Faces Used</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
