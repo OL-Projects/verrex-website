@@ -79,7 +79,12 @@ export default function MeasurementsPage() {
   }, [projectName, projectAddr, projectNotes, photos, floors, basket])
   useEffect(() => { const t = setTimeout(save, 1500); return () => clearTimeout(t) }, [save])
 
-  const addFloor = useCallback(() => setFloors(p => [...p, createFloor(`Floor ${p.length}`, p.length)]), [])
+  const addFloor = useCallback(() => setFloors(p => {
+    const last = p[p.length - 1]
+    const nf = createFloor(`Floor ${p.length}`, p.length)
+    if (last) { nf.width = last.width; nf.depth = last.depth; nf.ceilingHeight = last.ceilingHeight }
+    return [...p, nf]
+  }), [])
   const removeFloor = useCallback((id: string) => setFloors(p => p.length <= 1 ? p : p.filter(f => f.id !== id)), [])
   const updateFloor = useCallback((id: string, patch: Partial<BuildingFloor>) => setFloors(p => p.map(f => f.id === id ? { ...f, ...patch } : f)), [])
   const moveFloor = useCallback((id: string, dir: -1 | 1) => setFloors(p => {
@@ -358,8 +363,8 @@ export default function MeasurementsPage() {
                 {leftPanelOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </button>
             )}
-            {/* Compile right panel toggle */}
-            {compileMode && (
+            {/* Right panel toggle (compile mode OR edit mode with selected window) */}
+            {(compileMode || (!compileMode && selectedPlacedId)) && (
               <button onClick={() => setRightPanelOpen(p => !p)}
                 className="absolute top-3 right-3 z-10 h-7 w-7 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:text-emerald-600 shadow-sm transition">
                 {rightPanelOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -372,29 +377,6 @@ export default function MeasurementsPage() {
             </div>
           </div>
 
-          {/* Detail bar — edit mode */}
-          {!compileMode && selectedPlacedId && (() => {
-            const pw = floors.flatMap(f => f.windows).find(w => w.id === selectedPlacedId)
-            if (!pw) return null
-            const bw = basket.find(x => x.id === pw.measurementId)
-            return (
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className={`${C.card} mt-3 flex items-center justify-between flex-wrap gap-3`}>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center"><Maximize className="h-5 w-5 text-amber-600" /></div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">{pw.label} — {pw.dims}</p>
-                    <p className="text-[10px] text-slate-500">Face: <span className="font-bold uppercase">{pw.face}</span>{bw ? ` • ${bw.extColor} / ${bw.glassType} • ${WINDOW_TYPES[bw.typeKey]?.label || bw.typeKey}` : ""}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {moveMode && <p className="text-[10px] text-purple-600 font-bold animate-pulse self-center mr-1">🔀 Tap a face to drop</p>}
-                  <button onClick={() => setSelectedPlacedId(null)} className={`${C.btn} border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5`}>Deselect</button>
-                  <button onClick={() => removePlacedWindow(selectedPlacedId)} className={`${C.btn} bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600`}><Trash2 className="h-3.5 w-3.5" /> Remove</button>
-                </div>
-              </motion.div>
-            )
-          })()}
 
           {/* Compile mode detail popup */}
           {compileMode && compileDetail && (
@@ -428,10 +410,54 @@ export default function MeasurementsPage() {
           )}
         </div>
 
-        {/* RIGHT PANEL — compile mode window dashboard */}
+        {/* RIGHT PANEL — edit detail OR compile dashboard */}
         <AnimatePresence>
+          {/* Edit mode: selected window detail */}
+          {!compileMode && selectedPlacedId && rightPanelOpen && (() => {
+            const pw = floors.flatMap(f => f.windows).find(w => w.id === selectedPlacedId)
+            if (!pw) return null
+            const bw = basket.find(x => x.id === pw.measurementId)
+            const floorName = floors.find(f => f.windows.some(w => w.id === selectedPlacedId))?.name || "—"
+            return (
+              <motion.div key="edit-panel" initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+                className="hidden lg:block lg:shrink-0 overflow-hidden">
+                <div className="w-80 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+                  <div className={C.card}>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className={C.lbl + " mb-0"}>Selected Window</p>
+                      <button onClick={() => setSelectedPlacedId(null)} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
+                    </div>
+                    {bw && (
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 mb-3">
+                        <EstimateWindowSVG width={bw.width} height={bw.height} type={bw.typeKey} flipH={bw.hingeLeft} swingIn={bw.swingIn} />
+                      </div>
+                    )}
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">{pw.label}</h3>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">{pw.dims} — {pw.windowType}</p>
+                    <div className="mt-3 space-y-1.5 text-[11px]">
+                      <div className="flex justify-between"><span className="text-slate-400">Face</span><span className="font-bold uppercase">{pw.face}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-400">Floor</span><span className="font-bold">{floorName}</span></div>
+                      {bw && <>
+                        <div className="flex justify-between"><span className="text-slate-400">Product</span><span className="font-bold">{EST_PRODUCTS.find(p => p.id === bw.product)?.label || bw.product}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Ext Color</span><span className="font-bold">{bw.extColor}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Int Color</span><span className="font-bold">{bw.intColor}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Glass</span><span className="font-bold">{bw.glass} — {bw.glassType}</span></div>
+                      </>}
+                    </div>
+                    {bw?.notes && <p className="text-[10px] text-slate-500 mt-2 italic border-t border-slate-200 dark:border-white/10 pt-2">📝 {bw.notes}</p>}
+                    {moveMode && <p className="text-[10px] text-purple-600 font-bold mt-3 animate-pulse">🔀 Tap a face to drop this window</p>}
+                    <div className="flex gap-2 mt-4">
+                      <button onClick={() => setSelectedPlacedId(null)} className={`flex-1 ${C.btn} justify-center border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5`}>Deselect</button>
+                      <button onClick={() => removePlacedWindow(selectedPlacedId)} className={`flex-1 ${C.btn} justify-center bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600`}><Trash2 className="h-3.5 w-3.5" /> Remove</button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })()}
+          {/* Compile mode: window dashboard */}
           {compileMode && rightPanelOpen && (
-            <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+            <motion.div key="compile-panel" initial={{ width: 0, opacity: 0 }} animate={{ width: 320, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
               className="hidden lg:block lg:shrink-0 overflow-hidden">
               <div className="w-80 space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
                 <div className={C.card}>
