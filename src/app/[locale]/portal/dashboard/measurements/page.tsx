@@ -108,7 +108,7 @@ export default function MeasurementsPage() {
     const cfg = WINDOW_TYPES[bw.typeKey]
     const pw: PlacedWindow = { id: uid(), face, posU: u, posV: v, measurementId: bw.id,
       label: bw.label, dims: `${bw.width}" × ${bw.height}"`, windowType: cfg?.label || bw.typeKey,
-      wInches: bw.width, hInches: bw.height }
+      typeKey: bw.typeKey, wInches: bw.width, hInches: bw.height }
     setFloors(p => p.map(f => f.id === floorId ? { ...f, windows: [...f.windows, pw] } : f))
     setActiveWindowId(null)
   }, [activeWindowId, moveMode, selectedPlacedId, basket])
