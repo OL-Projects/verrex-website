@@ -99,6 +99,9 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                   {/* Prominent T-handle */}
                   <Rect x={ohx - 1.5} y={cy - 8} width={3} height={16} rx={1.5} fill={FC} opacity={0.8} />
                   <Rect x={ohx - 1} y={cy - 1} width={hingeOnLeft ? 8 : -8} height={2} rx={1} fill={FC} opacity={0.8} />
+                  {/* ★ Fenestration: casement opening-direction triangle */}
+                  <Line x1={hx} y1={cy} x2={ohx} y2={sy} stroke={ML} strokeWidth={0.7} opacity={0.45} />
+                  <Line x1={hx} y1={cy} x2={ohx} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.45} />
                 </G>
               )
             })()}
@@ -117,6 +120,12 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                   {/* Prominent T-handle */}
                   <Rect x={ohx - 1.5} y={cy - 8} width={3} height={16} rx={1.5} fill={FC} opacity={0.8} />
                   <Rect x={ohx - 1} y={cy - 1} width={hingeOnLeft ? 8 : -8} height={2} rx={1} fill={FC} opacity={0.8} />
+                  {/* ★ Fenestration: tilt & turn — casement triangle (side-hung turn) */}
+                  <Line x1={hx} y1={cy} x2={ohx} y2={sy} stroke={ML} strokeWidth={0.7} opacity={0.45} />
+                  <Line x1={hx} y1={cy} x2={ohx} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.45} />
+                  {/* ★ Fenestration: tilt & turn — awning triangle (top-hung tilt) */}
+                  <Line x1={sx + sw / 2} y1={sy} x2={sx} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.35} strokeDasharray="3 2" />
+                  <Line x1={sx + sw / 2} y1={sy} x2={sx + sw} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.35} strokeDasharray="3 2" />
                 </G>
               )
             })()}
@@ -130,6 +139,9 @@ export function EstimateWindowSVGPDF({ width, height, type, flipH = false, swing
                 <Rect x={sx + 3} y={sy + 1} width={sw - 6} height={2.5} rx={1} fill={FC} opacity={0.7} />
                 {/* Prominent bottom handle */}
                 <Rect x={cx - 5} y={sy + sh - 5} width={10} height={3} rx={1.5} fill={FC} opacity={0.8} />
+                {/* ★ Fenestration: awning (top-hung) opening-direction triangle */}
+                <Line x1={sx + sw / 2} y1={sy} x2={sx} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.45} />
+                <Line x1={sx + sw / 2} y1={sy} x2={sx + sw} y2={sy + sh} stroke={ML} strokeWidth={0.7} opacity={0.45} />
               </G>
             )}
 

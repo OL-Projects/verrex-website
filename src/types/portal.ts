@@ -459,5 +459,6 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Commissions', href: '/portal/dashboard/commissions', icon: 'BadgeDollarSign', roles: ['admin', 'partner'] },
   { label: 'Analytics', href: '/portal/dashboard/analytics', icon: 'BarChart3', roles: ['admin'] },
   { label: 'Timeline', href: '/portal/dashboard/activity', icon: 'Clock', roles: ['admin'] },
+  { label: 'AI Settings', href: '/portal/dashboard/ai-settings', icon: 'Brain', roles: ['admin'] },
   { label: 'Settings', href: '/portal/dashboard/settings', icon: 'Settings', roles: ['admin', 'client', 'contractor', 'supplier', 'partner', 'inspector'] },
 ];
