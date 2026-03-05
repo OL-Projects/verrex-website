@@ -120,7 +120,6 @@ export default async function LocaleLayout({ children, params }: Props) {
             <ThemeProvider
               attribute="class"
               defaultTheme="dark"
-              enableSystem
               disableTransitionOnChange={false}
             >
               <SiteChrome>{children}</SiteChrome>
