@@ -57,6 +57,8 @@ interface SceneProps {
   selectedPlacedId: string | null
   solidMode: boolean
   unit?: "ft" | "m"
+  selectMode?: boolean
+  onDeselect?: () => void
 }
 
 /* ─── Fenestration SVG (unchanged) ─── */
@@ -114,9 +116,11 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isDragging
 
   return (
     <group>
-      {/* Clickable intercept mesh — positioned forward to reliably win raycast vs building face */}
+      {/* Clickable intercept — onPointerDown fires BEFORE OrbitControls can consume the event */}
       {!isDragging && (
-        <mesh position={[0, 0, 0.08]} onClick={e => { e.stopPropagation(); onClick() }}>
+        <mesh position={[0, 0, 0.08]}
+          onPointerDown={e => { e.stopPropagation(); (e.target as any).setPointerCapture?.(e.pointerId); onClick() }}
+          onPointerUp={e => { (e.target as any).releasePointerCapture?.(e.pointerId) }}>
           <planeGeometry args={[adjW + 0.2, adjH + 0.2]} />
           <meshBasicMaterial transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
         </mesh>
@@ -359,7 +363,7 @@ function ScaleIndicator({ unit }: { unit: "ft" | "m" }) {
 }
 
 /* ─── Main Scene ─── */
-export function BuildingScene({ floors, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, unit = "ft" }: SceneProps) {
+export function BuildingScene({ floors, activeWindowId, activeWindowConfig, moveMode, compileMode, onFaceClick, onPlacedWindowClick, selectedPlacedId, solidMode, unit = "ft", selectMode = false, onDeselect }: SceneProps) {
   const isSolid = solidMode || compileMode
   const [liveMovePos, setLiveMovePos] = useState<LiveMovePos | null>(null)
 
@@ -380,11 +384,12 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
   }, [onFaceClick])
 
   return (
-    <Canvas style={{ width: "100%", height: "100%" }} shadows dpr={[1, 1.5]} flat
-      performance={{ min: 0.5 }}>
+    <Canvas style={{ width: "100%", height: "100%", cursor: selectMode ? "crosshair" : "auto" }} shadows dpr={[1, 1.5]} flat
+      performance={{ min: 0.5 }}
+      onPointerMissed={() => onDeselect?.()}>
       <PerspectiveCamera makeDefault position={[camDist * 0.7, camDist * 0.5, camDist * 0.7]} fov={45} />
       <OrbitControls makeDefault enableDamping dampingFactor={0.08}
-        enabled={!moveMode}
+        enabled={!moveMode && !selectMode}
         minPolarAngle={Math.PI * 0.05} maxPolarAngle={Math.PI * 0.485}
         minDistance={3} maxDistance={camDist * 3} target={[0, totalH / 2, 0]} />
       {/* Lighting */}

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling, Lock, Unlock, ChevronLeft, ChevronRight, Undo2, Redo2, Camera, Brain, Loader2 } from "lucide-react"
+import { Building2, Plus, Trash2, ChevronUp, ChevronDown, Ruler, Maximize, X, GripVertical, ImagePlus, Save, RotateCcw, Move, Eye, EyeOff, PanelLeftClose, PanelLeftOpen, Layers, ArrowLeftRight, RotateCw, Scaling, Lock, Unlock, ChevronLeft, ChevronRight, Undo2, Redo2, Camera, Brain, Loader2, MousePointerClick } from "lucide-react"
 import { Building3DCanvas } from "@/components/portal/building-3d-canvas"
 import type { BuildingFloor, PlacedWindow } from "@/components/portal/building-scene"
 import { EstimateWindowSVG } from "@/components/portal/estimate-window-svg"
@@ -65,6 +65,7 @@ export default function MeasurementsPage() {
   const [showScale, setShowScale] = useState(false)
   const [leftPanelOpen, setLeftPanelOpen] = useState(true)
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const [selectMode, setSelectMode] = useState(false)
 
   // Undo/Redo
   const [history, setHistory] = useState<BuildingFloor[][]>([])
@@ -212,16 +213,22 @@ export default function MeasurementsPage() {
     setActiveWindowId(null)
   }, [activeWindowId, moveMode, selectedPlacedId, basket])
 
-  // Escape key cancels grab
+  // Keyboard shortcuts: Escape = cancel grab, Z = toggle Select Mode
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && moveMode) {
-        setMoveMode(false); setSelectedPlacedId(null)
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
+      if (e.key === "Escape") {
+        if (moveMode) { setMoveMode(false); setSelectedPlacedId(null) }
+        if (selectMode) setSelectMode(false)
+      }
+      if (e.key === "z" || e.key === "Z") {
+        if (!compileMode) setSelectMode(p => !p)
       }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [moveMode])
+  }, [moveMode, selectMode, compileMode])
 
   const removePlacedWindow = useCallback((pwId: string) => {
     setFloors(p => p.map(f => ({ ...f, windows: f.windows.filter(w => w.id !== pwId) }))); setSelectedPlacedId(null); setMoveMode(false)
@@ -312,6 +319,10 @@ export default function MeasurementsPage() {
             <Redo2 className="h-4 w-4" />
           </button>
           {!compileMode && <>
+            <button onClick={() => setSelectMode(p => !p)} title="Select Mode (Z)"
+              className={`${C.btn} ${selectMode ? "bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/50 animate-pulse" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
+              <MousePointerClick className="h-4 w-4" /> {selectMode ? "Select ⌨Z" : "Select ⌨Z"}
+            </button>
             <button onClick={() => setSolidMode(p => !p)} className={`${C.btn} ${solidMode ? "bg-slate-900 text-white border-slate-700" : "border-slate-200 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/10"}`}>
               {solidMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />} {solidMode ? "Solid" : "Transparent"}
             </button>
@@ -607,7 +618,8 @@ export default function MeasurementsPage() {
                 <Building3DCanvas floors={floors} activeWindowId={activeWindowId} activeWindowConfig={activeWindowConfig}
                   moveMode={moveMode} compileMode={compileMode}
                   onFaceClick={handleFaceClick} onPlacedWindowClick={handlePlacedWindowClick}
-                  selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit} />
+                  selectedPlacedId={selectedPlacedId} solidMode={solidMode} unit={unit}
+                  selectMode={selectMode} onDeselect={() => { if (!moveMode) { setSelectedPlacedId(null); setSelectMode(false) } }} />
               </div>
             </div>
           </div>

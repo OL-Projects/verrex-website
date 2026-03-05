@@ -26,6 +26,8 @@ interface Props {
   selectedPlacedId: string | null
   solidMode: boolean
   unit?: "ft" | "m"
+  selectMode?: boolean
+  onDeselect?: () => void
 }
 
 export function Building3DCanvas(props: Props) {
