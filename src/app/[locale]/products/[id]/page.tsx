@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { products } from "@/lib/data"
-import { formatCurrency } from "@/lib/utils"
 import {
   ArrowLeft,
   ArrowRight,
@@ -82,9 +81,6 @@ export default async function ProductDetailPage({
                 {product.name}
               </h1>
 
-              <div className="mt-4 text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatCurrency(product.priceRange.min)} - {formatCurrency(product.priceRange.max)}
-              </div>
 
               <p className="mt-6 text-slate-600 dark:text-slate-400 leading-relaxed">
                 {product.description}
@@ -160,9 +156,6 @@ export default async function ProductDetailPage({
                         <Badge variant="secondary" className="mb-2 text-xs">{rp.category}</Badge>
                         <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">{rp.name}</h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{rp.shortDescription}</p>
-                        <div className="mt-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-                          {t("from")} {formatCurrency(rp.priceRange.min)}
-                        </div>
                       </CardContent>
                     </Card>
                   </IntlLink>

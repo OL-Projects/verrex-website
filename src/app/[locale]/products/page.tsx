@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { products } from "@/lib/data"
-import { formatCurrency } from "@/lib/utils"
 import { ProductCategory } from "@/types"
 import {
   Search,
@@ -137,9 +136,6 @@ export default function ProductsPage() {
                         {product.shortDescription}
                       </p>
                       <div className="mt-3 flex items-center justify-between">
-                        <span className="text-sm font-medium text-blue-600">
-                          {formatCurrency(product.priceRange.min)} - {formatCurrency(product.priceRange.max)}
-                        </span>
                         {product.isCustomizable && (
                           <Badge variant="success" className="text-[10px]">
                           {t('customizable')}
