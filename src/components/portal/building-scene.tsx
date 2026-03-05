@@ -103,10 +103,10 @@ function renderModule(mod: string, mx: number, my: number, mw: number, mh: numbe
   return <rect x={sx} y={sy} width={sw} height={sh} fill="#dbeafe" stroke="#1e3a5f" strokeWidth={1.5} />
 }
 
-/* ─── Window card on face ─── */
-const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isDragging, winW, winH, onClick, compileMode, solidMode }: {
-  pw: PlacedWindow; isSelected: boolean; isDragging?: boolean; winW: number; winH: number
-  onClick: () => void; compileMode: boolean; solidMode: boolean
+/* ─── Window card on face (PURE VISUAL — no intercept mesh, clicks handled by box mesh) ─── */
+const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, winW, winH, compileMode, solidMode }: {
+  pw: PlacedWindow; isSelected: boolean; winW: number; winH: number
+  compileMode: boolean; solidMode: boolean
 }) {
   const ratio = (pw.hInches || 48) / (pw.wInches || 48)
   const adjH = Math.min(winH, winW * ratio * 1.2)
@@ -116,29 +116,20 @@ const FaceWindowCard = memo(function FaceWindowCard({ pw, isSelected, isDragging
 
   return (
     <group>
-      {/* Clickable intercept — onPointerDown fires BEFORE OrbitControls can consume the event */}
-      {!isDragging && (
-        <mesh position={[0, 0, 0.08]}
-          onPointerDown={e => { e.stopPropagation(); (e.target as any).setPointerCapture?.(e.pointerId); onClick() }}
-          onPointerUp={e => { (e.target as any).releasePointerCapture?.(e.pointerId) }}>
-          <planeGeometry args={[adjW + 0.2, adjH + 0.2]} />
-          <meshBasicMaterial transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
-        </mesh>
-      )}
+      {/* Visual only — all pointer events disabled. Clicks detected on the box mesh via hit-testing. */}
       <Html position={[0, 0, 0.02]} center transform
         occlude={solidMode ? true : undefined}
-        style={{ pointerEvents: compileMode ? "auto" : "none" }}
+        style={{ pointerEvents: "none" }}
         distanceFactor={6}>
-        <div style={{ width: htmlW, height: htmlH }}
-          className={`${isSelected ? "ring-2 ring-amber-400 rounded-sm" : ""}`}
-          onClick={e => { e.stopPropagation(); onClick() }}>
+        <div style={{ width: htmlW, height: htmlH, pointerEvents: "none" }}
+          className={`${isSelected ? "ring-2 ring-amber-400 rounded-sm" : ""}`}>
           <FenestrationSVG typeKey={pw.typeKey} w={pw.wInches || 48} h={pw.hInches || 48} />
         </div>
       </Html>
       {(solidMode || compileMode || isSelected) && (
         <Html position={[0, -adjH / 2 - 0.18, 0]} center transform
           occlude={solidMode ? true : undefined}
-          style={{ pointerEvents: compileMode ? "auto" : "none" }}>
+          style={{ pointerEvents: "none" }}>
           <div className={`text-[7px] font-bold px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm ${isSelected ? "bg-amber-500 text-white" : "bg-slate-800 text-white"}`}>
             {pw.label} — {pw.dims}
           </div>
@@ -203,13 +194,38 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
     } else { setHoveredFace(null); setGhostHit(null) }
   }, [canPlace, moveMode, selectedPlacedId, activeWindowId, activeWindowConfig, computeFaceHit, setLiveMovePos, floor.id])
 
+  /* ─── Hit-test: check if a click at (face, u, v) overlaps a placed window ─── */
+  const findWindowAtPosition = useCallback((face: string, u: number, v: number): PlacedWindow | null => {
+    const faceW = (face === "front" || face === "back") ? w : d
+    const faceH = h
+    for (const pw of floor.windows) {
+      if (pw.face !== face) continue
+      // Window half-extents in face-UV space (with generous tolerance)
+      const halfU = ((pw.wInches || 48) * inchToUnit / faceW) / 2 + 0.03
+      const halfV = ((pw.hInches || 48) * inchToUnit / faceH) / 2 + 0.03
+      if (Math.abs(u - pw.posU) < halfU && Math.abs(v - pw.posV) < halfV) return pw
+    }
+    return null
+  }, [floor.windows, w, d, h, inchToUnit])
+
   const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
-    if (!canPlace) return          // let clicks pass through to window intercept meshes
     e.stopPropagation()
     const hit = computeFaceHit(e)
     if (!hit) return
+
+    // Priority 1: If NOT in placement/move mode, check for window selection
+    if (!canPlace) {
+      const clickedWin = findWindowAtPosition(hit.face, hit.u, hit.v)
+      if (clickedWin) {
+        onPlacedWindowClick(clickedWin.id)
+      }
+      return
+    }
+
+    // Priority 2: In move mode, drop the window at this position
+    // Priority 3: In placement mode, place from basket
     onFaceClick(floor.id, hit.face, hit.u, hit.v)
-  }, [canPlace, computeFaceHit, onFaceClick, floor.id])
+  }, [canPlace, computeFaceHit, onFaceClick, floor.id, findWindowAtPosition, onPlacedWindowClick])
 
   const wc = solidMode ? "#ffffff" : floor.color
   const wo = solidMode ? 1 : (hoveredFace ? 0.5 : 0.25)
@@ -220,9 +236,6 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
     if (moveMode && selectedPlacedId === pw.id) return false
     return true
   })
-
-  // Is a drag in progress? (used to disable intercept meshes on all other windows)
-  const dragInProgress = moveMode && !!selectedPlacedId
 
   return (
     <group position={[0, yOffset, 0]}>
@@ -247,8 +260,8 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
         const wp = toWorldPos(pw.face, pw.posU, pw.posV)
         return (
           <group key={pw.id} position={wp.pos} rotation={wp.rot}>
-            <FaceWindowCard pw={pw} isSelected={isSelected} isDragging={dragInProgress} winW={winW} winH={winH}
-              onClick={() => onPlacedWindowClick(pw.id)} compileMode={compileMode} solidMode={solidMode} />
+            <FaceWindowCard pw={pw} isSelected={isSelected} winW={winW} winH={winH}
+              compileMode={compileMode} solidMode={solidMode} />
           </group>
         )
       })}
@@ -260,7 +273,7 @@ function FloorMesh({ floor, yOffset, activeWindowId, activeWindowConfig, moveMod
         return (
           <group position={wp.pos} rotation={wp.rot}>
             <FaceWindowCard pw={movingWindow} isSelected={true} winW={winW} winH={winH}
-              onClick={() => {}} compileMode={compileMode} solidMode={solidMode} />
+              compileMode={compileMode} solidMode={solidMode} />
           </group>
         )
       })()}
@@ -432,7 +445,7 @@ export function BuildingScene({ floors, activeWindowId, activeWindowConfig, move
           return (
             <group position={pos} rotation={rot}>
               <FaceWindowCard pw={movingWindow} isSelected={true} winW={winW} winH={winH}
-                onClick={() => {}} compileMode={compileMode} solidMode={isSolid} />
+                compileMode={compileMode} solidMode={isSolid} />
             </group>
           )
         }
