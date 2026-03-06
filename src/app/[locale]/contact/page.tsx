@@ -223,7 +223,6 @@ function ContactPageContent() {
                         }),
                       })
                       if (!res.ok) throw new Error("Failed to send")
-                      toast({ title: "Message Sent!", description: "We'll get back to you shortly.", variant: "success" })
                       setSubmitted(true)
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     } catch {
