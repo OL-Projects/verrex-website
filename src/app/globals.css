@@ -675,6 +675,79 @@ html {
   animation: fade-in-backdrop 0.2s ease-out forwards;
 }
 
+/* ===== CONTACT SUCCESS ANIMATIONS ===== */
+@keyframes contact-scaleIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes contact-drawCheck {
+  0% { stroke-dashoffset: 50; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes contact-ripple {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes contact-floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.4); }
+}
+@keyframes contact-slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes contact-fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.success-check-circle {
+  will-change: transform, opacity;
+  animation: contact-scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.success-check-path {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: contact-drawCheck 0.5s ease-out 0.5s forwards;
+}
+.success-ripple-1 { will-change: transform, opacity; animation: contact-ripple 1.5s ease-out 0.3s forwards; }
+.success-ripple-2 { will-change: transform, opacity; animation: contact-ripple 1.5s ease-out 0.6s forwards; }
+.success-ripple-3 { will-change: transform, opacity; animation: contact-ripple 1.5s ease-out 0.9s forwards; }
+.success-particle {
+  will-change: transform, opacity;
+  animation: contact-floatUp 1.2s ease-out forwards;
+}
+.success-slide-1 { opacity: 0; animation: contact-slideUp 0.5s ease-out 0.7s forwards; }
+.success-slide-2 { opacity: 0; animation: contact-slideUp 0.5s ease-out 0.9s forwards; }
+.success-slide-3 { opacity: 0; animation: contact-slideUp 0.5s ease-out 1.1s forwards; }
+.success-slide-4 { opacity: 0; animation: contact-slideUp 0.5s ease-out 1.3s forwards; }
+.form-entrance {
+  animation: contact-fadeIn 0.5s ease-out forwards;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .success-check-circle,
+  .success-check-path,
+  .success-ripple-1,
+  .success-ripple-2,
+  .success-ripple-3,
+  .success-particle,
+  .success-slide-1,
+  .success-slide-2,
+  .success-slide-3,
+  .success-slide-4,
+  .form-entrance {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .success-check-path {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
 /* ===== 3D CANVAS: drei Html overlay pointer-events fix ===== */
 /* drei's <Html> creates absolutely-positioned, CSS-transformed divs over the canvas.
    Even with style={{ pointerEvents: "none" }}, intermediate wrapper divs can block

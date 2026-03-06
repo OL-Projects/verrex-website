@@ -21,6 +21,7 @@ function ContactPageContent() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [fadeOut, setFadeOut] = useState(false)
+  const [formEntering, setFormEntering] = useState(false)
   const [messageGlow, setMessageGlow] = useState(false)
   const searchParams = useSearchParams()
   const messageRef = useRef<HTMLTextAreaElement>(null)
@@ -42,55 +43,53 @@ function ContactPageContent() {
     }
   }, [fromEmail])
 
+  // Deterministic particle positions (no Math.random in render)
+  const particles = [
+    { size: 6, x: -40, y: -30, color: '#34d399' },
+    { size: 8, x: 35, y: -35, color: '#60a5fa' },
+    { size: 5, x: 45, y: 5, color: '#34d399' },
+    { size: 7, x: 30, y: 40, color: '#60a5fa' },
+    { size: 6, x: -10, y: 45, color: '#34d399' },
+    { size: 8, x: -45, y: 25, color: '#60a5fa' },
+    { size: 5, x: -35, y: -5, color: '#34d399' },
+    { size: 7, x: 10, y: -45, color: '#60a5fa' },
+  ]
+
   const handleSendAnother = () => {
     setFadeOut(true)
     setTimeout(() => {
       setSubmitted(false)
       setFadeOut(false)
+      setFormEntering(true)
       window.scrollTo({ top: 0, behavior: "smooth" })
+      // Clear entrance animation flag after it completes
+      setTimeout(() => setFormEntering(false), 600)
     }, 500)
   }
 
   if (submitted) {
     return (
       <div className={`min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-[#030712] dark:to-[#020617] transition-all duration-500 ${fadeOut ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
-        <style>{`
-          @keyframes drawCheck { 0% { stroke-dashoffset: 50; } 100% { stroke-dashoffset: 0; } }
-          @keyframes scaleIn { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
-          @keyframes ripple { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(2.2); opacity: 0; } }
-          @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(0.5); opacity: 0; } }
-          @keyframes slideUp { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-          .check-circle { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-          .check-path { stroke-dasharray: 50; stroke-dashoffset: 50; animation: drawCheck 0.5s ease-out 0.5s forwards; }
-          .ripple-1 { animation: ripple 1.5s ease-out 0.3s forwards; }
-          .ripple-2 { animation: ripple 1.5s ease-out 0.6s forwards; }
-          .ripple-3 { animation: ripple 1.5s ease-out 0.9s forwards; }
-          .particle { animation: floatUp 1.2s ease-out forwards; }
-          .slide-up-1 { opacity: 0; animation: slideUp 0.5s ease-out 0.7s forwards; }
-          .slide-up-2 { opacity: 0; animation: slideUp 0.5s ease-out 0.9s forwards; }
-          .slide-up-3 { opacity: 0; animation: slideUp 0.5s ease-out 1.1s forwards; }
-          .slide-up-4 { opacity: 0; animation: slideUp 0.5s ease-out 1.3s forwards; }
-        `}</style>
         <div className="mx-auto max-w-md px-6 py-20 text-center">
           {/* Animated SVG Checkmark */}
           <div className="relative mx-auto mb-10 h-28 w-28">
             {/* Ripple rings */}
-            <div className="absolute inset-0 rounded-full bg-emerald-400/15 ripple-1" />
-            <div className="absolute inset-0 rounded-full bg-emerald-400/10 ripple-2" />
-            <div className="absolute inset-0 rounded-full bg-emerald-400/5 ripple-3" />
-            {/* Floating particles */}
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="particle absolute" style={{
-                left: '50%', top: '50%',
-                width: `${4 + Math.random() * 6}px`, height: `${4 + Math.random() * 6}px`,
-                borderRadius: '50%',
-                background: i % 2 === 0 ? '#34d399' : '#60a5fa',
-                transform: `rotate(${i * 45}deg) translateX(${30 + Math.random() * 20}px)`,
+            <div className="absolute inset-0 rounded-full bg-emerald-400/15 success-ripple-1" />
+            <div className="absolute inset-0 rounded-full bg-emerald-400/10 success-ripple-2" />
+            <div className="absolute inset-0 rounded-full bg-emerald-400/5 success-ripple-3" />
+            {/* Floating particles — deterministic positions via top/left offsets */}
+            {particles.map((p, i) => (
+              <div key={i} className="success-particle absolute rounded-full" style={{
+                left: `calc(50% + ${p.x}px)`,
+                top: `calc(50% + ${p.y}px)`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                background: p.color,
                 animationDelay: `${0.4 + i * 0.08}s`,
               }} />
             ))}
             {/* Main circle + check */}
-            <svg viewBox="0 0 100 100" className="w-full h-full check-circle">
+            <svg viewBox="0 0 100 100" className="w-full h-full success-check-circle">
               <defs>
                 <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#34d399" />
@@ -98,24 +97,24 @@ function ContactPageContent() {
                 </linearGradient>
               </defs>
               <circle cx="50" cy="50" r="45" fill="url(#checkGrad)" />
-              <path className="check-path" d="M30 52 L44 66 L70 38" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <path className="success-check-path" d="M30 52 L44 66 L70 38" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white slide-up-1">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white success-slide-1">
             {t('successTitle')}
           </h1>
-          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 slide-up-2">
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 success-slide-2">
             {t('successDesc')}
           </p>
-          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500 slide-up-3">
-            We typically respond within 24 hours
+          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500 success-slide-3">
+            {t('responseTime')}
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center slide-up-4">
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center success-slide-4">
             <Button variant="primary" size="lg" onClick={handleSendAnother}>
               <Send className="h-4 w-4" /> {t('sendAnother')}
             </Button>
             <IntlLink href="/">
-              <Button variant="outline" size="lg">Back to Home</Button>
+              <Button variant="outline" size="lg">{t('backToHome')}</Button>
             </IntlLink>
           </div>
         </div>
@@ -124,7 +123,7 @@ function ContactPageContent() {
   }
 
   return (
-    <div>
+    <div className={formEntering ? "form-entrance" : ""}>
       <section className="relative bg-slate-50 dark:bg-[#000000] py-20 overflow-hidden">
         {/* Light mode SVG */}
         <div className="absolute inset-0 dark:hidden">

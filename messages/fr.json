@@ -240,6 +240,8 @@
     "successTitle": "Message envoyé!",
     "successDesc": "Merci de nous avoir contactés. Notre équipe vous répondra dans les 24 heures.",
     "sendAnother": "Envoyer un autre message",
+    "responseTime": "Nous répondons généralement dans les 24 heures",
+    "backToHome": "Retour à l'accueil",
     "sendMessage": "Envoyez-nous un message",
     "fullName": "Nom complet",
     "fullNamePlaceholder": "Jean Tremblay",

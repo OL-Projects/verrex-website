@@ -240,6 +240,8 @@
     "successTitle": "Message Sent!",
     "successDesc": "Thank you for reaching out. Our team will get back to you within 24 hours.",
     "sendAnother": "Send Another Message",
+    "responseTime": "We typically respond within 24 hours",
+    "backToHome": "Back to Home",
     "sendMessage": "Send Us a Message",
     "fullName": "Full Name",
     "fullNamePlaceholder": "John Doe",
