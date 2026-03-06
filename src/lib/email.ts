@@ -1,7 +1,7 @@
 import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = "VEREX Portal <onboarding@resend.dev>"
+const FROM = "VEREX Portal <portal@verex.ca>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://verex.ca"
 
 export async function sendWelcomeEmail(to: string, name: string) {
