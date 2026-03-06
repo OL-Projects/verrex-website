@@ -166,6 +166,11 @@ function LoginContent() {
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+            <div className="text-center mt-2">
+              <IntlLink href="/portal/forgot-password" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                Forgot your password?
+              </IntlLink>
+            </div>
           </form>
 
           <div className="flex items-center gap-3 my-6">
