@@ -12,6 +12,13 @@ const COMPANY = {
   website: "www.verex.ca",
 }
 
+// ─── Icon Badge Helper (replaces emojis) ────────────────────
+function iconBadge(symbol: string, bgColor: string, textColor: string): string {
+  return `<div style="display:inline-block;background:${bgColor};border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center">
+    <span style="color:${textColor};font-size:24px;font-weight:700;font-family:Georgia,serif">${symbol}</span>
+  </div>`
+}
+
 // ─── Shared Email Layout ────────────────────────────────────
 function emailLayout(content: string, preheader: string): string {
   return `<!DOCTYPE html>
@@ -35,7 +42,6 @@ function emailLayout(content: string, preheader: string): string {
   </style>
 </head>
 <body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
-  <!-- Preheader text (hidden, shows in inbox preview) -->
   <div style="display:none;font-size:1px;color:#f1f5f9;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">${preheader}</div>
   
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px">
@@ -122,7 +128,7 @@ function getDeliverabilityHeaders() {
 // ═══════════════════════════════════════════════════════════
 export async function sendWelcomeEmail(to: string, name: string) {
   const firstName = name.split(" ")[0]
-  const preheader = `Welcome to VEREX Portal, ${firstName}! Your account is ready.`
+  const preheader = `Welcome to VEREX Portal, ${firstName} — your account is ready.`
 
   const content = `
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:26px;font-weight:800">Welcome to VEREX Portal</h1>
@@ -153,25 +159,21 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
     ${ctaButton("Log In to Your Portal", `${BASE_URL}/en/portal/login`)}
 
-    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">If you didn't create this account, you can safely ignore this email or <a href="mailto:${COMPANY.email}" style="color:#2563eb">contact us</a>.</p>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">If you did not create this account, you can safely ignore this email or <a href="mailto:${COMPANY.email}" style="color:#2563eb">contact us</a>.</p>
   `
 
-  const text = `Welcome to VEREX Portal, ${firstName}!\n\nYour account has been created successfully. Log in at: ${BASE_URL}/en/portal/login\n\nWith your portal account you can:\n- Track your projects in real-time\n- Request quotes and estimates online\n- Communicate directly with our team\n\n${COMPANY.name}\n${COMPANY.address}\n${COMPANY.phone}`
+  const text = `Welcome to VEREX Portal, ${firstName}!\n\nYour account has been created successfully.\n\nLog in at: ${BASE_URL}/en/portal/login\n\nWith your portal account you can:\n- Track your projects in real-time\n- Request quotes and estimates online\n- Communicate directly with our team\n\n${COMPANY.name}\n${COMPANY.address}\n${COMPANY.phone}`
 
-  try {
-    const result = await resend.emails.send({
-      from: FROM_PORTAL,
-      to,
-      subject: `Welcome to VEREX Portal, ${firstName}!`,
-      html: emailLayout(content, preheader),
-      text,
-      replyTo: COMPANY.email,
-      headers: getDeliverabilityHeaders(),
-    })
-    console.log("✅ Welcome email sent to", to, result.data?.id)
-  } catch (err) {
-    console.error("❌ Failed to send welcome email:", err)
-  }
+  const result = await resend.emails.send({
+    from: FROM_PORTAL,
+    to,
+    subject: `Welcome to VEREX Portal, ${firstName}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Welcome email sent:", to, result.data?.id)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -180,11 +182,11 @@ export async function sendWelcomeEmail(to: string, name: string) {
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
   const firstName = name.split(" ")[0]
   const resetUrl = `${BASE_URL}/en/portal/reset-password?token=${token}`
-  const preheader = `Reset your VEREX Portal password. This link expires in 1 hour.`
+  const preheader = `Reset your VEREX Portal password — this link expires in 1 hour.`
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      <div style="display:inline-block;background:#fef3c7;border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center;font-size:28px">&#128274;</div>
+      ${iconBadge("&oplus;", "#fef3c7", "#d97706")}
     </div>
     
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Password Reset Request</h1>
@@ -193,28 +195,24 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
     ${ctaButton("Reset My Password", resetUrl)}
 
     <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;margin:0 0 20px">
-      <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5"><strong>&#9200; This link expires in 1 hour.</strong> If you didn't request this, no action is needed &mdash; your password remains unchanged.</p>
+      <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5"><strong>This link expires in 1 hour.</strong> If you did not request this reset, no action is needed &mdash; your password remains unchanged.</p>
     </div>
 
-    <p style="color:#94a3b8;font-size:12px;margin:0;line-height:1.5;word-break:break-all">If the button doesn't work, copy this link into your browser:<br><a href="${resetUrl}" style="color:#2563eb;font-size:12px">${resetUrl}</a></p>
+    <p style="color:#94a3b8;font-size:12px;margin:0;line-height:1.5;word-break:break-all">If the button does not work, copy this link into your browser:<br><a href="${resetUrl}" style="color:#2563eb;font-size:12px">${resetUrl}</a></p>
   `
 
-  const text = `Password Reset Request\n\nHi ${firstName},\n\nWe received a request to reset your VEREX Portal password.\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour. If you didn't request this, no action is needed.\n\n${COMPANY.name}\n${COMPANY.phone}`
+  const text = `Password Reset Request\n\nHi ${firstName},\n\nWe received a request to reset your VEREX Portal password.\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour. If you did not request this, no action is needed.\n\n${COMPANY.name}\n${COMPANY.phone}`
 
-  try {
-    const result = await resend.emails.send({
-      from: FROM_NOREPLY,
-      to,
-      subject: "Reset Your VEREX Portal Password",
-      html: emailLayout(content, preheader),
-      text,
-      replyTo: COMPANY.email,
-      headers: getDeliverabilityHeaders(),
-    })
-    console.log("✅ Password reset email sent to", to, result.data?.id)
-  } catch (err) {
-    console.error("❌ Failed to send reset email:", err)
-  }
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: "VEREX Portal — Password Reset",
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Reset email sent:", to, result.data?.id)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -226,38 +224,34 @@ export async function sendPasswordChangedEmail(to: string, name: string) {
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      <div style="display:inline-block;background:#dcfce7;border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center;font-size:28px">&#9989;</div>
+      ${iconBadge("&check;", "#dcfce7", "#16a34a")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Password Changed</h1>
     <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, your VEREX Portal password has been successfully updated.</p>
 
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px 24px;margin:0 0 24px;text-align:center">
-      <p style="margin:0;color:#166534;font-size:15px;font-weight:600">&#128274; Your account is secure</p>
+      <p style="margin:0;color:#166534;font-size:15px;font-weight:600">Your account is secure</p>
       <p style="margin:8px 0 0;color:#15803d;font-size:13px">You can now log in with your new password.</p>
     </div>
 
     ${ctaButton("Log In Now", `${BASE_URL}/en/portal/login`, "#059669")}
 
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px 20px;margin:0">
-      <p style="margin:0;color:#991b1b;font-size:13px;line-height:1.5"><strong>&#9888;&#65039; Didn't make this change?</strong> Contact us immediately at <a href="mailto:${COMPANY.email}" style="color:#dc2626;font-weight:600">${COMPANY.email}</a> or call <a href="tel:${COMPANY.phone}" style="color:#dc2626;font-weight:600">${COMPANY.phone}</a>.</p>
+      <p style="margin:0;color:#991b1b;font-size:13px;line-height:1.5"><strong>Did not make this change?</strong> Contact us immediately at <a href="mailto:${COMPANY.email}" style="color:#dc2626;font-weight:600">${COMPANY.email}</a> or call <a href="tel:${COMPANY.phone}" style="color:#dc2626;font-weight:600">${COMPANY.phone}</a>.</p>
     </div>
   `
 
-  const text = `Password Changed Successfully\n\nHi ${firstName},\n\nYour VEREX Portal password has been successfully updated. You can now log in with your new password at: ${BASE_URL}/en/portal/login\n\nIf you did not make this change, contact us immediately at ${COMPANY.email} or call ${COMPANY.phone}.\n\n${COMPANY.name}\n${COMPANY.address}`
+  const text = `Password Changed Successfully\n\nHi ${firstName},\n\nYour VEREX Portal password has been successfully updated.\n\nLog in at: ${BASE_URL}/en/portal/login\n\nIf you did not make this change, contact us immediately at ${COMPANY.email} or call ${COMPANY.phone}.\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  try {
-    const result = await resend.emails.send({
-      from: FROM_NOREPLY,
-      to,
-      subject: "Your VEREX Portal Password Was Changed",
-      html: emailLayout(content, preheader),
-      text,
-      replyTo: COMPANY.email,
-      headers: getDeliverabilityHeaders(),
-    })
-    console.log("✅ Password changed email sent to", to, result.data?.id)
-  } catch (err) {
-    console.error("❌ Failed to send password changed email:", err)
-  }
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: "VEREX Portal — Password Changed",
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Password changed email sent:", to, result.data?.id)
 }
