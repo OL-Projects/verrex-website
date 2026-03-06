@@ -185,14 +185,14 @@ function ContactPageContent() {
                     }
                   }} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" name="name" placeholder={t('fullNamePlaceholder')} required /></div>
+                      <div><Label htmlFor="name">{t('fullName')}</Label><Input id="name" name="name" placeholder={t('fullNamePlaceholder')} /></div>
                       <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" name="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div><Label htmlFor="phone">{t('phone')}</Label><Input id="phone" name="phone" type="tel" placeholder={t('phonePlaceholder')} /></div>
                       <div>
-                        <Label htmlFor="subject">{t('subject')} *</Label>
-                        <select id="subject" name="subject" required className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                        <Label htmlFor="subject">{t('subject')}</Label>
+                        <select id="subject" name="subject" className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                           <option value="">Select a subject</option>
                           <option value="general">General Inquiry</option>
                           <option value="quote">Quote Request</option>
@@ -204,7 +204,7 @@ function ContactPageContent() {
                     </div>
                     <div>
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="message">{t('message')} *</Label>
+                        <Label htmlFor="message">{t('message')}</Label>
                         {fromEmail && (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
                             <Mail className="h-3 w-3" />
@@ -218,7 +218,6 @@ function ContactPageContent() {
                         name="message"
                         placeholder={t('messagePlaceholder')}
                         rows={5}
-                        required
                         className={messageGlow ? "ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all duration-500" : "transition-all duration-500"}
                       />
                     </div>

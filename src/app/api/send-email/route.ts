@@ -171,7 +171,7 @@ function buildQuickQuoteEmail(data: QuickQuoteData): string {
 }
 
 function getSubjectLine(type: FormType, data: Record<string, unknown>): string {
-  const name = (data.name as string) || "Unknown";
+  const name = (data.name as string) || (data.email as string) || "Anonymous";
   switch (type) {
     case "contact":
       return `New Contact: ${name} — ${(data.subject as string) || "General Inquiry"}`;
@@ -191,9 +191,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { type, ...data } = body as { type: FormType } & Record<string, unknown>;
 
-    if (!type || !data.name || !data.email) {
+    if (!type || !data.email) {
       return NextResponse.json(
-        { error: "Missing required fields: type, name, email" },
+        { error: "Missing required fields: type, email" },
         { status: 400 }
       );
     }
