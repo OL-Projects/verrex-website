@@ -77,11 +77,11 @@ export default function AppointmentsPage() {
                 }),
               })
               if (!res.ok) throw new Error("Failed to send")
-              toast({ title: "Appointment Booked!", description: "We'll confirm your appointment shortly.", variant: "success" })
+              toast({ title: t('bookedTitle'), description: t('bookedDesc'), variant: "success" })
               setSubmitted(true)
               window.scrollTo({ top: 0, behavior: "smooth" })
             } catch {
-              toast({ title: "Failed to Book", description: "Please try again or call us directly.", variant: "error" })
+              toast({ title: t('failedTitle'), description: t('failedDesc'), variant: "error" })
             } finally {
               setSending(false)
             }
@@ -144,14 +144,14 @@ export default function AppointmentsPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><Label htmlFor="phone">{t('phone')} *</Label><Input id="phone" name="phone" type="tel" placeholder={t('phonePlaceholder')} required /></div>
-                  <div><Label htmlFor="location">Location / Address</Label><Input id="location" name="location" placeholder="123 Main St, Toronto" /></div>
+                  <div><Label htmlFor="location">{t('locationLabel')}</Label><Input id="location" name="location" placeholder={t('locationPlaceholder')} /></div>
                 </div>
                 <div><Label htmlFor="notes">{t('notes')}</Label><Textarea id="notes" name="notes" placeholder={t('notesPlaceholder')} rows={3} /></div>
               </CardContent>
             </Card>
 
             <Button type="submit" variant="primary" size="xl" className="w-full" disabled={sending}>
-              {sending ? <><Loader2 className="h-5 w-5 animate-spin" /> Booking...</> : <><Calendar className="h-5 w-5" /> {t('bookAppointment')}</>}
+              {sending ? <><Loader2 className="h-5 w-5 animate-spin" /> {t('booking')}</> : <><Calendar className="h-5 w-5" /> {t('bookAppointment')}</>}
             </Button>
           </form>
         </div>

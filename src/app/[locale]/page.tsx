@@ -180,11 +180,11 @@ export default function HomePage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <input name="phone" type="tel" placeholder={t('phone')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
-                    <input name="city" type="text" placeholder="City" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="city" type="text" placeholder={t('cityPlaceholder')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
-                  <input name="postalCode" type="text" placeholder="Postal Code" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                  <input name="postalCode" type="text" placeholder={t('postalCodePlaceholder')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-2">Select Product Type</p>
+                    <p className="text-xs font-medium text-white/70 mb-2">{t('selectProductType')}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {["Casement Windows", "Sliding Doors", "Double Hung", "Storefront", "Curtain Wall", "Entry Doors"].map((product) => (
                         <label key={product} className="flex items-center gap-2 text-xs text-white/70 hover:text-white/90 cursor-pointer">
@@ -195,11 +195,11 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-white/70 mb-1 block">Quantity / Units</label>
-                    <input name="quantity" type="number" placeholder="e.g. 10" min="1" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <label className="text-xs font-medium text-white/70 mb-1 block">{t('quantityLabel')}</label>
+                    <input name="quantity" type="number" placeholder={t('quantityPlaceholder')} min="1" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
                   <Button type="submit" variant="primary" size="lg" className="w-full hover:scale-[1.02] active:scale-[0.98] transition-transform" disabled={qqSending}>
-                    {qqSending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <>{t('getEstimate')} <ArrowRight className="h-4 w-4" /></>}
+                    {qqSending ? <><Loader2 className="h-4 w-4 animate-spin" /> {t('sending')}</> : <>{t('getEstimate')} <ArrowRight className="h-4 w-4" /></>}
                   </Button>
                 </form>
               </div>
@@ -229,11 +229,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-              Solutions For Every Sector
+              {t('sectorTitle')}
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Comprehensive window and door systems engineered for every building type — 
-              from multi-family developments to government facilities and manufacturing plants.
+              {t('sectorDesc')}
             </p>
           </FadeIn>
 
@@ -303,7 +302,7 @@ export default function HomePage() {
                         </h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{product.shortDescription}</p>
                         <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium">
-                          View Details <ArrowRight className="h-3 w-3" />
+                          {t('viewDetails')} <ArrowRight className="h-3 w-3" />
                         </div>
                       </CardContent>
                     </Card>
@@ -393,21 +392,21 @@ export default function HomePage() {
           <div className="max-w-lg">
             <FadeIn>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
-                Why Choose <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">VEREX</span>?
+                {t('whyChooseTitle')} <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">{t('whyChooseBrand')}</span>?
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
               <p className="mt-5 text-lg text-white/80 leading-relaxed drop-shadow-md">
-                We are your strategic partner for fenestration projects of any scale — combining manufacturer-direct pricing, certified installation, and comprehensive project management to deliver results.
+                {t('whyChooseDesc')}
               </p>
             </FadeIn>
 
             <div className="mt-10 space-y-6">
               {[
-                { icon: Shield, title: "Fully Licensed & Bonded", desc: "Complete liability coverage, WSIB compliant, and licensed professionals on every project." },
-                { icon: BadgeCheck, title: "Code Compliant", desc: "All products meet or exceed the National Building Code of Canada, CSA A440, and NAFS standards." },
-                { icon: Truck, title: "On-Time, On-Budget", desc: "98% on-time completion rate with transparent project management and milestone tracking." },
-                { icon: FileText, title: "Premium Quality, Price-Match Guarantee", desc: "Uncompromising quality backed by our price-match guarantee. Get the best products at the most competitive prices — guaranteed." },
+                { icon: Shield, title: t('whyLicensed'), desc: t('whyLicensedDesc') },
+                { icon: BadgeCheck, title: t('whyCode'), desc: t('whyCodeDesc') },
+                { icon: Truck, title: t('whyOnTime'), desc: t('whyOnTimeDesc') },
+                { icon: FileText, title: t('whyPriceMatch'), desc: t('whyPriceMatchDesc') },
               ].map((item, i) => (
                 <FadeIn key={item.title} delay={0.15 + i * 0.1}>
                   <div className="flex gap-4 items-start">
@@ -484,7 +483,7 @@ export default function HomePage() {
           <FadeIn className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/80 dark:bg-blue-900/30 border border-blue-200/50 dark:border-blue-800/30 mb-5">
               <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 tracking-wide uppercase">Industry Certified</span>
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300 tracking-wide uppercase">{t('industryCertified')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
               {t('certsTitle')}
@@ -556,7 +555,7 @@ export default function HomePage() {
                       {/* Verified badge */}
                       <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/30">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">Verified</span>
+                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{t('verified')}</span>
                       </div>
                     </div>
                   </div>

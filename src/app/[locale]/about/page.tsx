@@ -29,7 +29,7 @@ export default async function AboutPage() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-transparent to-transparent dark:from-black/70 z-10" />
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Badge variant="primary" className="mb-4">About VEREX</Badge>
+          <Badge variant="primary" className="mb-4">{t('aboutBadge')}</Badge>
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white max-w-3xl">{t('title')}</h1>
           <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl">{t('description')}</p>
           <div className="mt-8 flex items-center gap-6 flex-wrap">
@@ -44,10 +44,10 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: "500+", label: "Projects Completed" },
-              { value: "50+", label: "Expert Team Members" },
-              { value: "2M+", label: "Sq Ft Installed" },
-              { value: "98%", label: "On-Time Delivery" },
+              { value: "500+", label: t('projectsCompleted') },
+              { value: "50+", label: t('expertTeamMembers') },
+              { value: "2M+", label: t('sqFtInstalled') },
+              { value: "98%", label: t('onTimeDelivery') },
             ].map((stat, i) => (
               <div key={i}>
                 <p className="text-3xl md:text-4xl font-black text-blue-600 dark:text-blue-400">{stat.value}</p>
@@ -66,7 +66,7 @@ export default async function AboutPage() {
               {/* Pull quote */}
               <div className="border-l-4 border-blue-600 pl-6 mb-8">
                 <p className="text-xl md:text-2xl font-semibold text-slate-800 dark:text-white italic leading-relaxed">
-                  &ldquo;Excellence in every pane &mdash; delivering quality fenestration solutions you can trust.&rdquo;
+                  &ldquo;{t('pullQuote')}&rdquo;
                 </p>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('missionTitle')}</h2>
@@ -104,9 +104,9 @@ export default async function AboutPage() {
       <section className="py-16 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <Badge variant="secondary" className="mb-3">Industry Standards</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Certifications &amp; Compliance</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">All VEREX products meet or exceed the highest industry standards</p>
+            <Badge variant="secondary" className="mb-3">{t('industryStandards')}</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('certsCompliance')}</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">{t('certsDesc')}</p>
           </div>
           <CertificationsBar variant="full" />
         </div>
