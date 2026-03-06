@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-slate-500 dark:text-slate-500 mb-4">The link expires in 1 hour.</p>
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 mb-6 text-left">
               <div className="flex items-start gap-3">
-                <span className="text-xl mt-0.5">📬</span>
+                <Mail className="h-5 w-5 mt-0.5 text-amber-600 dark:text-amber-400" />
                 <div>
                   <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">Don&apos;t see the email?</p>
                   <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">Check your <strong>Spam</strong> or <strong>Junk</strong> folder — it may take a minute to arrive. If using Gmail, also check the <strong>Promotions</strong> tab.</p>

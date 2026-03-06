@@ -356,7 +356,7 @@ export default function MeasurementsPage() {
             className="rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 p-3 flex items-center gap-3">
             <FileOutput className="h-5 w-5 text-indigo-600 shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-bold text-indigo-900 dark:text-indigo-200">✅ Estimate Created Successfully</p>
+              <p className="text-sm font-bold text-indigo-900 dark:text-indigo-200">Estimate Created Successfully</p>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-400">{basket.length} window(s) exported with full specs — pricing can be added in the Estimate Creator</p>
             </div>
             <button onClick={() => { router.push(`/${locale}/portal/dashboard/estimates`) }}
