@@ -43,14 +43,32 @@ function ContactPageContent() {
 
   if (submitted) {
     return (
-      <div className="py-20">
-        <div className="mx-auto max-w-lg px-4 text-center">
-          <div className="h-20 w-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+      <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-[#030712] dark:to-[#020617]">
+        <div className="mx-auto max-w-md px-6 py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Animated checkmark */}
+          <div className="relative mx-auto mb-8">
+            <div className="h-24 w-24 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 animate-in zoom-in duration-500">
+              <CheckCircle2 className="h-12 w-12 text-white drop-shadow-sm" />
+            </div>
+            <div className="absolute inset-0 h-24 w-24 mx-auto rounded-full bg-emerald-400/20 animate-ping" style={{ animationDuration: '2s', animationIterationCount: '3' }} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">{t('successTitle')}</h1>
-          <p className="mt-4 text-slate-600">{t('successDesc')}</p>
-          <Button variant="primary" className="mt-8" onClick={() => setSubmitted(false)}>{t('sendAnother')}</Button>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
+            {t('successTitle')}
+          </h1>
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
+            {t('successDesc')}
+          </p>
+          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500 animate-in fade-in duration-500 delay-500">
+            We typically respond within 24 hours
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 delay-500">
+            <Button variant="primary" size="lg" onClick={() => setSubmitted(false)}>
+              <Send className="h-4 w-4" /> {t('sendAnother')}
+            </Button>
+            <IntlLink href="/">
+              <Button variant="outline" size="lg">Back to Home</Button>
+            </IntlLink>
+          </div>
         </div>
       </div>
     )
@@ -159,6 +177,7 @@ function ContactPageContent() {
                       if (!res.ok) throw new Error("Failed to send")
                       toast({ title: "Message Sent!", description: "We'll get back to you shortly.", variant: "success" })
                       setSubmitted(true)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
                     } catch {
                       toast({ title: "Failed to Send", description: "Please try again or call us directly.", variant: "error" })
                     } finally {

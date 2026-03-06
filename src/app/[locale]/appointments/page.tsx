@@ -80,6 +80,7 @@ export default function AppointmentsPage() {
               if (!res.ok) throw new Error("Failed to send")
               toast({ title: "Appointment Booked!", description: "We'll confirm your appointment shortly.", variant: "success" })
               setSubmitted(true)
+              window.scrollTo({ top: 0, behavior: "smooth" })
             } catch {
               toast({ title: "Failed to Book", description: "Please try again or call us directly.", variant: "error" })
             } finally {

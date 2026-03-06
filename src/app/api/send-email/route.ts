@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { error } = await resend.emails.send({
-      from: "VEREX Website <onboarding@resend.dev>",
+      from: "VEREX Website <noreply@verex.ca>",
       to: [ADMIN_EMAIL],
       subject: getSubjectLine(type, data),
       html,
