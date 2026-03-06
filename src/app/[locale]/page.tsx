@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import Image from "next/image"
@@ -35,7 +36,9 @@ import {
   Truck,
 } from "lucide-react"
 
+import { Loader2 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 const iconMap: Record<string, LucideIcon> = {
   MessageSquare, Ruler, Wrench, Search, Sparkles, Settings,
@@ -43,6 +46,8 @@ const iconMap: Record<string, LucideIcon> = {
 
 export default function HomePage() {
   const t = useTranslations('HomePage')
+  const { toast } = useToast()
+  const [qqSending, setQqSending] = useState(false)
 
   const stats = [
     { value: t('stat1Value'), label: t('stat1Label') },
@@ -138,22 +143,52 @@ export default function HomePage() {
               <div className="hidden lg:block bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 shadow-2xl hero-quote-form">
                 <h3 className="text-lg font-bold text-white mb-1">{t('quoteFormSubtitle')}</h3>
                 <p className="text-xs text-white/60 mb-4">{t('quickQuoteDesc')}</p>
-                <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-3" onSubmit={async (e) => {
+                  e.preventDefault()
+                  setQqSending(true)
+                  const fd = new FormData(e.currentTarget)
+                  const products = ["Casement Windows", "Sliding Doors", "Double Hung", "Storefront", "Curtain Wall", "Entry Doors"].filter((_, i) => fd.getAll("products").includes(String(i)))
+                  const checkedProducts: string[] = []
+                  e.currentTarget.querySelectorAll<HTMLInputElement>('input[name="product"]').forEach((cb) => { if (cb.checked) checkedProducts.push(cb.value) })
+                  try {
+                    const res = await fetch("/api/send-email", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        type: "quick-quote",
+                        name: fd.get("name"),
+                        email: fd.get("email"),
+                        phone: fd.get("phone"),
+                        city: fd.get("city"),
+                        postalCode: fd.get("postalCode"),
+                        products: checkedProducts,
+                        quantity: fd.get("quantity"),
+                      }),
+                    })
+                    if (!res.ok) throw new Error("Failed")
+                    toast({ title: "Quote Request Sent!", description: "We'll get back to you with an estimate.", variant: "success" })
+                    e.currentTarget.reset()
+                  } catch {
+                    toast({ title: "Failed to Send", description: "Please try again or call us.", variant: "error" })
+                  } finally {
+                    setQqSending(false)
+                  }
+                }}>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder={t('fullName')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
-                    <input type="email" placeholder={t('email')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="name" type="text" placeholder={t('fullName')} required className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="email" type="email" placeholder={t('email')} required className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="tel" placeholder={t('phone')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
-                    <input type="text" placeholder="City" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="phone" type="tel" placeholder={t('phone')} className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="city" type="text" placeholder="City" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
-                  <input type="text" placeholder="Postal Code" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                  <input name="postalCode" type="text" placeholder="Postal Code" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   <div>
                     <p className="text-xs font-medium text-white/70 mb-2">Select Product Type</p>
                     <div className="grid grid-cols-2 gap-2">
                       {["Casement Windows", "Sliding Doors", "Double Hung", "Storefront", "Curtain Wall", "Entry Doors"].map((product) => (
                         <label key={product} className="flex items-center gap-2 text-xs text-white/70 hover:text-white/90 cursor-pointer">
-                          <input type="checkbox" className="rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400/50 h-3.5 w-3.5" />
+                          <input type="checkbox" name="product" value={product} className="rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400/50 h-3.5 w-3.5" />
                           {product}
                         </label>
                       ))}
@@ -161,10 +196,10 @@ export default function HomePage() {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-white/70 mb-1 block">Quantity / Units</label>
-                    <input type="number" placeholder="e.g. 10" min="1" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
+                    <input name="quantity" type="number" placeholder="e.g. 10" min="1" className="w-full px-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-blue-400/50 focus:border-blue-400/50" />
                   </div>
-                  <Button variant="primary" size="lg" className="w-full hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                    {t('getEstimate')} <ArrowRight className="h-4 w-4" />
+                  <Button type="submit" variant="primary" size="lg" className="w-full hover:scale-[1.02] active:scale-[0.98] transition-transform" disabled={qqSending}>
+                    {qqSending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <>{t('getEstimate')} <ArrowRight className="h-4 w-4" /></>}
                   </Button>
                 </form>
               </div>

@@ -10,13 +10,16 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, FileText, Upload, ArrowRight, ArrowLeft, Phone } from "lucide-react"
+import { CheckCircle2, FileText, Upload, ArrowRight, ArrowLeft, Phone, Loader2 } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function QuotePage() {
   const t = useTranslations('QuotePage')
   const steps = [t("step1"), t("step2"), t("step3"), t("step4")]
+  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(0)
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", address: "",
     projectType: "", serviceType: "", description: "",
@@ -27,9 +30,23 @@ export default function QuotePage() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setSending(true)
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "quote", ...formData }),
+      })
+      if (!res.ok) throw new Error("Failed to send")
+      toast({ title: "Quote Request Sent!", description: "We'll prepare your quote and get back to you shortly.", variant: "success" })
+      setSubmitted(true)
+    } catch {
+      toast({ title: "Failed to Send", description: "Please try again or call us directly.", variant: "error" })
+    } finally {
+      setSending(false)
+    }
   }
 
   if (submitted) {
@@ -217,8 +234,8 @@ export default function QuotePage() {
                       {t("next")} <ArrowRight className="h-4 w-4" />
                     </Button>
                   ) : (
-                    <Button type="submit" variant="primary">
-                      <FileText className="h-4 w-4" /> {t("submitRequest")}
+                    <Button type="submit" variant="primary" disabled={sending}>
+                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><FileText className="h-4 w-4" /> {t("submitRequest")}</>}
                     </Button>
                   )}
                 </div>

@@ -10,13 +10,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { companyInfo } from "@/lib/data"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Video } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Video, Loader2 } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
+import { useToast } from "@/components/ui/use-toast"
 
 function ContactPageContent() {
   const t = useTranslations('ContactPage')
+  const { toast } = useToast()
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
   const [messageGlow, setMessageGlow] = useState(false)
   const searchParams = useSearchParams()
   const messageRef = useRef<HTMLTextAreaElement>(null)
@@ -134,16 +137,43 @@ function ContactPageContent() {
               <Card>
                 <CardContent className="p-8">
                   <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('sendMessage')}</h2>
-                  <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }} className="space-y-5">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    setSending(true)
+                    const form = e.currentTarget
+                    const formData = new FormData(form)
+                    try {
+                      const res = await fetch("/api/send-email", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          type: "contact",
+                          name: formData.get("name"),
+                          email: formData.get("email"),
+                          phone: formData.get("phone"),
+                          subject: formData.get("subject"),
+                          message: formData.get("message"),
+                          contactMethod: formData.get("contactMethod"),
+                        }),
+                      })
+                      if (!res.ok) throw new Error("Failed to send")
+                      toast({ title: "Message Sent!", description: "We'll get back to you shortly.", variant: "success" })
+                      setSubmitted(true)
+                    } catch {
+                      toast({ title: "Failed to Send", description: "Please try again or call us directly.", variant: "error" })
+                    } finally {
+                      setSending(false)
+                    }
+                  }} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" placeholder={t('fullNamePlaceholder')} required /></div>
-                      <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
+                      <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" name="name" placeholder={t('fullNamePlaceholder')} required /></div>
+                      <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" name="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="phone">{t('phone')}</Label><Input id="phone" type="tel" placeholder={t('phonePlaceholder')} /></div>
+                      <div><Label htmlFor="phone">{t('phone')}</Label><Input id="phone" name="phone" type="tel" placeholder={t('phonePlaceholder')} /></div>
                       <div>
                         <Label htmlFor="subject">{t('subject')} *</Label>
-                        <select id="subject" required className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                        <select id="subject" name="subject" required className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                           <option value="">Select a subject</option>
                           <option value="general">General Inquiry</option>
                           <option value="quote">Quote Request</option>
@@ -166,6 +196,7 @@ function ContactPageContent() {
                       <Textarea
                         ref={messageRef}
                         id="message"
+                        name="message"
                         placeholder={t('messagePlaceholder')}
                         rows={5}
                         required
@@ -188,8 +219,8 @@ function ContactPageContent() {
                         ))}
                       </div>
                     </div>
-                    <Button type="submit" variant="primary" size="lg" className="w-full">
-                      <Send className="h-4 w-4" /> {t('submitBtn')}
+                    <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
+                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> {t('submitBtn')}</>}
                     </Button>
                   </form>
                 </CardContent>

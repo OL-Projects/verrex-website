@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "../globals.css"
 import { SiteChrome } from "@/components/layout/site-chrome"
+import { ToastProvider } from "@/components/ui/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { SessionProvider } from "@/components/providers/session-provider"
 import { NextIntlClientProvider, hasLocale } from "next-intl"
@@ -122,7 +124,10 @@ export default async function LocaleLayout({ children, params }: Props) {
               defaultTheme="dark"
               disableTransitionOnChange={false}
             >
-              <SiteChrome>{children}</SiteChrome>
+              <ToastProvider>
+                <SiteChrome>{children}</SiteChrome>
+                <Toaster />
+              </ToastProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </SessionProvider>

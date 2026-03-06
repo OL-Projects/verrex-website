@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { appointmentTimeSlots } from "@/lib/data"
-import { Calendar, MapPin, Video, Building2, Wrench, Search, CheckCircle2, Clock } from "lucide-react"
+import { Calendar, MapPin, Video, Building2, Wrench, Search, CheckCircle2, Clock, Loader2 } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function AppointmentsPage() {
   const t = useTranslations('AppointmentsPage')
@@ -19,7 +20,9 @@ export default function AppointmentsPage() {
     { id: "virtual-consultation", label: t('virtualConsultation'), icon: Video, desc: t('virtualConsultationDesc') },
     { id: "showroom-visit", label: t('showroomVisit'), icon: Building2, desc: t('showroomVisitDesc') },
   ]
+  const { toast } = useToast()
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
   const [selectedType, setSelectedType] = useState("")
   const [selectedTime, setSelectedTime] = useState("")
 
@@ -53,7 +56,36 @@ export default function AppointmentsPage() {
 
       <section className="py-12 dark:bg-[#030712]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }} className="space-y-8">
+          <form onSubmit={async (e) => {
+            e.preventDefault()
+            setSending(true)
+            const form = e.currentTarget
+            const fd = new FormData(form)
+            try {
+              const res = await fetch("/api/send-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  type: "appointment",
+                  name: fd.get("name"),
+                  email: fd.get("email"),
+                  phone: fd.get("phone"),
+                  location: fd.get("location"),
+                  appointmentType: selectedType,
+                  date: fd.get("date"),
+                  time: selectedTime,
+                  notes: fd.get("notes"),
+                }),
+              })
+              if (!res.ok) throw new Error("Failed to send")
+              toast({ title: "Appointment Booked!", description: "We'll confirm your appointment shortly.", variant: "success" })
+              setSubmitted(true)
+            } catch {
+              toast({ title: "Failed to Book", description: "Please try again or call us directly.", variant: "error" })
+            } finally {
+              setSending(false)
+            }
+          }} className="space-y-8">
             {/* Appointment Type */}
             <Card>
               <CardHeader>
@@ -83,7 +115,7 @@ export default function AppointmentsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="date">{t('selectDateAndTime')} *</Label>
-                  <Input id="date" type="date" required min={new Date().toISOString().split("T")[0]} />
+                  <Input id="date" name="date" type="date" required min={new Date().toISOString().split("T")[0]} />
                 </div>
                 <div>
                   <Label>{t('availableTimeSlots')} *</Label>
@@ -107,19 +139,19 @@ export default function AppointmentsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" placeholder={t('fullNamePlaceholder')} required /></div>
-                  <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
+                  <div><Label htmlFor="name">{t('fullName')} *</Label><Input id="name" name="name" placeholder={t('fullNamePlaceholder')} required /></div>
+                  <div><Label htmlFor="email">{t('email')} *</Label><Input id="email" name="email" type="email" placeholder={t('emailPlaceholder')} required /></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><Label htmlFor="phone">{t('phone')} *</Label><Input id="phone" type="tel" placeholder={t('phonePlaceholder')} required /></div>
-                  <div><Label htmlFor="location">Location / Address</Label><Input id="location" placeholder="123 Main St, Toronto" /></div>
+                  <div><Label htmlFor="phone">{t('phone')} *</Label><Input id="phone" name="phone" type="tel" placeholder={t('phonePlaceholder')} required /></div>
+                  <div><Label htmlFor="location">Location / Address</Label><Input id="location" name="location" placeholder="123 Main St, Toronto" /></div>
                 </div>
-                <div><Label htmlFor="notes">{t('notes')}</Label><Textarea id="notes" placeholder={t('notesPlaceholder')} rows={3} /></div>
+                <div><Label htmlFor="notes">{t('notes')}</Label><Textarea id="notes" name="notes" placeholder={t('notesPlaceholder')} rows={3} /></div>
               </CardContent>
             </Card>
 
-            <Button type="submit" variant="primary" size="xl" className="w-full">
-              <Calendar className="h-5 w-5" /> {t('bookAppointment')}
+            <Button type="submit" variant="primary" size="xl" className="w-full" disabled={sending}>
+              {sending ? <><Loader2 className="h-5 w-5 animate-spin" /> Booking...</> : <><Calendar className="h-5 w-5" /> {t('bookAppointment')}</>}
             </Button>
           </form>
         </div>
