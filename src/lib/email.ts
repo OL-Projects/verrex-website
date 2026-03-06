@@ -1,111 +1,260 @@
 import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = "VEREX Portal <portal@verex.ca>"
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://verex.ca"
+const FROM_PORTAL = "VEREX Portal <portal@verex.ca>"
+const FROM_NOREPLY = "VEREX <noreply@verex.ca>"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.verex.ca"
+const COMPANY = {
+  name: "VEREX Industries Inc.",
+  address: "123 Glass Avenue, Toronto, ON M5V 3A8",
+  phone: "(514) 742-2160",
+  email: "admin@verex.ca",
+  website: "www.verex.ca",
+}
 
+// ─── Shared Email Layout ────────────────────────────────────
+function emailLayout(content: string, preheader: string): string {
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>VEREX</title>
+  <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
+  <style>
+    body,table,td{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+    body{margin:0;padding:0;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#f1f5f9}
+    img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic}
+    table{border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0}
+    a{color:#2563eb;text-decoration:none}
+    @media only screen and (max-width:600px){.container{width:100%!important;padding:16px!important}}
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
+  <!-- Preheader text (hidden, shows in inbox preview) -->
+  <div style="display:none;font-size:1px;color:#f1f5f9;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">${preheader}</div>
+  
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px">
+    <tr>
+      <td align="center">
+        <table role="presentation" class="container" width="580" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f2847 0%,#1e3a5f 40%,#2563eb 100%);padding:36px 40px;text-align:center">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <div style="display:inline-block;background:rgba(255,255,255,0.12);border-radius:12px;padding:10px 24px;margin-bottom:12px">
+                      <span style="color:#ffffff;font-size:32px;font-weight:800;letter-spacing:3px">VEREX</span>
+                    </div>
+                    <p style="color:#93c5fd;margin:0;font-size:13px;letter-spacing:1.5px;text-transform:uppercase">Premium Windows &amp; Doors</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding:36px 40px 24px">${content}</td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:0 40px 32px">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="border-top:1px solid #e2e8f0;padding-top:24px">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size:12px;color:#94a3b8;line-height:1.6">
+                          <p style="margin:0 0 4px"><strong style="color:#64748b">${COMPANY.name}</strong></p>
+                          <p style="margin:0 0 4px">${COMPANY.address}</p>
+                          <p style="margin:0 0 4px">
+                            <a href="tel:${COMPANY.phone}" style="color:#94a3b8;text-decoration:none">${COMPANY.phone}</a>
+                            &nbsp;&middot;&nbsp;
+                            <a href="mailto:${COMPANY.email}" style="color:#94a3b8;text-decoration:none">${COMPANY.email}</a>
+                          </p>
+                          <p style="margin:0 0 12px"><a href="${BASE_URL}" style="color:#2563eb">${COMPANY.website}</a></p>
+                          <p style="margin:0;color:#cbd5e1;font-size:11px">&copy; ${new Date().getFullYear()} ${COMPANY.name} &mdash; All rights reserved.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+}
+
+// ─── CTA Button Helper ──────────────────────────────────────
+function ctaButton(text: string, url: string, color = "#2563eb"): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto">
+    <tr>
+      <td align="center" style="background:${color};border-radius:10px">
+        <!--[if mso]><i style="letter-spacing:32px;mso-font-width:-100%;mso-text-raise:24pt">&nbsp;</i><![endif]-->
+        <a href="${url}" target="_blank" style="display:inline-block;background:${color};color:#ffffff;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:0.3px;mso-padding-alt:0">${text}</a>
+        <!--[if mso]><i style="letter-spacing:32px;mso-font-width:-100%">&nbsp;</i><![endif]-->
+      </td>
+    </tr>
+  </table>`
+}
+
+// ─── Shared Headers for Deliverability ──────────────────────
+const deliverabilityHeaders = {
+  "X-Entity-Ref-ID": `verex-${Date.now()}`,
+  "List-Unsubscribe": `<mailto:unsubscribe@verex.ca?subject=unsubscribe>`,
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+}
+
+// ═══════════════════════════════════════════════════════════
+// WELCOME EMAIL
+// ═══════════════════════════════════════════════════════════
 export async function sendWelcomeEmail(to: string, name: string) {
-  try {
-    await resend.emails.send({
-      from: FROM,
-      to,
-      subject: "Welcome to VEREX Portal",
-      html: `
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-<div style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-  <div style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);padding:32px;text-align:center">
-    <h1 style="color:#fff;margin:0;font-size:28px;letter-spacing:1px">VEREX</h1>
-    <p style="color:#93c5fd;margin:8px 0 0;font-size:13px">Premium Windows & Doors</p>
-  </div>
-  <div style="padding:32px">
-    <h2 style="color:#1e293b;margin:0 0 16px;font-size:22px">Welcome, ${name}!</h2>
-    <p style="color:#475569;line-height:1.6;margin:0 0 16px">Your VEREX Portal account has been created successfully. You can now access your dashboard to track projects, request quotes, and communicate with our team.</p>
-    <div style="text-align:center;margin:24px 0">
-      <a href="${BASE_URL}/en/portal/login" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">Log In to Your Portal</a>
+  const firstName = name.split(" ")[0]
+  const preheader = `Welcome to VEREX Portal, ${firstName}! Your account is ready.`
+
+  const content = `
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:26px;font-weight:800">Welcome to VEREX Portal</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px">Hello ${firstName}, your account is ready to go.</p>
+    
+    <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:0 0 12px">
+            <span style="display:inline-block;background:#2563eb;color:#fff;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;font-weight:700;margin-right:12px;vertical-align:middle">1</span>
+            <span style="color:#1e293b;font-size:14px;font-weight:600;vertical-align:middle">Track your projects in real-time</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 0 12px">
+            <span style="display:inline-block;background:#2563eb;color:#fff;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;font-weight:700;margin-right:12px;vertical-align:middle">2</span>
+            <span style="color:#1e293b;font-size:14px;font-weight:600;vertical-align:middle">Request quotes and estimates online</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0">
+            <span style="display:inline-block;background:#2563eb;color:#fff;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;font-weight:700;margin-right:12px;vertical-align:middle">3</span>
+            <span style="color:#1e293b;font-size:14px;font-weight:600;vertical-align:middle">Communicate directly with our team</span>
+          </td>
+        </tr>
+      </table>
     </div>
-    <p style="color:#94a3b8;font-size:13px;margin:24px 0 0;border-top:1px solid #e2e8f0;padding-top:16px">If you didn't create this account, please ignore this email or contact us at <a href="mailto:admin@verex.ca" style="color:#2563eb">admin@verex.ca</a>.</p>
-  </div>
-  <div style="background:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0">
-    <p style="color:#94a3b8;font-size:12px;margin:0">© ${new Date().getFullYear()} VEREX Industries — Premium Windows & Doors</p>
-  </div>
-</div>
-</body></html>`
+
+    ${ctaButton("Log In to Your Portal", `${BASE_URL}/en/portal/login`)}
+
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">If you didn't create this account, you can safely ignore this email or <a href="mailto:${COMPANY.email}" style="color:#2563eb">contact us</a>.</p>
+  `
+
+  const text = `Welcome to VEREX Portal, ${firstName}!\n\nYour account has been created successfully. Log in at: ${BASE_URL}/en/portal/login\n\nWith your portal account you can:\n- Track your projects in real-time\n- Request quotes and estimates online\n- Communicate directly with our team\n\n${COMPANY.name}\n${COMPANY.address}\n${COMPANY.phone}`
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM_PORTAL,
+      to,
+      subject: `Welcome to VEREX Portal, ${firstName}!`,
+      html: emailLayout(content, preheader),
+      text,
+      replyTo: COMPANY.email,
+      headers: deliverabilityHeaders,
     })
-    console.log("✅ Welcome email sent to", to)
+    console.log("✅ Welcome email sent to", to, result.data?.id)
   } catch (err) {
     console.error("❌ Failed to send welcome email:", err)
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// PASSWORD RESET EMAIL
+// ═══════════════════════════════════════════════════════════
 export async function sendPasswordResetEmail(to: string, name: string, token: string) {
+  const firstName = name.split(" ")[0]
   const resetUrl = `${BASE_URL}/en/portal/reset-password?token=${token}`
+  const preheader = `Reset your VEREX Portal password. This link expires in 1 hour.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      <div style="display:inline-block;background:#fef3c7;border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center;font-size:28px">&#128274;</div>
+    </div>
+    
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Password Reset Request</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, we received a request to reset your VEREX Portal password. Click the button below to create a new one.</p>
+
+    ${ctaButton("Reset My Password", resetUrl)}
+
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;margin:0 0 20px">
+      <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5"><strong>&#9200; This link expires in 1 hour.</strong> If you didn't request this, no action is needed &mdash; your password remains unchanged.</p>
+    </div>
+
+    <p style="color:#94a3b8;font-size:12px;margin:0;line-height:1.5;word-break:break-all">If the button doesn't work, copy this link into your browser:<br><a href="${resetUrl}" style="color:#2563eb;font-size:12px">${resetUrl}</a></p>
+  `
+
+  const text = `Password Reset Request\n\nHi ${firstName},\n\nWe received a request to reset your VEREX Portal password.\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour. If you didn't request this, no action is needed.\n\n${COMPANY.name}\n${COMPANY.phone}`
+
   try {
-    await resend.emails.send({
-      from: FROM,
+    const result = await resend.emails.send({
+      from: FROM_NOREPLY,
       to,
       subject: "Reset Your VEREX Portal Password",
-      html: `
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-<div style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-  <div style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);padding:32px;text-align:center">
-    <h1 style="color:#fff;margin:0;font-size:28px;letter-spacing:1px">VEREX</h1>
-    <p style="color:#93c5fd;margin:8px 0 0;font-size:13px">Password Reset Request</p>
-  </div>
-  <div style="padding:32px">
-    <h2 style="color:#1e293b;margin:0 0 16px;font-size:22px">Hi ${name},</h2>
-    <p style="color:#475569;line-height:1.6;margin:0 0 16px">We received a request to reset your password. Click the button below to create a new password. This link expires in <strong>1 hour</strong>.</p>
-    <div style="text-align:center;margin:24px 0">
-      <a href="${resetUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">Reset Password</a>
-    </div>
-    <p style="color:#94a3b8;font-size:13px;margin:16px 0 0">If the button doesn't work, copy this link:<br><a href="${resetUrl}" style="color:#2563eb;word-break:break-all">${resetUrl}</a></p>
-    <p style="color:#ef4444;font-size:13px;margin:16px 0 0;padding:12px;background:#fef2f2;border-radius:8px">⚠️ If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
-  </div>
-  <div style="background:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0">
-    <p style="color:#94a3b8;font-size:12px;margin:0">© ${new Date().getFullYear()} VEREX Industries — Premium Windows & Doors</p>
-  </div>
-</div>
-</body></html>`
+      html: emailLayout(content, preheader),
+      text,
+      replyTo: COMPANY.email,
+      headers: deliverabilityHeaders,
     })
-    console.log("✅ Password reset email sent to", to)
+    console.log("✅ Password reset email sent to", to, result.data?.id)
   } catch (err) {
     console.error("❌ Failed to send reset email:", err)
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// PASSWORD CHANGED CONFIRMATION
+// ═══════════════════════════════════════════════════════════
 export async function sendPasswordChangedEmail(to: string, name: string) {
+  const firstName = name.split(" ")[0]
+  const preheader = `Your VEREX Portal password was successfully changed.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      <div style="display:inline-block;background:#dcfce7;border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center;font-size:28px">&#9989;</div>
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Password Changed</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, your VEREX Portal password has been successfully updated.</p>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px 24px;margin:0 0 24px;text-align:center">
+      <p style="margin:0;color:#166534;font-size:15px;font-weight:600">&#128274; Your account is secure</p>
+      <p style="margin:8px 0 0;color:#15803d;font-size:13px">You can now log in with your new password.</p>
+    </div>
+
+    ${ctaButton("Log In Now", `${BASE_URL}/en/portal/login`, "#059669")}
+
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px 20px;margin:0">
+      <p style="margin:0;color:#991b1b;font-size:13px;line-height:1.5"><strong>&#9888;&#65039; Didn't make this change?</strong> Contact us immediately at <a href="mailto:${COMPANY.email}" style="color:#dc2626;font-weight:600">${COMPANY.email}</a> or call <a href="tel:${COMPANY.phone}" style="color:#dc2626;font-weight:600">${COMPANY.phone}</a>.</p>
+    </div>
+  `
+
+  const text = `Password Changed Successfully\n\nHi ${firstName},\n\nYour VEREX Portal password has been successfully updated. You can now log in with your new password at: ${BASE_URL}/en/portal/login\n\nIf you did not make this change, contact us immediately at ${COMPANY.email} or call ${COMPANY.phone}.\n\n${COMPANY.name}\n${COMPANY.address}`
+
   try {
-    await resend.emails.send({
-      from: FROM,
+    const result = await resend.emails.send({
+      from: FROM_NOREPLY,
       to,
       subject: "Your VEREX Portal Password Was Changed",
-      html: `
-<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-<div style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-  <div style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);padding:32px;text-align:center">
-    <h1 style="color:#fff;margin:0;font-size:28px;letter-spacing:1px">VEREX</h1>
-    <p style="color:#93c5fd;margin:8px 0 0;font-size:13px">Security Notification</p>
-  </div>
-  <div style="padding:32px">
-    <h2 style="color:#1e293b;margin:0 0 16px;font-size:22px">Hi ${name},</h2>
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:0 0 16px">
-      <p style="color:#166534;margin:0;font-size:14px">✅ Your password has been successfully changed.</p>
-    </div>
-    <p style="color:#475569;line-height:1.6;margin:0 0 16px">You can now log in to your VEREX Portal with your new password.</p>
-    <p style="color:#ef4444;font-size:13px;margin:16px 0 0;padding:12px;background:#fef2f2;border-radius:8px">⚠️ If you did not make this change, please contact us immediately at <a href="mailto:admin@verex.ca" style="color:#2563eb">admin@verex.ca</a> or call us directly.</p>
-  </div>
-  <div style="background:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0">
-    <p style="color:#94a3b8;font-size:12px;margin:0">© ${new Date().getFullYear()} VEREX Industries — Premium Windows & Doors</p>
-  </div>
-</div>
-</body></html>`
+      html: emailLayout(content, preheader),
+      text,
+      replyTo: COMPANY.email,
+      headers: deliverabilityHeaders,
     })
-    console.log("✅ Password changed email sent to", to)
+    console.log("✅ Password changed email sent to", to, result.data?.id)
   } catch (err) {
     console.error("❌ Failed to send password changed email:", err)
   }
