@@ -27,8 +27,14 @@ export async function POST(request: Request) {
       },
     })
 
-    // Send reset email (non-blocking)
-    sendPasswordResetEmail(user.email, user.name, token).catch(console.error)
+    // Send reset email — AWAIT so we catch failures
+    try {
+      await sendPasswordResetEmail(user.email, user.name, token)
+      console.log("✅ Reset email sent to", user.email)
+    } catch (emailErr) {
+      console.error("❌ Failed to send reset email:", emailErr)
+      // Still return success to prevent email enumeration
+    }
 
     return NextResponse.json(successMsg)
   } catch (error) {

@@ -109,10 +109,12 @@ function ctaButton(text: string, url: string, color = "#2563eb"): string {
 }
 
 // ─── Shared Headers for Deliverability ──────────────────────
-const deliverabilityHeaders = {
-  "X-Entity-Ref-ID": `verex-${Date.now()}`,
-  "List-Unsubscribe": `<mailto:unsubscribe@verex.ca?subject=unsubscribe>`,
-  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+function getDeliverabilityHeaders() {
+  return {
+    "X-Entity-Ref-ID": `verex-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    "List-Unsubscribe": `<mailto:unsubscribe@verex.ca?subject=unsubscribe>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -164,7 +166,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
       html: emailLayout(content, preheader),
       text,
       replyTo: COMPANY.email,
-      headers: deliverabilityHeaders,
+      headers: getDeliverabilityHeaders(),
     })
     console.log("✅ Welcome email sent to", to, result.data?.id)
   } catch (err) {
@@ -207,7 +209,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
       html: emailLayout(content, preheader),
       text,
       replyTo: COMPANY.email,
-      headers: deliverabilityHeaders,
+      headers: getDeliverabilityHeaders(),
     })
     console.log("✅ Password reset email sent to", to, result.data?.id)
   } catch (err) {
@@ -252,7 +254,7 @@ export async function sendPasswordChangedEmail(to: string, name: string) {
       html: emailLayout(content, preheader),
       text,
       replyTo: COMPANY.email,
-      headers: deliverabilityHeaders,
+      headers: getDeliverabilityHeaders(),
     })
     console.log("✅ Password changed email sent to", to, result.data?.id)
   } catch (err) {
