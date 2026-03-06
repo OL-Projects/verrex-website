@@ -113,6 +113,7 @@ function LoginContent() {
             <div>
               <p className="text-sm font-medium">Account created successfully!</p>
               <p className="text-xs mt-0.5 opacity-80">Sign in below with your new credentials.</p>
+              <p className="text-xs mt-2 opacity-70">📬 A welcome email was sent — check your <strong>Spam</strong> or <strong>Junk</strong> folder if you don&apos;t see it.</p>
             </div>
           </motion.div>
         )}
