@@ -18,7 +18,6 @@ export default function AppointmentsPage() {
   const appointmentTypes = [
     { id: "on-site-measurement", label: t('onSiteMeasurement'), icon: MapPin, desc: t('onSiteMeasurementDesc') },
     { id: "virtual-consultation", label: t('virtualConsultation'), icon: Video, desc: t('virtualConsultationDesc') },
-    { id: "showroom-visit", label: t('showroomVisit'), icon: Building2, desc: t('showroomVisitDesc') },
   ]
   const { toast } = useToast()
   const [submitted, setSubmitted] = useState(false)

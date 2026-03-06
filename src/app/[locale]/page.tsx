@@ -407,7 +407,7 @@ export default function HomePage() {
                 { icon: Shield, title: "Fully Licensed & Bonded", desc: "Complete liability coverage, WSIB compliant, and licensed professionals on every project." },
                 { icon: BadgeCheck, title: "Code Compliant", desc: "All products meet or exceed the National Building Code of Canada, CSA A440, and NAFS standards." },
                 { icon: Truck, title: "On-Time, On-Budget", desc: "98% on-time completion rate with transparent project management and milestone tracking." },
-                { icon: FileText, title: "Volume & Contract Pricing", desc: "Competitive pricing for multi-unit, institutional, and recurring maintenance contracts." },
+                { icon: FileText, title: "Premium Quality, Price-Match Guarantee", desc: "Uncompromising quality backed by our price-match guarantee. Get the best products at the most competitive prices — guaranteed." },
               ].map((item, i) => (
                 <FadeIn key={item.title} delay={0.15 + i * 0.1}>
                   <div className="flex gap-4 items-start">
