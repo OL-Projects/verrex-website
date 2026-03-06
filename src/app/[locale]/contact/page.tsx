@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { companyInfo } from "@/lib/data"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Video, Loader2 } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Send, MessageSquare, Video, Loader2 } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { useToast } from "@/components/ui/use-toast"
@@ -20,6 +20,7 @@ function ContactPageContent() {
   const { toast } = useToast()
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
+  const [fadeOut, setFadeOut] = useState(false)
   const [messageGlow, setMessageGlow] = useState(false)
   const searchParams = useSearchParams()
   const messageRef = useRef<HTMLTextAreaElement>(null)
@@ -41,28 +42,76 @@ function ContactPageContent() {
     }
   }, [fromEmail])
 
+  const handleSendAnother = () => {
+    setFadeOut(true)
+    setTimeout(() => {
+      setSubmitted(false)
+      setFadeOut(false)
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }, 500)
+  }
+
   if (submitted) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-[#030712] dark:to-[#020617]">
-        <div className="mx-auto max-w-md px-6 py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {/* Animated checkmark */}
-          <div className="relative mx-auto mb-8">
-            <div className="h-24 w-24 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 animate-in zoom-in duration-500">
-              <CheckCircle2 className="h-12 w-12 text-white drop-shadow-sm" />
-            </div>
-            <div className="absolute inset-0 h-24 w-24 mx-auto rounded-full bg-emerald-400/20 animate-ping" style={{ animationDuration: '2s', animationIterationCount: '3' }} />
+      <div className={`min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-[#030712] dark:to-[#020617] transition-all duration-500 ${fadeOut ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
+        <style>{`
+          @keyframes drawCheck { 0% { stroke-dashoffset: 50; } 100% { stroke-dashoffset: 0; } }
+          @keyframes scaleIn { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+          @keyframes ripple { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(2.2); opacity: 0; } }
+          @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(0.5); opacity: 0; } }
+          @keyframes slideUp { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+          .check-circle { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+          .check-path { stroke-dasharray: 50; stroke-dashoffset: 50; animation: drawCheck 0.5s ease-out 0.5s forwards; }
+          .ripple-1 { animation: ripple 1.5s ease-out 0.3s forwards; }
+          .ripple-2 { animation: ripple 1.5s ease-out 0.6s forwards; }
+          .ripple-3 { animation: ripple 1.5s ease-out 0.9s forwards; }
+          .particle { animation: floatUp 1.2s ease-out forwards; }
+          .slide-up-1 { opacity: 0; animation: slideUp 0.5s ease-out 0.7s forwards; }
+          .slide-up-2 { opacity: 0; animation: slideUp 0.5s ease-out 0.9s forwards; }
+          .slide-up-3 { opacity: 0; animation: slideUp 0.5s ease-out 1.1s forwards; }
+          .slide-up-4 { opacity: 0; animation: slideUp 0.5s ease-out 1.3s forwards; }
+        `}</style>
+        <div className="mx-auto max-w-md px-6 py-20 text-center">
+          {/* Animated SVG Checkmark */}
+          <div className="relative mx-auto mb-10 h-28 w-28">
+            {/* Ripple rings */}
+            <div className="absolute inset-0 rounded-full bg-emerald-400/15 ripple-1" />
+            <div className="absolute inset-0 rounded-full bg-emerald-400/10 ripple-2" />
+            <div className="absolute inset-0 rounded-full bg-emerald-400/5 ripple-3" />
+            {/* Floating particles */}
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="particle absolute" style={{
+                left: '50%', top: '50%',
+                width: `${4 + Math.random() * 6}px`, height: `${4 + Math.random() * 6}px`,
+                borderRadius: '50%',
+                background: i % 2 === 0 ? '#34d399' : '#60a5fa',
+                transform: `rotate(${i * 45}deg) translateX(${30 + Math.random() * 20}px)`,
+                animationDelay: `${0.4 + i * 0.08}s`,
+              }} />
+            ))}
+            {/* Main circle + check */}
+            <svg viewBox="0 0 100 100" className="w-full h-full check-circle">
+              <defs>
+                <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#34d399" />
+                  <stop offset="100%" stopColor="#059669" />
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="45" fill="url(#checkGrad)" />
+              <path className="check-path" d="M30 52 L44 66 L70 38" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white slide-up-1">
             {t('successTitle')}
           </h1>
-          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
+          <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 slide-up-2">
             {t('successDesc')}
           </p>
-          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500 animate-in fade-in duration-500 delay-500">
+          <p className="mt-2 text-sm text-slate-400 dark:text-slate-500 slide-up-3">
             We typically respond within 24 hours
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center animate-in fade-in slide-in-from-bottom-2 duration-500 delay-500">
-            <Button variant="primary" size="lg" onClick={() => setSubmitted(false)}>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center slide-up-4">
+            <Button variant="primary" size="lg" onClick={handleSendAnother}>
               <Send className="h-4 w-4" /> {t('sendAnother')}
             </Button>
             <IntlLink href="/">
