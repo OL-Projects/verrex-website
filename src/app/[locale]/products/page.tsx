@@ -23,8 +23,8 @@ export default function ProductsPage() {
 
   const filters: { value: FilterType; label: string }[] = [
     { value: "all", label: t('allProducts') },
-    { value: "Windows", label: "Windows" },
-    { value: "Doors", label: "Doors" },
+    { value: "Windows", label: t('windowsFilter', { defaultValue: 'Windows' }) },
+    { value: "Doors", label: t('doorsFilter', { defaultValue: 'Doors' }) },
   ]
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
   const [searchQuery, setSearchQuery] = useState("")

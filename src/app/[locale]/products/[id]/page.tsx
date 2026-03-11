@@ -67,15 +67,14 @@ export default async function ProductDetailPage({
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Product Diagram — Large & Premium */}
+            {/* Product Diagram */}
             <div className="relative">
               <div className="aspect-square bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-[#0a0f1a] dark:via-[#080e1a] dark:to-[#060b14] rounded-3xl flex items-center justify-center p-10 shadow-lg border border-slate-200/50 dark:border-slate-800/50">
                 <WindowTypeDiagram id={product.diagramId} className="w-full h-full max-w-[380px] max-h-[380px]" />
               </div>
-              {/* Floating badges */}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
                 <div className="px-4 py-1.5 bg-white dark:bg-slate-800 rounded-full shadow-md border border-slate-200 dark:border-slate-700 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                  <Shield className="h-3.5 w-3.5" /> ENERGY STAR® Certified
+                  <Shield className="h-3.5 w-3.5" /> {t("energyStarBadge")}
                 </div>
               </div>
             </div>
@@ -87,7 +86,7 @@ export default async function ProductDetailPage({
                 {product.isCustomizable && (
                   <Badge variant="success" className="text-xs">{t("customizable")}</Badge>
                 )}
-                <Badge variant="outline" className="text-xs border-amber-300 text-amber-600 dark:text-amber-400">★ Premium</Badge>
+                <Badge variant="outline" className="text-xs border-amber-300 text-amber-600 dark:text-amber-400">{t("premiumBadge")}</Badge>
               </div>
 
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -100,12 +99,12 @@ export default async function ProductDetailPage({
 
               {/* Trust indicators */}
               <div className="mt-6 flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-blue-500" /> Trusted by 500+ clients</span>
-                <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-amber-500" /> 4.9/5 Rating</span>
-                <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-emerald-500" /> Free delivery on 10+ units</span>
+                <span className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-blue-500" /> {t("trustedClients")}</span>
+                <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-amber-500" /> {t("ratingLabel")}</span>
+                <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-emerald-500" /> {t("freeDelivery")}</span>
               </div>
 
-              {/* Key Features — Premium Cards */}
+              {/* Key Features */}
               <div className="mt-8">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4">{t("keyFeatures")}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -118,26 +117,26 @@ export default async function ProductDetailPage({
                 </div>
               </div>
 
-              {/* CTA Buttons — Strong */}
+              {/* CTA Buttons */}
               <div className="mt-10 flex flex-col sm:flex-row gap-3">
                 <IntlLink href={`/quote?product=${product.id}`} className="flex-1">
                   <Button variant="primary" size="lg" className="w-full text-base gap-2">
                     <FileText className="h-5 w-5" />
-                    Get a Free Quote
+                    {t("getFreeQuote")}
                   </Button>
                 </IntlLink>
                 <IntlLink href="/appointments" className="flex-1">
                   <Button variant="outline" size="lg" className="w-full text-base gap-2">
                     <Calendar className="h-5 w-5" />
-                    Book Consultation
+                    {t("bookConsultation")}
                   </Button>
                 </IntlLink>
               </div>
 
               <div className="mt-4 text-center">
-                <a href="tel:+14165550199" className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="tel:+15149924080" className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <Phone className="h-4 w-4" />
-                  Or call us: (416) 555-0199
+                  {t("callUs")}
                 </a>
               </div>
             </div>
@@ -145,7 +144,7 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* Specifications + Certifications Side by Side */}
+      {/* Specifications + Certifications */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -164,13 +163,13 @@ export default async function ProductDetailPage({
 
             {/* Certifications */}
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Certified Quality</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{t("certifiedQuality")}</h2>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { name: "ENERGY STAR®", src: "/images/certifications/energy-star.svg", darkSrc: "/images/certifications/energy-star-dark.svg", desc: "Meets strict energy efficiency guidelines" },
-                  { name: "NFRC", src: "/images/certifications/nfrc.svg", darkSrc: "/images/certifications/nfrc-dark.svg", desc: "Independently rated performance" },
-                  { name: "CSA", src: "/images/certifications/csa-light.svg", darkSrc: "/images/certifications/csa-dark.svg", desc: "Canadian safety standards compliant" },
-                  { name: "CE", src: "/images/certifications/ce-light.svg", darkSrc: "/images/certifications/ce-dark.svg", desc: "European conformity certified" },
+                  { name: "ENERGY STAR®", src: "/images/certifications/energy-star.svg", darkSrc: "/images/certifications/energy-star-dark.svg", descKey: "certEnergyDesc" as const },
+                  { name: "NFRC", src: "/images/certifications/nfrc.svg", darkSrc: "/images/certifications/nfrc-dark.svg", descKey: "certNfrcDesc" as const },
+                  { name: "CSA", src: "/images/certifications/csa-light.svg", darkSrc: "/images/certifications/csa-dark.svg", descKey: "certCsaDesc" as const },
+                  { name: "CE", src: "/images/certifications/ce-light.svg", darkSrc: "/images/certifications/ce-dark.svg", descKey: "certCeDesc" as const },
                 ].map((cert) => (
                   <div key={cert.name} className="p-5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center shadow-sm hover:shadow-md transition-shadow">
                     <div className="h-16 flex items-center justify-center mb-3">
@@ -178,7 +177,7 @@ export default async function ProductDetailPage({
                       <Image src={cert.darkSrc} alt={cert.name} width={100} height={60} className="h-12 w-auto object-contain hidden dark:block" unoptimized />
                     </div>
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">{cert.name}</h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{cert.desc}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{t(cert.descKey)}</p>
                   </div>
                 ))}
               </div>
@@ -190,8 +189,8 @@ export default async function ProductDetailPage({
                     <ShieldCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white">Lifetime Limited Warranty</h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Every VEREX product is backed by our comprehensive warranty covering glass seal failure, hardware defects, and frame integrity.</p>
+                    <h4 className="font-bold text-slate-900 dark:text-white">{t("warrantyTitle")}</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t("warrantyDesc")}</p>
                   </div>
                 </div>
               </div>
@@ -206,27 +205,27 @@ export default async function ProductDetailPage({
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/50 dark:border-slate-700/50 mb-4">
               <Scale className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Regulatory Compliance</span>
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">{t("regulatoryCompliance")}</span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Industry Standards & Compliance</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">All products are manufactured and tested in accordance with applicable national and international standards.</p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t("industryStandards")}</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">{t("industryStandardsDesc")}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden divide-y divide-slate-200 dark:divide-slate-800">
             {[
-              { icon: BookOpen, standard: "National Building Code of Canada (NBC)", detail: "Full compliance with Part 5 — Environmental Separation and Part 9 — Housing & Small Buildings" },
-              { icon: BadgeCheck, standard: "CSA A440 / NAFS — North American Standard", detail: "Tested and rated for air tightness, water penetration, wind load resistance, and forced entry" },
-              { icon: Shield, standard: "ENERGY STAR® Canada — Zone Rated", detail: "Meets or exceeds Natural Resources Canada criteria for climate zones 1 through 3" },
-              { icon: Stamp, standard: "NFRC Certified Ratings", detail: "Independent third-party performance ratings for U-Factor, SHGC, VT, and condensation resistance" },
-              { icon: Building2, standard: "RBQ Licensed — Régie du bâtiment du Québec", detail: "Licensed under the Régie du bâtiment for manufacturing, supply, and installation in Quebec" },
-              { icon: ShieldCheck, standard: "ISO 9001:2015 Quality Management", detail: "Manufacturing processes certified under international quality management standards" },
+              { icon: BookOpen, standardKey: "nbcStandard" as const, detailKey: "nbcDetail" as const },
+              { icon: BadgeCheck, standardKey: "csaNafsStandard" as const, detailKey: "csaNafsDetail" as const },
+              { icon: Shield, standardKey: "energyStarStandard" as const, detailKey: "energyStarDetail" as const },
+              { icon: Stamp, standardKey: "nfrcStandard" as const, detailKey: "nfrcDetail" as const },
+              { icon: Building2, standardKey: "rbqStandard" as const, detailKey: "rbqDetail" as const },
+              { icon: ShieldCheck, standardKey: "isoStandard" as const, detailKey: "isoDetail" as const },
             ].map((item) => (
-              <div key={item.standard} className="flex items-start gap-5 px-6 py-5 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+              <div key={item.standardKey} className="flex items-start gap-5 px-6 py-5 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                 <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
                   <item.icon className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">{item.standard}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{item.detail}</p>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">{t(item.standardKey)}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{t(item.detailKey)}</p>
                 </div>
               </div>
             ))}
@@ -237,20 +236,20 @@ export default async function ProductDetailPage({
       {/* Why Choose This Product */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">Why Choose the {product.name}?</h2>
-          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">Engineered for Canadian climates, built to exceed industry standards, and designed for lasting beauty.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">{t("whyChooseThe")} {product.name}?</h2>
+          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12">{t("whyChooseDesc")}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "Superior Energy Savings", desc: "Triple-pane options and thermal break technology reduce heating costs by up to 30%." },
-              { icon: Shield, title: "Unmatched Durability", desc: "Tested to withstand extreme Canadian winters, high winds, and driving rain." },
-              { icon: Award, title: "Professional Installation", desc: "Certified installers ensure perfect fit, optimal performance, and zero callbacks." },
+              { icon: Zap, titleKey: "whyEnergy" as const, descKey: "whyEnergyDesc" as const },
+              { icon: Shield, titleKey: "whyDurability" as const, descKey: "whyDurabilityDesc" as const },
+              { icon: Award, titleKey: "whyInstall" as const, descKey: "whyInstallDesc" as const },
             ].map((item) => (
-              <div key={item.title} className="p-8 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div key={item.titleKey} className="p-8 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="h-14 w-14 mx-auto bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-5">
                   <item.icon className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t(item.titleKey)}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{t(item.descKey)}</p>
               </div>
             ))}
           </div>
@@ -260,17 +259,17 @@ export default async function ProductDetailPage({
       {/* Final CTA */}
       <section className="py-16 dark:bg-[#030712]">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Ready to Transform Your Space?</h2>
-          <p className="mt-3 text-slate-600 dark:text-slate-400">Get a personalized quote for the {product.name} — no obligation, no hidden fees.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t("readyTitle")}</h2>
+          <p className="mt-3 text-slate-600 dark:text-slate-400">{t("readyDesc", { product: product.name })}</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <IntlLink href={`/quote?product=${product.id}`}>
               <Button variant="primary" size="lg" className="gap-2 text-base px-8">
-                <FileText className="h-5 w-5" /> Request Your Free Quote <ArrowRight className="h-4 w-4" />
+                <FileText className="h-5 w-5" /> {t("requestFreeQuote")} <ArrowRight className="h-4 w-4" />
               </Button>
             </IntlLink>
             <IntlLink href="/appointments">
               <Button variant="outline" size="lg" className="gap-2">
-                <Calendar className="h-5 w-5" /> Schedule a Visit
+                <Calendar className="h-5 w-5" /> {t("scheduleVisit")}
               </Button>
             </IntlLink>
           </div>
@@ -294,7 +293,7 @@ export default async function ProductDetailPage({
                       <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{rp.name}</h3>
                       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{rp.shortDescription}</p>
                       <div className="mt-3 flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium">
-                        View Details <ArrowRight className="h-3 w-3" />
+                        {t("viewDetails")} <ArrowRight className="h-3 w-3" />
                       </div>
                     </CardContent>
                   </Card>
