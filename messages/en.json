@@ -910,5 +910,132 @@
       "tempered": "Tempered",
       "laminated": "Laminated"
     }
+  },
+  "ProductData": {
+    "subcategory": {
+      "Windows": "Windows",
+      "Doors": "Doors"
+    },
+    "specKey": {
+      "frame": "Frame",
+      "glass": "Glass",
+      "operation": "Operation",
+      "rating": "Rating",
+      "energy": "Energy",
+      "panels": "Panels",
+      "locking": "Locking",
+      "mode": "Mode",
+      "threshold": "Threshold",
+      "leaf": "Leaf",
+      "compliance": "Compliance"
+    },
+    "specVal": {
+      "aluminum___pvc": "Aluminum / PVC",
+      "double_or_triple_glazed": "Double or Triple Glazed",
+      "top_hinged__swings_outward": "Top-hinged, swings outward",
+      "csa_a440": "CSA A440",
+      "energy_star_certified": "ENERGY STAR® Certified",
+      "horizontal_slide": "Horizontal slide",
+      "side_hinged__swings_outward": "Side-hinged, swings outward",
+      "tilt_inward___full_swing_inward": "Tilt inward + full swing inward",
+      "crank_operated__swings_outward": "Crank-operated, swings outward",
+      "horizontal_glide_on_track": "Horizontal glide on track",
+      "2__3__or_4_panel": "2, 3, or 4-panel",
+      "multi_point": "Multi-point",
+      "bi_fold_stack": "Bi-fold stack",
+      "2_to_7_panel": "2 to 7-panel",
+      "flush_option": "Flush option",
+      "hinged__single_or_double": "Hinged, single or double",
+      "single___double": "Single / Double",
+      "ada___aoda": "ADA / AODA"
+    },
+    "top-hung": {
+      "name": "Top Hung (Awning) Window",
+      "shortDescription": "Top-hinged awning window — ventilates while keeping rain out.",
+      "description": "Top-hinged window that swings outward from the bottom. Excellent for ventilation while maintaining weather protection. The outward swing prevents rain from entering even when open. Ideal for bathrooms, kitchens, and basements where moisture control and airflow are essential.",
+      "feature1": "Opens outward from bottom",
+      "feature2": "Rain protection while ventilating",
+      "feature3": "Multi-point locking system",
+      "feature4": "Excellent seal performance",
+      "feature5": "Easy to operate",
+      "feature6": "Low maintenance"
+    },
+    "sliding-window": {
+      "name": "Sliding Window",
+      "shortDescription": "Smooth horizontal sliding window — wide openings, space-efficient.",
+      "description": "Horizontally sliding sash window that glides on precision-engineered tracks. Offers wide openings without intruding into interior or exterior space. Ideal for rooms facing walkways, patios, or areas where swing clearance is limited.",
+      "feature1": "Smooth horizontal glide",
+      "feature2": "No exterior protrusion",
+      "feature3": "Wide opening area",
+      "feature4": "Easy to clean",
+      "feature5": "Durable track system",
+      "feature6": "Screen compatible"
+    },
+    "casement": {
+      "name": "Casement Window",
+      "shortDescription": "Side-hinged window — full opening, maximum airflow.",
+      "description": "Side-hinged window that swings outward for full-width ventilation. Offers unobstructed views, superior energy efficiency due to compression sealing, and easy cleaning from inside. Perfect for living rooms, bedrooms, and any space requiring maximum natural light and airflow.",
+      "feature1": "Full opening for maximum airflow",
+      "feature2": "Compression seal for energy efficiency",
+      "feature3": "Unobstructed exterior views",
+      "feature4": "Multi-point locking system",
+      "feature5": "Easy interior cleaning",
+      "feature6": "Modern slim sightlines"
+    },
+    "tilt-turn": {
+      "name": "Tilt & Turn Window",
+      "shortDescription": "European dual-mode — tilts for ventilation, turns for full access.",
+      "description": "European-style dual-function window that tilts inward from the top for secure ventilation or swings fully inward on side hinges for easy cleaning and emergency egress. Combines superior thermal performance with versatile operation.",
+      "feature1": "Dual tilt and turn operation",
+      "feature2": "Secure top-tilt ventilation",
+      "feature3": "Full inward swing for cleaning",
+      "feature4": "Emergency egress capable",
+      "feature5": "Superior thermal performance",
+      "feature6": "Child-safe tilt mode"
+    },
+    "hand-cranked": {
+      "name": "Hand Cranked (Casement) Window",
+      "shortDescription": "Crank-operated casement — precise control, outward opening.",
+      "description": "Casement window operated by a hand crank mechanism that swings the sash outward. Provides precise control over the opening angle, excellent for hard-to-reach locations like above kitchen sinks or counters. Robust mechanical operation with tight weather sealing.",
+      "feature1": "Precise crank-operated opening",
+      "feature2": "Ideal for hard-to-reach spots",
+      "feature3": "Tight seal when closed",
+      "feature4": "Full outward projection",
+      "feature5": "Smooth mechanical operation",
+      "feature6": "Durable hardware"
+    },
+    "sliding-door": {
+      "name": "Sliding Patio Door",
+      "shortDescription": "Large-panel sliding door — seamless indoor-outdoor living.",
+      "description": "Large-panel door system that glides horizontally on heavy-duty precision tracks. Available in 2, 3, and 4-panel configurations. Creates seamless transitions between indoor and outdoor living spaces while maximizing natural light and views.",
+      "feature1": "Heavy-duty roller mechanism",
+      "feature2": "Floor-to-ceiling glass",
+      "feature3": "Multi-point security locks",
+      "feature4": "Thermal break frames",
+      "feature5": "Smooth effortless glide",
+      "feature6": "Screen door included"
+    },
+    "folding-door": {
+      "name": "Folding (Bi-Fold) Door",
+      "shortDescription": "Multi-panel bi-fold — opens entire wall for indoor-outdoor flow.",
+      "description": "Multi-panel bi-fold door system that folds and stacks to create wide-open passages. Transforms entire walls into open-air spaces. Ideal for patios, restaurants, and any space where maximum opening width and flexible living are desired.",
+      "feature1": "Full wall opening capability",
+      "feature2": "Bi-fold panel stacking",
+      "feature3": "Flush threshold option",
+      "feature4": "Weather-rated seals",
+      "feature5": "Smooth folding operation",
+      "feature6": "Multiple panel configurations"
+    },
+    "swing-door": {
+      "name": "Swing Entry Door",
+      "shortDescription": "Classic hinged door — single or double, residential & commercial.",
+      "description": "Traditional hinged door that swings open on side-mounted hinges. Available as single or double-leaf, inward or outward opening. Suitable for residential entries, commercial storefronts, and institutional buildings with ADA/AODA compliance options.",
+      "feature1": "Classic hinged operation",
+      "feature2": "Single or double leaf",
+      "feature3": "ADA/AODA compliant options",
+      "feature4": "Panic hardware available",
+      "feature5": "Heavy-duty hinges",
+      "feature6": "Wide range of finishes"
+    }
   }
 }

@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { products, services, testimonials, companyInfo } from "@/lib/data"
+import { services, testimonials, companyInfo } from "@/lib/data"
+import { getLocalizedProducts } from "@/lib/data-i18n"
 import { FadeIn, FadeInLeft, FadeInRight, StaggerContainer, StaggerItem, ScaleIn, RevealSection, AnimatedCounter, HoverCard } from "@/components/ui/motion"
 import {
   ArrowRight,
@@ -46,6 +47,8 @@ const iconMap: Record<string, LucideIcon> = {
 
 export default function HomePage() {
   const t = useTranslations('HomePage')
+  const tData = useTranslations('ProductData')
+  const products = getLocalizedProducts(tData)
   const { toast } = useToast()
   const [qqSending, setQqSending] = useState(false)
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { products } from "@/lib/data"
+import { getLocalizedProducts } from "@/lib/data-i18n"
 import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import {
   Search, X, ArrowRight, LayoutGrid, List, Check, Sparkles,
@@ -29,6 +29,8 @@ const typeInfo: Record<string, { title: string; desc: string; features: string[]
 
 export default function CatalogPage() {
   const t = useTranslations('CatalogPage')
+  const tData = useTranslations('ProductData')
+  const products = getLocalizedProducts(tData)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")

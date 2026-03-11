@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
-import { products } from "@/lib/data"
+import { getLocalizedProducts } from "@/lib/data-i18n"
 import {
   Search,
   SlidersHorizontal,
@@ -20,6 +20,8 @@ type FilterType = "all" | "Windows" | "Doors"
 
 export default function ProductsPage() {
   const t = useTranslations('ProductsPage')
+  const tData = useTranslations('ProductData')
+  const products = getLocalizedProducts(tData)
 
   const filters: { value: FilterType; label: string }[] = [
     { value: "all", label: t('allProducts') },

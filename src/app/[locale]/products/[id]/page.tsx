@@ -5,7 +5,8 @@ import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { products } from "@/lib/data"
+import { products as rawProducts } from "@/lib/data"
+import { getLocalizedProducts } from "@/lib/data-i18n"
 import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
 import {
   ArrowRight,
@@ -28,7 +29,7 @@ import {
 } from "lucide-react"
 
 export function generateStaticParams() {
-  return products.map((product) => ({ id: product.id }))
+  return rawProducts.map((product) => ({ id: product.id }))
 }
 
 export default async function ProductDetailPage({
@@ -38,6 +39,8 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params
   const t = await getTranslations('ProductDetail')
+  const tData = await getTranslations('ProductData')
+  const products = getLocalizedProducts(tData)
   const product = products.find((p) => p.id === id)
 
   if (!product) {

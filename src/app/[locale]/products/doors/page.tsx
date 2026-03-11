@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { WindowTypeDiagram } from "@/components/ui/WindowTypeDiagram"
-import { products } from "@/lib/data"
+import { getLocalizedProducts } from "@/lib/data-i18n"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 
 export default function DoorsPage() {
   const t = useTranslations('DoorsPage')
+  const tData = useTranslations('ProductData')
+  const products = getLocalizedProducts(tData)
 
   const doorProducts = products.filter((p) => p.subcategory === "Doors")
 
