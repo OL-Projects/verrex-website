@@ -50,27 +50,27 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top bar — Glassmorphism */}
-      <div className="bg-slate-900/50 dark:bg-black/35 backdrop-blur-xl text-white border-b border-white/10">
+      <div className="bg-white/80 dark:bg-black/35 backdrop-blur-xl text-slate-700 dark:text-white border-b border-slate-200/60 dark:border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-10 items-center justify-between text-sm">
             <div className="flex items-center gap-6">
               <a
                 href={`tel:${companyInfo.phone}`}
-                className="flex items-center gap-1.5 hover:text-blue-300 transition-colors"
+                className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               >
                 <Phone className="h-3.5 w-3.5" />
                 {companyInfo.phone}
               </a>
               <IntlLink
                 href="/contact?focus=message"
-                className="hidden sm:flex items-center gap-1.5 hover:text-blue-300 transition-colors"
+                className="hidden sm:flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
                 {companyInfo.email}
               </IntlLink>
             </div>
             <div className="flex items-center gap-4">
-              <span className="hidden md:inline text-slate-300/80">
+              <span className="hidden md:inline text-slate-500 dark:text-slate-300/80">
                 {t('monFri')}{companyInfo.hours.weekdays}
               </span>
             </div>
@@ -83,7 +83,7 @@ export function Header() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <IntlLink href="/" className="flex items-stretch gap-3 group">
+            <IntlLink href="/" className="flex items-center gap-3 group">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -92,9 +92,9 @@ export function Header() {
                 <Image
                   src="/images/vx-logo.svg"
                   alt="VEREX logo"
-                  width={44}
-                  height={44}
-                  className="h-full w-auto object-contain dark:brightness-0 dark:invert"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 object-contain dark:brightness-0 dark:invert"
                   priority
                 />
               </motion.div>
