@@ -30,7 +30,7 @@ export async function GET() {
   // Test auth module import
   try {
     const authMod = await import("@/lib/auth")
-    checks.auth_module = authMod.auth ? "OK (auth function loaded)" : "FAIL: auth function missing"
+    checks.auth_module = typeof authMod.auth === "function" ? "OK (auth function loaded)" : "FAIL: auth function missing"
   } catch (e: unknown) {
     const err = e as Error
     checks.auth_module = `FAIL: ${err.message?.substring(0, 300)}`
