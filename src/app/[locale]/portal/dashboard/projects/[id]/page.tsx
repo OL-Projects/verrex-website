@@ -53,15 +53,15 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ComponentType<{ className?: s
   file_uploaded: { icon: Upload, color: "bg-violet-100 dark:bg-violet-500/15 text-violet-600" },
 }
 
-const ENTRY_TYPES = [
-  { type: "note", label: "📝 Note", desc: "Add a text note" },
-  { type: "photo", label: "📷 Photo(s)", desc: "Upload photos" },
-  { type: "document", label: "📎 Document", desc: "Upload a file" },
-  { type: "issue", label: "⚠️ Issue", desc: "Report a problem" },
-  { type: "resolved", label: "✅ Resolved", desc: "Mark issue resolved" },
-  { type: "progress", label: "📊 Progress", desc: "Update progress" },
-  { type: "milestone", label: "🏁 Milestone", desc: "Mark a milestone" },
-  { type: "financial", label: "💰 Financial", desc: "Payment / change order" },
+const ENTRY_TYPES: { type: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
+  { type: "note", label: "Note", desc: "Add a text note", icon: FileText, color: "bg-blue-100 dark:bg-blue-500/15 text-blue-600" },
+  { type: "photo", label: "Photo(s)", desc: "Upload photos", icon: ImageIcon, color: "bg-purple-100 dark:bg-purple-500/15 text-purple-600" },
+  { type: "document", label: "Document", desc: "Upload a file", icon: Paperclip, color: "bg-indigo-100 dark:bg-indigo-500/15 text-indigo-600" },
+  { type: "issue", label: "Issue", desc: "Report a problem", icon: AlertTriangle, color: "bg-red-100 dark:bg-red-500/15 text-red-600" },
+  { type: "resolved", label: "Resolved", desc: "Mark issue resolved", icon: CheckCircle2, color: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600" },
+  { type: "progress", label: "Progress", desc: "Update progress", icon: FolderKanban, color: "bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600" },
+  { type: "milestone", label: "Milestone", desc: "Mark a milestone", icon: Milestone, color: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-600" },
+  { type: "financial", label: "Financial", desc: "Payment / change order", icon: DollarSign, color: "bg-green-100 dark:bg-green-500/15 text-green-600" },
 ]
 
 // ─── Main Component ─────────────────────────────────────
@@ -259,13 +259,18 @@ function ActivityTab({ activities, projectId, isAdmin, onRefresh }: { activities
               </button>
               {showAddMenu && (
                 <div className="absolute z-20 top-12 left-0 w-64 p-2 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700">
-                  {ENTRY_TYPES.map(et => (
-                    <button key={et.type} onClick={() => { setAddType(et.type); setShowAddMenu(false) }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                      <span className="text-lg">{et.label.split(" ")[0]}</span>
-                      <div><p className="text-sm font-medium text-slate-900 dark:text-white">{et.label.split(" ").slice(1).join(" ")}</p><p className="text-[10px] text-slate-400">{et.desc}</p></div>
-                    </button>
-                  ))}
+                  {ENTRY_TYPES.map(et => {
+                    const EntryIcon = et.icon
+                    return (
+                      <button key={et.type} onClick={() => { setAddType(et.type); setShowAddMenu(false) }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${et.color}`}>
+                          <EntryIcon className="h-4 w-4" />
+                        </div>
+                        <div><p className="text-sm font-medium text-slate-900 dark:text-white">{et.label}</p><p className="text-[10px] text-slate-400">{et.desc}</p></div>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
