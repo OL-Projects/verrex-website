@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { ViewportToggle } from "@/components/ui/viewport-toggle"
 import { VEREXLogo } from "@/components/ui/verrex-logo"
+import Image from "next/image"
 import { companyInfo } from "@/lib/data"
 import {
   Phone,
@@ -82,15 +83,22 @@ export function Header() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <IntlLink href="/" className="flex items-center gap-3 group">
+            <IntlLink href="/" className="flex items-stretch gap-3 group">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative"
+                className="relative flex items-center"
               >
-                <VEREXLogo variant="icon" size={44} />
+                <Image
+                  src="/images/vx-logo.svg"
+                  alt="VEREX logo"
+                  width={44}
+                  height={44}
+                  className="h-full w-auto object-contain dark:brightness-0 dark:invert"
+                  priority
+                />
               </motion.div>
-              <div className="flex flex-col">
+              <div className="flex flex-col justify-center">
                 <span className="text-2xl font-extrabold tracking-tight leading-none text-slate-900 dark:text-white drop-shadow-sm">
                   VEREX
                 </span>
