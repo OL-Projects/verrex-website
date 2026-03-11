@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
+import Image from 'next/image'
 import { companyInfo } from "@/lib/data"
 import {
   Phone,
@@ -45,9 +46,13 @@ export function Footer() {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <IntlLink href="/" className="flex items-center gap-2 mb-4">
-              <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-lg">VX</span>
-              </div>
+              <Image
+                src="/images/vx-logo.svg"
+                alt="VEREX logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain brightness-0 invert"
+              />
               <div>
                 <span className="text-2xl font-bold tracking-tight">
                   VEREX

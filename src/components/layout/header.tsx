@@ -92,9 +92,9 @@ export function Header() {
                 <Image
                   src="/images/vx-logo.svg"
                   alt="VEREX logo"
-                  width={36}
-                  height={36}
-                  className="h-9 w-9 object-contain dark:brightness-0 dark:invert"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 object-contain dark:brightness-0 dark:invert"
                   priority
                 />
               </motion.div>

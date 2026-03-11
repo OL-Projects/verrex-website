@@ -394,9 +394,12 @@ export default function HomePage() {
         <div className="relative z-[2] px-8 sm:px-12 lg:px-20 py-24 md:py-32">
           <div className="max-w-lg">
             <FadeIn>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
-                {t('whyChooseTitle')} <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">{t('whyChooseBrand')}</span>?
-              </h2>
+              <div className="flex items-center gap-4">
+                <Image src="/images/vx-logo.svg" alt="VEREX logo" width={52} height={52} className="h-13 w-13 object-contain brightness-0 invert drop-shadow-lg" style={{ height: '52px', width: '52px' }} />
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
+                  {t('whyChooseTitle')} <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-400 bg-clip-text text-transparent">{t('whyChooseBrand')}</span>?
+                </h2>
+              </div>
             </FadeIn>
             <FadeIn delay={0.1}>
               <p className="mt-5 text-lg text-white/80 leading-relaxed drop-shadow-md">
@@ -576,6 +579,9 @@ export default function HomePage() {
         <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl" />
         <div className="relative mx-auto max-w-4xl px-4 text-center">
           <FadeIn>
+            <div className="flex justify-center mb-4">
+              <Image src="/images/vx-logo.svg" alt="VEREX logo" width={48} height={48} className="h-12 w-12 object-contain brightness-0 invert" />
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
               {t('ctaTitle')}
             </h2>
