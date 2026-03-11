@@ -1145,62 +1145,62 @@
     "1": {
       "name": "Consultation gratuite",
       "description": "Discutez de vos besoins de projet, explorez les options de produits et obtenez des conseils d'experts — le tout sans frais. Nous vous aidons à prendre des décisions éclairées pour votre maison ou votre entreprise.",
-      "features": [
-        "Évaluation sans obligation",
-        "Recommandations de produits",
-        "Planification budgétaire",
-        "Estimation de l'échéancier"
-      ]
+      "features": {
+        "0": "Évaluation sans obligation",
+        "1": "Recommandations de produits",
+        "2": "Planification budgétaire",
+        "3": "Estimation de l'échéancier"
+      }
     },
     "2": {
       "name": "Mesure sur site",
       "description": "Des mesures précises au laser prises à votre emplacement pour assurer un ajustement parfait pour chaque installation de fenêtre et de porte.",
-      "features": [
-        "Mesure de précision au laser",
-        "Évaluation de l'état du site",
-        "Dimensionnement sur mesure",
-        "Spécifications écrites"
-      ]
+      "features": {
+        "0": "Mesure de précision au laser",
+        "1": "Évaluation de l'état du site",
+        "2": "Dimensionnement sur mesure",
+        "3": "Spécifications écrites"
+      }
     },
     "3": {
       "name": "Installation professionnelle",
       "description": "Notre équipe d'installation certifiée s'assure que vos fenêtres et portes sont installées selon les spécifications du fabricant et les codes du bâtiment locaux.",
-      "features": [
-        "Installateurs agréés et assurés",
-        "Méthodes certifiées par le fabricant",
-        "Installation conforme aux codes",
-        "Garantie de chantier propre"
-      ]
+      "features": {
+        "0": "Installateurs agréés et assurés",
+        "1": "Méthodes certifiées par le fabricant",
+        "2": "Installation conforme aux codes",
+        "3": "Garantie de chantier propre"
+      }
     },
     "4": {
       "name": "Inspection du site",
       "description": "Évaluation complète de vos fenêtres et portes existantes pour identifier les problèmes, les points de perte d'énergie et les priorités de remplacement.",
-      "features": [
-        "Évaluation détaillée de l'état",
-        "Analyse de l'efficacité énergétique",
-        "Recommandations prioritaires",
-        "Rapport d'inspection écrit"
-      ]
+      "features": {
+        "0": "Évaluation détaillée de l'état",
+        "1": "Analyse de l'efficacité énergétique",
+        "2": "Recommandations prioritaires",
+        "3": "Rapport d'inspection écrit"
+      }
     },
     "5": {
       "name": "Fabrication sur mesure",
       "description": "Solutions de fenêtres et de portes sur mesure fabriquées selon vos spécifications exactes pour des exigences architecturales uniques.",
-      "features": [
-        "Formes et tailles personnalisées",
-        "Options de vitrage spécialisées",
-        "Profils de cadre uniques",
-        "Consultation architecturale"
-      ]
+      "features": {
+        "0": "Formes et tailles personnalisées",
+        "1": "Options de vitrage spécialisées",
+        "2": "Profils de cadre uniques",
+        "3": "Consultation architecturale"
+      }
     },
     "6": {
       "name": "Réparation et entretien",
       "description": "Services de réparation et d'entretien préventif experts pour prolonger la durée de vie et les performances de vos fenêtres et portes existantes.",
-      "features": [
-        "Remplacement de joints",
-        "Réparation de quincaillerie",
-        "Remplacement de vitrage",
-        "Calfeutrage"
-      ]
+      "features": {
+        "0": "Remplacement de joints",
+        "1": "Réparation de quincaillerie",
+        "2": "Remplacement de vitrage",
+        "3": "Calfeutrage"
+      }
     },
     "duration": {
       "1": "30-60 minutes",

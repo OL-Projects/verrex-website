@@ -1145,62 +1145,62 @@
     "1": {
       "name": "Free Consultation",
       "description": "Discuss your project requirements, explore product options, and get expert advice — all at no cost. We help you make informed decisions for your home or business.",
-      "features": [
-        "No-obligation assessment",
-        "Product recommendations",
-        "Budget planning",
-        "Timeline estimation"
-      ]
+      "features": {
+        "0": "No-obligation assessment",
+        "1": "Product recommendations",
+        "2": "Budget planning",
+        "3": "Timeline estimation"
+      }
     },
     "2": {
       "name": "On-Site Measurement",
       "description": "Accurate, laser-precise measurements taken at your location to ensure perfect fit for every window and door installation.",
-      "features": [
-        "Laser precision measuring",
-        "Site condition assessment",
-        "Custom sizing",
-        "Written specifications"
-      ]
+      "features": {
+        "0": "Laser precision measuring",
+        "1": "Site condition assessment",
+        "2": "Custom sizing",
+        "3": "Written specifications"
+      }
     },
     "3": {
       "name": "Professional Installation",
       "description": "Our certified installation team ensures your windows and doors are installed to manufacturer specifications and local building codes.",
-      "features": [
-        "Licensed & insured installers",
-        "Manufacturer-certified methods",
-        "Code-compliant installation",
-        "Clean job site guarantee"
-      ]
+      "features": {
+        "0": "Licensed & insured installers",
+        "1": "Manufacturer-certified methods",
+        "2": "Code-compliant installation",
+        "3": "Clean job site guarantee"
+      }
     },
     "4": {
       "name": "Site Inspection",
       "description": "Comprehensive evaluation of your existing windows and doors to identify issues, energy loss points, and replacement priorities.",
-      "features": [
-        "Detailed condition assessment",
-        "Energy efficiency analysis",
-        "Priority recommendations",
-        "Written inspection report"
-      ]
+      "features": {
+        "0": "Detailed condition assessment",
+        "1": "Energy efficiency analysis",
+        "2": "Priority recommendations",
+        "3": "Written inspection report"
+      }
     },
     "5": {
       "name": "Custom Fabrication",
       "description": "Bespoke window and door solutions manufactured to your exact specifications for unique architectural requirements.",
-      "features": [
-        "Custom shapes & sizes",
-        "Specialty glass options",
-        "Unique frame profiles",
-        "Architectural consultation"
-      ]
+      "features": {
+        "0": "Custom shapes & sizes",
+        "1": "Specialty glass options",
+        "2": "Unique frame profiles",
+        "3": "Architectural consultation"
+      }
     },
     "6": {
       "name": "Repair & Maintenance",
       "description": "Expert repair and preventive maintenance services to extend the life and performance of your existing windows and doors.",
-      "features": [
-        "Seal replacement",
-        "Hardware repair",
-        "Glass replacement",
-        "Weatherstripping"
-      ]
+      "features": {
+        "0": "Seal replacement",
+        "1": "Hardware repair",
+        "2": "Glass replacement",
+        "3": "Weatherstripping"
+      }
     },
     "duration": {
       "1": "30-60 minutes",
