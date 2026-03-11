@@ -136,8 +136,8 @@ export default function QuotePage() {
                       <div><Label htmlFor="email">{t("email")} *</Label><Input id="email" type="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)} placeholder="john@example.com" required /></div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="phone">{t("phone")} *</Label><Input id="phone" type="tel" value={formData.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="(416) 555-0199" required /></div>
-                      <div><Label htmlFor="address">{t("address")}</Label><Input id="address" value={formData.address} onChange={(e) => updateField("address", e.target.value)} placeholder="123 Main St, Toronto" /></div>
+                      <div><Label htmlFor="phone">{t("phone")} *</Label><Input id="phone" type="tel" value={formData.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="(514) 992-4080" required /></div>
+                      <div><Label htmlFor="address">{t("address")}</Label><Input id="address" value={formData.address} onChange={(e) => updateField("address", e.target.value)} placeholder="135 Evergreen Dr., Beaconsfield" /></div>
                     </div>
                   </>
                 )}
@@ -247,7 +247,7 @@ export default function QuotePage() {
           <div className="mt-8 text-center">
             <p className="text-sm text-slate-500">
               Need immediate assistance? Call us at{" "}
-              <a href="tel:(416) 555-0199" className="text-blue-600 font-medium">(416) 555-0199</a>
+              <a href="tel:+15149924080" className="text-blue-600 font-medium">(514) 992-4080</a>
             </p>
           </div>
         </div>
