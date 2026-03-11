@@ -9,7 +9,7 @@ export async function GET() {
   const projects = await prisma.project.findMany({
     include: {
       client: { select: { id: true, name: true, email: true, phone: true } },
-      _count: { select: { appointments: true, invoices: true } },
+      _count: { select: { appointments: true, invoices: true, activities: true, tasks: true, attachments: true } },
     },
     orderBy: { createdAt: "desc" },
   })
