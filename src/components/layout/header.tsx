@@ -87,14 +87,14 @@ export function Header() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative flex items-center"
+                className="relative flex items-center shrink-0 w-10 h-10"
               >
                 <Image
                   src="/images/vx-logo.svg"
                   alt="VEREX logo"
                   width={40}
                   height={40}
-                  className="h-10 w-10 object-contain dark:brightness-0 dark:invert"
+                  className="h-10 w-10 min-w-[40px] object-contain dark:brightness-0 dark:invert"
                   priority
                 />
               </motion.div>
