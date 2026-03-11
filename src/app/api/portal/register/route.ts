@@ -25,8 +25,12 @@ export async function POST(request: Request) {
     sendWelcomeEmail(user.email, user.name).catch(console.error)
 
     return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
-  } catch (error) {
-    console.error("Registration error:", error)
-    return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 })
+  } catch (error: unknown) {
+    const err = error as Error
+    console.error("Registration error:", err)
+    return NextResponse.json({ 
+      error: "Registration failed. Please try again.",
+      debug: process.env.NODE_ENV === "development" ? undefined : `${err.name}: ${err.message?.substring(0, 300)}`
+    }, { status: 500 })
   }
 }
