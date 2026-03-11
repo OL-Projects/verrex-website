@@ -50,7 +50,7 @@ export default function SignupPage() {
       const res = await fetch("/api/portal/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, role: selectedRole || "client" }),
       })
 
       const data = await res.json()
@@ -202,12 +202,6 @@ export default function SignupPage() {
           )}
         </div>
 
-        {/* Phase 1 notice */}
-        <div className="mt-4 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-500/5 border border-blue-200/50 dark:border-blue-500/10 text-center">
-          <p className="text-[11px] text-blue-600/70 dark:text-blue-400/60">
-            <span className="font-medium">Phase 1 Demo</span> — Accounts are stored in memory and reset on server restart.
-          </p>
-        </div>
       </motion.div>
     </div>
   )

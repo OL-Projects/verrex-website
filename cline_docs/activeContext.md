@@ -1,6 +1,56 @@
 # Active Context
 
-## Latest Session — Feb 25, 2026
+## Latest Session — Mar 11, 2026
+
+### Completed: Real Authentication System (Production-Ready)
+
+**Auth Fixes & Upgrades:**
+- Fixed `AUTH_SECRET` env var (NextAuth v5 requires `AUTH_SECRET`, was using `NEXTAUTH_SECRET`)
+- Added `AUTH_TRUST_HOST=true` and `NEXT_PUBLIC_BASE_URL` to `.env.local`
+- Fixed demo login email mismatch (login page buttons now match seeded DB users: `*@verex.ca`)
+- Standardized password minimum to 8 characters everywhere (signup, register API, reset-password API, reset-password page)
+- Added `role` field to signup request body (was missing, now explicitly sends selected role)
+- Removed misleading "Phase 1 Demo — Accounts stored in memory" notice from signup page
+
+**New API Endpoints:**
+- `PUT /api/portal/profile` — Fetch and update logged-in user's profile (name, phone, company)
+- `POST /api/portal/change-password` — Change password (requires current password verification)
+
+**Settings Page Upgrade:**
+- Profile section now fetches real user data from DB via `/api/portal/profile`
+- Editable fields: Name, Phone, Company (Email is read-only)
+- Shows role badge and "Member since" date
+- Working "Save Changes" button with dirty-state detection
+- Working "Change Password" flow (current password → new password → confirm)
+- Removed all "demo mode" and "Phase 2" labels from functional features
+- Auto-clearing success/error messages
+
+**API Test Results (all passing):**
+- ✅ Signup creates real user in PostgreSQL (Neon)
+- ✅ Duplicate email rejected (409)
+- ✅ Short password rejected (400, "at least 8 characters")
+- ✅ Login via NextAuth credentials (302 redirect, session cookie set)
+- ✅ Forgot password sends real email via Resend + prevents email enumeration
+- ✅ Invalid reset token rejected (400)
+- ✅ Profile endpoint rejects unauthenticated requests (401)
+- ✅ Change-password endpoint rejects unauthenticated requests (401)
+- ✅ Welcome email delivered successfully
+- ✅ Password reset email delivered successfully
+
+**Security Features:**
+- bcrypt password hashing (12 rounds)
+- JWT sessions (24hr expiry)
+- CSRF protection via NextAuth
+- Route protection via proxy.ts (dashboard routes require session cookie)
+- Email enumeration prevention on forgot-password
+- Password reset tokens expire after 1 hour
+- Server-side session validation on all protected API endpoints
+
+**Build Status:** ✅ Clean — 0 errors, all routes compiled
+
+---
+
+## Previous Session — Feb 25, 2026
 
 ### Completed: Full Portal System (Phase 1 MVP)
 

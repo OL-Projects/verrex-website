@@ -56,7 +56,7 @@ function ResetPasswordForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) { setError("Passwords do not match"); return }
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return }
+    if (password.length < 8) { setError("Password must be at least 8 characters"); return }
     setLoading(true)
     setError("")
     try {
@@ -93,7 +93,7 @@ function ResetPasswordForm() {
             <div>
               <Label htmlFor="password">New Password</Label>
               <div className="relative">
-                <Input id="password" type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 6 characters" required minLength={6} />
+                <Input id="password" type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 characters" required minLength={8} />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                   {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -101,7 +101,7 @@ function ResetPasswordForm() {
             </div>
             <div>
               <Label htmlFor="confirm">Confirm Password</Label>
-              <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter your password" required minLength={6} />
+              <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter your password" required minLength={8} />
             </div>
             <Button type="submit" variant="primary" className="w-full" disabled={loading}>
               {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Resetting...</> : "Reset Password"}

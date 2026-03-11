@@ -198,11 +198,11 @@ function LoginContent() {
           <div className="grid grid-cols-3 gap-2">
             {[
               { label: "Admin", email: "admin@verex.ca", pass: "admin123" },
-              { label: "Client", email: "client@demo.com", pass: "client123" },
-              { label: "Contractor", email: "contractor@demo.com", pass: "contractor123" },
-              { label: "Supplier", email: "supplier@demo.com", pass: "supplier123" },
-              { label: "Partner", email: "partner@homedepot.com", pass: "partner123" },
-              { label: "Inspector", email: "inspector@demo.com", pass: "inspector123" },
+              { label: "Client", email: "client@verex.ca", pass: "client123" },
+              { label: "Contractor", email: "contractor@verex.ca", pass: "contractor123" },
+              { label: "Supplier", email: "supplier@verex.ca", pass: "supplier123" },
+              { label: "Partner", email: "partner@verex.ca", pass: "partner123" },
+              { label: "Inspector", email: "inspector@verex.ca", pass: "inspector123" },
             ].map((demo) => (
               <button key={demo.label} type="button" onClick={() => fillDemo(demo.email, demo.pass)}
                 className="px-3 py-2 text-xs font-medium rounded-lg bg-slate-100/80 dark:bg-white/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 border border-slate-200/60 dark:border-white/10 transition-all cursor-pointer">
