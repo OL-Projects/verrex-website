@@ -18,7 +18,7 @@ export function VEREXIcon({ className = "", size = 40 }: { className?: string; s
       alt="VEREX logo"
       width={size}
       height={size}
-      className={`object-contain ${className}`}
+      className={`object-contain dark:brightness-0 dark:invert ${className}`}
       priority
     />
   )
@@ -36,7 +36,7 @@ export function VEREXLogo({ className = "", size = 44, variant = "icon" }: VEREX
           alt="VEREX logo"
           width={size}
           height={size}
-          className="object-contain"
+          className="object-contain dark:brightness-0 dark:invert"
           priority
         />
       </div>
@@ -54,7 +54,7 @@ export function VEREXLogo({ className = "", size = 44, variant = "icon" }: VEREX
           alt="VEREX logo"
           width={size}
           height={size}
-          className="object-contain"
+          className="object-contain dark:brightness-0 dark:invert"
           priority
         />
       </div>
