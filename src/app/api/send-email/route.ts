@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 import {
   sendContactConfirmationEmail,
   sendQuoteConfirmationEmail,
@@ -237,6 +238,24 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Save as Lead in database (non-blocking)
+    const leadType = type === "quick-quote" ? "quick_quote" : type;
+    prisma.lead.create({
+      data: {
+        name: (data.name as string) || "Unknown",
+        email: data.email as string,
+        phone: (data.phone as string) || null,
+        source: "website",
+        type: leadType,
+        subject: (data.subject as string) || null,
+        message: (data.message as string) || (data.description as string) || null,
+        projectType: (data.projectType as string) || null,
+        budget: (data.budget as string) || null,
+        address: (data.address as string) || (data.location as string) || null,
+        metadata: JSON.stringify(data),
+      },
+    }).catch((err: unknown) => console.error("Lead capture error:", err));
 
     // Send confirmation email to the user (non-blocking)
     const userName = (data.name as string) || "Customer";

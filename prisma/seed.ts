@@ -3,27 +3,49 @@ import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
-const demoUsers = [
-  { name: "Admin User", email: "admin@verex.ca", password: "admin123", role: "admin", company: "VEREX Industries" },
-  { name: "Jean Tremblay", email: "client@verex.ca", password: "client123", role: "client", company: "Tremblay Residences" },
-  { name: "Mike Chen", email: "contractor@verex.ca", password: "contractor123", role: "contractor", company: "Chen Construction" },
-  { name: "Sarah Wilson", email: "supplier@verex.ca", password: "supplier123", role: "supplier", company: "Wilson Glass Supply" },
-  { name: "David Brown", email: "partner@verex.ca", password: "partner123", role: "partner", company: "Brown Installations" },
-  { name: "Lisa Park", email: "inspector@verex.ca", password: "inspector123", role: "inspector", company: "Park Quality Assurance" },
-]
-
 async function main() {
-  console.log("🌱 Seeding demo users...")
-  for (const user of demoUsers) {
-    const hashed = await bcrypt.hash(user.password, 12)
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: { password: hashed, name: user.name, role: user.role, company: user.company, isDemo: true },
-      create: { name: user.name, email: user.email, password: hashed, role: user.role, company: user.company, isDemo: true },
-    })
-    console.log(`  ✅ ${user.role}: ${user.email}`)
+  console.log("🌱 Seeding database...")
+
+  // ─── Master Admin Account ─────────────────────────────
+  const adminPassword = await bcrypt.hash("VerexAdmin2026!", 12)
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@verex.ca" },
+    update: { role: "admin", name: "VEREX Admin" },
+    create: {
+      name: "VEREX Admin",
+      email: "admin@verex.ca",
+      password: adminPassword,
+      role: "admin",
+      company: "VEREX Industries Inc.",
+      phone: "(514) 992-4080",
+    },
+  })
+  console.log(`✅ Admin account: ${admin.email} (${admin.role})`)
+
+  // ─── Ensure any existing admin@verex.ca is role=admin ─
+  await prisma.user.updateMany({
+    where: { email: "admin@verex.ca" },
+    data: { role: "admin" },
+  })
+
+  // ─── Clean up test accounts (optional) ────────────────
+  const testCount = await prisma.user.count({
+    where: { email: { contains: "@test.com" } },
+  })
+  if (testCount > 0) {
+    console.log(`⚠️  Found ${testCount} test accounts (@test.com)`)
   }
-  console.log("🎉 Seed complete!")
+
+  const userCount = await prisma.user.count()
+  const clientCount = await prisma.user.count({ where: { role: "client" } })
+  const adminCount = await prisma.user.count({ where: { role: "admin" } })
+  console.log(`📊 Total users: ${userCount} (${adminCount} admin, ${clientCount} clients)`)
+  console.log("✅ Seed complete!")
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect())
+main()
+  .catch((e) => {
+    console.error("❌ Seed error:", e)
+    process.exit(1)
+  })
+  .finally(() => prisma.$disconnect())

@@ -7,18 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── Users ──────────────────────────────────────────────
 model User {
   id             String          @id @default(cuid())
   name           String
   email          String          @unique
   password       String
-  role           String          @default("client")
+  role           String          @default("client") // admin | client | contractor | partner
   company        String?
   phone          String?
+  address        String?
+  city           String?
+  postalCode     String?
+  notes          String?
   isDemo         Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
   passwordResets PasswordReset[]
+  projects       Project[]       @relation("ClientProjects")
+  appointments   Appointment[]   @relation("ClientAppointments")
+  invoices       Invoice[]       @relation("ClientInvoices")
+  sentMessages   Message[]       @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+  leads          Lead[]          @relation("AssignedLeads")
 }
 
 model PasswordReset {
@@ -28,4 +40,131 @@ model PasswordReset {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+// ─── Projects ───────────────────────────────────────────
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("pending") // pending | in_progress | completed | cancelled
+  type        String?  // new_construction | renovation | replacement | commercial
+  address     String?
+  city        String?
+  postalCode  String?
+  startDate   DateTime?
+  endDate     DateTime?
+  totalValue  Float?
+  notes       String?
+
+  clientId    String
+  client      User     @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Cascade)
+
+  appointments Appointment[]
+  invoices     Invoice[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+}
+
+// ─── Appointments ───────────────────────────────────────
+model Appointment {
+  id        String   @id @default(cuid())
+  title     String
+  type      String   @default("consultation") // consultation | measurement | installation | follow_up
+  status    String   @default("scheduled") // scheduled | confirmed | completed | cancelled
+  date      DateTime
+  time      String?
+  duration  Int?     // minutes
+  location  String?
+  notes     String?
+
+  clientId  String
+  client    User     @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([date])
+}
+
+// ─── Invoices ───────────────────────────────────────────
+model Invoice {
+  id          String   @id @default(cuid())
+  number      String   @unique
+  amount      Float
+  tax         Float    @default(0)
+  total       Float
+  status      String   @default("draft") // draft | sent | paid | overdue | cancelled
+  dueDate     DateTime?
+  paidDate    DateTime?
+  description String?
+  items       String?  // JSON string of line items
+
+  clientId    String
+  client      User     @relation("ClientInvoices", fields: [clientId], references: [id], onDelete: Cascade)
+
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+}
+
+// ─── Messages ───────────────────────────────────────────
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  read       Boolean  @default(false)
+
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([read])
+}
+
+// ─── Leads (from website forms) ─────────────────────────
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  source      String   @default("website") // website | referral | phone | walk_in
+  type        String   @default("contact") // contact | quote | appointment | quick_quote
+  status      String   @default("new") // new | contacted | qualified | converted | lost
+  subject     String?
+  message     String?
+  projectType String?
+  budget      String?
+  address     String?
+  metadata    String?  // JSON for extra form data
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  convertedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([type])
+  @@index([assignedToId])
 }
