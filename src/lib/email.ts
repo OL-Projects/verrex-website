@@ -6,8 +6,8 @@ const FROM_NOREPLY = "VEREX <noreply@verex.ca>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.verex.ca"
 const COMPANY = {
   name: "VEREX Industries Inc.",
-  address: "123 Glass Avenue, Toronto, ON M5V 3A8",
-  phone: "(514) 742-2160",
+  address: "135 Evergreen Dr., Beaconsfield, QC",
+  phone: "(514) 992-4080",
   email: "admin@verex.ca",
   website: "www.verex.ca",
 }

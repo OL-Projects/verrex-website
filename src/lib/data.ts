@@ -463,9 +463,9 @@ export const companyInfo = {
   tagline: "Premium Windows & Doors",
   description:
     "VEREX is a premier window and door corporation providing high-performance fenestration systems for residential, commercial, institutional, and industrial clients across Canada. From project planning to professional installation, we deliver excellence at every step.",
-  phone: "(514) 742-2160",
+  phone: "(514) 992-4080",
   email: "admin@verex.ca",
-  address: "123 Glass Avenue, Toronto, ON M5V 3A8",
+  address: "135 Evergreen Dr., Beaconsfield, QC",
   hours: {
     weekdays: "8:00 AM - 6:00 PM",
     saturday: "9:00 AM - 4:00 PM",
