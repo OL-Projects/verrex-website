@@ -161,7 +161,7 @@ export function Header() {
                 <IntlLink href="/portal">
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <LogIn className="h-3.5 w-3.5" />
-                    Portal
+                    {t('portal')}
                   </Button>
                 </IntlLink>
                 <IntlLink href="/quote">
@@ -226,7 +226,7 @@ export function Header() {
                   <IntlLink href="/portal" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full gap-2">
                       <LogIn className="h-4 w-4" />
-                      Portal Login
+                      {t('portalLogin')}
                     </Button>
                   </IntlLink>
                   <IntlLink href="/quote" onClick={() => setMobileMenuOpen(false)}>

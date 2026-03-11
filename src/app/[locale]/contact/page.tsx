@@ -146,15 +146,15 @@ function ContactPageContent() {
             {/* Contact Info */}
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-slate-900">{t('getInTouch')}</h2>
-              <p className="text-slate-600">Reach us by phone, email, or visit our office. We&apos;re here to help with all your window and door needs.</p>
+              <p className="text-slate-600">{t('getInTouchDesc')}</p>
 
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: "Phone", value: companyInfo.phone, href: `tel:${companyInfo.phone}` },
-                  { icon: Mail, label: "Email", value: companyInfo.email, href: `mailto:${companyInfo.email}` },
-                  { icon: MapPin, label: "Address", value: companyInfo.address, href: "#" },
+                  { icon: Phone, label: t('phoneLabel'), value: companyInfo.phone, href: `tel:${companyInfo.phone}`, key: "phone" },
+                  { icon: Mail, label: t('emailLabel'), value: companyInfo.email, href: `mailto:${companyInfo.email}`, key: "email" },
+                  { icon: MapPin, label: t('addressLabel'), value: companyInfo.address, href: "#", key: "address" },
                 ].map((item) => (
-                  <a key={item.label} href={item.href} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                  <a key={item.key} href={item.href} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center shrink-0">
                       <item.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
@@ -184,15 +184,15 @@ function ContactPageContent() {
                 <Card className="cursor-pointer hover:shadow-md transition-all">
                   <CardContent className="p-4 text-center">
                     <MessageSquare className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <p className="text-sm font-medium">Live Chat</p>
-                    <p className="text-xs text-slate-500">Coming Soon</p>
+                    <p className="text-sm font-medium">{t('liveChat')}</p>
+                    <p className="text-xs text-slate-500">{t('comingSoon')}</p>
                   </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:shadow-md transition-all">
                   <CardContent className="p-4 text-center">
                     <Video className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <p className="text-sm font-medium">Video Call</p>
-                    <p className="text-xs text-slate-500">Book Online</p>
+                    <p className="text-sm font-medium">{t('videoCall')}</p>
+                    <p className="text-xs text-slate-500">{t('bookOnline')}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -226,7 +226,7 @@ function ContactPageContent() {
                       setSubmitted(true)
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     } catch {
-                      toast({ title: "Failed to Send", description: "Please try again or call us directly.", variant: "error" })
+                      toast({ title: t('toastFailedTitle'), description: t('toastFailedDesc'), variant: "error" })
                     } finally {
                       setSending(false)
                     }
@@ -240,12 +240,12 @@ function ContactPageContent() {
                       <div>
                         <Label htmlFor="subject">{t('subject')}</Label>
                         <select id="subject" name="subject" className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-                          <option value="">Select a subject</option>
-                          <option value="general">General Inquiry</option>
-                          <option value="quote">Quote Request</option>
-                          <option value="installation">Installation Question</option>
-                          <option value="support">Support</option>
-                          <option value="partnership">Partnership</option>
+                          <option value="">{t('selectSubject')}</option>
+                          <option value="general">{t('subjectGeneral')}</option>
+                          <option value="quote">{t('subjectQuote')}</option>
+                          <option value="installation">{t('subjectInstallation')}</option>
+                          <option value="support">{t('subjectSupport')}</option>
+                          <option value="partnership">{t('subjectPartnership')}</option>
                         </select>
                       </div>
                     </div>
@@ -269,23 +269,27 @@ function ContactPageContent() {
                       />
                     </div>
                     <div>
-                      <Label>Attachments</Label>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Add photos of your windows or relevant documents</p>
+                      <Label>{t('attachments')}</Label>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">{t('attachmentsDesc')}</p>
                       <FileUpload maxFiles={5} maxSizeMB={10} />
                     </div>
                     <div>
-                      <Label>Preferred Contact Method</Label>
+                      <Label>{t('preferredContact')}</Label>
                       <div className="mt-2 flex gap-4">
-                        {["Email", "Phone", "Either"].map((method) => (
-                          <label key={method} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-                            <input type="radio" name="contactMethod" value={method.toLowerCase()} defaultChecked={method === "Either"} className="text-blue-600" />
-                            {method}
+                        {[
+                          { key: "email", label: t('contactEmail'), value: "email" },
+                          { key: "phone", label: t('contactPhone'), value: "phone" },
+                          { key: "either", label: t('contactEither'), value: "either" },
+                        ].map((method) => (
+                          <label key={method.key} className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                            <input type="radio" name="contactMethod" value={method.value} defaultChecked={method.key === "either"} className="text-blue-600" />
+                            {method.label}
                           </label>
                         ))}
                       </div>
                     </div>
                     <Button type="submit" variant="primary" size="lg" className="w-full" disabled={sending}>
-                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> {t('submitBtn')}</>}
+                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> {t('sending')}</> : <><Send className="h-4 w-4" /> {t('submitBtn')}</>}
                     </Button>
                   </form>
                 </CardContent>
@@ -300,7 +304,7 @@ function ContactPageContent() {
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<div className="py-20 text-center text-slate-400">Loading...</div>}>
+    <Suspense fallback={<div className="py-20 text-center text-slate-400"></div>}>
       <ContactPageContent />
     </Suspense>
   )

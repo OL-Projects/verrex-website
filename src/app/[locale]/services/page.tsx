@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { services } from "@/lib/data"
+import { getLocalizedServices } from "@/lib/data-i18n"
 import {
   ArrowRight, Clock, CheckCircle2, MessageSquare, Ruler, Wrench,
   Search, Sparkles, Settings, Phone, Award, Users, Timer, ShieldCheck,
@@ -15,17 +15,19 @@ export const metadata: Metadata = { title: "Services" }
 
 const iconMap: Record<string, LucideIcon> = { MessageSquare, Ruler, Wrench, Search, Sparkles, Settings }
 
-const process_steps = [
-  { step: "01", title: "Initial Consultation", description: "Free consultation to understand your needs, budget, and timeline. Available in-person or via video call." },
-  { step: "02", title: "On-Site Assessment", description: "Our certified technicians visit your location for precise measurements and site evaluation." },
-  { step: "03", title: "Custom Quote", description: "Receive a detailed, itemized quote with product recommendations and installation timeline." },
-  { step: "04", title: "Production & Delivery", description: "Your custom windows and doors are manufactured to exact specifications and delivered on schedule." },
-  { step: "05", title: "Professional Installation", description: "Our expert team installs everything to the highest standards with minimal disruption." },
-  { step: "06", title: "Quality Inspection", description: "Final walkthrough to ensure everything meets our quality standards and your expectations." },
-]
-
 export default async function ServicesPage() {
   const t = await getTranslations('ServicesPage')
+  const tService = await getTranslations('ServiceData')
+  const services = getLocalizedServices(tService)
+
+  const process_steps = [
+    { step: "01", title: t('processStep1Title'), description: t('processStep1Desc') },
+    { step: "02", title: t('processStep2Title'), description: t('processStep2Desc') },
+    { step: "03", title: t('processStep3Title'), description: t('processStep3Desc') },
+    { step: "04", title: t('processStep4Title'), description: t('processStep4Desc') },
+    { step: "05", title: t('processStep5Title'), description: t('processStep5Desc') },
+    { step: "06", title: t('processStep6Title'), description: t('processStep6Desc') },
+  ]
   return (
     <div>
       {/* Hero with Custom Blueprint Background — Light/Dark */}
@@ -55,10 +57,10 @@ export default async function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { icon: Award, value: "500+", label: "Projects Completed" },
-              { icon: Users, value: "15+", label: "Years of Experience" },
-              { icon: Timer, value: "98%", label: "On-Time Completion" },
-              { icon: ShieldCheck, value: "100%", label: "Satisfaction Guarantee" },
+              { icon: Award, value: "500+", label: t('statProjectsCompleted') },
+              { icon: Users, value: "15+", label: t('statYearsExperience') },
+              { icon: Timer, value: "98%", label: t('statOnTime') },
+              { icon: ShieldCheck, value: "100%", label: t('statSatisfaction') },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
@@ -144,9 +146,9 @@ export default async function ServicesPage() {
       <section className="py-16 bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-3">How We Work</Badge>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Our Process</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">From first contact to project completion, here&apos;s how we deliver exceptional results.</p>
+            <Badge variant="secondary" className="mb-3">{t('howWeWork')}</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('ourProcess')}</h2>
+            <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">{t('processDesc')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
             {process_steps.map((item, idx) => (

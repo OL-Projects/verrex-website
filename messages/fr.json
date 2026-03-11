@@ -11,7 +11,7 @@
     "catalog": "Catalogue",
     "projects": "Projets",
     "services": "Services",
-    "about": "À\u00A0propos",
+    "about": "À propos",
     "contact": "Contact",
     "getQuote": "Obtenir une soumission",
     "bookAppointment": "Prendre rendez-vous",
@@ -21,7 +21,9 @@
     "windowsAndDoors": "Fenêtres et portes",
     "monFri": "Lun-Ven : ",
     "callUs": "Appelez-nous",
-    "search": "Recherche"
+    "search": "Recherche",
+    "portal": "Portail",
+    "portalLogin": "Connexion au portail"
   },
   "Footer": {
     "products": "Produits",
@@ -141,7 +143,17 @@
     "postalCodePlaceholder": "Code postal",
     "quantityLabel": "Quantité / Unités",
     "quantityPlaceholder": "ex. 10",
-    "sending": "Envoi en cours..."
+    "sending": "Envoi en cours...",
+    "productCasement": "Fenêtres à battant",
+    "productSliding": "Portes coulissantes",
+    "productDoubleHung": "Fenêtres à guillotine",
+    "productStorefront": "Vitrine commerciale",
+    "productCurtainWall": "Mur-rideau",
+    "productEntryDoors": "Portes d'entrée",
+    "toastQuoteSentTitle": "Demande de soumission envoyée!",
+    "toastQuoteSentDesc": "Nous vous recontacterons avec une estimation.",
+    "toastQuoteFailTitle": "Échec de l'envoi",
+    "toastQuoteFailDesc": "Veuillez réessayer ou nous appeler."
   },
   "AboutPage": {
     "title": "À propos de VEREX",
@@ -313,13 +325,13 @@
     "subjectGeneral": "Demande générale",
     "subjectQuote": "Demande de soumission",
     "subjectInstallation": "Question d'installation",
-    "subjectSupport": "Soutien",
+    "subjectSupport": "Soutien technique",
     "subjectPartnership": "Partenariat",
     "phoneLabel": "Téléphone",
     "emailLabel": "Courriel",
     "addressLabel": "Adresse",
     "attachments": "Pièces jointes",
-    "attachmentsDesc": "Ajoutez des photos de vos fenêtres ou documents pertinents",
+    "attachmentsDesc": "Ajoutez des photos de vos fenêtres ou des documents pertinents",
     "preferredContact": "Méthode de contact préférée",
     "contactEmail": "Courriel",
     "contactPhone": "Téléphone",
@@ -327,7 +339,34 @@
     "reachUsDesc": "Contactez-nous par téléphone, courriel ou visitez notre bureau. Nous sommes là pour vous aider avec tous vos besoins en fenêtres et portes.",
     "failedTitle": "Échec de l'envoi",
     "failedDesc": "Veuillez réessayer ou nous appeler directement.",
-    "toAdmin": "À : admin@verex.ca"
+    "toAdmin": "À : admin@verex.ca",
+    "getInTouchDesc": "Rejoignez-nous par téléphone, courriel ou visitez notre bureau. Nous sommes là pour vous aider avec tous vos besoins en fenêtres et portes.",
+    "sending": "Envoi en cours...",
+    "toastFailedTitle": "Échec de l'envoi",
+    "toastFailedDesc": "Veuillez réessayer ou nous appeler directement.",
+    "loading": "Chargement...",
+    "subjectService": "Demande de service",
+    "subjectOther": "Autre",
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
+    "yourMessage": "Votre message",
+    "submitMessage": "Envoyer le message",
+    "phoneTitle": "Téléphone",
+    "phoneDesc": "Appelez-nous pour une assistance immédiate",
+    "emailTitle": "Courriel",
+    "emailDesc": "Envoyez-nous une demande détaillée",
+    "officeTitle": "Bureau",
+    "officeDesc": "Visitez notre salle d'exposition",
+    "processTitle": "Notre processus",
+    "processDesc": "Du premier contact à l'achèvement du projet",
+    "processStepTitle1": "Consultation gratuite",
+    "processStepDesc1": "Nous discutons de vos besoins et fournissons des recommandations d'experts sans frais.",
+    "processStepTitle2": "Mesure sur site",
+    "processStepDesc2": "Des mesures précises prises à votre emplacement pour un ajustement parfait.",
+    "processStepTitle3": "Soumission personnalisée",
+    "processStepDesc3": "Soumission détaillée et détaillée avec recommandations de produits.",
+    "processStepTitle4": "Installation",
+    "processStepDesc4": "Installation professionnelle avec un minimum de perturbation."
   },
   "SearchPage": {
     "title": "Recherche",
@@ -531,7 +570,46 @@
     "contactMethod": "Méthode de contact",
     "back": "Retour",
     "next": "Suivant",
-    "submitRequest": "Soumettre la demande"
+    "submitRequest": "Soumettre la demande",
+    "toastSuccessTitle": "Demande de soumission envoyée!",
+    "toastSuccessDesc": "Nous préparerons votre soumission et vous recontacterons sous peu.",
+    "toastFailedTitle": "Échec de l'envoi",
+    "toastFailedDesc": "Veuillez réessayer ou nous appeler directement.",
+    "quoteReference": "Référence de soumission",
+    "preferredDate": "Date préférée",
+    "preferredTime": "Heure préférée",
+    "selectTime": "Sélectionnez l'heure",
+    "timeMorning": "Matin (9h-12h)",
+    "timeAfternoon": "Après-midi (12h-16h)",
+    "timeEvening": "Soir (16h-18h)",
+    "budgetUnder1k": "Moins de 1 000 $",
+    "budget1kTo5k": "1 000 $ - 5 000 $",
+    "budget5kTo15k": "5 000 $ - 15 000 $",
+    "budget15kPlus": "15 000 $ et plus",
+    "uploadPhotos": "Téléverser des photos/plans (Optionnel)",
+    "dragDropText": "Glissez-déposez vos fichiers ici, ou cliquez pour parcourir",
+    "fileFormats": "JPG, PNG, PDF jusqu'à 10 Mo",
+    "reviewName": "Nom :",
+    "reviewEmail": "Courriel :",
+    "reviewPhone": "Téléphone :",
+    "reviewAddress": "Adresse :",
+    "reviewProjectType": "Type de projet :",
+    "reviewService": "Service :",
+    "reviewBudget": "Budget :",
+    "reviewPreferredDate": "Date préférée :",
+    "reviewDescription": "Description :",
+    "sending": "Envoi en cours...",
+    "needHelp": "Besoin d'aide immédiate? Appelez-nous au",
+    "typeResidential": "Résidentiel",
+    "typeCommercial": "Commercial",
+    "typeIndustrial": "Industriel",
+    "scopeInstallation": "Installation",
+    "scopeMeasurement": "Mesure",
+    "scopeInspection": "Inspection",
+    "scopeConsultation": "Consultation",
+    "scopeRepair": "Réparation",
+    "scopeCustom": "Sur mesure",
+    "descriptionPlaceholder": "Décrivez votre projet, incluant le nombre de fenêtres/portes, les dimensions si connues, et toute exigence particulière..."
   },
   "ServicesPage": {
     "title": "Nos services",
@@ -550,7 +628,26 @@
     "ctaTitle": "Besoin d'une solution sur mesure?",
     "ctaDesc": "Contactez notre équipe pour discuter de vos besoins spécifiques et obtenir une soumission personnalisée.",
     "getFreeQuote": "Soumission gratuite",
-    "bookConsultation": "Réserver une consultation"
+    "bookConsultation": "Réserver une consultation",
+    "howWeWork": "Notre méthode",
+    "ourProcess": "Notre processus",
+    "processDesc": "Du premier contact à l'achèvement du projet, voici comment nous livrons des résultats exceptionnels.",
+    "processStep1Title": "Consultation initiale",
+    "processStep1Desc": "Consultation gratuite pour comprendre vos besoins, votre budget et votre échéancier. Disponible en personne ou par appel vidéo.",
+    "processStep2Title": "Évaluation sur site",
+    "processStep2Desc": "Nos techniciens certifiés visitent votre emplacement pour des mesures précises et une évaluation du site.",
+    "processStep3Title": "Soumission personnalisée",
+    "processStep3Desc": "Recevez une soumission détaillée et détaillée avec des recommandations de produits et un calendrier d'installation.",
+    "processStep4Title": "Production et livraison",
+    "processStep4Desc": "Vos fenêtres et portes sur mesure sont fabriquées selon des spécifications exactes et livrées dans les délais.",
+    "processStep5Title": "Installation professionnelle",
+    "processStep5Desc": "Notre équipe d'experts installe le tout selon les normes les plus élevées avec un minimum de perturbation.",
+    "processStep6Title": "Inspection de qualité",
+    "processStep6Desc": "Visite finale pour s'assurer que tout répond à nos normes de qualité et à vos attentes.",
+    "statProjectsCompleted": "Projets réalisés",
+    "statYearsExperience": "Années d'expérience",
+    "statOnTime": "Livraison à temps",
+    "statSatisfaction": "Garantie de satisfaction"
   },
   "WindowsPage": {
     "badge": "Fenêtres VEREX",
@@ -701,7 +798,13 @@
     "previous": "Précédent",
     "nextLabel": "Suivant",
     "of": "de",
-    "page": "Page"
+    "page": "Page",
+    "addPhotos": "Ajouter des photos",
+    "attachFiles": "Joindre des fichiers",
+    "dragDropFiles": "Glissez-déposez vos fichiers ici, ou utilisez les boutons ci-dessus",
+    "maxFilesInfo": "Max {maxFiles} fichiers, {maxSizeMB} Mo chacun",
+    "filesAttached": "{count} de {maxFiles} fichiers joints",
+    "removeAll": "Tout supprimer"
   },
   "Data": {
     "products": {
@@ -1036,6 +1139,94 @@
       "feature4": "Quincaillerie antipanique disponible",
       "feature5": "Charnières robustes",
       "feature6": "Large gamme de finis"
+    }
+  },
+  "ServiceData": {
+    "1": {
+      "name": "Consultation gratuite",
+      "description": "Discutez de vos besoins de projet, explorez les options de produits et obtenez des conseils d'experts — le tout sans frais. Nous vous aidons à prendre des décisions éclairées pour votre maison ou votre entreprise.",
+      "features": [
+        "Évaluation sans obligation",
+        "Recommandations de produits",
+        "Planification budgétaire",
+        "Estimation de l'échéancier"
+      ]
+    },
+    "2": {
+      "name": "Mesure sur site",
+      "description": "Des mesures précises au laser prises à votre emplacement pour assurer un ajustement parfait pour chaque installation de fenêtre et de porte.",
+      "features": [
+        "Mesure de précision au laser",
+        "Évaluation de l'état du site",
+        "Dimensionnement sur mesure",
+        "Spécifications écrites"
+      ]
+    },
+    "3": {
+      "name": "Installation professionnelle",
+      "description": "Notre équipe d'installation certifiée s'assure que vos fenêtres et portes sont installées selon les spécifications du fabricant et les codes du bâtiment locaux.",
+      "features": [
+        "Installateurs agréés et assurés",
+        "Méthodes certifiées par le fabricant",
+        "Installation conforme aux codes",
+        "Garantie de chantier propre"
+      ]
+    },
+    "4": {
+      "name": "Inspection du site",
+      "description": "Évaluation complète de vos fenêtres et portes existantes pour identifier les problèmes, les points de perte d'énergie et les priorités de remplacement.",
+      "features": [
+        "Évaluation détaillée de l'état",
+        "Analyse de l'efficacité énergétique",
+        "Recommandations prioritaires",
+        "Rapport d'inspection écrit"
+      ]
+    },
+    "5": {
+      "name": "Fabrication sur mesure",
+      "description": "Solutions de fenêtres et de portes sur mesure fabriquées selon vos spécifications exactes pour des exigences architecturales uniques.",
+      "features": [
+        "Formes et tailles personnalisées",
+        "Options de vitrage spécialisées",
+        "Profils de cadre uniques",
+        "Consultation architecturale"
+      ]
+    },
+    "6": {
+      "name": "Réparation et entretien",
+      "description": "Services de réparation et d'entretien préventif experts pour prolonger la durée de vie et les performances de vos fenêtres et portes existantes.",
+      "features": [
+        "Remplacement de joints",
+        "Réparation de quincaillerie",
+        "Remplacement de vitrage",
+        "Calfeutrage"
+      ]
+    },
+    "duration": {
+      "1": "30-60 minutes",
+      "2": "1-2 heures",
+      "3": "Demi-journée - Plusieurs jours",
+      "4": "1-3 heures",
+      "5": "2-4 semaines",
+      "6": "1-4 heures"
+    }
+  },
+  "TestimonialData": {
+    "1": {
+      "content": "VEREX a transformé notre maison avec de magnifiques fenêtres à battant. L'équipe d'installation était professionnelle, propre et efficace. Nous avons déjà remarqué une réduction importante de nos factures de chauffage.",
+      "role": "Propriétaire"
+    },
+    "2": {
+      "content": "Gérant un complexe de 200 unités, j'ai besoin de partenaires fiables. VEREX a livré chaque fenêtre à temps, dans le budget, et leur service après-vente est exceptionnel.",
+      "role": "Gestionnaire immobilier"
+    },
+    "3": {
+      "content": "En tant qu'architecte, j'apprécie la capacité de VEREX à exécuter des conceptions personnalisées avec précision. Leur travail de mur-rideau sur notre dernier projet a dépassé les attentes.",
+      "role": "Architecte"
+    },
+    "4": {
+      "content": "Les installations de vitrage de qualité industrielle pour notre usine de fabrication ont été réalisées selon les normes de sécurité les plus élevées. VEREX comprend les besoins commerciaux.",
+      "role": "Directeur d'usine"
     }
   }
 }

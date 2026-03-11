@@ -40,11 +40,11 @@ export default function QuotePage() {
         body: JSON.stringify({ type: "quote", ...formData }),
       })
       if (!res.ok) throw new Error("Failed to send")
-      toast({ title: "Quote Request Sent!", description: "We'll prepare your quote and get back to you shortly.", variant: "success" })
+      toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc"), variant: "success" })
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: "smooth" })
     } catch {
-      toast({ title: "Failed to Send", description: "Please try again or call us directly.", variant: "error" })
+      toast({ title: t("toastFailedTitle"), description: t("toastFailedDesc"), variant: "error" })
     } finally {
       setSending(false)
     }
@@ -62,7 +62,7 @@ export default function QuotePage() {
             {t("successDesc")}
           </p>
           <p className="mt-2 text-sm text-slate-500">
-            Quote Reference: VRX-2026-PENDING
+            {t("quoteReference")}: VRX-2026-PENDING
           </p>
           <div className="mt-8 flex gap-4 justify-center">
             <Button variant="primary" onClick={() => { setSubmitted(false); setCurrentStep(0); setFormData({ name: "", email: "", phone: "", address: "", projectType: "", serviceType: "", description: "", preferredDate: "", preferredTime: "", budget: "" }) }}>
@@ -148,10 +148,14 @@ export default function QuotePage() {
                     <div>
                       <Label>{t("projectType")} *</Label>
                       <div className="mt-2 grid grid-cols-3 gap-3">
-                        {["residential", "commercial", "industrial"].map((type) => (
-                          <button key={type} type="button" onClick={() => updateField("projectType", type)}
-                            className={`p-4 rounded-lg border text-center capitalize transition-all ${formData.projectType === type ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
-                            {type}
+                        {[
+                          { key: "residential", label: t("typeResidential") },
+                          { key: "commercial", label: t("typeCommercial") },
+                          { key: "industrial", label: t("typeIndustrial") },
+                        ].map((type) => (
+                          <button key={type.key} type="button" onClick={() => updateField("projectType", type.key)}
+                            className={`p-4 rounded-lg border text-center transition-all ${formData.projectType === type.key ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
+                            {type.label}
                           </button>
                         ))}
                       </div>
@@ -159,15 +163,22 @@ export default function QuotePage() {
                     <div>
                       <Label>{t("projectScope")} *</Label>
                       <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {["installation", "measurement", "inspection", "consultation", "repair", "custom"].map((type) => (
-                          <button key={type} type="button" onClick={() => updateField("serviceType", type)}
-                            className={`p-3 rounded-lg border text-sm text-center capitalize transition-all ${formData.serviceType === type ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
-                            {type}
+                        {[
+                          { key: "installation", label: t("scopeInstallation") },
+                          { key: "measurement", label: t("scopeMeasurement") },
+                          { key: "inspection", label: t("scopeInspection") },
+                          { key: "consultation", label: t("scopeConsultation") },
+                          { key: "repair", label: t("scopeRepair") },
+                          { key: "custom", label: t("scopeCustom") },
+                        ].map((type) => (
+                          <button key={type.key} type="button" onClick={() => updateField("serviceType", type.key)}
+                            className={`p-3 rounded-lg border text-sm text-center transition-all ${formData.serviceType === type.key ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
+                            {type.label}
                           </button>
                         ))}
                       </div>
                     </div>
-                    <div><Label htmlFor="description">{t("additionalDetails")} *</Label><Textarea id="description" value={formData.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Describe your project, including the number of windows/doors, sizes if known, and any special requirements..." rows={4} required /></div>
+                    <div><Label htmlFor="description">{t("additionalDetails")} *</Label><Textarea id="description" value={formData.description} onChange={(e) => updateField("description", e.target.value)} placeholder={t("descriptionPlaceholder")} rows={4} required /></div>
                   </>
                 )}
 
@@ -175,34 +186,39 @@ export default function QuotePage() {
                 {currentStep === 2 && (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div><Label htmlFor="preferredDate">Preferred Date</Label><Input id="preferredDate" type="date" value={formData.preferredDate} onChange={(e) => updateField("preferredDate", e.target.value)} /></div>
-                      <div><Label htmlFor="preferredTime">Preferred Time</Label>
+                      <div><Label htmlFor="preferredDate">{t("preferredDate")}</Label><Input id="preferredDate" type="date" value={formData.preferredDate} onChange={(e) => updateField("preferredDate", e.target.value)} /></div>
+                      <div><Label htmlFor="preferredTime">{t("preferredTime")}</Label>
                         <select id="preferredTime" value={formData.preferredTime} onChange={(e) => updateField("preferredTime", e.target.value)}
                           className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-                          <option value="">Select time</option>
-                          <option value="morning">Morning (9AM-12PM)</option>
-                          <option value="afternoon">Afternoon (12PM-4PM)</option>
-                          <option value="evening">Evening (4PM-6PM)</option>
+                          <option value="">{t("selectTime")}</option>
+                          <option value="morning">{t("timeMorning")}</option>
+                          <option value="afternoon">{t("timeAfternoon")}</option>
+                          <option value="evening">{t("timeEvening")}</option>
                         </select>
                       </div>
                     </div>
                     <div>
                       <Label>{t("budget")}</Label>
                       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {["Under $1,000", "$1,000-$5,000", "$5,000-$15,000", "$15,000+"].map((budget) => (
-                          <button key={budget} type="button" onClick={() => updateField("budget", budget)}
-                            className={`p-3 rounded-lg border text-sm text-center transition-all ${formData.budget === budget ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
-                            {budget}
+                        {[
+                          { key: "under1k", label: t("budgetUnder1k") },
+                          { key: "1kTo5k", label: t("budget1kTo5k") },
+                          { key: "5kTo15k", label: t("budget5kTo15k") },
+                          { key: "15kPlus", label: t("budget15kPlus") },
+                        ].map((budget) => (
+                          <button key={budget.key} type="button" onClick={() => updateField("budget", budget.key)}
+                            className={`p-3 rounded-lg border text-sm text-center transition-all ${formData.budget === budget.key ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 dark:text-slate-300"}`}>
+                            {budget.label}
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <Label>Upload Photos/Blueprints (Optional)</Label>
+                      <Label>{t("uploadPhotos")}</Label>
                       <div className="mt-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-8 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer">
                         <Upload className="h-8 w-8 mx-auto text-slate-400 mb-2" />
-                        <p className="text-sm text-slate-500">Drag & drop files here, or click to browse</p>
-                        <p className="text-xs text-slate-400 mt-1">JPG, PNG, PDF up to 10MB</p>
+                        <p className="text-sm text-slate-500">{t("dragDropText")}</p>
+                        <p className="text-xs text-slate-400 mt-1">{t("fileFormats")}</p>
                       </div>
                     </div>
                   </>
@@ -212,16 +228,16 @@ export default function QuotePage() {
                 {currentStep === 3 && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div><span className="text-slate-500">Name:</span><p className="font-medium">{formData.name || "—"}</p></div>
-                      <div><span className="text-slate-500">Email:</span><p className="font-medium">{formData.email || "—"}</p></div>
-                      <div><span className="text-slate-500">Phone:</span><p className="font-medium">{formData.phone || "—"}</p></div>
-                      <div><span className="text-slate-500">Address:</span><p className="font-medium">{formData.address || "—"}</p></div>
-                      <div><span className="text-slate-500">Project Type:</span><p className="font-medium capitalize">{formData.projectType || "—"}</p></div>
-                      <div><span className="text-slate-500">Service:</span><p className="font-medium capitalize">{formData.serviceType || "—"}</p></div>
-                      <div><span className="text-slate-500">Budget:</span><p className="font-medium">{formData.budget || "—"}</p></div>
-                      <div><span className="text-slate-500">Preferred Date:</span><p className="font-medium">{formData.preferredDate || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewName")}</span><p className="font-medium">{formData.name || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewEmail")}</span><p className="font-medium">{formData.email || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewPhone")}</span><p className="font-medium">{formData.phone || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewAddress")}</span><p className="font-medium">{formData.address || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewProjectType")}</span><p className="font-medium capitalize">{formData.projectType || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewService")}</span><p className="font-medium capitalize">{formData.serviceType || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewBudget")}</span><p className="font-medium">{formData.budget || "—"}</p></div>
+                      <div><span className="text-slate-500">{t("reviewPreferredDate")}</span><p className="font-medium">{formData.preferredDate || "—"}</p></div>
                     </div>
-                    <div><span className="text-sm text-slate-500">Description:</span><p className="text-sm font-medium mt-1">{formData.description || "—"}</p></div>
+                    <div><span className="text-sm text-slate-500">{t("reviewDescription")}</span><p className="text-sm font-medium mt-1">{formData.description || "—"}</p></div>
                   </div>
                 )}
 
@@ -236,7 +252,7 @@ export default function QuotePage() {
                     </Button>
                   ) : (
                     <Button type="submit" variant="primary" disabled={sending}>
-                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><FileText className="h-4 w-4" /> {t("submitRequest")}</>}
+                      {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("sending")}</> : <><FileText className="h-4 w-4" /> {t("submitRequest")}</>}
                     </Button>
                   )}
                 </div>
@@ -246,7 +262,7 @@ export default function QuotePage() {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-slate-500">
-              Need immediate assistance? Call us at{" "}
+              {t("needHelp")}{" "}
               <a href="tel:+15149924080" className="text-blue-600 font-medium">(514) 992-4080</a>
             </p>
           </div>

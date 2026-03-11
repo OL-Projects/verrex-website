@@ -21,7 +21,9 @@
     "windowsAndDoors": "Windows & Doors",
     "monFri": "Mon-Fri: ",
     "callUs": "Call Us",
-    "search": "Search"
+    "search": "Search",
+    "portal": "Portal",
+    "portalLogin": "Portal Login"
   },
   "Footer": {
     "products": "Products",
@@ -141,7 +143,17 @@
     "postalCodePlaceholder": "Postal Code",
     "quantityLabel": "Quantity / Units",
     "quantityPlaceholder": "e.g. 10",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "productCasement": "Casement Windows",
+    "productSliding": "Sliding Doors",
+    "productDoubleHung": "Double Hung",
+    "productStorefront": "Storefront",
+    "productCurtainWall": "Curtain Wall",
+    "productEntryDoors": "Entry Doors",
+    "toastQuoteSentTitle": "Quote Request Sent!",
+    "toastQuoteSentDesc": "We'll get back to you with an estimate.",
+    "toastQuoteFailTitle": "Failed to Send",
+    "toastQuoteFailDesc": "Please try again or call us."
   },
   "AboutPage": {
     "title": "About VEREX",
@@ -327,7 +339,34 @@
     "reachUsDesc": "Reach us by phone, email, or visit our office. We're here to help with all your window and door needs.",
     "failedTitle": "Failed to Send",
     "failedDesc": "Please try again or call us directly.",
-    "toAdmin": "To: admin@verex.ca"
+    "toAdmin": "To: admin@verex.ca",
+    "getInTouchDesc": "Reach us by phone, email, or visit our office. We're here to help with all your window and door needs.",
+    "sending": "Sending...",
+    "toastFailedTitle": "Failed to Send",
+    "toastFailedDesc": "Please try again or call us directly.",
+    "loading": "Loading...",
+    "subjectService": "Service Request",
+    "subjectOther": "Other",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "yourMessage": "Your Message",
+    "submitMessage": "Send Message",
+    "phoneTitle": "Phone",
+    "phoneDesc": "Call us for immediate assistance",
+    "emailTitle": "Email",
+    "emailDesc": "Send us a detailed inquiry",
+    "officeTitle": "Office",
+    "officeDesc": "Visit our showroom",
+    "processTitle": "Our Process",
+    "processDesc": "From first contact to project completion",
+    "processStepTitle1": "Free Consultation",
+    "processStepDesc1": "We discuss your needs and provide expert recommendations at no cost.",
+    "processStepTitle2": "On-Site Measurement",
+    "processStepDesc2": "Precise measurements taken at your location for perfect fit.",
+    "processStepTitle3": "Custom Quote",
+    "processStepDesc3": "Detailed, itemized quote with product recommendations.",
+    "processStepTitle4": "Installation",
+    "processStepDesc4": "Professional installation with minimal disruption."
   },
   "SearchPage": {
     "title": "Search",
@@ -531,7 +570,46 @@
     "contactMethod": "Contact Method",
     "back": "Back",
     "next": "Next",
-    "submitRequest": "Submit Request"
+    "submitRequest": "Submit Request",
+    "toastSuccessTitle": "Quote Request Sent!",
+    "toastSuccessDesc": "We'll prepare your quote and get back to you shortly.",
+    "toastFailedTitle": "Failed to Send",
+    "toastFailedDesc": "Please try again or call us directly.",
+    "quoteReference": "Quote Reference",
+    "preferredDate": "Preferred Date",
+    "preferredTime": "Preferred Time",
+    "selectTime": "Select time",
+    "timeMorning": "Morning (9AM-12PM)",
+    "timeAfternoon": "Afternoon (12PM-4PM)",
+    "timeEvening": "Evening (4PM-6PM)",
+    "budgetUnder1k": "Under $1,000",
+    "budget1kTo5k": "$1,000-$5,000",
+    "budget5kTo15k": "$5,000-$15,000",
+    "budget15kPlus": "$15,000+",
+    "uploadPhotos": "Upload Photos/Blueprints (Optional)",
+    "dragDropText": "Drag & drop files here, or click to browse",
+    "fileFormats": "JPG, PNG, PDF up to 10MB",
+    "reviewName": "Name:",
+    "reviewEmail": "Email:",
+    "reviewPhone": "Phone:",
+    "reviewAddress": "Address:",
+    "reviewProjectType": "Project Type:",
+    "reviewService": "Service:",
+    "reviewBudget": "Budget:",
+    "reviewPreferredDate": "Preferred Date:",
+    "reviewDescription": "Description:",
+    "sending": "Sending...",
+    "needHelp": "Need immediate assistance? Call us at",
+    "typeResidential": "Residential",
+    "typeCommercial": "Commercial",
+    "typeIndustrial": "Industrial",
+    "scopeInstallation": "Installation",
+    "scopeMeasurement": "Measurement",
+    "scopeInspection": "Inspection",
+    "scopeConsultation": "Consultation",
+    "scopeRepair": "Repair",
+    "scopeCustom": "Custom",
+    "descriptionPlaceholder": "Describe your project, including the number of windows/doors, sizes if known, and any special requirements..."
   },
   "ServicesPage": {
     "title": "Our Services",
@@ -550,7 +628,26 @@
     "ctaTitle": "Need a Custom Solution?",
     "ctaDesc": "Contact our team to discuss your specific requirements and get a tailored quote.",
     "getFreeQuote": "Get Free Quote",
-    "bookConsultation": "Book Consultation"
+    "bookConsultation": "Book Consultation",
+    "howWeWork": "How We Work",
+    "ourProcess": "Our Process",
+    "processDesc": "From first contact to project completion, here's how we deliver exceptional results.",
+    "processStep1Title": "Initial Consultation",
+    "processStep1Desc": "Free consultation to understand your needs, budget, and timeline. Available in-person or via video call.",
+    "processStep2Title": "On-Site Assessment",
+    "processStep2Desc": "Our certified technicians visit your location for precise measurements and site evaluation.",
+    "processStep3Title": "Custom Quote",
+    "processStep3Desc": "Receive a detailed, itemized quote with product recommendations and installation timeline.",
+    "processStep4Title": "Production & Delivery",
+    "processStep4Desc": "Your custom windows and doors are manufactured to exact specifications and delivered on schedule.",
+    "processStep5Title": "Professional Installation",
+    "processStep5Desc": "Our expert team installs everything to the highest standards with minimal disruption.",
+    "processStep6Title": "Quality Inspection",
+    "processStep6Desc": "Final walkthrough to ensure everything meets our quality standards and your expectations.",
+    "statProjectsCompleted": "Projects Completed",
+    "statYearsExperience": "Years of Experience",
+    "statOnTime": "On-Time Completion",
+    "statSatisfaction": "Satisfaction Guarantee"
   },
   "WindowsPage": {
     "badge": "VEREX Windows",
@@ -701,7 +798,13 @@
     "previous": "Previous",
     "nextLabel": "Next",
     "of": "of",
-    "page": "Page"
+    "page": "Page",
+    "addPhotos": "Add Photos",
+    "attachFiles": "Attach Files",
+    "dragDropFiles": "Drag & drop files here, or use the buttons above",
+    "maxFilesInfo": "Max {maxFiles} files, {maxSizeMB}MB each",
+    "filesAttached": "{count} of {maxFiles} files attached",
+    "removeAll": "Remove all"
   },
   "Data": {
     "products": {
@@ -1036,6 +1139,94 @@
       "feature4": "Panic hardware available",
       "feature5": "Heavy-duty hinges",
       "feature6": "Wide range of finishes"
+    }
+  },
+  "ServiceData": {
+    "1": {
+      "name": "Free Consultation",
+      "description": "Discuss your project requirements, explore product options, and get expert advice — all at no cost. We help you make informed decisions for your home or business.",
+      "features": [
+        "No-obligation assessment",
+        "Product recommendations",
+        "Budget planning",
+        "Timeline estimation"
+      ]
+    },
+    "2": {
+      "name": "On-Site Measurement",
+      "description": "Accurate, laser-precise measurements taken at your location to ensure perfect fit for every window and door installation.",
+      "features": [
+        "Laser precision measuring",
+        "Site condition assessment",
+        "Custom sizing",
+        "Written specifications"
+      ]
+    },
+    "3": {
+      "name": "Professional Installation",
+      "description": "Our certified installation team ensures your windows and doors are installed to manufacturer specifications and local building codes.",
+      "features": [
+        "Licensed & insured installers",
+        "Manufacturer-certified methods",
+        "Code-compliant installation",
+        "Clean job site guarantee"
+      ]
+    },
+    "4": {
+      "name": "Site Inspection",
+      "description": "Comprehensive evaluation of your existing windows and doors to identify issues, energy loss points, and replacement priorities.",
+      "features": [
+        "Detailed condition assessment",
+        "Energy efficiency analysis",
+        "Priority recommendations",
+        "Written inspection report"
+      ]
+    },
+    "5": {
+      "name": "Custom Fabrication",
+      "description": "Bespoke window and door solutions manufactured to your exact specifications for unique architectural requirements.",
+      "features": [
+        "Custom shapes & sizes",
+        "Specialty glass options",
+        "Unique frame profiles",
+        "Architectural consultation"
+      ]
+    },
+    "6": {
+      "name": "Repair & Maintenance",
+      "description": "Expert repair and preventive maintenance services to extend the life and performance of your existing windows and doors.",
+      "features": [
+        "Seal replacement",
+        "Hardware repair",
+        "Glass replacement",
+        "Weatherstripping"
+      ]
+    },
+    "duration": {
+      "1": "30-60 minutes",
+      "2": "1-2 hours",
+      "3": "Half day - Multiple days",
+      "4": "1-3 hours",
+      "5": "2-4 weeks",
+      "6": "1-4 hours"
+    }
+  },
+  "TestimonialData": {
+    "1": {
+      "content": "VEREX transformed our home with beautiful casement windows. The installation team was professional, clean, and efficient. We've already noticed a significant reduction in our heating bills.",
+      "role": "Homeowner"
+    },
+    "2": {
+      "content": "Managing a 200-unit complex, I need reliable partners. VEREX delivered every window on time, on budget, and their after-sales support is exceptional.",
+      "role": "Property Manager"
+    },
+    "3": {
+      "content": "As an architect, I appreciate VEREX's ability to execute custom designs precisely. Their curtain wall work on our latest project exceeded expectations.",
+      "role": "Architect"
+    },
+    "4": {
+      "content": "The industrial-grade glass installations for our manufacturing facility were completed to the highest safety standards. VEREX understands commercial needs.",
+      "role": "Factory Manager"
     }
   }
 }

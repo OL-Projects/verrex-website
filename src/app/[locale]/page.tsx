@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { CertificationsBar } from "@/components/ui/CertificationsBar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { services, testimonials, companyInfo } from "@/lib/data"
-import { getLocalizedProducts } from "@/lib/data-i18n"
+import { companyInfo } from "@/lib/data"
+import { getLocalizedProducts, getLocalizedServices, getLocalizedTestimonials } from "@/lib/data-i18n"
 import { FadeIn, FadeInLeft, FadeInRight, StaggerContainer, StaggerItem, ScaleIn, RevealSection, AnimatedCounter, HoverCard } from "@/components/ui/motion"
 import {
   ArrowRight,
@@ -48,7 +48,11 @@ const iconMap: Record<string, LucideIcon> = {
 export default function HomePage() {
   const t = useTranslations('HomePage')
   const tData = useTranslations('ProductData')
+  const tService = useTranslations('ServiceData')
+  const tTestimonial = useTranslations('TestimonialData')
   const products = getLocalizedProducts(tData)
+  const services = getLocalizedServices(tService)
+  const testimonials = getLocalizedTestimonials(tTestimonial)
   const { toast } = useToast()
   const [qqSending, setQqSending] = useState(false)
 
@@ -169,10 +173,10 @@ export default function HomePage() {
                       }),
                     })
                     if (!res.ok) throw new Error("Failed")
-                    toast({ title: "Quote Request Sent!", description: "We'll get back to you with an estimate.", variant: "success" })
+                    toast({ title: t('toastQuoteSentTitle'), description: t('toastQuoteSentDesc'), variant: "success" })
                     e.currentTarget.reset()
                   } catch {
-                    toast({ title: "Failed to Send", description: "Please try again or call us.", variant: "error" })
+                    toast({ title: t('toastQuoteFailTitle'), description: t('toastQuoteFailDesc'), variant: "error" })
                   } finally {
                     setQqSending(false)
                   }
@@ -189,10 +193,17 @@ export default function HomePage() {
                   <div>
                     <p className="text-xs font-medium text-white/70 mb-2">{t('selectProductType')}</p>
                     <div className="grid grid-cols-2 gap-2">
-                      {["Casement Windows", "Sliding Doors", "Double Hung", "Storefront", "Curtain Wall", "Entry Doors"].map((product) => (
-                        <label key={product} className="flex items-center gap-2 text-xs text-white/70 hover:text-white/90 cursor-pointer">
-                          <input type="checkbox" name="product" value={product} className="rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400/50 h-3.5 w-3.5" />
-                          {product}
+                      {[
+                        { key: "casement", label: t('productCasement') },
+                        { key: "sliding", label: t('productSliding') },
+                        { key: "doubleHung", label: t('productDoubleHung') },
+                        { key: "storefront", label: t('productStorefront') },
+                        { key: "curtainWall", label: t('productCurtainWall') },
+                        { key: "entryDoors", label: t('productEntryDoors') },
+                      ].map((product) => (
+                        <label key={product.key} className="flex items-center gap-2 text-xs text-white/70 hover:text-white/90 cursor-pointer">
+                          <input type="checkbox" name="product" value={product.key} className="rounded border-white/30 bg-white/10 text-blue-500 focus:ring-blue-400/50 h-3.5 w-3.5" />
+                          {product.label}
                         </label>
                       ))}
                     </div>
