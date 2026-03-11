@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import {
+  sendContactConfirmationEmail,
+  sendQuoteConfirmationEmail,
+  sendAppointmentConfirmationEmail,
+  sendQuickQuoteConfirmationEmail,
+} from "@/lib/email";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@verex.ca";
@@ -230,6 +236,29 @@ export async function POST(req: NextRequest) {
         { error: "Failed to send email. Please try again." },
         { status: 500 }
       );
+    }
+
+    // Send confirmation email to the user (non-blocking)
+    const userName = (data.name as string) || "Customer";
+    const userEmail = data.email as string;
+    switch (type) {
+      case "contact":
+        sendContactConfirmationEmail(userEmail, userName, data.subject as string | undefined).catch(console.error);
+        break;
+      case "quote":
+        sendQuoteConfirmationEmail(userEmail, userName, data.projectType as string | undefined).catch(console.error);
+        break;
+      case "appointment":
+        sendAppointmentConfirmationEmail(userEmail, userName, {
+          type: data.appointmentType as string | undefined,
+          date: data.date as string | undefined,
+          time: data.time as string | undefined,
+          location: data.location as string | undefined,
+        }).catch(console.error);
+        break;
+      case "quick-quote":
+        sendQuickQuoteConfirmationEmail(userEmail, userName, data.products as string[] | undefined).catch(console.error);
+        break;
     }
 
     return NextResponse.json({ success: true, message: "Email sent successfully" });

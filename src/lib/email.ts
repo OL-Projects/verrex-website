@@ -255,3 +255,202 @@ export async function sendPasswordChangedEmail(to: string, name: string) {
   })
   console.log("Password changed email sent:", to, result.data?.id)
 }
+
+// ═══════════════════════════════════════════════════════════
+// CONTACT FORM CONFIRMATION (to user)
+// ═══════════════════════════════════════════════════════════
+export async function sendContactConfirmationEmail(to: string, name: string, subject?: string) {
+  const firstName = name.split(" ")[0]
+  const preheader = `Thank you for contacting VEREX, ${firstName} — we'll respond within 24 hours.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&hearts;", "#dbeafe", "#2563eb")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">We Received Your Message</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, thank you for reaching out to VEREX. Our team has received your ${subject ? `inquiry about <strong>${subject}</strong>` : "message"} and will get back to you shortly.</p>
+
+    <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:24px;margin:0 0 24px;text-align:center">
+      <p style="margin:0 0 4px;color:#1e40af;font-size:16px;font-weight:700">Expected Response Time</p>
+      <p style="margin:0;color:#3b82f6;font-size:14px">Within 24 business hours</p>
+    </div>
+
+    <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0 0 24px;text-align:center">In the meantime, feel free to explore our product catalog or request a free estimate online.</p>
+
+    ${ctaButton("Explore Our Products", `${BASE_URL}/en/products`)}
+
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">Need immediate assistance? Call us at <a href="tel:${COMPANY.phone}" style="color:#2563eb;font-weight:600">${COMPANY.phone}</a></p>
+  `
+
+  const text = `Thank you for contacting VEREX, ${firstName}!\n\nWe received your ${subject || "message"} and will respond within 24 business hours.\n\nIn the meantime, explore our products at ${BASE_URL}/en/products\n\nNeed immediate help? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
+
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: `VEREX — We received your message, ${firstName}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Contact confirmation sent:", to, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUOTE REQUEST CONFIRMATION (to user)
+// ═══════════════════════════════════════════════════════════
+export async function sendQuoteConfirmationEmail(to: string, name: string, projectType?: string) {
+  const firstName = name.split(" ")[0]
+  const preheader = `Your quote request has been received, ${firstName} — our team is preparing your estimate.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&equiv;", "#f3e8ff", "#7c3aed")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Quote Request Received</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, thank you for your interest in VEREX premium windows and doors. We've received your ${projectType ? `<strong>${projectType}</strong> ` : ""}quote request.</p>
+
+    <div style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #ddd6fe;border-radius:12px;padding:24px;margin:0 0 24px">
+      <h3 style="margin:0 0 16px;color:#5b21b6;font-size:15px;font-weight:700">What happens next?</h3>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:0 0 12px">
+            <span style="display:inline-block;background:#7c3aed;color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:12px;vertical-align:middle">1</span>
+            <span style="color:#1e293b;font-size:14px;vertical-align:middle">Our team reviews your project details</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 0 12px">
+            <span style="display:inline-block;background:#7c3aed;color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:12px;vertical-align:middle">2</span>
+            <span style="color:#1e293b;font-size:14px;vertical-align:middle">We prepare a detailed, customized quote</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0">
+            <span style="display:inline-block;background:#7c3aed;color:#fff;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:12px;vertical-align:middle">3</span>
+            <span style="color:#1e293b;font-size:14px;vertical-align:middle">You receive your quote within 1–2 business days</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    ${ctaButton("View Our Window Types", `${BASE_URL}/en/products`, "#7c3aed")}
+
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">Questions? Call us at <a href="tel:${COMPANY.phone}" style="color:#2563eb;font-weight:600">${COMPANY.phone}</a> or reply to this email.</p>
+  `
+
+  const text = `Quote Request Received!\n\nHi ${firstName},\n\nThank you for your ${projectType || ""} quote request. Here's what happens next:\n\n1. Our team reviews your project details\n2. We prepare a detailed, customized quote\n3. You receive your quote within 1-2 business days\n\nView our products: ${BASE_URL}/en/products\n\nQuestions? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
+
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: `VEREX — Your quote request has been received`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Quote confirmation sent:", to, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// APPOINTMENT CONFIRMATION (to user)
+// ═══════════════════════════════════════════════════════════
+export async function sendAppointmentConfirmationEmail(
+  to: string, name: string, details: { type?: string; date?: string; time?: string; location?: string }
+) {
+  const firstName = name.split(" ")[0]
+  const preheader = `Your appointment with VEREX is confirmed, ${firstName}.`
+  const aptType = details.type?.replace(/-/g, " ") || "consultation"
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&squ;", "#dcfce7", "#059669")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Appointment Confirmed</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, your <strong style="text-transform:capitalize">${aptType}</strong> appointment request has been received.</p>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${details.type ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:110px">Type</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px;text-transform:capitalize">${aptType}</td></tr>` : ""}
+        ${details.date ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Date</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.date}</td></tr>` : ""}
+        ${details.time ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Time</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.time}</td></tr>` : ""}
+        ${details.location ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Location</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.location}</td></tr>` : ""}
+      </table>
+    </div>
+
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;margin:0 0 24px">
+      <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5">A member of our team will confirm the exact time and may reach out to finalize details. Please keep your phone available.</p>
+    </div>
+
+    ${ctaButton("Visit VEREX Website", `${BASE_URL}`, "#059669")}
+
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">Need to reschedule? Call <a href="tel:${COMPANY.phone}" style="color:#2563eb;font-weight:600">${COMPANY.phone}</a> or email <a href="mailto:${COMPANY.email}" style="color:#2563eb">${COMPANY.email}</a></p>
+  `
+
+  const text = `Appointment Confirmed!\n\nHi ${firstName},\n\nYour ${aptType} appointment has been received.\n\n${details.date ? `Date: ${details.date}\n` : ""}${details.time ? `Time: ${details.time}\n` : ""}${details.location ? `Location: ${details.location}\n` : ""}\nOur team will confirm the exact time and may reach out to finalize details.\n\nNeed to reschedule? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
+
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: `VEREX — Appointment confirmed, ${firstName}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Appointment confirmation sent:", to, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUICK QUOTE CONFIRMATION (to user)
+// ═══════════════════════════════════════════════════════════
+export async function sendQuickQuoteConfirmationEmail(to: string, name: string, products?: string[]) {
+  const firstName = name.split(" ")[0]
+  const preheader = `Your quick quote request is being processed, ${firstName}.`
+
+  const productHtml = products?.length
+    ? products.map(p => `<li style="padding:3px 0;color:#1e293b;font-size:14px">${p}</li>`).join("")
+    : ""
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&raquo;", "#e0f2fe", "#0369a1")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Quick Quote Received</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6">Hi ${firstName}, we've received your quick quote request and our team will review it promptly.</p>
+
+    ${productHtml ? `
+    <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:12px;padding:24px;margin:0 0 24px">
+      <p style="margin:0 0 12px;color:#0c4a6e;font-size:14px;font-weight:700">Products you're interested in:</p>
+      <ul style="margin:0;padding-left:20px">${productHtml}</ul>
+    </div>
+    ` : ""}
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin:0 0 24px;text-align:center">
+      <p style="margin:0 0 4px;color:#0369a1;font-size:16px;font-weight:700">Expect a response within</p>
+      <p style="margin:0;color:#0ea5e9;font-size:14px">1 business day</p>
+    </div>
+
+    ${ctaButton("Browse Full Catalog", `${BASE_URL}/en/products`, "#0369a1")}
+
+    <p style="color:#94a3b8;font-size:13px;line-height:1.5;margin:0;text-align:center">Questions? Call <a href="tel:${COMPANY.phone}" style="color:#2563eb;font-weight:600">${COMPANY.phone}</a></p>
+  `
+
+  const text = `Quick Quote Received!\n\nHi ${firstName},\n\nWe've received your quick quote request and will respond within 1 business day.\n\n${products?.length ? `Products: ${products.join(", ")}\n\n` : ""}Browse our catalog: ${BASE_URL}/en/products\n\nQuestions? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
+
+  const result = await resend.emails.send({
+    from: FROM_NOREPLY,
+    to,
+    subject: `VEREX — Quick quote request received`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Quick quote confirmation sent:", to, result.data?.id)
+}

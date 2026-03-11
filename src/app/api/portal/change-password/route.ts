@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { sendPasswordChangedEmail } from "@/lib/email"
 
 export async function POST(request: Request) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     // Fetch user with password hash
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, password: true },
+      select: { id: true, name: true, email: true, password: true },
     })
 
     if (!user) {
@@ -44,6 +45,9 @@ export async function POST(request: Request) {
       where: { id: session.user.id },
       data: { password: hashed },
     })
+
+    // Send security notification email (non-blocking)
+    sendPasswordChangedEmail(user.email, user.name).catch(console.error)
 
     return NextResponse.json({ success: true, message: "Password changed successfully" })
   } catch (error) {
