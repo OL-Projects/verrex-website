@@ -68,13 +68,9 @@ export async function POST(request: Request) {
     subject, message, notes, projectType, budget, address, city, postalCode,
     assignedToId, metadata } = body
 
-  if (!name || !email) {
-    return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
-  }
-
   const lead = await prisma.lead.create({
     data: {
-      name, email,
+      name: name || "", email: email || "",
       phone: phone || null,
       company: company || null,
       source: source || "website",

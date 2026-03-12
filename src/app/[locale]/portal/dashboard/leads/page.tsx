@@ -296,7 +296,6 @@ function InlineLeadForm({ lead, onClose, onSaved }: { lead: Lead | null; onClose
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.email) return
     setSubmitting(true)
     const method = isEdit ? "PATCH" : "POST"
     const body = isEdit ? { id: lead!.id, ...form } : form
@@ -322,8 +321,8 @@ function InlineLeadForm({ lead, onClose, onSaved }: { lead: Lead | null; onClose
 
         {/* Row 1: Core — Name, Email, Phone, Company */}
         <div className="grid grid-cols-4 gap-2">
-          <div><label className={lCls}>Name *</label><input type="text" required value={form.name} onChange={e => update("name", e.target.value)} placeholder="John Smith" className={iCls} autoFocus /></div>
-          <div><label className={lCls}>Email *</label><input type="email" required value={form.email} onChange={e => update("email", e.target.value)} placeholder="john@example.com" className={iCls} /></div>
+          <div><label className={lCls}>Name</label><input type="text" value={form.name} onChange={e => update("name", e.target.value)} placeholder="John Smith" className={iCls} autoFocus /></div>
+          <div><label className={lCls}>Email</label><input type="text" value={form.email} onChange={e => update("email", e.target.value)} placeholder="john@example.com" className={iCls} /></div>
           <div><label className={lCls}>Phone</label><input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="(514) 555-1234" className={iCls} /></div>
           <div><label className={lCls}>Company</label><input type="text" value={form.company} onChange={e => update("company", e.target.value)} placeholder="Company" className={iCls} /></div>
         </div>
@@ -346,7 +345,7 @@ function InlineLeadForm({ lead, onClose, onSaved }: { lead: Lead | null; onClose
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-0.5">
-          <button type="submit" disabled={submitting || !form.name || !form.email}
+          <button type="submit" disabled={submitting}
             className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-medium transition-colors">
             {submitting ? "Saving..." : isEdit ? "Save" : "Create"}
           </button>
