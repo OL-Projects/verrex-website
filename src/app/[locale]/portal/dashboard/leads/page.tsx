@@ -178,6 +178,15 @@ export default function LeadsPage() {
         </div>
       </div>
 
+      {/* ─── Inline Create/Edit Form ─── */}
+      <AnimatePresence>
+        {(showCreate || editingLead) && (
+          <InlineLeadForm lead={editingLead}
+            onClose={() => { setShowCreate(false); setEditingLead(null) }}
+            onSaved={() => { setShowCreate(false); setEditingLead(null); fetchLeads(pagination.page) }} />
+        )}
+      </AnimatePresence>
+
       {/* Bulk Actions */}
       {selected.size > 0 && (
         <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
@@ -261,14 +270,6 @@ export default function LeadsPage() {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
-      <AnimatePresence>
-        {(showCreate || editingLead) && (
-          <LeadModal lead={editingLead} onClose={() => { setShowCreate(false); setEditingLead(null) }}
-            onSaved={() => { setShowCreate(false); setEditingLead(null); fetchLeads(pagination.page) }} />
-        )}
-      </AnimatePresence>
-
       {/* Import Modal */}
       <AnimatePresence>
         {showImport && <ImportModal onClose={() => setShowImport(false)} onImported={() => { setShowImport(false); fetchLeads(1) }} />}
@@ -277,8 +278,8 @@ export default function LeadsPage() {
   )
 }
 
-// ─── Lead Create/Edit Modal ─────────────────────────────
-function LeadModal({ lead, onClose, onSaved }: { lead: Lead | null; onClose: () => void; onSaved: () => void }) {
+// ─── Inline Lead Create/Edit Form ───────────────────────
+function InlineLeadForm({ lead, onClose, onSaved }: { lead: Lead | null; onClose: () => void; onSaved: () => void }) {
   const isEdit = !!lead
   const [form, setForm] = useState({
     name: lead?.name || "", email: lead?.email || "", phone: lead?.phone || "",
@@ -302,110 +303,128 @@ function LeadModal({ lead, onClose, onSaved }: { lead: Lead | null; onClose: () 
     setSubmitting(false); onSaved()
   }
 
+  const inputCls = "w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+  const labelCls = "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1"
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95 }}
-        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700"
-        onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">{isEdit ? "Edit Lead" : "New Lead"}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Contact Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 sm:col-span-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1">Full Name *</label>
-              <input type="text" required value={form.name} onChange={e => update("name", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
-            </div>
-            <div className="col-span-2 sm:col-span-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1">Email *</label>
-              <input type="email" required value={form.email} onChange={e => update("email", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Phone</label>
-              <input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Company</label>
-              <input type="text" value={form.company} onChange={e => update("company", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
-            </div>
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="overflow-hidden"
+    >
+      <div className="rounded-2xl bg-white dark:bg-slate-800/90 shadow-xl border border-blue-200/60 dark:border-blue-500/20 backdrop-blur-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3 bg-blue-50/50 dark:bg-blue-500/5 border-b border-blue-100 dark:border-blue-500/10">
+          <div className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4 text-blue-500" />
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{isEdit ? "Edit Lead" : "New Lead"}</h4>
+            {isEdit && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 font-medium">Editing</span>}
           </div>
-          {/* Classification */}
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><X className="h-4 w-4" /></button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          {/* Row 1: Contact Info */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>
-              <select value={form.status} onChange={e => update("status", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm">
+              <label className={labelCls}>Full Name *</label>
+              <input type="text" required value={form.name} onChange={e => update("name", e.target.value)} placeholder="John Smith" className={inputCls} autoFocus />
+            </div>
+            <div>
+              <label className={labelCls}>Email *</label>
+              <input type="email" required value={form.email} onChange={e => update("email", e.target.value)} placeholder="john@example.com" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Phone</label>
+              <input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="(514) 555-1234" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Company</label>
+              <input type="text" value={form.company} onChange={e => update("company", e.target.value)} placeholder="Company name" className={inputCls} />
+            </div>
+          </div>
+
+          {/* Row 2: Classification */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div>
+              <label className={labelCls}>Status</label>
+              <select value={form.status} onChange={e => update("status", e.target.value)} className={inputCls}>
                 {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Priority</label>
-              <select value={form.priority} onChange={e => update("priority", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm">
+              <label className={labelCls}>Priority</label>
+              <select value={form.priority} onChange={e => update("priority", e.target.value)} className={inputCls}>
                 {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Source</label>
-              <select value={form.source} onChange={e => update("source", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm">
+              <label className={labelCls}>Source</label>
+              <select value={form.source} onChange={e => update("source", e.target.value)} className={inputCls}>
                 {SOURCES.map(s => <option key={s} value={s}>{s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Budget</label>
-              <input type="text" value={form.budget} onChange={e => update("budget", e.target.value)} placeholder="$25,000"
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
-            </div>
-          </div>
-          {/* Location */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-3 sm:col-span-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1">Address</label>
-              <input type="text" value={form.address} onChange={e => update("address", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
+              <label className={labelCls}>Budget</label>
+              <input type="text" value={form.budget} onChange={e => update("budget", e.target.value)} placeholder="$25,000" className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">City</label>
-              <input type="text" value={form.city} onChange={e => update("city", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
+              <label className={labelCls}>Project Type</label>
+              <input type="text" value={form.projectType} onChange={e => update("projectType", e.target.value)} placeholder="Renovation" className={inputCls} />
+            </div>
+          </div>
+
+          {/* Row 3: Location */}
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            <div className="col-span-3 sm:col-span-2">
+              <label className={labelCls}>Address</label>
+              <input type="text" value={form.address} onChange={e => update("address", e.target.value)} placeholder="123 Main St" className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Postal Code</label>
-              <input type="text" value={form.postalCode} onChange={e => update("postalCode", e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none" />
+              <label className={labelCls}>City</label>
+              <input type="text" value={form.city} onChange={e => update("city", e.target.value)} placeholder="Montreal" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Postal Code</label>
+              <input type="text" value={form.postalCode} onChange={e => update("postalCode", e.target.value)} placeholder="H1A 1A1" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Subject</label>
+              <input type="text" value={form.subject} onChange={e => update("subject", e.target.value)} placeholder="Window quote" className={inputCls} />
             </div>
           </div>
-          {/* Notes */}
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Notes</label>
-            <textarea value={form.notes} onChange={e => update("notes", e.target.value)} rows={3}
-              placeholder="Internal notes, project details, follow-up reminders..."
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none resize-none" />
+
+          {/* Row 4: Notes & Message side by side */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Notes</label>
+              <textarea value={form.notes} onChange={e => update("notes", e.target.value)} rows={2}
+                placeholder="Internal notes, follow-up reminders..."
+                className={`${inputCls} resize-none`} />
+            </div>
+            <div>
+              <label className={labelCls}>Message</label>
+              <textarea value={form.message} onChange={e => update("message", e.target.value)} rows={2}
+                placeholder="Original message from the lead..."
+                className={`${inputCls} resize-none`} />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1">Message</label>
-            <textarea value={form.message} onChange={e => update("message", e.target.value)} rows={2}
-              placeholder="Original message from the lead..."
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none resize-none" />
-          </div>
-          {/* Submit */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm text-slate-500">Cancel</button>
-            <button type="submit" disabled={submitting || !form.name || !form.email}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors">
-              {submitting ? "Saving..." : isEdit ? "Save Changes" : "Create Lead"}
-            </button>
+
+          {/* Actions */}
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-[10px] text-slate-400">* Required fields</p>
+            <div className="flex gap-2">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Cancel</button>
+              <button type="submit" disabled={submitting || !form.name || !form.email}
+                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors">
+                {submitting ? "Saving..." : isEdit ? "Save Changes" : "Create Lead"}
+              </button>
+            </div>
           </div>
         </form>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
