@@ -238,22 +238,27 @@ model Message {
   @@index([read])
 }
 
-// ─── Leads (from website forms) ─────────────────────────
+// ─── Leads (CRM — scales to 10,000+) ───────────────────
 model Lead {
   id          String   @id @default(cuid())
   name        String
   email       String
   phone       String?
   company     String?
-  source      String   @default("website") // website | referral | phone | walk_in
+  source      String   @default("website") // website | referral | phone | walk_in | home_depot
   type        String   @default("contact") // contact | quote | appointment | quick_quote
   status      String   @default("new") // new | contacted | qualified | converted | lost
+  priority    String   @default("medium") // low | medium | high | urgent
+  stage       String   @default("lead_received") // pipeline stage
   subject     String?
-  message     String?
+  message     String?  @db.Text
+  notes       String?  @db.Text
   projectType String?
   budget      String?
   address     String?
-  metadata    String?  // JSON for extra form data
+  city        String?
+  postalCode  String?
+  metadata    String?  @db.Text // JSON for extra form data
 
   assignedToId String?
   assignedTo   User?   @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
@@ -264,5 +269,11 @@ model Lead {
 
   @@index([status])
   @@index([type])
+  @@index([priority])
+  @@index([stage])
+  @@index([source])
   @@index([assignedToId])
+  @@index([createdAt])
+  @@index([name])
+  @@index([email])
 }
