@@ -6,12 +6,12 @@ import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link as IntlLink } from "@/i18n/navigation"
 import {
-  ArrowLeft, FolderKanban, MapPin, User, Phone, Mail, Calendar,
-  Clock, CheckCircle2, AlertTriangle, Plus, Send, Upload,
-  FileText, Image as ImageIcon, MessageSquare, Flag, Milestone,
-  DollarSign, AlertCircle, CheckSquare, Square, ListTodo,
-  Users, Receipt, Paperclip, X, ChevronDown,
+  ArrowLeft, FolderKanban, MapPin, User, Phone, Mail,
+  Clock, CheckCircle2, Plus, Upload,
+  FileText, Image as ImageIcon, CheckSquare, Square, ListTodo,
+  Users, Receipt, Paperclip,
 } from "lucide-react"
+import ActivityTimeline from "@/components/portal/ActivityTimeline"
 
 // ─── Types ──────────────────────────────────────────────
 interface ProjectDetail {
@@ -38,31 +38,6 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
   { key: "invoices", label: "Invoices", icon: Receipt },
 ]
 
-const ACTIVITY_ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string }> = {
-  note: { icon: FileText, color: "bg-blue-100 dark:bg-blue-500/15 text-blue-600" },
-  photo: { icon: ImageIcon, color: "bg-purple-100 dark:bg-purple-500/15 text-purple-600" },
-  document: { icon: Paperclip, color: "bg-indigo-100 dark:bg-indigo-500/15 text-indigo-600" },
-  status_change: { icon: Flag, color: "bg-amber-100 dark:bg-amber-500/15 text-amber-600" },
-  task_completed: { icon: CheckCircle2, color: "bg-green-100 dark:bg-green-500/15 text-green-600" },
-  task_created: { icon: Plus, color: "bg-sky-100 dark:bg-sky-500/15 text-sky-600" },
-  issue: { icon: AlertTriangle, color: "bg-red-100 dark:bg-red-500/15 text-red-600" },
-  resolved: { icon: CheckCircle2, color: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600" },
-  progress: { icon: FolderKanban, color: "bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600" },
-  milestone: { icon: Milestone, color: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-600" },
-  financial: { icon: DollarSign, color: "bg-green-100 dark:bg-green-500/15 text-green-600" },
-  file_uploaded: { icon: Upload, color: "bg-violet-100 dark:bg-violet-500/15 text-violet-600" },
-}
-
-const ENTRY_TYPES: { type: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
-  { type: "note", label: "Note", desc: "Add a text note", icon: FileText, color: "bg-blue-100 dark:bg-blue-500/15 text-blue-600" },
-  { type: "photo", label: "Photo(s)", desc: "Upload photos", icon: ImageIcon, color: "bg-purple-100 dark:bg-purple-500/15 text-purple-600" },
-  { type: "document", label: "Document", desc: "Upload a file", icon: Paperclip, color: "bg-indigo-100 dark:bg-indigo-500/15 text-indigo-600" },
-  { type: "issue", label: "Issue", desc: "Report a problem", icon: AlertTriangle, color: "bg-red-100 dark:bg-red-500/15 text-red-600" },
-  { type: "resolved", label: "Resolved", desc: "Mark issue resolved", icon: CheckCircle2, color: "bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600" },
-  { type: "progress", label: "Progress", desc: "Update progress", icon: FolderKanban, color: "bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600" },
-  { type: "milestone", label: "Milestone", desc: "Mark a milestone", icon: Milestone, color: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-600" },
-  { type: "financial", label: "Financial", desc: "Payment / change order", icon: DollarSign, color: "bg-green-100 dark:bg-green-500/15 text-green-600" },
-]
 
 // ─── Main Component ─────────────────────────────────────
 export default function ProjectDetailPage() {
@@ -139,7 +114,7 @@ export default function ProjectDetailPage() {
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
           {activeTab === "overview" && <OverviewTab project={project} tasks={tasks} files={files} />}
-          {activeTab === "activity" && <ActivityTab activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject() }} />}
+          {activeTab === "activity" && <ActivityTimeline activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject() }} />}
           {activeTab === "tasks" && <TasksTab tasks={tasks} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadTasks(); loadActivities() }} />}
           {activeTab === "files" && <FilesTab files={files} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadFiles(); loadActivities() }} />}
           {activeTab === "team" && <TeamTab project={project} />}
@@ -216,141 +191,6 @@ function OverviewTab({ project, tasks, files }: { project: ProjectDetail; tasks:
           </div>
         )}
       </div>
-    </div>
-  )
-}
-
-// ─── Activity Timeline Tab ──────────────────────────────
-function ActivityTab({ activities, projectId, isAdmin, onRefresh }: { activities: Activity[]; projectId: string; isAdmin: boolean; onRefresh: () => void }) {
-  const [showAddMenu, setShowAddMenu] = useState(false)
-  const [addType, setAddType] = useState<string | null>(null)
-  const [content, setContent] = useState("")
-  const [submitting, setSubmitting] = useState(false)
-
-  const addEntry = async () => {
-    if (!addType || !content.trim()) return
-    setSubmitting(true)
-    await fetch(`/api/admin/projects/${projectId}/activity`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: addType, content: content.trim() }),
-    })
-    setContent(""); setAddType(null); setShowAddMenu(false); setSubmitting(false)
-    onRefresh()
-  }
-
-  // Group activities by date
-  const grouped: Record<string, Activity[]> = {}
-  activities.forEach(a => {
-    const date = new Date(a.createdAt).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
-    if (!grouped[date]) grouped[date] = []
-    grouped[date].push(a)
-  })
-
-  return (
-    <div className="max-w-3xl">
-      {/* Add Entry Button */}
-      {isAdmin && (
-        <div className="mb-6">
-          {!addType ? (
-            <div className="relative">
-              <button onClick={() => setShowAddMenu(!showAddMenu)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
-                <Plus className="h-4 w-4" /> Add Entry <ChevronDown className="h-3 w-3" />
-              </button>
-              {showAddMenu && (
-                <div className="absolute z-20 top-12 left-0 w-64 p-2 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700">
-                  {ENTRY_TYPES.map(et => {
-                    const EntryIcon = et.icon
-                    return (
-                      <button key={et.type} onClick={() => { setAddType(et.type); setShowAddMenu(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${et.color}`}>
-                          <EntryIcon className="h-4 w-4" />
-                        </div>
-                        <div><p className="text-sm font-medium text-slate-900 dark:text-white">{et.label}</p><p className="text-[10px] text-slate-400">{et.desc}</p></div>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-blue-200 dark:border-blue-500/20">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-slate-900 dark:text-white capitalize">New {addType.replace(/_/g, " ")} Entry</span>
-                <button onClick={() => { setAddType(null); setContent("") }} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
-              </div>
-              <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Type your entry..." rows={3}
-                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 resize-none" />
-              <div className="flex justify-end mt-2">
-                <button onClick={addEntry} disabled={submitting || !content.trim()}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors">
-                  <Send className="h-3.5 w-3.5" /> {submitting ? "Posting..." : "Post Entry"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Timeline */}
-      {activities.length === 0 ? (
-        <div className="text-center py-16">
-          <Clock className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-500 dark:text-slate-400 text-sm">No activity yet. Add your first entry to start the project timeline.</p>
-        </div>
-      ) : (
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-5 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-700" />
-
-          {Object.entries(grouped).map(([date, entries]) => (
-            <div key={date} className="mb-8">
-              <div className="relative flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center z-10">
-                  <Calendar className="h-4 w-4 text-slate-500" />
-                </div>
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{date}</span>
-              </div>
-
-              <div className="space-y-3 ml-5 pl-8 border-l-0">
-                {entries.map(activity => {
-                  const cfg = ACTIVITY_ICONS[activity.type] || ACTIVITY_ICONS.note
-                  const Icon = cfg.icon
-                  const urls = activity.attachmentUrls ? JSON.parse(activity.attachmentUrls) as string[] : []
-                  return (
-                    <motion.div key={activity.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                      className="relative flex gap-3">
-                      {/* Bullet */}
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.color}`}>
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      {/* Card */}
-                      <div className="flex-1 p-3 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">{activity.type.replace(/_/g, " ")}</span>
-                          <span className="text-[10px] text-slate-400">{new Date(activity.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
-                        </div>
-                        {activity.content && <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{activity.content}</p>}
-                        {urls.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {urls.map((url: string, i: number) => (
-                              <a key={i} href={url} target="_blank" rel="noreferrer" className="h-16 w-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                <img src={url} alt="" className="h-full w-full object-cover" />
-                              </a>
-                            ))}
-                          </div>
-                        )}
-                        <p className="text-[10px] text-slate-400 mt-1">— {activity.author.name}</p>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
