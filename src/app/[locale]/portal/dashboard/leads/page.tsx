@@ -178,15 +178,6 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* ─── Inline Create/Edit Form ─── */}
-      <AnimatePresence>
-        {(showCreate || editingLead) && (
-          <InlineLeadForm lead={editingLead}
-            onClose={() => { setShowCreate(false); setEditingLead(null) }}
-            onSaved={() => { setShowCreate(false); setEditingLead(null); fetchLeads(pagination.page) }} />
-        )}
-      </AnimatePresence>
-
       {/* Bulk Actions */}
       {selected.size > 0 && (
         <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
@@ -216,6 +207,16 @@ export default function LeadsPage() {
               </tr>
             </thead>
             <tbody>
+              {/* Inline form row — inside table under header */}
+              {(showCreate || editingLead) && (
+                <tr className="border-b border-blue-200/40 dark:border-blue-500/10">
+                  <td colSpan={9} className="p-0">
+                    <InlineLeadForm lead={editingLead}
+                      onClose={() => { setShowCreate(false); setEditingLead(null) }}
+                      onSaved={() => { setShowCreate(false); setEditingLead(null); fetchLeads(pagination.page) }} />
+                  </td>
+                </tr>
+              )}
               {loading ? (
                 <tr><td colSpan={9} className="p-12 text-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto" /></td></tr>
               ) : leads.length === 0 ? (
@@ -303,129 +304,56 @@ function InlineLeadForm({ lead, onClose, onSaved }: { lead: Lead | null; onClose
     setSubmitting(false); onSaved()
   }
 
-  const inputCls = "w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
-  const labelCls = "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1"
+  const iCls = "w-full px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+  const lCls = "block text-[10px] font-medium text-slate-400 mb-0.5"
 
   return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="overflow-hidden"
-    >
-      <div className="rounded-2xl bg-white dark:bg-slate-800/90 shadow-xl border border-blue-200/60 dark:border-blue-500/20 backdrop-blur-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 bg-blue-50/50 dark:bg-blue-500/5 border-b border-blue-100 dark:border-blue-500/10">
+    <div className="bg-blue-50/40 dark:bg-blue-500/5 border-b border-blue-200/40 dark:border-blue-500/10">
+      <form onSubmit={handleSubmit} className="max-w-2xl px-4 py-3 space-y-2.5">
+        {/* Header line */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4 text-blue-500" />
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{isEdit ? "Edit Lead" : "New Lead"}</h4>
-            {isEdit && <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 font-medium">Editing</span>}
+            <UserPlus className="h-3.5 w-3.5 text-blue-500" />
+            <span className="text-xs font-semibold text-slate-700 dark:text-white">{isEdit ? "Edit Lead" : "New Lead"}</span>
+            {isEdit && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 font-bold">EDITING</span>}
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><X className="h-4 w-4" /></button>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Row 1: Contact Info */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div>
-              <label className={labelCls}>Full Name *</label>
-              <input type="text" required value={form.name} onChange={e => update("name", e.target.value)} placeholder="John Smith" className={inputCls} autoFocus />
-            </div>
-            <div>
-              <label className={labelCls}>Email *</label>
-              <input type="email" required value={form.email} onChange={e => update("email", e.target.value)} placeholder="john@example.com" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Phone</label>
-              <input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="(514) 555-1234" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Company</label>
-              <input type="text" value={form.company} onChange={e => update("company", e.target.value)} placeholder="Company name" className={inputCls} />
-            </div>
-          </div>
+        {/* Row 1: Core — Name, Email, Phone, Company */}
+        <div className="grid grid-cols-4 gap-2">
+          <div><label className={lCls}>Name *</label><input type="text" required value={form.name} onChange={e => update("name", e.target.value)} placeholder="John Smith" className={iCls} autoFocus /></div>
+          <div><label className={lCls}>Email *</label><input type="email" required value={form.email} onChange={e => update("email", e.target.value)} placeholder="john@example.com" className={iCls} /></div>
+          <div><label className={lCls}>Phone</label><input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="(514) 555-1234" className={iCls} /></div>
+          <div><label className={lCls}>Company</label><input type="text" value={form.company} onChange={e => update("company", e.target.value)} placeholder="Company" className={iCls} /></div>
+        </div>
 
-          {/* Row 2: Classification */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div>
-              <label className={labelCls}>Status</label>
-              <select value={form.status} onChange={e => update("status", e.target.value)} className={inputCls}>
-                {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Priority</label>
-              <select value={form.priority} onChange={e => update("priority", e.target.value)} className={inputCls}>
-                {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Source</label>
-              <select value={form.source} onChange={e => update("source", e.target.value)} className={inputCls}>
-                {SOURCES.map(s => <option key={s} value={s}>{s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Budget</label>
-              <input type="text" value={form.budget} onChange={e => update("budget", e.target.value)} placeholder="$25,000" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Project Type</label>
-              <input type="text" value={form.projectType} onChange={e => update("projectType", e.target.value)} placeholder="Renovation" className={inputCls} />
-            </div>
-          </div>
+        {/* Row 2: Classification — Status, Priority, Source, City */}
+        <div className="grid grid-cols-4 gap-2">
+          <div><label className={lCls}>Status</label><select value={form.status} onChange={e => update("status", e.target.value)} className={iCls}>{STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}</select></div>
+          <div><label className={lCls}>Priority</label><select value={form.priority} onChange={e => update("priority", e.target.value)} className={iCls}>{PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select></div>
+          <div><label className={lCls}>Source</label><select value={form.source} onChange={e => update("source", e.target.value)} className={iCls}>{SOURCES.map(s => <option key={s} value={s}>{s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</option>)}</select></div>
+          <div><label className={lCls}>City</label><input type="text" value={form.city} onChange={e => update("city", e.target.value)} placeholder="Montreal" className={iCls} /></div>
+        </div>
 
-          {/* Row 3: Location */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-            <div className="col-span-3 sm:col-span-2">
-              <label className={labelCls}>Address</label>
-              <input type="text" value={form.address} onChange={e => update("address", e.target.value)} placeholder="123 Main St" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>City</label>
-              <input type="text" value={form.city} onChange={e => update("city", e.target.value)} placeholder="Montreal" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Postal Code</label>
-              <input type="text" value={form.postalCode} onChange={e => update("postalCode", e.target.value)} placeholder="H1A 1A1" className={inputCls} />
-            </div>
-            <div>
-              <label className={labelCls}>Subject</label>
-              <input type="text" value={form.subject} onChange={e => update("subject", e.target.value)} placeholder="Window quote" className={inputCls} />
-            </div>
-          </div>
+        {/* Row 3: Extra — Address, Postal, Budget, Notes */}
+        <div className="grid grid-cols-4 gap-2">
+          <div><label className={lCls}>Address</label><input type="text" value={form.address} onChange={e => update("address", e.target.value)} placeholder="123 Main St" className={iCls} /></div>
+          <div><label className={lCls}>Postal Code</label><input type="text" value={form.postalCode} onChange={e => update("postalCode", e.target.value)} placeholder="H1A 1A1" className={iCls} /></div>
+          <div><label className={lCls}>Budget</label><input type="text" value={form.budget} onChange={e => update("budget", e.target.value)} placeholder="$25,000" className={iCls} /></div>
+          <div><label className={lCls}>Notes</label><input type="text" value={form.notes} onChange={e => update("notes", e.target.value)} placeholder="Quick notes..." className={iCls} /></div>
+        </div>
 
-          {/* Row 4: Notes & Message side by side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className={labelCls}>Notes</label>
-              <textarea value={form.notes} onChange={e => update("notes", e.target.value)} rows={2}
-                placeholder="Internal notes, follow-up reminders..."
-                className={`${inputCls} resize-none`} />
-            </div>
-            <div>
-              <label className={labelCls}>Message</label>
-              <textarea value={form.message} onChange={e => update("message", e.target.value)} rows={2}
-                placeholder="Original message from the lead..."
-                className={`${inputCls} resize-none`} />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between pt-1">
-            <p className="text-[10px] text-slate-400">* Required fields</p>
-            <div className="flex gap-2">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Cancel</button>
-              <button type="submit" disabled={submitting || !form.name || !form.email}
-                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors">
-                {submitting ? "Saving..." : isEdit ? "Save Changes" : "Create Lead"}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </motion.div>
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-0.5">
+          <button type="submit" disabled={submitting || !form.name || !form.email}
+            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-medium transition-colors">
+            {submitting ? "Saving..." : isEdit ? "Save" : "Create"}
+          </button>
+          <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+        </div>
+      </form>
+    </div>
   )
 }
 
