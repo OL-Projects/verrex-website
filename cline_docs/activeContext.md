@@ -1,6 +1,35 @@
 # Active Context
 
-## Latest Session — Mar 11, 2026
+## Latest Session — Mar 11, 2026 (Evening)
+
+### Completed: IT Operations Center (Support → IT Portal Page)
+
+**New Sidebar Section: Support → IT**
+- Added "Support" group to sidebar navigation (after Insights)
+- Added "IT" nav item with Monitor icon
+- EN/FR translations added (`it`/`support` keys in portal-i18n.ts)
+
+**6 Live API Routes Created (all admin-only, session-validated):**
+- `GET /api/admin/it/system-info` — Node.js runtime, CPU, memory, OS, env vars audit, framework versions
+- `GET /api/admin/it/database-stats` — PostgreSQL ping latency, table row counts, users by role, recent signups
+- `GET /api/admin/it/services` — Live connectivity checks: PostgreSQL, NextAuth, Resend, Vercel Blob, Next.js runtime
+- `GET /api/admin/it/users` — Full user listing with related data counts (projects, invoices, leads, etc.)
+- `DELETE /api/admin/it/users/[id]` — Delete user account with cascade (prevents self-deletion)
+- `POST /api/admin/it/users/[id]/reset-password` — Force password reset with secure temp password (bcrypt 12 rounds)
+
+**IT Dashboard Page (`/portal/dashboard/it`):**
+- 6 top-level stat badges: Uptime, Heap, CPU%, DB Latency, Total Users, Total DB Rows
+- Collapsible sections:
+  1. **Server & Environment** — Node/Next/Prisma/TS versions, CPU model, RAM, heap, env vars audit (✅/✗)
+  2. **Database Dashboard** — Ping latency, provider, total rows, per-table row counts, DB version
+  3. **Connected Services** — Live status for PostgreSQL, NextAuth, Resend, Blob Storage, Next.js
+  4. **Security Overview** — Users by role, new accounts (7d), auth config audit
+  5. **Account Management** — Searchable user table, reset password (with show/copy temp pw), delete account (confirm flow)
+  6. **Diagnostics & Quick Actions** — Refresh all, build version, last refreshed timestamp
+
+**Build Status:** ✅ TypeScript compiled clean — pre-existing Resend env issue on change-password route (unrelated)
+
+---
 
 ### Completed: Real Authentication System (Production-Ready)
 

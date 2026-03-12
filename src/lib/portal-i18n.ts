@@ -24,10 +24,10 @@ export interface PortalT {
     dashboard: string; leads: string; projects: string; appointments: string
     measurements: string; estimates: string; contracts: string; orders: string
     messages: string; invoices: string; commissions: string; analytics: string
-    timeline: string; settings: string; signOut: string
+    timeline: string; aiSettings: string; it: string; settings: string; signOut: string
     // Groups
     overview: string; crm: string; operations: string; communication: string
-    financialDocs: string; insights: string
+    financialDocs: string; insights: string; support: string
     // Topbar
     notifications: string; noNotifications: string; profileSettings: string
     // Roles
@@ -148,9 +148,9 @@ const en: PortalT = {
     dashboard: "Dashboard", leads: "Leads", projects: "Projects", appointments: "Appointments",
     measurements: "Measurements", estimates: "Estimates", contracts: "Contracts", orders: "Orders",
     messages: "Messages", invoices: "Invoices", commissions: "Commissions", analytics: "Analytics",
-    timeline: "Timeline", settings: "Settings", signOut: "Sign Out",
+    timeline: "Timeline", aiSettings: "AI Settings", it: "IT", settings: "Settings", signOut: "Sign Out",
     overview: "Overview", crm: "CRM", operations: "Operations", communication: "Communication",
-    financialDocs: "Financial Documents", insights: "Insights",
+    financialDocs: "Financial Documents", insights: "Insights", support: "Support",
     notifications: "Notifications", noNotifications: "No notifications", profileSettings: "Profile Settings",
     roles: { admin: "Admin / Sales", client: "Client", contractor: "Contractor", supplier: "Supplier", partner: "Partner", inspector: "Inspector" },
   },
@@ -295,9 +295,9 @@ const fr: PortalT = {
     dashboard: "Tableau de bord", leads: "Prospects", projects: "Projets", appointments: "Rendez-vous",
     measurements: "Mesures", estimates: "Soumissions", contracts: "Contrats", orders: "Commandes",
     messages: "Messages", invoices: "Factures", commissions: "Commissions", analytics: "Analytiques",
-    timeline: "Chronologie", settings: "Paramètres", signOut: "Déconnexion",
+    timeline: "Chronologie", aiSettings: "Paramètres IA", it: "TI", settings: "Paramètres", signOut: "Déconnexion",
     overview: "Aperçu", crm: "CRM", operations: "Opérations", communication: "Communication",
-    financialDocs: "Documents financiers", insights: "Perspectives",
+    financialDocs: "Documents financiers", insights: "Perspectives", support: "Soutien",
     notifications: "Notifications", noNotifications: "Aucune notification", profileSettings: "Paramètres du profil",
     roles: { admin: "Admin / Ventes", client: "Client", contractor: "Entrepreneur", supplier: "Fournisseur", partner: "Partenaire", inspector: "Inspecteur" },
   },

@@ -14,12 +14,14 @@ import {
   Ruler, Package, MessageSquare, Receipt, BadgeDollarSign,
   Settings, PanelLeftClose, PanelLeft, X, LogOut, ChevronDown,
   BarChart3, Activity, Clock, FileText, ClipboardSignature, Brain,
+  Monitor,
 } from "lucide-react"
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard, UserPlus, FolderKanban, CalendarDays,
   Ruler, Package, MessageSquare, Receipt, BadgeDollarSign, Settings,
   BarChart3, Activity, Clock, FileText, ClipboardSignature, Brain,
+  Monitor,
 }
 
 // Navigation group keys (labels are translated at render time)
@@ -30,6 +32,7 @@ const NAV_GROUP_KEYS = [
   { key: "communication", items: ["Messages"] },
   { key: "financialDocs", items: ["Estimates", "Invoices", "Contracts", "Commissions"] },
   { key: "insights", items: ["Analytics", "Timeline", "AI Settings"] },
+  { key: "support", items: ["IT"] },
 ]
 
 // Map SIDEBAR_NAV English labels → portal-i18n nav keys
@@ -37,7 +40,7 @@ const NAV_LABEL_MAP: Record<string, string> = {
   Dashboard: "dashboard", Leads: "leads", Projects: "projects", Appointments: "appointments",
   Measurements: "measurements", Estimates: "estimates", Contracts: "contracts", Orders: "orders",
   Messages: "messages", Invoices: "invoices", Commissions: "commissions", Analytics: "analytics",
-  Timeline: "timeline", "AI Settings": "aiSettings", Settings: "settings",
+  Timeline: "timeline", "AI Settings": "aiSettings", IT: "it", Settings: "settings",
 }
 
 const roleColors: Record<string, string> = {
