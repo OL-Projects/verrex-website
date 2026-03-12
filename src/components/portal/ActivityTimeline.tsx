@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback, DragEvent } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Clock, CheckCircle2, AlertTriangle, Plus, Send, Upload,
@@ -8,6 +8,7 @@ import {
   DollarSign, FolderKanban, Paperclip, X, ChevronDown,
   ArrowUpDown, Calendar, Download, ExternalLink,
   AlertCircle, TrendingUp, Trophy, CreditCard, Banknote,
+  ListTodo, CircleDot, Trash2,
 } from "lucide-react"
 
 // ─── Types ──────────────────────────────────────────────
@@ -36,6 +37,7 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ComponentType<{ className?: s
   milestone:      { icon: MilestoneIcon,  color: "text-yellow-600 dark:text-yellow-400", bg: "bg-yellow-100 dark:bg-yellow-500/15" },
   financial:      { icon: DollarSign,     color: "text-green-600 dark:text-green-400",   bg: "bg-green-100 dark:bg-green-500/15" },
   file_uploaded:  { icon: Upload,         color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-100 dark:bg-violet-500/15" },
+  task_list:      { icon: ListTodo,       color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-100 dark:bg-orange-500/15" },
 }
 
 const ENTRY_TYPES: EntryTypeConfig[] = [
@@ -47,6 +49,7 @@ const ENTRY_TYPES: EntryTypeConfig[] = [
   { type: "progress",  label: "Progress",  desc: "Update progress",         icon: FolderKanban,  color: "bg-cyan-100 dark:bg-cyan-500/15 text-cyan-600" },
   { type: "milestone", label: "Milestone", desc: "Mark a milestone",        icon: MilestoneIcon, color: "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-600" },
   { type: "financial", label: "Financial", desc: "Payment / change order",  icon: DollarSign,    color: "bg-green-100 dark:bg-green-500/15 text-green-600" },
+  { type: "task_list", label: "Tasks",     desc: "Add task bullet points",  icon: ListTodo,      color: "bg-orange-100 dark:bg-orange-500/15 text-orange-600" },
 ]
 
 const SEVERITY_OPTIONS = [
@@ -282,8 +285,34 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
   // Financial-specific
   const [financialType, setFinancialType] = useState("payment")
   const [financialAmount, setFinancialAmount] = useState("")
+  // Task list-specific
+  const [taskItems, setTaskItems] = useState<string[]>([""])
+  // Drag state
+  const [dragOver, setDragOver] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDrop = useCallback(async (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); e.stopPropagation(); setDragOver(false)
+    const files = Array.from(e.dataTransfer.files)
+    if (!files.length) return
+    setUploading(true)
+    for (const file of files) {
+      const form = new FormData()
+      form.append("file", file)
+      try {
+        const res = await fetch("/api/upload", { method: "POST", body: form })
+        if (res.ok) {
+          const blob = await res.json()
+          setUploadedFiles(prev => [...prev, { name: file.name, url: blob.url, type: file.type }])
+        }
+      } catch { /* ignore */ }
+    }
+    setUploading(false)
+  }, [])
+
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true) }, [])
+  const handleDragLeave = useCallback(() => setDragOver(false), [])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -316,6 +345,7 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
     if (type === "progress") metadata.progressValue = progressValue
     if (type === "milestone") metadata.milestoneTitle = milestoneTitle
     if (type === "financial") { metadata.financialType = financialType; metadata.amount = parseFloat(financialAmount) || 0 }
+    if (type === "task_list") { metadata.taskItems = taskItems.filter(t => t.trim()) }
 
     await fetch(`/api/admin/projects/${projectId}/activity`, {
       method: "POST",
@@ -339,6 +369,7 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
     if (type === "resolved" && !resolvedIssueId) return false
     if (type === "milestone" && !milestoneTitle.trim()) return false
     if (type === "financial" && !financialAmount) return false
+    if (type === "task_list" && taskItems.filter(t => t.trim()).length === 0) return false
     return true
   }
 
@@ -364,15 +395,20 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
         {/* ─── Photo Form ─── */}
         {type === "photo" && (
           <>
-            {/* Upload zone */}
-            <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-purple-300 dark:border-purple-600 hover:border-purple-400 cursor-pointer bg-purple-50/50 dark:bg-purple-500/5 transition-colors">
-              <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleFileUpload} className="hidden" />
-              {uploading ? (
-                <div className="flex items-center gap-2"><div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /><span className="text-sm text-purple-600">Uploading...</span></div>
-              ) : (
-                <><ImageIcon className="h-8 w-8 text-purple-400" /><span className="text-sm text-purple-600 dark:text-purple-400 font-medium">Click to upload photos</span><span className="text-[10px] text-slate-400">JPG, PNG, WebP — multiple allowed</span></>
-              )}
-            </label>
+            {/* Upload zone — supports drag & drop */}
+            <div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
+              className={`relative rounded-xl border-2 border-dashed transition-all ${dragOver ? "border-purple-500 bg-purple-100/50 dark:bg-purple-500/10 scale-[1.01]" : "border-purple-300 dark:border-purple-600 bg-purple-50/50 dark:bg-purple-500/5"}`}>
+              <label className="flex flex-col items-center justify-center gap-2 p-6 cursor-pointer">
+                <input ref={fileInputRef} type="file" multiple accept="image/*" onChange={handleFileUpload} className="hidden" />
+                {uploading ? (
+                  <div className="flex items-center gap-2"><div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /><span className="text-sm text-purple-600">Uploading...</span></div>
+                ) : dragOver ? (
+                  <><Upload className="h-8 w-8 text-purple-500 animate-bounce" /><span className="text-sm text-purple-600 font-semibold">Drop photos here</span></>
+                ) : (
+                  <><ImageIcon className="h-8 w-8 text-purple-400" /><span className="text-sm text-purple-600 dark:text-purple-400 font-medium">Drag & drop or click to upload photos</span><span className="text-[10px] text-slate-400">JPG, PNG, WebP — multiple allowed</span></>
+                )}
+              </label>
+            </div>
             {/* Preview grid */}
             {uploadedFiles.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -393,14 +429,19 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
         {/* ─── Document Form ─── */}
         {type === "document" && (
           <>
-            <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-600 hover:border-indigo-400 cursor-pointer bg-indigo-50/50 dark:bg-indigo-500/5 transition-colors">
-              <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv" onChange={handleFileUpload} className="hidden" />
-              {uploading ? (
-                <div className="flex items-center gap-2"><div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" /><span className="text-sm text-indigo-600">Uploading...</span></div>
-              ) : (
-                <><Paperclip className="h-8 w-8 text-indigo-400" /><span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">Click to upload documents</span><span className="text-[10px] text-slate-400">PDF, DOC, XLS, TXT, CSV</span></>
-              )}
-            </label>
+            <div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
+              className={`relative rounded-xl border-2 border-dashed transition-all ${dragOver ? "border-indigo-500 bg-indigo-100/50 dark:bg-indigo-500/10 scale-[1.01]" : "border-indigo-300 dark:border-indigo-600 bg-indigo-50/50 dark:bg-indigo-500/5"}`}>
+              <label className="flex flex-col items-center justify-center gap-2 p-6 cursor-pointer">
+                <input type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv" onChange={handleFileUpload} className="hidden" />
+                {uploading ? (
+                  <div className="flex items-center gap-2"><div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" /><span className="text-sm text-indigo-600">Uploading...</span></div>
+                ) : dragOver ? (
+                  <><Upload className="h-8 w-8 text-indigo-500 animate-bounce" /><span className="text-sm text-indigo-600 font-semibold">Drop files here</span></>
+                ) : (
+                  <><Paperclip className="h-8 w-8 text-indigo-400" /><span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">Drag & drop or click to upload documents</span><span className="text-[10px] text-slate-400">PDF, DOC, XLS, TXT, CSV</span></>
+                )}
+              </label>
+            </div>
             {uploadedFiles.length > 0 && (
               <div className="space-y-2">
                 {uploadedFiles.map((f, i) => (
@@ -541,6 +582,36 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
             </div>
             <textarea value={content} onChange={e => setContent(e.target.value)}
               placeholder="Notes about this transaction (optional)..." rows={2}
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 resize-none" />
+          </>
+        )}
+
+        {/* ─── Task List Form ─── */}
+        {type === "task_list" && (
+          <>
+            <div>
+              <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Task Items</label>
+              <div className="space-y-2">
+                {taskItems.map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <CircleDot className="h-4 w-4 text-orange-400 shrink-0" />
+                    <input type="text" value={item} onChange={e => { const n = [...taskItems]; n[i] = e.target.value; setTaskItems(n) }}
+                      placeholder={`Task ${i + 1}...`}
+                      className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30"
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); setTaskItems([...taskItems, ""]) } }} />
+                    {taskItems.length > 1 && (
+                      <button onClick={() => setTaskItems(taskItems.filter((_, j) => j !== i))} className="text-slate-300 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setTaskItems([...taskItems, ""])}
+                className="flex items-center gap-1 mt-2 text-xs font-medium text-orange-600 dark:text-orange-400 hover:underline">
+                <Plus className="h-3 w-3" /> Add another task
+              </button>
+            </div>
+            <textarea value={content} onChange={e => setContent(e.target.value)}
+              placeholder="Additional notes (optional)..." rows={2}
               className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 resize-none" />
           </>
         )}
@@ -740,6 +811,35 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
             <p className="text-2xl font-bold text-green-700 dark:text-green-400">${amt.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
             {activity.content && <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{activity.content}</p>}
             <p className="text-[10px] text-green-400/70 mt-2">— {activity.author.name}</p>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
+  // ─── Task List Card ───
+  if (activity.type === "task_list") {
+    const items = (meta.taskItems as string[]) || []
+    return (
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+        <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
+        <div className="flex-1 rounded-xl bg-orange-50/80 dark:bg-orange-500/5 border border-orange-200/60 dark:border-orange-500/15 overflow-hidden">
+          <div className="px-4 py-2 bg-orange-100/50 dark:bg-orange-500/10 border-b border-orange-200/40 dark:border-orange-500/10 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ListTodo className="h-3.5 w-3.5 text-orange-500" />
+              <span className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase">Tasks ({items.length})</span>
+            </div>
+            <span className="text-[10px] text-orange-400">{time}</span>
+          </div>
+          <div className="px-4 py-3 space-y-1.5">
+            {items.map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <CircleDot className="h-4 w-4 text-orange-400 mt-0.5 shrink-0" />
+                <span className="text-sm text-slate-700 dark:text-slate-300">{item}</span>
+              </div>
+            ))}
+            {activity.content && <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 italic">{activity.content}</p>}
+            <p className="text-[10px] text-orange-400/70 mt-2">— {activity.author.name}</p>
           </div>
         </div>
       </motion.div>
