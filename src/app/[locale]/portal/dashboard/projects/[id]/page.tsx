@@ -291,27 +291,49 @@ function TasksTab({ tasks, projectId, isAdmin, onRefresh }: { tasks: Task[]; pro
 // ─── Files Tab ──────────────────────────────────────────
 function FilesTab({ files, projectId, isAdmin, onRefresh }: { files: Attachment[]; projectId: string; isAdmin: boolean; onRefresh: () => void }) {
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+  const [dragOver, setDragOver] = useState(false)
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files
-    if (!fileList?.length) return
-    setUploading(true)
+  const uploadFiles = async (fileList: File[]) => {
+    if (!fileList.length) return
+    setUploading(true); setUploadError("")
+    let successCount = 0
 
-    for (const file of Array.from(fileList)) {
-      const form = new FormData()
-      form.append("file", file)
-      const res = await fetch("/api/upload", { method: "POST", body: form })
-      if (res.ok) {
+    for (const file of fileList) {
+      try {
+        const form = new FormData()
+        form.append("file", file)
+        const res = await fetch("/api/upload", { method: "POST", body: form })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "Upload failed" }))
+          throw new Error(err.error || `Upload failed (${res.status})`)
+        }
         const blob = await res.json()
         const isImage = file.type.startsWith("image/")
         await fetch(`/api/admin/projects/${projectId}/files`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fileName: file.name, fileUrl: blob.url, fileSize: file.size, fileType: file.type, category: isImage ? "photo" : "document" }),
         })
+        successCount++
+      } catch (err) {
+        console.error("Upload error:", err)
+        setUploadError(err instanceof Error ? err.message : "Upload failed")
       }
     }
-    setUploading(false); onRefresh()
+    setUploading(false)
+    if (successCount > 0) onRefresh()
+  }
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return
+    await uploadFiles(Array.from(e.target.files))
     e.target.value = ""
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault(); setDragOver(false)
+    const droppedFiles = Array.from(e.dataTransfer.files)
+    if (droppedFiles.length) await uploadFiles(droppedFiles)
   }
 
   const photos = files.filter(f => f.fileType?.startsWith("image/"))
@@ -320,14 +342,28 @@ function FilesTab({ files, projectId, isAdmin, onRefresh }: { files: Attachment[
   return (
     <div className="space-y-6">
       {isAdmin && (
-        <label className="flex items-center justify-center gap-2 p-8 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-colors bg-white/30 dark:bg-white/2">
-          <input type="file" multiple onChange={handleUpload} className="hidden" accept="image/*,.pdf,.doc,.docx" />
-          {uploading ? (
-            <><div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" /><span className="text-sm text-blue-600">Uploading...</span></>
-          ) : (
-            <><Upload className="h-6 w-6 text-slate-400" /><span className="text-sm text-slate-500">Click to upload files (photos, PDFs, documents)</span></>
+        <>
+          <label
+            onDrop={handleDrop}
+            onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            className={`flex items-center justify-center gap-2 p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all bg-white/30 dark:bg-white/2 ${dragOver ? "border-blue-500 bg-blue-50/50 dark:bg-blue-500/10 scale-[1.01]" : "border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500"}`}>
+            <input type="file" multiple onChange={handleUpload} className="hidden" accept="image/*,.pdf,.doc,.docx,.xlsx,.zip" />
+            {uploading ? (
+              <><div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" /><span className="text-sm text-blue-600">Uploading...</span></>
+            ) : dragOver ? (
+              <><Upload className="h-6 w-6 text-blue-500" /><span className="text-sm text-blue-600 font-medium">Drop files here</span></>
+            ) : (
+              <><Upload className="h-6 w-6 text-slate-400" /><span className="text-sm text-slate-500">Click or drag & drop to upload (photos, PDFs, documents)</span></>
+            )}
+          </label>
+          {uploadError && (
+            <div className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-sm text-red-600 dark:text-red-400 flex items-center justify-between">
+              <span>⚠ {uploadError}</span>
+              <button onClick={() => setUploadError("")} className="text-red-400 hover:text-red-600 text-xs ml-2">dismiss</button>
+            </div>
           )}
-        </label>
+        </>
       )}
 
       {/* Photos */}
