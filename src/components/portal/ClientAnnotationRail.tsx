@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   MessageSquare, Camera, Paperclip, Plus, X, Send, Upload,
-  FileText, Trash2, ArrowRight,
+  FileText, Trash2, ArrowLeft,
 } from "lucide-react"
 
 // ─── Types (exported for ActivityTimeline) ───────────────
@@ -110,6 +110,14 @@ export function ActivityBullets({
               }`}
               title={`${existing.length > 0 ? `${existing.length} annotation(s)` : `Add ${pos} annotation`}`}
             >
+              {/* Arrowhead (pointing left) */}
+              <ArrowLeft className={`h-4 w-4 -mr-1 transition-colors ${
+                existing.length > 0
+                  ? "text-teal-500 dark:text-teal-400"
+                  : isActive
+                    ? "text-teal-500 dark:text-teal-400"
+                    : "text-slate-300 dark:text-slate-600"
+              }`} />
               {/* Horizontal line segment */}
               <div className={`w-5 h-0.5 rounded-full transition-colors ${
                 existing.length > 0
@@ -117,14 +125,6 @@ export function ActivityBullets({
                   : isActive
                     ? "bg-teal-400 dark:bg-teal-500"
                     : "bg-slate-200 dark:bg-slate-700 group-hover:bg-teal-300"
-              }`} />
-              {/* Arrowhead */}
-              <ArrowRight className={`h-4 w-4 -ml-1 transition-colors ${
-                existing.length > 0
-                  ? "text-teal-500 dark:text-teal-400"
-                  : isActive
-                    ? "text-teal-500 dark:text-teal-400"
-                    : "text-slate-300 dark:text-slate-600"
               }`} />
             </button>
 
