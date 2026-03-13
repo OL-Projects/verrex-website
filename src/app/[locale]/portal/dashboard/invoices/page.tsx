@@ -11,6 +11,7 @@ import {
 import type { Invoice } from "@/types/portal"
 import InvoiceForm from "./invoice-form"
 import InvoiceDetail from "./invoice-detail"
+import ClientInvoicesInbox from "./client-invoices-inbox"
 
 type StatusFilter = "all" | "draft" | "sent" | "paid" | "overdue" | "void"
 type RightPanel = { type: "none" } | { type: "view"; invoice: Invoice } | { type: "create" } | { type: "edit"; invoice: Invoice }
@@ -64,6 +65,14 @@ export default function InvoicesPage() {
   const panelOpen = panel.type !== "none"
 
   // On mobile, if panel is open, show only the panel with a back button
+
+  // Role-based view: client sees inbox, admin sees management
+  const userRole = (session?.user as any)?.role || 'client'
+  
+  if (userRole === 'client') {
+    return <ClientInvoicesInbox clientId={userId} />
+  }
+
   return (
     <div className="space-y-4">
       {/* Header + Stats — always visible */}

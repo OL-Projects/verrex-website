@@ -16,6 +16,8 @@ import type {
   Contract,
   ContractScopeItem,
   ContractPayment,
+  Estimation,
+  EstimationItem,
   Notification,
   Partner,
   PortalUser,
@@ -414,6 +416,7 @@ export const mockContracts: Contract[] = [
     id: 'cont_001',
     contractNumber: 'CONT-VEREX-2026-0001',
     projectId: 'proj_001',
+    clientId: 'usr_client_001',
     clientName: 'Jean-Pierre Tremblay',
     clientAddress: '742 Rue Saint-Denis',
     clientCity: 'Montreal, QC H2X 3K6',
@@ -454,6 +457,7 @@ export const mockContracts: Contract[] = [
     id: 'cont_002',
     contractNumber: 'CONT-VEREX-2026-0002',
     projectId: 'proj_002',
+    clientId: 'usr_client_001',
     clientName: 'Marie Dubois',
     clientAddress: '123 Boulevard des Laurentides',
     clientCity: 'Laval, QC H7G 2T1',
@@ -485,6 +489,102 @@ export const mockContracts: Contract[] = [
     createdAt: '2026-02-20',
   },
 ];
+
+// --- Estimations (Client-facing estimate summaries) ---
+
+export const mockEstimations: Estimation[] = [
+  {
+    id: 'est_001',
+    estimateNumber: 'EST-VEREX-2026-0001',
+    projectId: 'proj_001',
+    clientId: 'usr_client_001',
+    clientName: 'Jean-Pierre Tremblay',
+    clientAddress: '742 Rue Saint-Denis',
+    clientCity: 'Montreal, QC H2X 3K6',
+    items: [
+      { id: 'ei_001', room: 'Kitchen', description: 'Casement Windows — Triple-pane Low-E Argon', windowType: 'casement', width: 36, height: 48, color: 'White', glassType: 'triple', quantity: 2, unitPrice: 1200, total: 2400 },
+      { id: 'ei_002', room: 'Living Room', description: 'Bay Window — Triple-pane, Oak Interior', windowType: 'bay', width: 96, height: 60, color: 'White', glassType: 'triple', quantity: 1, unitPrice: 4500, total: 4500 },
+      { id: 'ei_003', room: 'Master Bedroom', description: 'Casement Windows — Double-pane', windowType: 'casement', width: 30, height: 48, color: 'White', glassType: 'double', quantity: 2, unitPrice: 980, total: 1960 },
+      { id: 'ei_004', room: 'Dining Room', description: 'Patio Door — Sliding, Triple-pane', windowType: 'patio_door', width: 72, height: 80, color: 'White', glassType: 'triple', quantity: 1, unitPrice: 3800, total: 3800 },
+    ],
+    subtotal: 12660,
+    installationCost: 8500,
+    deliveryCost: 2340,
+    taxGST: 1175,
+    taxQST: 2344.13,
+    tax: 3519.13,
+    total: 27019.13,
+    status: 'accepted',
+    validUntil: '2026-01-12',
+    sentDate: '2025-12-12',
+    notes: 'Triple-glass Energy Star throughout. 30% deposit required upon acceptance.',
+    readByClient: true,
+    clientResponse: 'accepted',
+    createdAt: '2025-12-10',
+  },
+  {
+    id: 'est_002',
+    estimateNumber: 'EST-VEREX-2026-0002',
+    projectId: 'proj_001',
+    clientId: 'usr_client_001',
+    clientName: 'Jean-Pierre Tremblay',
+    clientAddress: '742 Rue Saint-Denis',
+    clientCity: 'Montreal, QC H2X 3K6',
+    items: [
+      { id: 'ei_005', room: 'Basement', description: 'Awning Windows — Egress compliant', windowType: 'awning', width: 36, height: 24, color: 'White', glassType: 'double', quantity: 3, unitPrice: 680, total: 2040 },
+      { id: 'ei_006', room: 'Garage', description: 'Fixed Window — Tempered glass', windowType: 'fixed', width: 48, height: 36, color: 'White', glassType: 'tempered', quantity: 1, unitPrice: 520, total: 520 },
+    ],
+    subtotal: 2560,
+    installationCost: 1800,
+    deliveryCost: 350,
+    taxGST: 235.50,
+    taxQST: 469.59,
+    tax: 705.09,
+    total: 5415.09,
+    status: 'sent',
+    validUntil: '2026-04-15',
+    sentDate: '2026-03-10',
+    notes: 'Additional estimate for basement + garage windows. Can be combined with existing project.',
+    readByClient: false,
+    clientResponse: 'pending',
+    createdAt: '2026-03-10',
+  },
+  {
+    id: 'est_003',
+    estimateNumber: 'EST-VEREX-2026-0003',
+    projectId: 'proj_002',
+    clientId: 'usr_client_001',
+    clientName: 'Jean-Pierre Tremblay',
+    clientAddress: '742 Rue Saint-Denis',
+    clientCity: 'Montreal, QC H2X 3K6',
+    items: [
+      { id: 'ei_007', room: 'Sunroom', description: 'Fixed Picture Windows — Floor to ceiling', windowType: 'fixed', width: 60, height: 84, color: 'White', glassType: 'triple', quantity: 4, unitPrice: 2200, total: 8800 },
+      { id: 'ei_008', room: 'Sunroom', description: 'French Door — Outswing, double panel', windowType: 'french_door', width: 72, height: 80, color: 'White', glassType: 'triple', quantity: 1, unitPrice: 4800, total: 4800 },
+    ],
+    subtotal: 13600,
+    installationCost: 6500,
+    deliveryCost: 800,
+    taxGST: 1045,
+    taxQST: 2083.64,
+    tax: 3128.64,
+    total: 24028.64,
+    status: 'sent',
+    validUntil: '2026-04-20',
+    sentDate: '2026-03-12',
+    notes: 'Sunroom addition estimate. Premium triple-pane throughout for thermal efficiency.',
+    readByClient: false,
+    clientResponse: 'pending',
+    createdAt: '2026-03-12',
+  },
+];
+
+export function getEstimationsByRole(userId: string, role: string): Estimation[] {
+  switch (role) {
+    case 'admin': return mockEstimations;
+    case 'client': return mockEstimations.filter(e => e.clientId === userId);
+    default: return [];
+  }
+}
 
 // --- Notifications ---
 

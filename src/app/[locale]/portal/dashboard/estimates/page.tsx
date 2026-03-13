@@ -15,6 +15,8 @@ import { EstimateCustomizePanel } from "@/components/portal/estimate-customize-p
 import { EstimatePreviewPanel } from "@/components/portal/estimate-preview-panel"
 import { EstimateLeftSidebar } from "@/components/portal/estimate-left-sidebar"
 import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
+import { useSession } from "next-auth/react"
+import ClientEstimationsInbox from "./client-estimations-inbox"
 import {
   type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
@@ -56,6 +58,11 @@ export default function EstimatesPage() {
   const showPreview = sidePanel === "preview"
   const showCustomize = sidePanel === "settings"
 
+  // Role-based view: client sees inbox, admin sees estimate builder
+  const { data: session } = useSession()
+  const userRole = (session?.user as any)?.role || 'client'
+  const userId = (session?.user as any)?.id || 'usr_client_001'
+
   // Lock body scroll only on mobile — desktop panels are sticky side columns
   useEffect(() => {
     if (sidePanel !== "none" && window.innerWidth < 1024) {
@@ -63,6 +70,7 @@ export default function EstimatesPage() {
       return () => { document.body.style.overflow = "" }
     }
   }, [sidePanel])
+
   const [sigs, setSigs] = useState<{ client: string; rep: string }>({ client: "", rep: "" })
   const [addMenuRoom, setAddMenuRoom] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
@@ -234,6 +242,10 @@ export default function EstimatesPage() {
     navigator.clipboard.writeText(emailBody).catch(() => {})
   }, [emailBody])
   let globalIdx = 0
+
+  if (userRole === 'client') {
+    return <ClientEstimationsInbox clientId={userId} />
+  }
 
   return (
     <>

@@ -7,6 +7,9 @@ import type { Contract } from "@/types/portal"
 import ContractDetail from "./contract-detail"
 import ContractForm from "./contract-form"
 
+import { useSession } from "next-auth/react"
+import ClientContractsInbox from "./client-contracts-inbox"
+
 const statusBadge: Record<string, { cls: string; label: string }> = {
   draft: { cls: "bg-slate-200 text-slate-700", label: "Draft" },
   sent: { cls: "bg-blue-100 text-blue-700", label: "Sent" },
@@ -85,6 +88,16 @@ export default function ContractsPage() {
       <p className="text-sm font-medium">Select a contract or create a new one</p>
     </div>
   )
+
+  
+  // Role-based view: client sees inbox, admin sees management
+  const { data: session } = useSession()
+  const userRole = (session?.user as any)?.role || 'client'
+  const userId = (session?.user as any)?.id || 'usr_client_001'
+  
+  if (userRole === 'client') {
+    return <ClientContractsInbox clientId={userId} />
+  }
 
   return (
     <div className="h-[calc(100vh-64px)] flex">

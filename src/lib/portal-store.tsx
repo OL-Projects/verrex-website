@@ -6,12 +6,12 @@ import type {
   MeasurementEntry, TimelineEvent, Commission, Notification,
   PipelineStage, OrderStatus, LeadSource, LeadPriority, AppointmentType,
   TimelineEventType, TimelineVisibility, UserRole,
-  Contract,
+  Contract, Estimation, ClientDocumentResponse,
 } from "@/types/portal"
 import {
   mockLeads, mockProjects, mockAppointments, mockOrders,
   mockInvoices, mockMessages, mockChatThreads, mockMeasurements,
-  mockTimelineEvents, mockCommissions, mockContracts, mockNotifications, mockUsers,
+  mockTimelineEvents, mockCommissions, mockContracts, mockEstimations, mockNotifications, mockUsers,
 } from "@/lib/portal-data"
 
 // ── Utility ────────────────────────────────────────
@@ -36,6 +36,12 @@ interface PortalStore {
   contracts: Contract[]
   createContract: (data: Omit<Contract, "id" | "createdAt">) => Contract
   updateContract: (id: string, data: Partial<Contract>) => void
+  estimations: Estimation[]
+  updateEstimation: (id: string, data: Partial<Estimation>) => void
+  // Client document actions
+  markDocumentRead: (type: 'invoice' | 'contract' | 'estimation', id: string) => void
+  respondToDocument: (type: 'invoice' | 'contract' | 'estimation', id: string, response: ClientDocumentResponse, notes?: string) => void
+  signContract: (id: string, signature: string) => void
   notifications: Notification[]
 
   // Lead CRUD
@@ -110,6 +116,28 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
   const updateContract = useCallback((id: string, data: Partial<Contract>) => {
     setContracts(prev => prev.map(c => c.id === id ? { ...c, ...data } : c))
   }, [])
+  const [estimations, setEstimations] = useState<Estimation[]>(() => isDev ? [...mockEstimations] : [])
+  const updateEstimation = useCallback((id: string, data: Partial<Estimation>) => {
+    setEstimations(prev => prev.map(e => e.id === id ? { ...e, ...data } : e))
+  }, [])
+
+  // Client document actions
+  const markDocumentRead = useCallback((type: 'invoice' | 'contract' | 'estimation', id: string) => {
+    if (type === 'invoice') setInvoices(prev => prev.map(d => d.id === id ? { ...d, readByClient: true } : d))
+    else if (type === 'contract') setContracts(prev => prev.map(d => d.id === id ? { ...d, readByClient: true } : d))
+    else setEstimations(prev => prev.map(d => d.id === id ? { ...d, readByClient: true } : d))
+  }, [])
+
+  const respondToDocument = useCallback((type: 'invoice' | 'contract' | 'estimation', id: string, response: ClientDocumentResponse, notes?: string) => {
+    if (type === 'invoice') setInvoices(prev => prev.map(d => d.id === id ? { ...d, clientResponse: response } : d))
+    else if (type === 'contract') setContracts(prev => prev.map(d => d.id === id ? { ...d, clientResponse: response, clientNotes: notes } : d))
+    else setEstimations(prev => prev.map(d => d.id === id ? { ...d, clientResponse: response, clientNotes: notes, status: response === 'accepted' ? 'accepted' as const : response === 'rejected' ? 'rejected' as const : response === 'revision_requested' ? 'revision_requested' as const : d.status } : d))
+  }, [])
+
+  const signContract = useCallback((id: string, signature: string) => {
+    setContracts(prev => prev.map(c => c.id === id ? { ...c, clientSignature: signature, clientSignedDate: today(), status: 'signed' as const, signedDate: today(), clientResponse: 'accepted' as const } : c))
+  }, [])
+
   const [notifications, setNotifications] = useState<Notification[]>(() => isDev ? [...mockNotifications] : [])
 
   // ── Helpers ──
@@ -282,6 +310,8 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
     createAppointment, updateAppointment, cancelAppointment, completeAppointment,
     updateOrderStatus, sendMessage, createInvoice, markInvoicePaid, sendInvoice, voidInvoice, updateInvoice,
     contracts, createContract, updateContract,
+    estimations, updateEstimation,
+    markDocumentRead, respondToDocument, signContract,
     addMeasurement, addTimelineEvent, markNotificationRead, addNotification,
   }
 

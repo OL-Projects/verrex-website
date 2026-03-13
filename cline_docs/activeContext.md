@@ -1,5 +1,39 @@
 # Active Context
 
+## Latest: Client Portal Financial Documents Overhaul (March 13, 2026)
+
+### What Was Done
+Added **Contracts** and **Estimations** client inbox pages alongside existing **Invoices**, creating a complete "Financial Documents" section in the portal sidebar. All three pages now:
+- Show **badge counts** on the sidebar for unread/pending documents (client role only)
+- Display a **client inbox view** (read-only reception) when the user has `role: client`
+- Display the **admin management view** (full CRUD) when the user has `role: admin`
+- Support **document signing** (contracts via SignaturePad component)
+- Support **revision requests** (contracts + estimations via RevisionRequestModal)
+- Support **acknowledge** action (invoices + estimations)
+- Track **read/unread** status with blue dot indicators
+
+### Files Created
+- `src/app/[locale]/portal/dashboard/contracts/` — Full contracts management page + client inbox
+- `src/app/[locale]/portal/dashboard/estimates/client-estimations-inbox.tsx` — Client estimation inbox  
+- `src/app/[locale]/portal/dashboard/invoices/client-invoices-inbox.tsx` — Client invoice inbox
+- `src/components/portal/signature-pad.tsx` — Reusable signature capture component
+- `src/components/portal/revision-request-modal.tsx` — Reusable revision request modal
+
+### Files Modified
+- `src/types/portal.ts` — Added Contract, Estimation types + readByClient/clientResponse fields on Invoice
+- `src/lib/portal-store.tsx` — Added contracts[], estimations[] stores + actions (sign, respond, markRead)
+- `src/components/portal/sidebar.tsx` — Added badge counts for financial docs (client role)
+- `src/app/[locale]/portal/dashboard/invoices/page.tsx` — Role-based view split
+- `src/app/[locale]/portal/dashboard/estimates/page.tsx` — Role-based view split
+
+### Architecture Pattern
+- Admin sees full management tools (create, edit, send, void)
+- Client sees inbox-style read-only view with action buttons (sign, acknowledge, request revision)
+- Role detection: `useSession()` → `session.user.role` → conditional render
+- All hooks called before early return (React Rules of Hooks compliant)
+
+## Previous Context
+
 ## Latest Session — Mar 11, 2026 (Evening)
 
 ### Completed: IT Operations Center (Support → IT Portal Page)

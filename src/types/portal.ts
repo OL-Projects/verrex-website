@@ -259,6 +259,8 @@ export interface ChatThread {
   unreadCount: number;
 }
 
+export type ClientDocumentResponse = 'pending' | 'acknowledged' | 'accepted' | 'rejected' | 'revision_requested';
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -283,6 +285,8 @@ export interface Invoice {
   paidDate?: string;
   paidMethod?: string;
   sentDate?: string;
+  readByClient?: boolean;
+  clientResponse?: ClientDocumentResponse;
   createdAt: string;
 }
 
@@ -297,6 +301,7 @@ export interface Contract {
   id: string;
   contractNumber: string;
   projectId: string;
+  clientId?: string;
   clientName: string;
   clientAddress: string;
   clientCity: string;
@@ -310,6 +315,11 @@ export interface Contract {
   status: 'draft' | 'sent' | 'signed' | 'active' | 'completed' | 'void';
   signedDate?: string;
   notes: string;
+  readByClient?: boolean;
+  clientResponse?: ClientDocumentResponse;
+  clientSignature?: string;
+  clientSignedDate?: string;
+  clientNotes?: string;
   createdAt: string;
 }
 
@@ -325,6 +335,48 @@ export interface ContractPayment {
   amount: number;
   dueDate: string;
   status: 'pending' | 'paid';
+}
+
+// --- Estimation (Client-facing estimate summary) ---
+
+export interface Estimation {
+  id: string;
+  estimateNumber: string;
+  projectId: string;
+  clientId: string;
+  clientName: string;
+  clientAddress: string;
+  clientCity: string;
+  items: EstimationItem[];
+  subtotal: number;
+  taxGST: number;
+  taxQST: number;
+  tax: number;
+  total: number;
+  installationCost: number;
+  deliveryCost: number;
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'revision_requested' | 'void';
+  validUntil: string;
+  sentDate?: string;
+  notes: string;
+  readByClient?: boolean;
+  clientResponse?: ClientDocumentResponse;
+  clientNotes?: string;
+  createdAt: string;
+}
+
+export interface EstimationItem {
+  id: string;
+  room: string;
+  description: string;
+  windowType: WindowType;
+  width: number;
+  height: number;
+  color: string;
+  glassType: GlassType;
+  quantity: number;
+  unitPrice: number;
+  total: number;
 }
 
 export interface Commission {
@@ -451,8 +503,8 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Projects', href: '/portal/dashboard/projects', icon: 'FolderKanban', roles: ['admin', 'client', 'contractor', 'inspector'] },
   { label: 'Appointments', href: '/portal/dashboard/appointments', icon: 'CalendarDays', roles: ['admin', 'client', 'contractor', 'inspector'] },
   { label: 'Measurements', href: '/portal/dashboard/measurements', icon: 'Ruler', roles: ['admin', 'contractor', 'inspector'] },
-  { label: 'Estimates', href: '/portal/dashboard/estimates', icon: 'FileText', roles: ['admin'] },
-  { label: 'Contracts', href: '/portal/dashboard/contracts', icon: 'ClipboardSignature', roles: ['admin'] },
+  { label: 'Estimates', href: '/portal/dashboard/estimates', icon: 'FileText', roles: ['admin', 'client'] },
+  { label: 'Contracts', href: '/portal/dashboard/contracts', icon: 'ClipboardSignature', roles: ['admin', 'client'] },
   { label: 'Orders', href: '/portal/dashboard/orders', icon: 'Package', roles: ['admin', 'supplier'] },
   { label: 'Messages', href: '/portal/dashboard/messages', icon: 'MessageSquare', roles: ['admin', 'client', 'contractor'] },
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
