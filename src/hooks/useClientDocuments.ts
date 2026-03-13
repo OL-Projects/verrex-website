@@ -25,8 +25,10 @@ export interface ClientDocument {
 export function useClientDocuments(type?: string) {
   const [docs, setDocs] = useState<ClientDocument[]>([])
   const [loading, setLoading] = useState(true)
+  const isBrowser = typeof window !== "undefined"
 
   const fetchDocs = useCallback(async () => {
+    if (!isBrowser) return // SSR guard
     try {
       const params = new URLSearchParams()
       if (type) params.set("type", type)
@@ -40,14 +42,14 @@ export function useClientDocuments(type?: string) {
     } finally {
       setLoading(false)
     }
-  }, [type])
+  }, [type, isBrowser])
 
   useEffect(() => {
+    if (!isBrowser) return // SSR guard
     fetchDocs()
-    // Poll every 15 seconds for new documents
     const interval = setInterval(fetchDocs, 15000)
     return () => clearInterval(interval)
-  }, [fetchDocs])
+  }, [fetchDocs, isBrowser])
 
   const markAsRead = useCallback(async (docId: string) => {
     try {
@@ -76,6 +78,7 @@ export function useDocumentBadges() {
   const [badges, setBadges] = useState({ invoices: 0, contracts: 0, estimates: 0 })
 
   useEffect(() => {
+    if (typeof window === "undefined") return // SSR guard
     let active = true
     const fetchBadges = async () => {
       try {
