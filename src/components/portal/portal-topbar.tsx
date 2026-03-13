@@ -1,6 +1,7 @@
 "use client"
 
 import { useSession, signOut } from "next-auth/react"
+import { useProfilePhoto } from "@/lib/use-profile-photo"
 import { motion } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageSwitcher } from "@/components/layout/language-switcher"
@@ -22,6 +23,7 @@ interface PortalTopbarProps {
 
 export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
   const { data: session } = useSession()
+  const profilePhoto = useProfilePhoto(session?.user?.id || "")
   const T = usePortalT()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -115,9 +117,13 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center gap-2 h-9 pl-2 pr-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
           >
-            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-              {session?.user?.name?.charAt(0) || "?"}
-            </div>
+            {profilePhoto ? (
+              <img src={profilePhoto} alt={session?.user?.name || "User"} className="h-7 w-7 rounded-full object-cover ring-1 ring-white/20" />
+            ) : (
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                {session?.user?.name?.charAt(0) || "?"}
+              </div>
+            )}
             <div className="hidden sm:block text-left">
               <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight truncate max-w-32">
                 {session?.user?.name || "User"}

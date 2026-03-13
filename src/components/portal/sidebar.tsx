@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { SIDEBAR_NAV } from "@/types/portal"
 import type { UserRole } from "@/types/portal"
+import { useProfilePhoto } from "@/lib/use-profile-photo"
 import {
   LayoutDashboard, UserPlus, FolderKanban, CalendarDays,
   Ruler, Package, MessageSquare, Receipt, BadgeDollarSign,
@@ -95,6 +96,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   }, [])
   const userRole = (session?.user?.role || "client") as UserRole
   const userName = session?.user?.name || "User"
+  const profilePhoto = useProfilePhoto(session?.user?.id || "")
   const userEmail = session?.user?.email || ""
 
   const filteredNav = SIDEBAR_NAV.filter((item) =>
@@ -174,9 +176,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {!collapsed ? (
         <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
-              {userName.charAt(0)}
-            </div>
+            {profilePhoto ? (
+              <img src={profilePhoto} alt={userName} className="h-9 w-9 rounded-xl object-cover shadow-sm shrink-0 ring-1 ring-white/20" />
+            ) : (
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
+                {userName.charAt(0)}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-slate-900 dark:text-white truncate leading-tight">{userName}</p>
               <span className={`inline-flex items-center gap-1 mt-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md border ${roleColors[userRole]}`}>
@@ -188,9 +194,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         </div>
       ) : (
         <div className="px-3 py-3 border-b border-slate-100 dark:border-white/5 flex justify-center">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-            {userName.charAt(0)}
-          </div>
+          {profilePhoto ? (
+            <img src={profilePhoto} alt={userName} className="h-9 w-9 rounded-xl object-cover shadow-sm ring-1 ring-white/20" />
+          ) : (
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
+              {userName.charAt(0)}
+            </div>
+          )}
         </div>
       )}
 
