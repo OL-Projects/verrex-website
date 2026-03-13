@@ -8,7 +8,7 @@ import {
   DollarSign, FolderKanban, Paperclip, X, ChevronDown,
   ArrowUpDown, Calendar, Download, ExternalLink,
   AlertCircle, TrendingUp, Trophy, CreditCard, Banknote,
-  ListTodo, CircleDot, Trash2,
+  ListTodo, CircleDot, Trash2, Pencil,
 } from "lucide-react"
 import { type Annotation, ActivityBullets } from "./ClientAnnotationRail"
 
@@ -205,7 +205,7 @@ export default function ActivityTimeline({
                       {/* Card row + "at" bullet (center-aligned) */}
                       <div className="flex items-center gap-4 mb-1">
                         <div className="flex-1 min-w-0">
-                          <ActivityCard activity={activity} onLightbox={setLightboxUrl} />
+                          <ActivityCard activity={activity} onLightbox={setLightboxUrl} projectId={projectId} currentUserId={currentUserId} isAdmin={isAdmin} onRefresh={onRefresh} />
                         </div>
                         {showAnnotationRail && (
                           <div className="w-64 shrink-0 hidden lg:block">
@@ -695,19 +695,42 @@ function EntryForm({ type, projectId, onCancel, onPosted, openIssues }: {
 }
 
 // ─── Activity Card (enhanced per-type rendering) ────────
-function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox: (url: string) => void }) {
+function ActivityCard({ activity, onLightbox, projectId, currentUserId, isAdmin, onRefresh }: {
+  activity: Activity; onLightbox: (url: string) => void
+  projectId: string; currentUserId: string; isAdmin: boolean; onRefresh: () => void
+}) {
+  const [deleting, setDeleting] = useState(false)
   const cfg = ACTIVITY_ICONS[activity.type] || ACTIVITY_ICONS.note
   const Icon = cfg.icon
   const urls: string[] = activity.attachmentUrls ? JSON.parse(activity.attachmentUrls) : []
   const meta: Record<string, unknown> = activity.metadata ? JSON.parse(activity.metadata) : {}
   const time = new Date(activity.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  const canModify = activity.authorId === currentUserId || isAdmin
+
+  const handleDelete = async () => {
+    if (!confirm("Delete this entry?")) return
+    setDeleting(true)
+    await fetch(`/api/admin/projects/${projectId}/activity?activityId=${activity.id}`, { method: "DELETE" })
+    setDeleting(false)
+    onRefresh()
+  }
+
+  // Shared action buttons (edit + delete) rendered on every card
+  const ActionButtons = () => canModify ? (
+    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <button onClick={handleDelete} disabled={deleting} title="Delete entry"
+        className="p-1 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  ) : null
 
   // ─── Issue Card ───
   if (activity.type === "issue") {
     const sev = (meta.severity as string) || "medium"
     const sevCfg = SEVERITY_OPTIONS.find(s => s.value === sev) || SEVERITY_OPTIONS[1]
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 rounded-xl bg-red-50/80 dark:bg-red-500/5 border border-red-200/60 dark:border-red-500/15 overflow-hidden">
           <div className="px-4 py-2 bg-red-100/50 dark:bg-red-500/10 border-b border-red-200/40 dark:border-red-500/10 flex items-center justify-between">
@@ -716,7 +739,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
               <span className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase">Issue Report</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${sevCfg.cls}`}>{sevCfg.label}</span>
             </div>
-            <span className="text-[10px] text-red-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-red-400">{time}</span></div>
           </div>
           <div className="px-4 py-3">
             {activity.content && <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{activity.content}</p>}
@@ -731,7 +754,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   // ─── Resolved Card ───
   if (activity.type === "resolved") {
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 rounded-xl bg-emerald-50/80 dark:bg-emerald-500/5 border border-emerald-200/60 dark:border-emerald-500/15 overflow-hidden">
           <div className="px-4 py-2 bg-emerald-100/50 dark:bg-emerald-500/10 border-b border-emerald-200/40 dark:border-emerald-500/10 flex items-center justify-between">
@@ -739,7 +762,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
               <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase">Issue Resolved</span>
             </div>
-            <span className="text-[10px] text-emerald-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-emerald-400">{time}</span></div>
           </div>
           <div className="px-4 py-3">
             {activity.content && <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{activity.content}</p>}
@@ -753,12 +776,12 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   // ─── Photo Card ───
   if (activity.type === "photo") {
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-medium text-purple-500 uppercase tracking-wide">Photos</span>
-            <span className="text-[10px] text-slate-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-slate-400">{time}</span></div>
           </div>
           {urls.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-2">
@@ -780,12 +803,12 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   // ─── Document Card ───
   if (activity.type === "document" || activity.type === "file_uploaded") {
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-medium text-indigo-500 uppercase tracking-wide">Document</span>
-            <span className="text-[10px] text-slate-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-slate-400">{time}</span></div>
           </div>
           {urls.length > 0 && (
             <div className="space-y-2 mb-2">
@@ -813,12 +836,12 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   if (activity.type === "progress") {
     const pv = (meta.progressValue as number) || 0
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 p-4 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-medium text-cyan-500 uppercase tracking-wide">Progress Update</span>
-            <span className="text-[10px] text-slate-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-slate-400">{time}</span></div>
           </div>
           <div className="flex items-center gap-3 mb-2">
             <div className="flex-1 h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -837,7 +860,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   if (activity.type === "milestone") {
     const mTitle = (meta.milestoneTitle as string) || ""
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50/50 dark:from-yellow-500/5 dark:to-amber-500/5 border border-yellow-200/60 dark:border-yellow-500/15 overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-3">
@@ -849,7 +872,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
           </div>
           <div className="px-4 pb-2 flex items-center justify-between">
             <p className="text-[10px] text-yellow-500/70">— {activity.author.name}</p>
-            <span className="text-[10px] text-yellow-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-yellow-400">{time}</span></div>
           </div>
         </div>
       </motion.div>
@@ -862,7 +885,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
     const ft = (meta.financialType as string) || "payment"
     const ftCfg = FINANCIAL_TYPES.find(f => f.value === ft)
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 rounded-xl bg-green-50/80 dark:bg-green-500/5 border border-green-200/60 dark:border-green-500/15 overflow-hidden">
           <div className="px-4 py-2 bg-green-100/50 dark:bg-green-500/10 border-b border-green-200/40 dark:border-green-500/10 flex items-center justify-between">
@@ -870,7 +893,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
               <DollarSign className="h-3.5 w-3.5 text-green-500" />
               <span className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase">{ftCfg?.label || ft}</span>
             </div>
-            <span className="text-[10px] text-green-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-green-400">{time}</span></div>
           </div>
           <div className="px-4 py-3">
             <p className="text-2xl font-bold text-green-700 dark:text-green-400">${amt.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
@@ -886,7 +909,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
   if (activity.type === "task_list") {
     const items = (meta.taskItems as string[]) || []
     return (
-      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
         <div className="flex-1 rounded-xl bg-orange-50/80 dark:bg-orange-500/5 border border-orange-200/60 dark:border-orange-500/15 overflow-hidden">
           <div className="px-4 py-2 bg-orange-100/50 dark:bg-orange-500/10 border-b border-orange-200/40 dark:border-orange-500/10 flex items-center justify-between">
@@ -894,7 +917,7 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
               <ListTodo className="h-3.5 w-3.5 text-orange-500" />
               <span className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase">Tasks ({items.length})</span>
             </div>
-            <span className="text-[10px] text-orange-400">{time}</span>
+            <div className="flex items-center gap-2"><ActionButtons /><span className="text-[10px] text-orange-400">{time}</span></div>
           </div>
           <div className="px-4 py-3 space-y-1.5">
             {items.map((item, i) => (
@@ -913,12 +936,15 @@ function ActivityCard({ activity, onLightbox }: { activity: Activity; onLightbox
 
   // ─── Default Card (note, status_change, task_completed, etc.) ───
   return (
-    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3">
+    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group">
       <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.color}`}><Icon className="h-4 w-4" /></div>
       <div className="flex-1 p-3 rounded-xl bg-white/60 dark:bg-white/5 border border-slate-200/40 dark:border-white/5">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">{activity.type.replace(/_/g, " ")}</span>
-          <span className="text-[10px] text-slate-400">{time}</span>
+          <div className="flex items-center gap-2">
+            <ActionButtons />
+            <span className="text-[10px] text-slate-400">{time}</span>
+          </div>
         </div>
         {activity.content && <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{activity.content}</p>}
         {urls.length > 0 && <PhotoRow urls={urls} onLightbox={onLightbox} />}

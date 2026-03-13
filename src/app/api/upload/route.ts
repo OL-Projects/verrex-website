@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
-import { requireAdmin, unauthorized } from "@/lib/rbac"
+import { requireAuth, unauthorized } from "@/lib/rbac"
 import { getSupabaseServer, STORAGE_BUCKET, getPublicUrl } from "@/lib/supabase"
 
 export async function POST(request: Request) {
-  const session = await requireAdmin()
+  const session = await requireAuth()
   if (!session) return unauthorized()
 
   try {

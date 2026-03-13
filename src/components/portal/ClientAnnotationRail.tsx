@@ -94,7 +94,7 @@ export function ActivityBullets({
         const isActive = activeForm?.activityId === activityId && activeForm?.position === pos
 
         return (
-          <div key={pos} className="relative flex items-start gap-2">
+          <div key={pos} className="relative flex items-center gap-2">
             {/* Bullet dot */}
             <button
               onClick={() => {
