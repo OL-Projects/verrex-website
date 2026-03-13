@@ -26,7 +26,7 @@ export async function GET(req: Request) {
   const docs = await prisma.document.findMany({
     where,
     include: {
-      sender: { select: { id: true, name: true, role: true } },
+      sender: { select: { id: true, name: true, role: true, image: true } },
       recipient: { select: { id: true, name: true, role: true, company: true } },
       project: { select: { id: true, title: true } },
     },

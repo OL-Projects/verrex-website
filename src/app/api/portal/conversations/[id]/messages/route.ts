@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       ...(before ? { createdAt: { lt: new Date(before) } } : {}),
     },
     include: {
-      sender: { select: { id: true, name: true, role: true } },
+      sender: { select: { id: true, name: true, role: true, image: true } },
       reactions: { include: { user: { select: { id: true, name: true } } }, orderBy: { createdAt: "asc" } },
     },
     orderBy: { createdAt: "desc" },
@@ -76,7 +76,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       senderId: userId,
       ...(replyToId ? { replyToId } : {}),
     },
-    include: { sender: { select: { id: true, name: true, role: true } } },
+    include: { sender: { select: { id: true, name: true, role: true, image: true } } },
   })
 
   // Update conversation timestamp + sender's read marker
@@ -114,7 +114,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const updated = await prisma.message.update({
     where: { id: messageId },
     data: { content: content.trim(), editedAt: new Date() },
-    include: { sender: { select: { id: true, name: true, role: true } } },
+    include: { sender: { select: { id: true, name: true, role: true, image: true } } },
   })
 
   return NextResponse.json(updated)

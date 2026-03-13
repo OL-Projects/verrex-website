@@ -20,6 +20,7 @@ model User {
   city           String?
   postalCode     String?
   notes          String?
+  image          String?         // profile photo URL or base64
   isDemo         Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt

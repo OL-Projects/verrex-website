@@ -12,12 +12,12 @@ export async function GET() {
     where: { participants: { some: { userId } } },
     include: {
       participants: {
-        include: { user: { select: { id: true, name: true, role: true, company: true } } },
+        include: { user: { select: { id: true, name: true, role: true, company: true, image: true } } },
       },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
-        include: { sender: { select: { id: true, name: true } } },
+        include: { sender: { select: { id: true, name: true, image: true } } },
       },
       project: { select: { id: true, title: true } },
     },

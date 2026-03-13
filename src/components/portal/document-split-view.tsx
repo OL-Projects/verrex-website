@@ -89,8 +89,9 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
   // Status filter tabs
   const statuses = ["all", ...new Set(documents.map(d => d.status))]
 
-  // File type detection
-  const isRealFile = selected?.fileUrl && !selected.fileUrl.startsWith("/api/portal/")
+  // File type detection — any non-empty fileUrl is a valid file
+  const hasFile = !!selected?.fileUrl && selected.fileUrl.trim().length > 0
+  const isRealFile = hasFile
   const isPdf = selected?.fileUrl?.toLowerCase().endsWith(".pdf")
   const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(selected?.fileUrl || "")
 

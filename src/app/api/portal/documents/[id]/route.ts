@@ -56,7 +56,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const doc = await prisma.document.findUnique({
     where: { id },
     include: {
-      sender: { select: { id: true, name: true, role: true } },
+      sender: { select: { id: true, name: true, role: true, image: true } },
       recipient: { select: { id: true, name: true, role: true, company: true } },
       project: { select: { id: true, title: true } },
     },

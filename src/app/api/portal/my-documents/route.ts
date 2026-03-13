@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       ...(projectId ? { projectId } : {}),
     },
     include: {
-      sender: { select: { id: true, name: true } },
+      sender: { select: { id: true, name: true, image: true } },
       project: { select: { id: true, title: true } },
     },
     orderBy: { createdAt: "desc" },

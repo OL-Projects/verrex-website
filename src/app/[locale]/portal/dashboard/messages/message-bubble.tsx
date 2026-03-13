@@ -43,6 +43,10 @@ export default function MessageBubble({ msg, isMine, userId, isGroup, showSender
   const files = attachments.filter(a => a.type !== "image")
   const isDeleted = !!msg.deletedAt
   const senderColor = ROLE_BUBBLE_COLORS[msg.sender.role] || "text-slate-600"
+  // Avatar helper
+  const senderAvatar = msg.sender.image
+  const senderInitial = msg.sender.name?.charAt(0)?.toUpperCase() || "?"
+
   const hasOnlyImages = images.length > 0 && !msg.content && files.length === 0
 
   const handleCopy = () => {

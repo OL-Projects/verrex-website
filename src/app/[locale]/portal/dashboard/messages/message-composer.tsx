@@ -215,17 +215,17 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
           onChange={e => { if (e.target.files) handleFiles(e.target.files); e.target.value = "" }} />
 
         {/* Text input + expand */}
-        <div className={`flex-1 relative ${expanded ? "flex-1 flex flex-col" : ""}`}>
+        <div className={`flex-1 relative ${expanded ? "flex flex-col min-h-0" : ""}`}>
           <textarea ref={textRef} value={draft}
             onChange={e => { setDraft(e.target.value); adjustHeight() }}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
-            placeholder="Type a message… (Enter for new line)"
+            placeholder="Type a message…"
             rows={1}
             className={`w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/40 min-h-[42px] transition-all ${
-              expanded ? "flex-1 max-h-none" : "max-h-[140px]"
+              expanded ? "!h-full flex-1 max-h-none" : "max-h-[140px]"
             }`}
-            style={expanded ? {} : { height: "42px" }}
+            style={expanded ? { height: "100%" } : { height: "42px" }}
           />
           {/* Expand/Collapse button */}
           {(showExpandBtn || expanded) && (

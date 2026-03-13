@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
 // ─── Types ──────────────────────────────────────────────
-export interface Participant { id: string; name: string; role: string; company: string | null }
+export interface Participant { id: string; name: string; role: string; company: string | null; image?: string | null }
 export interface ConvoLastMsg { id: string; content: string; senderId: string; senderName: string; createdAt: string; attachmentUrls?: string | null }
 export interface Conversation {
   id: string; type: "direct" | "group"; name: string | null
@@ -18,7 +18,7 @@ export interface MessageReaction {
 
 export interface ChatMessage {
   id: string; content: string; attachmentUrls: string | null
-  senderId: string; sender: { id: string; name: string; role: string }
+  senderId: string; sender: { id: string; name: string; role: string; image?: string | null }
   createdAt: string
   editedAt?: string | null
   deletedAt?: string | null
@@ -26,7 +26,7 @@ export interface ChatMessage {
   replyTo?: { id: string; content: string; sender: { name: string } } | null
   reactions?: MessageReaction[]
 }
-export interface PortalUser { id: string; name: string; email: string; role: string; company: string | null }
+export interface PortalUser { id: string; name: string; email: string; role: string; company: string | null; image?: string | null }
 
 export const ROLE_COLORS: Record<string, string> = {
   admin: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
