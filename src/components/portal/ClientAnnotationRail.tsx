@@ -73,6 +73,7 @@ export default function ClientAnnotationRail({ activityIds, annotations, project
 // ─── Bullet Group for One Activity Card (exported for inline use) ──
 export function ActivityBullets({
   activityId, annotationMap, projectId, currentUserId, activeForm, setActiveForm, onAnnotationAdded,
+  positions: positionsOverride,
 }: {
   activityId: string
   annotationMap: Map<string, Annotation[]>
@@ -81,11 +82,12 @@ export function ActivityBullets({
   activeForm: { activityId: string; position: BulletPosition } | null
   setActiveForm: (v: { activityId: string; position: BulletPosition } | null) => void
   onAnnotationAdded: () => void
+  positions?: BulletPosition[]
 }) {
-  const positions: BulletPosition[] = ["before", "at", "after"]
+  const positions: BulletPosition[] = positionsOverride || ["before", "at", "after"]
 
   return (
-    <div className="flex flex-col justify-between h-full py-1">
+    <div className={`flex flex-col ${positions.length === 1 ? "items-start" : "justify-between h-full"} py-1`}>
       {positions.map(pos => {
         const key = `${activityId}:${pos}`
         const existing = annotationMap.get(key) || []
@@ -159,14 +161,14 @@ function AnnotationCard({ annotation, projectId, currentUserId, onDeleted }: {
   }
 
   return (
-    <div className="mb-1.5 p-2.5 rounded-xl bg-white/70 dark:bg-white/5 border border-emerald-200/50 dark:border-emerald-500/10 backdrop-blur-sm group">
-      <div className="flex items-start gap-2">
-        <div className={`h-5 w-5 rounded-md flex items-center justify-center shrink-0 ${typeCfg.color}`}>
-          <TypeIcon className="h-3 w-3" />
+    <div className="mb-2 p-3.5 rounded-xl bg-white/80 dark:bg-white/5 border border-emerald-200/50 dark:border-emerald-500/10 backdrop-blur-sm group shadow-sm">
+      <div className="flex items-start gap-2.5">
+        <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 ${typeCfg.color}`}>
+          <TypeIcon className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
           {annotation.content && (
-            <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{annotation.content}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{annotation.content}</p>
           )}
           {urls.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -252,23 +254,23 @@ function AnnotationForm({ activityId, position, projectId, onCancel, onPosted }:
 
       {step === "pick" ? (
         /* Step 1: Pick type */
-        <div className="p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
               {position === "before" ? "↑ Before" : position === "at" ? "→ About" : "↓ After"} this entry
             </span>
-            <button onClick={onCancel} className="text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>
+            <button onClick={onCancel} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
           </div>
-          <div className="flex gap-1.5">
+          <div className="grid grid-cols-3 gap-2">
             {TYPE_OPTIONS.map(opt => {
               const OptIcon = opt.icon
               return (
                 <button key={opt.type} onClick={() => { setType(opt.type); setStep("fill") }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all">
-                  <div className={`h-7 w-7 rounded-lg flex items-center justify-center ${opt.color}`}>
-                    <OptIcon className="h-3.5 w-3.5" />
+                  className="flex flex-col items-center gap-2 px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-white/3 hover:bg-white dark:hover:bg-white/5 hover:border-teal-300 dark:hover:border-teal-500/30 hover:shadow-md transition-all">
+                  <div className={`h-9 w-9 rounded-xl flex items-center justify-center ${opt.color}`}>
+                    <OptIcon className="h-4.5 w-4.5" />
                   </div>
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{opt.label}</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{opt.label}</span>
                 </button>
               )
             })}

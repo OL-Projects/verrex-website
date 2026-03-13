@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback, DragEvent } from "react"
+import { useState, useRef, useCallback, DragEvent, Fragment } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Clock, CheckCircle2, AlertTriangle, Plus, Send, Upload,
@@ -176,30 +176,56 @@ export default function ActivityTimeline({
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{group.date}</span>
               </div>
 
-              {/* Activity cards — with inline annotation bullets on the right */}
-              <div className="space-y-3 ml-5 pl-8">
-                {group.entries.map(activity => (
-                  <div key={activity.id} className="flex items-stretch gap-4">
-                    {/* Left: Activity Card */}
-                    <div className="flex-1 min-w-0">
-                      <ActivityCard activity={activity} onLightbox={setLightboxUrl} />
-                    </div>
-                    {/* Right: 3 Annotation bullets aligned to card height (before=top, at=center, after=bottom) */}
-                    {showAnnotationRail && (
-                      <div className="w-56 shrink-0 hidden lg:flex flex-col justify-between">
-                        <ActivityBullets
-                          activityId={activity.id}
-                          annotationMap={annotationMap}
-                          projectId={projectId}
-                          currentUserId={currentUserId}
-                          activeForm={activeForm}
-                          setActiveForm={setActiveForm}
-                          onAnnotationAdded={onAnnotationAdded || (() => {})}
-                        />
+              {/* Activity cards — with interleaved annotation bullets (no duplicate before/after) */}
+              <div className="ml-5 pl-8">
+                {group.entries.map((activity, idx) => {
+                  const isFirst = idx === 0
+                  const isLast = idx === group.entries.length - 1
+                  const bulletProps = {
+                    annotationMap,
+                    projectId,
+                    currentUserId,
+                    activeForm,
+                    setActiveForm,
+                    onAnnotationAdded: onAnnotationAdded || (() => {}),
+                  }
+
+                  return (
+                    <Fragment key={activity.id}>
+                      {/* "Before" bullet — only before the first card */}
+                      {isFirst && showAnnotationRail && (
+                        <div className="flex items-center gap-4 mb-1">
+                          <div className="flex-1" />
+                          <div className="w-64 shrink-0 hidden lg:block">
+                            <ActivityBullets activityId={activity.id} positions={["before"]} {...bulletProps} />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Card row + "at" bullet (center-aligned) */}
+                      <div className="flex items-center gap-4 mb-1">
+                        <div className="flex-1 min-w-0">
+                          <ActivityCard activity={activity} onLightbox={setLightboxUrl} />
+                        </div>
+                        {showAnnotationRail && (
+                          <div className="w-64 shrink-0 hidden lg:block">
+                            <ActivityBullets activityId={activity.id} positions={["at"]} {...bulletProps} />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* "After" gap bullet — between cards or after last card */}
+                      {showAnnotationRail && (
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="flex-1" />
+                          <div className="w-64 shrink-0 hidden lg:block">
+                            <ActivityBullets activityId={activity.id} positions={["after"]} {...bulletProps} />
+                          </div>
+                        </div>
+                      )}
+                    </Fragment>
+                  )
+                })}
               </div>
             </div>
           ))}
