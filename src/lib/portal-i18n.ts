@@ -23,7 +23,7 @@ export interface PortalT {
   nav: {
     dashboard: string; leads: string; projects: string; appointments: string
     measurements: string; estimates: string; contracts: string; orders: string
-    messages: string; invoices: string; commissions: string; analytics: string
+    messages: string; invoices: string; commissions: string; allDocuments: string; analytics: string
     timeline: string; aiSettings: string; it: string; settings: string; signOut: string
     // Groups
     overview: string; crm: string; operations: string; communication: string
@@ -147,7 +147,7 @@ const en: PortalT = {
   nav: {
     dashboard: "Dashboard", leads: "Leads", projects: "Projects", appointments: "Appointments",
     measurements: "Measurements", estimates: "Estimates", contracts: "Contracts", orders: "Orders",
-    messages: "Messages", invoices: "Invoices", commissions: "Commissions", analytics: "Analytics",
+    messages: "Messages", invoices: "Invoices", commissions: "Commissions", allDocuments: "All Documents", analytics: "Analytics",
     timeline: "Timeline", aiSettings: "AI Settings", it: "IT", settings: "Settings", signOut: "Sign Out",
     overview: "Overview", crm: "CRM", operations: "Operations", communication: "Communication",
     financialDocs: "Financial Documents", insights: "Insights", support: "Support",
@@ -294,7 +294,7 @@ const fr: PortalT = {
   nav: {
     dashboard: "Tableau de bord", leads: "Prospects", projects: "Projets", appointments: "Rendez-vous",
     measurements: "Mesures", estimates: "Soumissions", contracts: "Contrats", orders: "Commandes",
-    messages: "Messages", invoices: "Factures", commissions: "Commissions", analytics: "Analytiques",
+    messages: "Messages", invoices: "Factures", commissions: "Commissions", allDocuments: "Tous les documents", analytics: "Analytiques",
     timeline: "Chronologie", aiSettings: "Paramètres IA", it: "TI", settings: "Paramètres", signOut: "Déconnexion",
     overview: "Aperçu", crm: "CRM", operations: "Opérations", communication: "Communication",
     financialDocs: "Documents financiers", insights: "Perspectives", support: "Soutien",

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react"
 import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
 import { usePortalStore } from "@/lib/portal-store"
+import { SendDocumentModal } from "@/components/portal/send-document-modal"
 import {
   Receipt, Clock, CheckCircle2, AlertTriangle, FileText,
   Send, Ban, Eye, Plus, Filter, Pencil, Copy, ArrowLeft,
@@ -60,6 +61,12 @@ export default function InvoicesPage() {
   const handleDuplicate = (inv: Invoice) => {
     const invNum = `INV-VEREX-${new Date().getFullYear()}-${String(store.invoices.length + 1).padStart(4, "0")}`
     store.createInvoice({ ...inv, invoiceNumber: invNum, status: "draft", issueDate: new Date().toISOString().split("T")[0], dueDate: "", sentDate: undefined, paidDate: undefined, paidMethod: undefined })
+  }
+
+  // Send-to-contact modal state
+  const [sendModal, setSendModal] = useState<{ open: boolean; docs: { type: string; title: string; fileUrl: string }[] }>({ open: false, docs: [] })
+  const openSendTo = (inv: Invoice) => {
+    setSendModal({ open: true, docs: [{ type: "invoice", title: `${inv.invoiceNumber} — ${inv.clientName}`, fileUrl: `/api/portal/invoices/${inv.id}/pdf` }] })
   }
 
   const panelOpen = panel.type !== "none"
@@ -158,6 +165,7 @@ export default function InvoicesPage() {
                       <>
                         <button onClick={() => setPanel({ type: "edit", invoice: inv })} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"><Pencil className="h-2.5 w-2.5" />Edit</button>
                         <button onClick={() => store.sendInvoice(inv.id)} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-blue-600 text-white hover:bg-blue-700"><Send className="h-2.5 w-2.5" />Send</button>
+                        <button onClick={() => openSendTo(inv)} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-indigo-600 text-white hover:bg-indigo-700"><Eye className="h-2.5 w-2.5" />Send to…</button>
                       </>
                     )}
                     {(inv.status === "sent" || inv.status === "overdue") && (
@@ -201,6 +209,13 @@ export default function InvoicesPage() {
           </div>
         )}
       </div>
+
+      {/* Send-to-contact modal */}
+      <SendDocumentModal
+        open={sendModal.open}
+        onClose={() => setSendModal({ open: false, docs: [] })}
+        documents={sendModal.docs}
+      />
     </div>
   )
 }

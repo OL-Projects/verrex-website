@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react"
 import { usePortalStore } from "@/lib/portal-store"
-import { Plus, Search, ClipboardSignature, Send, CheckCircle2, Ban, Play, Flag } from "lucide-react"
+import { SendDocumentModal } from "@/components/portal/send-document-modal"
+import { Plus, Search, ClipboardSignature, Send, CheckCircle2, Ban, Play, Flag, Eye } from "lucide-react"
 import type { Contract } from "@/types/portal"
 import ContractDetail from "./contract-detail"
 import ContractForm from "./contract-form"
@@ -64,6 +65,12 @@ export default function ContractsPage() {
     if (!selected) return
     store.updateContract(selected.id, { status: "void" })
     setSelected({ ...selected, status: "void" })
+  }
+
+  // Send-to-contact modal
+  const [sendModal, setSendModal] = useState<{ open: boolean; docs: { type: string; title: string; fileUrl: string }[] }>({ open: false, docs: [] })
+  const openSendTo = (c: Contract) => {
+    setSendModal({ open: true, docs: [{ type: "contract", title: `${c.contractNumber} — ${c.clientName}`, fileUrl: `/api/portal/contracts/${c.id}/pdf` }] })
   }
 
   // Right panel content
@@ -148,6 +155,11 @@ export default function ContractsPage() {
                 <p className="text-[10px] text-slate-400 truncate">{c.clientAddress}</p>
                 <p className="text-[11px] font-bold text-slate-900 dark:text-white font-mono">{fmt(c.totalValue)}</p>
               </div>
+              {c.status === "draft" && (
+                <div className="flex gap-1 mt-2" onClick={e => e.stopPropagation()}>
+                  <button onClick={() => openSendTo(c)} className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-indigo-600 text-white hover:bg-indigo-700"><Eye className="h-2.5 w-2.5" />Send to…</button>
+                </div>
+              )}
             </button>
           ))}
         </div>
@@ -157,6 +169,13 @@ export default function ContractsPage() {
       <div className="hidden lg:flex lg:flex-1 flex-col bg-slate-50 dark:bg-slate-950">
         {rightPanel}
       </div>
+
+      {/* Send-to-contact modal */}
+      <SendDocumentModal
+        open={sendModal.open}
+        onClose={() => setSendModal({ open: false, docs: [] })}
+        documents={sendModal.docs}
+      />
     </div>
   )
 }

@@ -302,6 +302,7 @@ model Document {
   recipient   User      @relation("ReceivedDocuments", fields: [recipientId], references: [id], onDelete: Cascade)
 
   readAt      DateTime? // null = unread (inbox badge)
+  recalledAt  DateTime? // soft-recall (unsend) timestamp; null = active
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

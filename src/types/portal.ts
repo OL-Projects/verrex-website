@@ -509,6 +509,7 @@ export const SIDEBAR_NAV: SidebarItem[] = [
   { label: 'Messages', href: '/portal/dashboard/messages', icon: 'MessageSquare', roles: ['admin', 'client', 'contractor'] },
   { label: 'Invoices', href: '/portal/dashboard/invoices', icon: 'Receipt', roles: ['admin', 'client'] },
   { label: 'Commissions', href: '/portal/dashboard/commissions', icon: 'BadgeDollarSign', roles: ['admin', 'partner'] },
+  { label: 'All Documents', href: '/portal/dashboard/all-documents', icon: 'FileText', roles: ['admin'] },
   { label: 'Analytics', href: '/portal/dashboard/analytics', icon: 'BarChart3', roles: ['admin'] },
   { label: 'Timeline', href: '/portal/dashboard/activity', icon: 'Clock', roles: ['admin'] },
   { label: 'AI Settings', href: '/portal/dashboard/ai-settings', icon: 'Brain', roles: ['admin'] },

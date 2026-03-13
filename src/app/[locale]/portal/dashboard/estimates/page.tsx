@@ -17,6 +17,7 @@ import { EstimateLeftSidebar } from "@/components/portal/estimate-left-sidebar"
 import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import { useSession } from "next-auth/react"
 import ClientEstimationsInbox from "./client-estimations-inbox"
+import { SendDocumentModal } from "@/components/portal/send-document-modal"
 import {
   type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
@@ -154,6 +155,7 @@ export default function EstimatesPage() {
   // ═══ SEND — 2-step: PDF download + email modal ═══
   const [showSendModal, setShowSendModal] = useState(false)
   const [pdfReady, setPdfReady] = useState(false)
+  const [sendToModal, setSendToModal] = useState(false)
 
   const sendEstimate = useCallback(async () => {
     setPdfReady(false)
@@ -796,6 +798,9 @@ export default function EstimatesPage() {
         <button onClick={sendEstimate} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition flex items-center gap-1.5" title="Send estimate via email">
           <Send className="h-4 w-4" /><span className="hidden sm:inline">{T.est.send}</span>
         </button>
+        <button onClick={() => setSendToModal(true)} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition flex items-center gap-1.5" title="Send to contacts">
+          <Eye className="h-4 w-4" /><span className="hidden sm:inline">Send to…</span>
+        </button>
       </div>
     </div>
 
@@ -844,6 +849,13 @@ export default function EstimatesPage() {
         </div>
       </div>
     )}
+
+    {/* Send-to-contact modal */}
+    <SendDocumentModal
+      open={sendToModal}
+      onClose={() => setSendToModal(false)}
+      documents={[{ type: "estimation", title: `${est.estimateNumber} — ${est.clientName || "Client"}`, fileUrl: `/api/portal/estimates/${activeId}/pdf` }]}
+    />
 
     </>
   )
