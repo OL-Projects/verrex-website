@@ -54,7 +54,7 @@ function getWeekDates() {
 export default function AppointmentsPage() {
   const { data: session } = useSession()
   const store = usePortalStore()
-  const userId = session?.user?.id || "usr_admin_001"
+  const userId = session?.user?.id || ""
   const [settings, setSettings] = useState<AppointmentSettings>(() => loadSettings())
   const [view, setView] = useState<ViewTab>(() => settings.defaultView)
   const [showForm, setShowForm] = useState(false)

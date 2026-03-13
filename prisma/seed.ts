@@ -7,7 +7,8 @@ async function main() {
   console.log("🌱 Seeding database...")
 
   // ─── Master Admin Account ─────────────────────────────
-  const adminPassword = await bcrypt.hash("VerexAdmin2026!", 12)
+  const rawPassword = process.env.ADMIN_SEED_PASSWORD || "VerexAdmin2026!"
+  const adminPassword = await bcrypt.hash(rawPassword, 12)
   const admin = await prisma.user.upsert({
     where: { email: "admin@verex.ca" },
     update: { role: "admin", name: "VEREX Admin" },
@@ -28,12 +29,18 @@ async function main() {
     data: { role: "admin" },
   })
 
-  // ─── Clean up test accounts (optional) ────────────────
-  const testCount = await prisma.user.count({
-    where: { email: { contains: "@test.com" } },
+  // ─── Clean up test / demo accounts ────────────────────
+  const demoDeleted = await prisma.user.deleteMany({
+    where: {
+      OR: [
+        { email: { contains: "@test.com" } },
+        { email: { contains: "@demo.com" } },
+        { isDemo: true },
+      ],
+    },
   })
-  if (testCount > 0) {
-    console.log(`⚠️  Found ${testCount} test accounts (@test.com)`)
+  if (demoDeleted.count > 0) {
+    console.log(`🧹 Removed ${demoDeleted.count} test/demo accounts`)
   }
 
   const userCount = await prisma.user.count()

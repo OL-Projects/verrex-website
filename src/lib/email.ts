@@ -1,6 +1,19 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization to avoid crashing during build if key is missing
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY
+    if (!key) {
+      console.warn("⚠️ RESEND_API_KEY not set — emails will not be sent")
+      // Return a stub that won't crash but logs warnings
+      return { emails: { send: async () => { console.warn("⚠️ Email not sent (no API key)"); return { id: "stub" } } } } as unknown as Resend
+    }
+    _resend = new Resend(key)
+  }
+  return _resend
+}
 const FROM_PORTAL = "VEREX Portal <portal@verex.ca>"
 const FROM_NOREPLY = "VEREX <noreply@verex.ca>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.verex.ca"
@@ -164,7 +177,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 
   const text = `Welcome to VEREX Portal, ${firstName}!\n\nYour account has been created successfully.\n\nLog in at: ${BASE_URL}/en/portal/login\n\nWith your portal account you can:\n- Track your projects in real-time\n- Request quotes and estimates online\n- Communicate directly with our team\n\n${COMPANY.name}\n${COMPANY.address}\n${COMPANY.phone}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_PORTAL,
     to,
     subject: `Welcome to VEREX Portal, ${firstName}`,
@@ -203,7 +216,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
 
   const text = `Password Reset Request\n\nHi ${firstName},\n\nWe received a request to reset your VEREX Portal password.\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour. If you did not request this, no action is needed.\n\n${COMPANY.name}\n${COMPANY.phone}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: "VEREX Portal — Password Reset",
@@ -244,7 +257,7 @@ export async function sendPasswordChangedEmail(to: string, name: string) {
 
   const text = `Password Changed Successfully\n\nHi ${firstName},\n\nYour VEREX Portal password has been successfully updated.\n\nLog in at: ${BASE_URL}/en/portal/login\n\nIf you did not make this change, contact us immediately at ${COMPANY.email} or call ${COMPANY.phone}.\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: "VEREX Portal — Password Changed",
@@ -285,7 +298,7 @@ export async function sendContactConfirmationEmail(to: string, name: string, sub
 
   const text = `Thank you for contacting VEREX, ${firstName}!\n\nWe received your ${subject || "message"} and will respond within 24 business hours.\n\nIn the meantime, explore our products at ${BASE_URL}/en/products\n\nNeed immediate help? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: `VEREX — We received your message, ${firstName}`,
@@ -343,7 +356,7 @@ export async function sendQuoteConfirmationEmail(to: string, name: string, proje
 
   const text = `Quote Request Received!\n\nHi ${firstName},\n\nThank you for your ${projectType || ""} quote request. Here's what happens next:\n\n1. Our team reviews your project details\n2. We prepare a detailed, customized quote\n3. You receive your quote within 1-2 business days\n\nView our products: ${BASE_URL}/en/products\n\nQuestions? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: `VEREX — Your quote request has been received`,
@@ -393,7 +406,7 @@ export async function sendAppointmentConfirmationEmail(
 
   const text = `Appointment Confirmed!\n\nHi ${firstName},\n\nYour ${aptType} appointment has been received.\n\n${details.date ? `Date: ${details.date}\n` : ""}${details.time ? `Time: ${details.time}\n` : ""}${details.location ? `Location: ${details.location}\n` : ""}\nOur team will confirm the exact time and may reach out to finalize details.\n\nNeed to reschedule? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: `VEREX — Appointment confirmed, ${firstName}`,
@@ -443,7 +456,7 @@ export async function sendQuickQuoteConfirmationEmail(to: string, name: string, 
 
   const text = `Quick Quote Received!\n\nHi ${firstName},\n\nWe've received your quick quote request and will respond within 1 business day.\n\n${products?.length ? `Products: ${products.join(", ")}\n\n` : ""}Browse our catalog: ${BASE_URL}/en/products\n\nQuestions? Call ${COMPANY.phone}\n\n${COMPANY.name}\n${COMPANY.address}`
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: FROM_NOREPLY,
     to,
     subject: `VEREX — Quick quote request received`,

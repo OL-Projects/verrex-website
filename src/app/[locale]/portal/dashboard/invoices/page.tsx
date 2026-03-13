@@ -26,7 +26,7 @@ const statusConfig: Record<string, { color: string; bg: string; icon: React.Comp
 export default function InvoicesPage() {
   const { data: session } = useSession()
   const store = usePortalStore()
-  const userId = session?.user?.id || "usr_admin_001"
+  const userId = session?.user?.id || ""
   const [filter, setFilter] = useState<StatusFilter>("all")
   const [panel, setPanel] = useState<RightPanel>({ type: "none" })
 

@@ -20,7 +20,7 @@ export default function CommissionsPage() {
   const commissions = role === "admin"
     ? mockPartners.flatMap(p => {
         const comms = getCommissionsByPartner(userId)
-        return comms.length > 0 ? comms : getCommissionsByPartner("usr_partner_001")
+        return comms
       })
     : getCommissionsByPartner(userId)
 

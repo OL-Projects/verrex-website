@@ -88,17 +88,20 @@ export function usePortalStore(): PortalStore {
 }
 
 export function PortalStoreProvider({ children }: { children: ReactNode }) {
-  const [leads, setLeads] = useState<Lead[]>(() => [...mockLeads])
-  const [projects, setProjects] = useState<Project[]>(() => [...mockProjects])
-  const [appointments, setAppointments] = useState<Appointment[]>(() => [...mockAppointments])
-  const [orders, setOrders] = useState<Order[]>(() => [...mockOrders])
-  const [invoices, setInvoices] = useState<Invoice[]>(() => [...mockInvoices])
-  const [messages, setMessages] = useState<Message[]>(() => [...mockMessages])
-  const [threads, setThreads] = useState<ChatThread[]>(() => [...mockChatThreads])
-  const [measurements, setMeasurements] = useState<MeasurementEntry[]>(() => [...mockMeasurements])
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(() => [...mockTimelineEvents])
-  const [commissions] = useState<Commission[]>(() => [...mockCommissions])
-  const [contracts, setContracts] = useState<Contract[]>(() => [...mockContracts])
+  // In production, start with empty arrays — real data comes from APIs
+  // Mock data is only loaded in development for testing convenience
+  const isDev = process.env.NODE_ENV !== "production"
+  const [leads, setLeads] = useState<Lead[]>(() => isDev ? [...mockLeads] : [])
+  const [projects, setProjects] = useState<Project[]>(() => isDev ? [...mockProjects] : [])
+  const [appointments, setAppointments] = useState<Appointment[]>(() => isDev ? [...mockAppointments] : [])
+  const [orders, setOrders] = useState<Order[]>(() => isDev ? [...mockOrders] : [])
+  const [invoices, setInvoices] = useState<Invoice[]>(() => isDev ? [...mockInvoices] : [])
+  const [messages, setMessages] = useState<Message[]>(() => isDev ? [...mockMessages] : [])
+  const [threads, setThreads] = useState<ChatThread[]>(() => isDev ? [...mockChatThreads] : [])
+  const [measurements, setMeasurements] = useState<MeasurementEntry[]>(() => isDev ? [...mockMeasurements] : [])
+  const [timeline, setTimeline] = useState<TimelineEvent[]>(() => isDev ? [...mockTimelineEvents] : [])
+  const [commissions] = useState<Commission[]>(() => isDev ? [...mockCommissions] : [])
+  const [contracts, setContracts] = useState<Contract[]>(() => isDev ? [...mockContracts] : [])
   const createContract = useCallback((data: Omit<Contract, "id" | "createdAt">) => {
     const c: Contract = { ...data, id: uid("cont"), createdAt: today() }
     setContracts(prev => [c, ...prev])
@@ -107,7 +110,7 @@ export function PortalStoreProvider({ children }: { children: ReactNode }) {
   const updateContract = useCallback((id: string, data: Partial<Contract>) => {
     setContracts(prev => prev.map(c => c.id === id ? { ...c, ...data } : c))
   }, [])
-  const [notifications, setNotifications] = useState<Notification[]>(() => [...mockNotifications])
+  const [notifications, setNotifications] = useState<Notification[]>(() => isDev ? [...mockNotifications] : [])
 
   // ── Helpers ──
   const pushTimeline = useCallback((evt: Omit<TimelineEvent, "id">) => {

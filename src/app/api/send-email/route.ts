@@ -8,7 +8,16 @@ import {
   sendQuickQuoteConfirmationEmail,
 } from "@/lib/email";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init to avoid build crash when API key is missing locally
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) throw new Error("RESEND_API_KEY is required");
+    _resend = new Resend(key);
+  }
+  return _resend;
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@verex.ca";
 
 type FormType = "contact" | "quote" | "appointment" | "quick-quote";
@@ -223,7 +232,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Invalid form type" }, { status: 400 });
     }
 
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: "VEREX Website <noreply@verex.ca>",
       to: [ADMIN_EMAIL],
       subject: getSubjectLine(type, data),

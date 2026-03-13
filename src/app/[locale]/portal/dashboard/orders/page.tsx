@@ -21,7 +21,7 @@ const STATUS_FLOW: OrderStatus[] = ["quoted", "approved", "ordered", "confirmed"
 export default function OrdersPage() {
   const { data: session } = useSession()
   const store = usePortalStore()
-  const userId = session?.user?.id || "usr_admin_001"
+  const userId = session?.user?.id || ""
   const role = session?.user?.role || "admin"
   const [statusDropdown, setStatusDropdown] = useState<string | null>(null)
 
