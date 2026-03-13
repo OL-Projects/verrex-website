@@ -29,13 +29,15 @@ model User {
   appointments     Appointment[]       @relation("ClientAppointments")
   invoices         Invoice[]           @relation("ClientInvoices")
   sentMessages     Message[]           @relation("SentMessages")
-  receivedMessages Message[]           @relation("ReceivedMessages")
   leads            Lead[]              @relation("AssignedLeads")
   activities       ProjectActivity[]
   annotations      ClientAnnotation[]
   assignedTasks    ProjectTask[]
   uploadedFiles    ProjectAttachment[]
   teamMemberships  ProjectTeamMember[]
+  conversations    ConversationParticipant[]
+  sentDocuments    Document[]          @relation("SentDocuments")
+  receivedDocuments Document[]         @relation("ReceivedDocuments")
 }
 
 model PasswordReset {
@@ -69,13 +71,15 @@ model Project {
   clientId    String
   client      User     @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Cascade)
 
-  appointments  Appointment[]
-  invoices      Invoice[]
-  activities    ProjectActivity[]
-  annotations   ClientAnnotation[]
-  tasks         ProjectTask[]
-  attachments   ProjectAttachment[]
-  teamMembers   ProjectTeamMember[]
+  appointments   Appointment[]
+  invoices       Invoice[]
+  activities     ProjectActivity[]
+  annotations    ClientAnnotation[]
+  tasks          ProjectTask[]
+  attachments    ProjectAttachment[]
+  teamMembers    ProjectTeamMember[]
+  conversations  Conversation[]
+  documents      Document[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -223,23 +227,86 @@ model Invoice {
   @@index([status])
 }
 
-// ─── Messages ───────────────────────────────────────────
+// ─── Conversations & Messages ───────────────────────────
+model Conversation {
+  id          String   @id @default(cuid())
+  type        String   @default("direct") // direct | group
+  name        String?  // null for DMs, custom name for groups
+
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([projectId])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime?    // null = never read; for unread badge tracking
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([conversationId])
+}
+
 model Message {
-  id         String   @id @default(cuid())
-  content    String
-  read       Boolean  @default(false)
+  id             String       @id @default(cuid())
+  content        String       @db.Text
+  attachmentUrls String?      // JSON array of file URLs
 
-  senderId   String
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  receiverId String
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
+  createdAt      DateTime     @default(now())
 
+  @@index([conversationId, createdAt])
   @@index([senderId])
-  @@index([receiverId])
-  @@index([read])
+}
+
+// ─── Documents (Inbox: Contracts, Estimations, Invoices as PDFs) ──
+model Document {
+  id          String    @id @default(cuid())
+  type        String    // invoice | contract | estimation
+  title       String
+  description String?   @db.Text
+  fileUrl     String    // PDF URL (Vercel Blob / Supabase storage)
+  status      String    @default("sent") // draft | sent | viewed | signed
+
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  senderId    String
+  sender      User      @relation("SentDocuments", fields: [senderId], references: [id], onDelete: Cascade)
+
+  recipientId String
+  recipient   User      @relation("ReceivedDocuments", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  readAt      DateTime? // null = unread (inbox badge)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([recipientId])
+  @@index([senderId])
+  @@index([projectId])
+  @@index([type])
+  @@index([status])
 }
 
 // ─── Leads (CRM — scales to 10,000+) ───────────────────
