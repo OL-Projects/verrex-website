@@ -6,6 +6,10 @@ import { Reply, Pencil, Trash2, Copy, Check, CheckCheck, Ban, Download, FileText
 import { type ChatMessage, type MessageReaction, type ParsedAttachment, parseAttachments, fmtTime, canEdit, ROLE_BUBBLE_COLORS } from "./use-messages"
 
 const QUICK_EMOJIS = ["👍", "❤️", "😂", "😮", "🙏", "🔥"]
+const FULL_EMOJIS = [
+  "👍","❤️","😂","😮","🙏","🔥","😢","😡","🤔","😍","🎉","✅","⭐","💡","👏","🤝","💪","😎","🎯","🛠️",
+  "👋","😊","💬","📌","🏠","🪟","🚪","📐","🔨","📦","💰","📋","📸","🙌","💯","😅","🫡","🤩","👀","🫶",
+]
 
 interface Props {
   msg: ChatMessage
@@ -30,6 +34,7 @@ function ReadReceipt({ isMine }: { isMine: boolean }) {
 export default function MessageBubble({ msg, isMine, userId, isGroup, showSender, onReply, onEdit, onDelete, onReact, onImageClick }: Props) {
   const [showMenu, setShowMenu] = useState(false)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showFullEmojis, setShowFullEmojis] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const [copied, setCopied] = useState(false)
   const longPressRef = useRef<NodeJS.Timeout | null>(null)
@@ -132,20 +137,10 @@ export default function MessageBubble({ msg, isMine, userId, isGroup, showSender
           <ReactionPills reactions={reactionList} onReact={(emoji) => onReact(msg.id, emoji)} />
 
           {/* Emoji picker */}
-          <AnimatePresence>
-            {showEmojiPicker && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowEmojiPicker(false)} />
-                <motion.div initial={{ opacity: 0, scale: 0.8, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }}
-                  className={`absolute z-50 ${isMine ? "right-0" : "left-0"} -bottom-2 translate-y-full flex items-center gap-0.5 bg-white dark:bg-slate-800 rounded-full shadow-2xl border border-slate-100 dark:border-white/10 px-1.5 py-1`}>
-                  {QUICK_EMOJIS.map(e => (
-                    <button key={e} onClick={() => { onReact(msg.id, e); setShowEmojiPicker(false) }}
-                      className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-125">{e}</button>
-                  ))}
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
+          <EmojiPickerPopover show={showEmojiPicker} showFull={showFullEmojis} isMine={isMine}
+            onPick={(e) => { onReact(msg.id, e); setShowEmojiPicker(false); setShowFullEmojis(false) }}
+            onToggleFull={() => setShowFullEmojis(!showFullEmojis)}
+            onClose={() => { setShowEmojiPicker(false); setShowFullEmojis(false) }} />
         </div>
         <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied}
           onCopy={handleCopy} onReply={onReply} onEdit={onEdit} onDelete={onDelete}
@@ -251,20 +246,10 @@ export default function MessageBubble({ msg, isMine, userId, isGroup, showSender
         <ReactionPills reactions={reactionList} onReact={(emoji) => onReact(msg.id, emoji)} />
 
         {/* Emoji picker popover */}
-        <AnimatePresence>
-          {showEmojiPicker && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowEmojiPicker(false)} />
-              <motion.div initial={{ opacity: 0, scale: 0.8, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }}
-                className={`absolute z-50 ${isMine ? "right-0" : "left-0"} -bottom-2 translate-y-full flex items-center gap-0.5 bg-white dark:bg-slate-800 rounded-full shadow-2xl border border-slate-100 dark:border-white/10 px-1.5 py-1`}>
-                {QUICK_EMOJIS.map(e => (
-                  <button key={e} onClick={() => { onReact(msg.id, e); setShowEmojiPicker(false) }}
-                    className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-125">{e}</button>
-                ))}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+        <EmojiPickerPopover show={showEmojiPicker} showFull={showFullEmojis} isMine={isMine}
+          onPick={(e) => { onReact(msg.id, e); setShowEmojiPicker(false); setShowFullEmojis(false) }}
+          onToggleFull={() => setShowFullEmojis(!showFullEmojis)}
+          onClose={() => { setShowEmojiPicker(false); setShowFullEmojis(false) }} />
       </div>
 
       <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied}
@@ -350,6 +335,46 @@ function HoverActions({ isMine, msg, onReply, onEdit, onShowEmoji }: {
         </button>
       )}
     </div>
+  )
+}
+
+/* ── Emoji Picker Popover (quick + full grid) ── */
+function EmojiPickerPopover({ show, showFull, isMine, onPick, onToggleFull, onClose }: {
+  show: boolean; showFull: boolean; isMine: boolean
+  onPick: (emoji: string) => void; onToggleFull: () => void; onClose: () => void
+}) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={onClose} />
+          <motion.div initial={{ opacity: 0, scale: 0.8, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }}
+            className={`absolute z-50 ${isMine ? "right-0" : "left-0"} -bottom-2 translate-y-full bg-white dark:bg-slate-800 shadow-2xl border border-slate-100 dark:border-white/10 ${
+              showFull ? "rounded-2xl p-2 w-[280px]" : "rounded-full px-1.5 py-1"
+            }`}>
+            {showFull ? (
+              <div className="grid grid-cols-8 gap-0.5 max-h-[200px] overflow-y-auto">
+                {FULL_EMOJIS.map(e => (
+                  <button key={e} onClick={() => onPick(e)}
+                    className="h-8 w-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-110">{e}</button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center gap-0.5">
+                {QUICK_EMOJIS.map(e => (
+                  <button key={e} onClick={() => onPick(e)}
+                    className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-125">{e}</button>
+                ))}
+                <button onClick={onToggleFull}
+                  className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-sm text-slate-400 font-bold transition-transform hover:scale-110" title="More emojis">
+                  <SmilePlus className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   )
 }
 

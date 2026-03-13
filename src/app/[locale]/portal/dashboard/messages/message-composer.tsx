@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Send, Paperclip, Image as ImageIcon, X, Loader2, Smile, Reply } from "lucide-react"
+import { Send, Paperclip, Image as ImageIcon, X, Loader2, Smile, Reply, Maximize2, Minimize2 } from "lucide-react"
 import type { ChatMessage } from "./use-messages"
 
 const EMOJI_LIST = ["😀","😂","❤️","👍","🎉","🔥","✅","⭐","💡","🏠","🪟","🚪","📐","🔨","📦","💰","📋","🙏","👋","😊","🤔","😎","💪","🎯","🛠️","📸","👏","🤝","💬","📌"]
@@ -23,6 +23,8 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
   const [previews, setPreviews] = useState<string[]>([])
   const [showEmoji, setShowEmoji] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const [showExpandBtn, setShowExpandBtn] = useState(false)
   const textRef = useRef<HTMLTextAreaElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -66,12 +68,10 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
+    // Enter = new paragraph (no send), Escape = cancel edit/reply
     if (e.key === "Escape") {
-      if (editingMsg) onCancelEdit()
+      if (expanded) setExpanded(false)
+      else if (editingMsg) onCancelEdit()
       else if (replyTo) onCancelReply()
     }
   }
@@ -100,16 +100,23 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
     if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files)
   }, [])
 
-  // Auto-resize textarea
+  // Auto-resize textarea — up to 5 lines (~140px), then show expand button
+  const LINE_HEIGHT = 28 // approx px per line
+  const MAX_COMPACT_HEIGHT = LINE_HEIGHT * 5 // 5 lines = 140px
   const adjustHeight = () => {
-    if (textRef.current) {
-      textRef.current.style.height = "auto"
-      textRef.current.style.height = Math.min(textRef.current.scrollHeight, 120) + "px"
+    if (!textRef.current) return
+    textRef.current.style.height = "auto"
+    const scrollH = textRef.current.scrollHeight
+    if (expanded) {
+      textRef.current.style.height = "100%"
+    } else {
+      textRef.current.style.height = Math.min(scrollH, MAX_COMPACT_HEIGHT) + "px"
     }
+    setShowExpandBtn(scrollH > MAX_COMPACT_HEIGHT)
   }
 
   return (
-    <div className="border-t border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm"
+    <div className={`border-t border-slate-200/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex flex-col ${expanded ? "flex-1" : ""}`}
       onDragOver={e => { e.preventDefault(); setDragOver(true) }}
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}>
@@ -172,7 +179,7 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
       )}
 
       {/* Input row */}
-      <div className="flex items-end gap-2 p-3">
+      <div className={`flex items-end gap-2 p-3 ${expanded ? "flex-1" : ""}`}>
         {/* Emoji button */}
         <div className="relative">
           <button onClick={() => setShowEmoji(!showEmoji)}
@@ -207,16 +214,28 @@ export default function MessageComposer({ onSend, sending, replyTo, onCancelRepl
         <input ref={fileRef} type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" className="hidden"
           onChange={e => { if (e.target.files) handleFiles(e.target.files); e.target.value = "" }} />
 
-        {/* Text input */}
-        <textarea ref={textRef} value={draft}
-          onChange={e => { setDraft(e.target.value); adjustHeight() }}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          placeholder="Type a message…"
-          rows={1}
-          className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/40 max-h-[120px] min-h-[42px]"
-          style={{ height: "42px" }}
-        />
+        {/* Text input + expand */}
+        <div className={`flex-1 relative ${expanded ? "flex-1 flex flex-col" : ""}`}>
+          <textarea ref={textRef} value={draft}
+            onChange={e => { setDraft(e.target.value); adjustHeight() }}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            placeholder="Type a message… (Enter for new line)"
+            rows={1}
+            className={`w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/40 min-h-[42px] transition-all ${
+              expanded ? "flex-1 max-h-none" : "max-h-[140px]"
+            }`}
+            style={expanded ? {} : { height: "42px" }}
+          />
+          {/* Expand/Collapse button */}
+          {(showExpandBtn || expanded) && (
+            <button onClick={() => setExpanded(!expanded)}
+              className="absolute top-1 right-2 p-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-slate-200/60 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-400 hover:text-slate-600 transition-all shadow-sm z-10"
+              title={expanded ? "Collapse (Esc)" : "Expand editor"}>
+              {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            </button>
+          )}
+        </div>
 
         {/* Send button */}
         <motion.button onClick={handleSend}
