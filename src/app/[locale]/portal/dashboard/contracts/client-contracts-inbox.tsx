@@ -5,9 +5,11 @@ import { usePortalStore } from "@/lib/portal-store"
 import { useClientDocuments } from "@/hooks/useClientDocuments"
 import { ClipboardSignature, ChevronLeft, Clock, CheckCircle2, Play, PenLine, AlertCircle, Ban, ExternalLink, Inbox } from "lucide-react"
 import type { Contract } from "@/types/portal"
+import type { ClientDocument } from "@/hooks/useClientDocuments"
 import ContractDetail from "./contract-detail"
 import SignaturePad from "@/components/portal/signature-pad"
 import RevisionRequestModal from "@/components/portal/revision-request-modal"
+import DocumentViewer from "@/components/portal/document-viewer"
 
 const statusConfig: Record<string, { cls: string; label: string }> = {
   sent: { cls: "bg-amber-100 text-amber-700", label: "Needs Signature" },
@@ -21,6 +23,7 @@ export default function ClientContractsInbox({ clientId }: { clientId: string })
   const store = usePortalStore()
   const { docs: apiDocs, markAsRead, unreadCount: apiUnread } = useClientDocuments("contract")
   const [selected, setSelected] = useState<Contract | null>(null)
+  const [selectedApiDoc, setSelectedApiDoc] = useState<ClientDocument | null>(null)
   const [showSign, setShowSign] = useState(false)
   const [showRevision, setShowRevision] = useState(false)
 
@@ -49,6 +52,11 @@ export default function ClientContractsInbox({ clientId }: { clientId: string })
     store.respondToDocument("contract", selected.id, "revision_requested", notes)
     setShowRevision(false)
     setSelected({ ...selected, clientResponse: "revision_requested", clientNotes: notes })
+  }
+
+  // ── API Document Detail View ──
+  if (selectedApiDoc) {
+    return <DocumentViewer doc={selectedApiDoc} onBack={() => setSelectedApiDoc(null)} onRequestRevision={() => {}} onSign={() => {}} />
   }
 
   if (showSign && selected) {
@@ -113,7 +121,7 @@ export default function ClientContractsInbox({ clientId }: { clientId: string })
               const isRealFile = doc.fileUrl && !doc.fileUrl.startsWith("/api/portal/")
               return (
               <button key={doc.id}
-                onClick={() => { if (!doc.readAt) markAsRead(doc.id); if (isRealFile) window.open(doc.fileUrl, "_blank") }}
+                onClick={() => { if (!doc.readAt) markAsRead(doc.id); setSelectedApiDoc(doc) }}
                 className={`block w-full text-left p-4 rounded-xl border transition-all hover:shadow-md ${!doc.readAt ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-500/5 dark:border-indigo-500/20" : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">

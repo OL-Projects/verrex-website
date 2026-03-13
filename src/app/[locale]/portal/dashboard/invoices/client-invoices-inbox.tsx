@@ -5,7 +5,9 @@ import { usePortalStore } from "@/lib/portal-store"
 import { useClientDocuments } from "@/hooks/useClientDocuments"
 import { Receipt, Eye, Download, Clock, CheckCircle2, AlertTriangle, Ban, ChevronLeft, Loader2, ExternalLink, Inbox } from "lucide-react"
 import type { Invoice } from "@/types/portal"
+import type { ClientDocument } from "@/hooks/useClientDocuments"
 import InvoiceDetail from "./invoice-detail"
+import DocumentViewer from "@/components/portal/document-viewer"
 
 const statusConfig: Record<string, { cls: string; label: string; icon: typeof Receipt }> = {
   sent: { cls: "bg-blue-100 text-blue-700", label: "New", icon: Clock },
@@ -18,7 +20,7 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
   const store = usePortalStore()
   const { docs: apiDocs, loading: apiLoading, markAsRead, unreadCount: apiUnread } = useClientDocuments("invoice")
   const [selected, setSelected] = useState<Invoice | null>(null)
-  const [selectedApiDoc, setSelectedApiDoc] = useState<string | null>(null)
+  const [selectedApiDoc, setSelectedApiDoc] = useState<ClientDocument | null>(null)
   const [filter, setFilter] = useState<string>("all")
 
   const myInvoices = useMemo(() => {
@@ -33,6 +35,11 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
   function openInvoice(inv: Invoice) {
     setSelected(inv)
     if (!inv.readByClient) store.markDocumentRead("invoice", inv.id)
+  }
+
+  // ── API Document Detail View ──
+  if (selectedApiDoc) {
+    return <DocumentViewer doc={selectedApiDoc} onBack={() => setSelectedApiDoc(null)} onRequestRevision={() => {}} />
   }
 
   if (selected) {
@@ -83,7 +90,7 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
               const isRealFile = doc.fileUrl && !doc.fileUrl.startsWith("/api/portal/")
               return (
               <button key={doc.id}
-                onClick={() => { if (!doc.readAt) markAsRead(doc.id); if (isRealFile) window.open(doc.fileUrl, "_blank") }}
+                onClick={() => { if (!doc.readAt) markAsRead(doc.id); setSelectedApiDoc(doc) }}
                 className={`block w-full text-left p-4 rounded-xl border transition-all hover:shadow-md ${!doc.readAt ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-500/5 dark:border-indigo-500/20" : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
