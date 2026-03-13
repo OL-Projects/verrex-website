@@ -43,11 +43,11 @@ export const mockPartners: Partner[] = [
 
 export const mockUsers: PortalUser[] = [
   { id: 'usr_admin_001', email: 'admin@verex.ca', name: 'Sarah Mitchell', role: 'admin', phone: '(514) 555-0100', createdAt: '2025-01-15', lastLogin: '2026-02-25' },
-  { id: 'usr_client_001', email: 'client@demo.com', name: 'Jean-Pierre Tremblay', role: 'client', phone: '(514) 555-0201', createdAt: '2025-06-20', lastLogin: '2026-02-24' },
-  { id: 'usr_contractor_001', email: 'contractor@demo.com', name: 'Mike Thompson', role: 'contractor', phone: '(514) 555-0301', createdAt: '2025-03-10', lastLogin: '2026-02-25' },
-  { id: 'usr_supplier_001', email: 'supplier@demo.com', name: 'Lisa Chen', role: 'supplier', phone: '(416) 555-0401', createdAt: '2025-02-01', lastLogin: '2026-02-23' },
-  { id: 'usr_partner_001', email: 'partner@homedepot.com', name: 'David Wilson', role: 'partner', phone: '(416) 555-9000', partnerId: 'ptr_001', createdAt: '2025-01-01', lastLogin: '2026-02-25' },
-  { id: 'usr_inspector_001', email: 'inspector@demo.com', name: 'Robert Garcia', role: 'inspector', phone: '(514) 555-0501', createdAt: '2025-04-15', lastLogin: '2026-02-22' },
+  { id: 'usr_client_001', email: 'client@verex.ca', name: 'Jean-Pierre Tremblay', role: 'client', phone: '(514) 555-0201', createdAt: '2025-06-20', lastLogin: '2026-02-24' },
+  { id: 'usr_contractor_001', email: 'contractor@verex.ca', name: 'Mike Thompson', role: 'contractor', phone: '(514) 555-0301', createdAt: '2025-03-10', lastLogin: '2026-02-25' },
+  { id: 'usr_supplier_001', email: 'supplier@verex.ca', name: 'Lisa Chen', role: 'supplier', phone: '(416) 555-0401', createdAt: '2025-02-01', lastLogin: '2026-02-23' },
+  { id: 'usr_partner_001', email: 'partner@verex.ca', name: 'David Wilson', role: 'partner', phone: '(416) 555-9000', partnerId: 'ptr_001', createdAt: '2025-01-01', lastLogin: '2026-02-25' },
+  { id: 'usr_inspector_001', email: 'inspector@verex.ca', name: 'Robert Garcia', role: 'inspector', phone: '(514) 555-0501', createdAt: '2025-04-15', lastLogin: '2026-02-22' },
 ];
 
 // --- Leads ---
@@ -56,7 +56,7 @@ export const mockLeads: Lead[] = [
   {
     id: 'lead_001',
     clientName: 'Jean-Pierre Tremblay',
-    clientEmail: 'client@demo.com',
+    clientEmail: 'client@verex.ca',
     clientPhone: '(514) 555-0201',
     address: '742 Rue Saint-Denis',
     city: 'Montreal',

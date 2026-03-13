@@ -114,37 +114,6 @@ export default function PortalWelcomePage() {
           ))}
         </motion.div>
 
-        {/* Demo Accounts Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="max-w-2xl mx-auto p-6 rounded-2xl bg-amber-50/60 dark:bg-amber-500/5 backdrop-blur-xl border border-amber-200/50 dark:border-amber-500/15"
-        >
-          <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-400 mb-3 uppercase tracking-wider">
-            Demo Accounts
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            {[
-              { role: "Admin", email: "admin@verex.ca" },
-              { role: "Client", email: "client@demo.com" },
-              { role: "Contractor", email: "contractor@demo.com" },
-              { role: "Supplier", email: "supplier@demo.com" },
-              { role: "Partner", email: "partner@homedepot.com" },
-              { role: "Inspector", email: "inspector@demo.com" },
-            ].map((account) => (
-              <div key={account.role} className="flex items-center gap-2 text-amber-900 dark:text-amber-300/80">
-                <span className="font-medium w-24">{account.role}:</span>
-                <code className="text-xs bg-amber-100/60 dark:bg-amber-500/10 px-2 py-0.5 rounded">
-                  {account.email}
-                </code>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-amber-700/70 dark:text-amber-400/50 mt-3">
-            Password for all demo accounts: <code className="bg-amber-100/60 dark:bg-amber-500/10 px-1.5 py-0.5 rounded">[role]123</code>
-          </p>
-        </motion.div>
       </div>
     </div>
   )

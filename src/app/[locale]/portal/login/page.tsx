@@ -10,7 +10,7 @@ import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { Button } from "@/components/ui/button"
 import {
   LogIn, Mail, Lock, Eye, EyeOff, AlertCircle,
-  ArrowLeft, Loader2, CheckCircle2, Info,
+  ArrowLeft, Loader2, CheckCircle2,
 } from "lucide-react"
 
 export default function LoginPage() {
@@ -88,12 +88,6 @@ function LoginContent() {
     }
   }
 
-  const fillDemo = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail)
-    setPassword(demoPass)
-    setError("")
-    setErrorType("")
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4">
@@ -133,11 +127,6 @@ function LoginContent() {
               <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
                 <AlertCircle className="h-4 w-4 shrink-0" /> {error}
               </div>
-              {errorType === "auth" && (
-                <p className="text-xs text-red-600/70 dark:text-red-400/60 mt-2 ml-6">
-                  Tip: Use the Quick Demo buttons below to test each role instantly.
-                </p>
-              )}
             </motion.div>
           )}
 
@@ -188,30 +177,6 @@ function LoginContent() {
           </div>
         </div>
 
-        {/* Quick Demo Login */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-          className="mt-6 p-4 rounded-xl bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/30 dark:border-white/10">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Info className="h-3 w-3 text-slate-400" />
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Quick Demo Login</p>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: "Admin", email: "admin@verex.ca", pass: "admin123" },
-              { label: "Client", email: "client@verex.ca", pass: "client123" },
-              { label: "Contractor", email: "contractor@verex.ca", pass: "contractor123" },
-              { label: "Supplier", email: "supplier@verex.ca", pass: "supplier123" },
-              { label: "Partner", email: "partner@verex.ca", pass: "partner123" },
-              { label: "Inspector", email: "inspector@verex.ca", pass: "inspector123" },
-            ].map((demo) => (
-              <button key={demo.label} type="button" onClick={() => fillDemo(demo.email, demo.pass)}
-                className="px-3 py-2 text-xs font-medium rounded-lg bg-slate-100/80 dark:bg-white/5 hover:bg-blue-100 dark:hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 border border-slate-200/60 dark:border-white/10 transition-all cursor-pointer">
-                {demo.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2">Click a role → then press Sign In</p>
-        </motion.div>
       </motion.div>
     </div>
   )
