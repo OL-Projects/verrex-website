@@ -79,14 +79,17 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">Received from Admin ({apiDocs.length})</span>
               {apiUnread > 0 && <span className="text-[10px] font-bold bg-indigo-600 text-white rounded-full px-1.5 py-0.5">{apiUnread} new</span>}
             </div>
-            {apiDocs.map(doc => (
-              <a key={doc.id} href={doc.fileUrl} target="_blank" rel="noopener noreferrer"
-                onClick={() => { if (!doc.readAt) markAsRead(doc.id) }}
+            {apiDocs.map(doc => {
+              const isRealFile = doc.fileUrl && !doc.fileUrl.startsWith("/api/portal/")
+              return (
+              <button key={doc.id}
+                onClick={() => { if (!doc.readAt) markAsRead(doc.id); if (isRealFile) window.open(doc.fileUrl, "_blank") }}
                 className={`block w-full text-left p-4 rounded-xl border transition-all hover:shadow-md ${!doc.readAt ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-500/5 dark:border-indigo-500/20" : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {!doc.readAt && <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />}
+                      <Receipt className="h-4 w-4 text-indigo-500 shrink-0" />
                       <span className="font-semibold text-slate-900 dark:text-white text-sm truncate">{doc.title}</span>
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${!doc.readAt ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-600"}`}>
                         {!doc.readAt ? "New" : "Viewed"}
@@ -94,11 +97,13 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
                     </div>
                     <p className="text-xs text-slate-500">From: {doc.sender.name} · {new Date(doc.createdAt).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}</p>
                     {doc.description && <p className="text-xs text-slate-400 mt-1 truncate">{doc.description}</p>}
+                    {!isRealFile && <p className="text-xs text-indigo-500 mt-1 font-medium">📄 Document available in your portal</p>}
                   </div>
-                  <ExternalLink className="h-4 w-4 text-slate-400 shrink-0 mt-1" />
+                  {isRealFile ? <ExternalLink className="h-4 w-4 text-slate-400 shrink-0 mt-1" /> : <Eye className="h-4 w-4 text-indigo-400 shrink-0 mt-1" />}
                 </div>
-              </a>
-            ))}
+              </button>
+              )
+            })}
             {filtered.length > 0 && (
               <div className="flex items-center gap-2 px-1 pt-3 pb-2">
                 <Receipt className="h-4 w-4 text-blue-500" />

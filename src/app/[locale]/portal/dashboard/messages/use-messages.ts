@@ -176,22 +176,33 @@ export function useMessages(userId: string) {
     if ((!content.trim() && (!files || files.length === 0)) || !activeConvo || sending) return
     setSending(true)
     try {
-      let body: any
-      let headers: any = {}
+      // Step 1: Upload files to /api/upload if any
+      let attachmentUrls: string[] = []
       if (files && files.length > 0) {
-        const fd = new FormData()
-        fd.append("content", content.trim())
-        files.forEach(f => fd.append("files", f))
-        if (replyTo) fd.append("replyToId", replyTo.id)
-        body = fd
-      } else {
-        headers["Content-Type"] = "application/json"
-        body = JSON.stringify({
-          content: content.trim(),
-          ...(replyTo ? { replyToId: replyTo.id } : {}),
+        const uploadPromises = files.map(async (file) => {
+          const fd = new FormData()
+          fd.append("file", file)
+          const uploadRes = await fetch("/api/upload", { method: "POST", body: fd })
+          if (uploadRes.ok) {
+            const data = await uploadRes.json()
+            return data.url as string
+          }
+          return null
         })
+        const results = await Promise.all(uploadPromises)
+        attachmentUrls = results.filter((u): u is string => u !== null)
       }
-      const res = await fetch(`/api/portal/conversations/${activeConvo.id}/messages`, { method: "POST", headers: files?.length ? {} : headers, body })
+
+      // Step 2: Send message as JSON with attachment URLs
+      const payload: Record<string, unknown> = { content: content.trim() }
+      if (attachmentUrls.length > 0) payload.attachmentUrls = attachmentUrls
+      if (replyTo) payload.replyToId = replyTo.id
+
+      const res = await fetch(`/api/portal/conversations/${activeConvo.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
       if (res.ok) {
         const msg = await res.json()
         setMessages(prev => [...prev, msg])
