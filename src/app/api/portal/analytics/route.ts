@@ -18,9 +18,9 @@ export async function GET() {
       invoices, leads, projects, appointments, users,
       recentLeads, recentProjects,
     ] = await Promise.all([
-      prisma.invoice.findMany({ select: { total: true, status: true, issueDate: true, createdAt: true } }),
-      prisma.lead.findMany({ select: { source: true, stage: true, priority: true, createdAt: true, projectId: true } }),
-      prisma.project.findMany({ select: { id: true, stage: true, totalValue: true, createdAt: true, updatedAt: true } }),
+      prisma.invoice.findMany({ select: { total: true, status: true, createdAt: true, paidDate: true } }),
+      prisma.lead.findMany({ select: { source: true, stage: true, priority: true, createdAt: true, status: true } }),
+      prisma.project.findMany({ select: { id: true, status: true, totalValue: true, createdAt: true } }),
       prisma.appointment.findMany({ select: { type: true, status: true, date: true } }),
       prisma.user.count({ where: { role: "client" } }),
       prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
@@ -34,14 +34,14 @@ export async function GET() {
       const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1)
       const monthLabel = mStart.toLocaleDateString("en", { month: "short", year: "2-digit" })
       const monthRevenue = invoices
-        .filter(inv => inv.status === "paid" && inv.issueDate >= mStart && inv.issueDate < mEnd)
+        .filter(inv => inv.status === "paid" && (inv.paidDate || inv.createdAt) >= mStart && (inv.paidDate || inv.createdAt) < mEnd)
         .reduce((sum, inv) => sum + inv.total, 0)
       revenueMonths.push({ month: monthLabel, revenue: Math.round(monthRevenue) })
     }
 
     // ── Revenue MTD
     const revenueMTD = invoices
-      .filter(inv => inv.status === "paid" && inv.issueDate >= startOfMonth)
+      .filter(inv => inv.status === "paid" && (inv.paidDate || inv.createdAt) >= startOfMonth)
       .reduce((sum, inv) => sum + inv.total, 0)
 
     // ── Total Revenue
@@ -77,20 +77,18 @@ export async function GET() {
       return { stage: label, count }
     }).filter(f => f.count > 0)
 
-    // ── Conversion Rate (leads that became projects)
-    const convertedLeads = leads.filter(l => l.projectId).length
+    // ── Conversion Rate (leads that became converted status)
+    const convertedLeads = leads.filter(l => l.status === "converted").length
     const conversionRate = leads.length > 0 ? Math.round((convertedLeads / leads.length) * 100) : 0
 
     // ── Avg Project Value
-    const projectValues = projects.filter(p => p.totalValue > 0).map(p => p.totalValue)
+    const projectValues = projects.filter(p => p.totalValue && p.totalValue > 0).map(p => p.totalValue!)
     const avgProjectValue = projectValues.length > 0
       ? Math.round(projectValues.reduce((s, v) => s + v, 0) / projectValues.length)
       : 0
 
     // ── Completed Projects
-    const completedProjects = projects.filter(p =>
-      ["completion_verified", "payment_received", "closed"].includes(p.stage)
-    ).length
+    const completedProjects = projects.filter(p => p.status === "completed").length
 
     // ── Cancellation Rate (cancelled appointments / total)
     const totalApts = appointments.length
@@ -101,9 +99,9 @@ export async function GET() {
     const aptTypeMap: Record<string, number> = {}
     appointments.forEach(a => { aptTypeMap[a.type] = (aptTypeMap[a.type] || 0) + 1 })
 
-    // ── Project Stage Distribution
+    // ── Project Status Distribution
     const stageMap: Record<string, number> = {}
-    projects.forEach(p => { stageMap[p.stage] = (stageMap[p.stage] || 0) + 1 })
+    projects.forEach(p => { stageMap[p.status] = (stageMap[p.status] || 0) + 1 })
 
     return NextResponse.json({
       kpi: {

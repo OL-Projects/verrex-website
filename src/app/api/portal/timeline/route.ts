@@ -13,7 +13,7 @@ export async function GET() {
     const activities = await prisma.projectActivity.findMany({
       include: {
         author: { select: { id: true, name: true, role: true } },
-        project: { select: { id: true, stage: true } },
+        project: { select: { id: true, status: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 500,
@@ -28,10 +28,10 @@ export async function GET() {
       actorName: a.author?.name || "System",
       actorRole: a.author?.role || "system",
       eventType: mapActivityType(a.type),
-      title: a.title,
+      title: a.content || a.type.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
       visibility: "all" as const,
-      notes: a.description || undefined,
-      metadata: a.metadata ? (typeof a.metadata === "object" ? a.metadata as Record<string, string> : {}) : {},
+      notes: a.content || undefined,
+      metadata: a.metadata ? tryParseJson(a.metadata) : {},
     }))
 
     return NextResponse.json({ events, total: events.length })
@@ -42,6 +42,10 @@ export async function GET() {
       { status: 500 }
     )
   }
+}
+
+function tryParseJson(str: string): Record<string, string> {
+  try { return JSON.parse(str) } catch { return {} }
 }
 
 function mapActivityType(type: string): string {
