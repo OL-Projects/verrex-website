@@ -196,7 +196,7 @@ export default function ActivityTimeline({
                       {isFirst && showAnnotationRail && (
                         <div className="flex items-center gap-4 mb-1">
                           <div className="flex-1" />
-                          <div className="w-64 shrink-0 hidden lg:block">
+                          <div className="w-96 shrink-0 hidden lg:block">
                             <ActivityBullets activityId={activity.id} positions={["before"]} {...bulletProps} />
                           </div>
                         </div>
@@ -208,7 +208,7 @@ export default function ActivityTimeline({
                           <ActivityCard activity={activity} onLightbox={setLightboxUrl} projectId={projectId} currentUserId={currentUserId} isAdmin={isAdmin} onRefresh={onRefresh} />
                         </div>
                         {showAnnotationRail && (
-                          <div className="w-64 shrink-0 hidden lg:block">
+                          <div className="w-96 shrink-0 hidden lg:block">
                             <ActivityBullets activityId={activity.id} positions={["at"]} {...bulletProps} />
                           </div>
                         )}
@@ -218,7 +218,7 @@ export default function ActivityTimeline({
                       {showAnnotationRail && (
                         <div className="flex items-center gap-4 mb-3">
                           <div className="flex-1" />
-                          <div className="w-64 shrink-0 hidden lg:block">
+                          <div className="w-96 shrink-0 hidden lg:block">
                             <ActivityBullets activityId={activity.id} positions={["after"]} {...bulletProps} />
                           </div>
                         </div>

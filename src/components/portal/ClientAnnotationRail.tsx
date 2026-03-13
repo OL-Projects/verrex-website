@@ -161,10 +161,10 @@ function AnnotationCard({ annotation, projectId, currentUserId, onDeleted }: {
   }
 
   return (
-    <div className="mb-2 p-3.5 rounded-xl bg-white/80 dark:bg-white/5 border border-emerald-200/50 dark:border-emerald-500/10 backdrop-blur-sm group shadow-sm">
-      <div className="flex items-start gap-2.5">
-        <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 ${typeCfg.color}`}>
-          <TypeIcon className="h-4 w-4" />
+    <div className="mb-2.5 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-emerald-200/50 dark:border-emerald-500/10 backdrop-blur-sm group shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${typeCfg.color}`}>
+          <TypeIcon className="h-4.5 w-4.5" />
         </div>
         <div className="flex-1 min-w-0">
           {annotation.content && (
