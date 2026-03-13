@@ -10,6 +10,7 @@ import {
   AlertCircle, TrendingUp, Trophy, CreditCard, Banknote,
   ListTodo, CircleDot, Trash2,
 } from "lucide-react"
+import ClientAnnotationRail from "./ClientAnnotationRail"
 
 // ─── Types ──────────────────────────────────────────────
 interface Activity {
@@ -66,10 +67,18 @@ const FINANCIAL_TYPES = [
 ]
 
 // ─── Main Component ─────────────────────────────────────
+interface Annotation {
+  id: string; activityId: string; position: string; type: string
+  content: string | null; attachmentUrls: string | null; authorId: string
+  createdAt: string; author: { id: string; name: string; role: string }
+}
+
 export default function ActivityTimeline({
   activities, projectId, isAdmin, onRefresh,
+  annotations = [], currentUserId = "", onAnnotationAdded,
 }: {
   activities: Activity[]; projectId: string; isAdmin: boolean; onRefresh: () => void
+  annotations?: Annotation[]; currentUserId?: string; onAnnotationAdded?: () => void
 }) {
   const [sortNewest, setSortNewest] = useState(true)
   const [showInlineAdd, setShowInlineAdd] = useState(false)
@@ -91,6 +100,9 @@ export default function ActivityTimeline({
     grouped.find(g => g.date === date)!.entries.push(a)
   })
 
+  // Collect sorted activity IDs for the annotation rail
+  const sortedActivityIds = sorted.map(a => a.id)
+
   // Get open issues for the resolved picker
   const openIssues = activities.filter(a => {
     if (a.type !== "issue") return false
@@ -104,8 +116,11 @@ export default function ActivityTimeline({
     return !isResolved
   })
 
+  // Show annotation rail when there are activities and a userId
+  const showAnnotationRail = activities.length > 0 && currentUserId
+
   return (
-    <div className="max-w-3xl">
+    <div className={showAnnotationRail ? "max-w-6xl" : "max-w-3xl"}>
       {/* Header Bar */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -132,7 +147,9 @@ export default function ActivityTimeline({
           )}
         </div>
       ) : (
-        <div className="relative">
+        <div className="flex gap-8">
+          {/* ═══ LEFT: Main Activity Timeline ═══ */}
+          <div className={`relative ${showAnnotationRail ? "flex-1 min-w-0" : "flex-1"}`}>
           {/* Vertical line */}
           <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-blue-300 via-slate-200 to-slate-200 dark:from-blue-500/30 dark:via-slate-700 dark:to-slate-700" />
 
@@ -176,6 +193,27 @@ export default function ActivityTimeline({
               onRefresh={onRefresh}
               openIssues={openIssues}
             />
+          )}
+          </div>
+
+          {/* ═══ RIGHT: Client Annotation Rail ═══ */}
+          {showAnnotationRail && (
+            <div className="w-64 shrink-0 hidden lg:block">
+              <div className="sticky top-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Your Notes</span>
+                  <span className="text-[10px] text-slate-400">({annotations.length})</span>
+                </div>
+                <ClientAnnotationRail
+                  activityIds={sortedActivityIds}
+                  annotations={annotations}
+                  projectId={projectId}
+                  currentUserId={currentUserId}
+                  onAnnotationAdded={onAnnotationAdded || (() => {})}
+                />
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
 import dynamic from "next/dynamic"
@@ -8,7 +8,7 @@ import { usePortalStore } from "@/lib/portal-store"
 import {
   CalendarDays, MapPin, Clock, User, Wrench, Ruler, Search as SearchIcon,
   Eye, XCircle, CheckCircle2, List, CalendarRange, GanttChart,
-  AlertTriangle, TrendingUp, Users, Settings, Pencil,
+  AlertTriangle, Users, Settings, Pencil,
 } from "lucide-react"
 import type { Appointment } from "@/types/portal"
 import AppointmentForm, { type EditRecord } from "./appointment-form"
@@ -65,11 +65,27 @@ export default function AppointmentsPage() {
 
   const isFormOpen = (showForm && !editingApt) || !!editingApt
 
+  // Single-click a date → select it (show day detail below calendar)
+  // Double-click a date → open the add form inline on the right
+  const lastClickRef = useRef({ date: "", time: 0 })
   const handleDateClick = (dateStr: string) => {
     const d = dateStr.split("T")[0]
-    setSelectedDate(d)
-    setEditingApt(null)
-    setShowForm(true)
+    const now = Date.now()
+    const isDoubleClick = lastClickRef.current.date === d && (now - lastClickRef.current.time) < 400
+    lastClickRef.current.date = d
+    lastClickRef.current.time = now
+
+    if (isDoubleClick) {
+      // Double-click → open form for this date
+      setSelectedDate(d)
+      setEditingApt(null)
+      setShowForm(true)
+    } else {
+      // Single-click → just select date to show day detail
+      setSelectedDate(d)
+      setShowForm(false)
+      setEditingApt(null)
+    }
   }
 
   // Appointments for the selected day (shown below calendar)
@@ -190,7 +206,7 @@ export default function AppointmentsPage() {
                     <div className="px-5 py-8 text-center">
                       <CalendarDays className="h-8 w-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                       <p className="text-sm text-slate-400 dark:text-slate-500">No appointments scheduled</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-600 mt-0.5">Click + New to add one for this date</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-600 mt-0.5">Double-click this date or press + New to add an appointment</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-slate-100 dark:divide-white/5">

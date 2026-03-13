@@ -172,7 +172,7 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
   if (!open) return null
 
   return (
-    <div className="h-full flex flex-col bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-xl overflow-hidden inline-form-enter">
+    <div className="h-full flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-lg overflow-hidden inline-form-enter">
       <style>{`
         @keyframes inline-form-slide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
         .inline-form-enter { animation: inline-form-slide 0.25s ease-out forwards; }

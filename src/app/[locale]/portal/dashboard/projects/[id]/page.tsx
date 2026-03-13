@@ -48,6 +48,7 @@ export default function ProjectDetailPage() {
 
   const [project, setProject] = useState<ProjectDetail | null>(null)
   const [activities, setActivities] = useState<Activity[]>([])
+  const [annotations, setAnnotations] = useState<{ id: string; activityId: string; position: string; type: string; content: string | null; attachmentUrls: string | null; authorId: string; createdAt: string; author: { id: string; name: string; role: string } }[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
   const [files, setFiles] = useState<Attachment[]>([])
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
@@ -85,10 +86,14 @@ export default function ProjectDetailPage() {
     fetch(`${apiBase}/files`).then(r => r.json()).then(d => setFiles(Array.isArray(d) ? d : [])).catch(console.error)
   }, [apiBase])
 
+  const loadAnnotations = useCallback(() => {
+    fetch(`/api/portal/my-projects/${id}/annotations`).then(r => r.json()).then(d => setAnnotations(Array.isArray(d) ? d : [])).catch(console.error)
+  }, [id])
+
   useEffect(() => {
-    Promise.all([loadProject(), loadActivities(), loadTasks(), loadFiles()])
+    Promise.all([loadProject(), loadActivities(), loadTasks(), loadFiles(), loadAnnotations()])
       .finally(() => setLoading(false))
-  }, [loadProject, loadActivities, loadTasks, loadFiles])
+  }, [loadProject, loadActivities, loadTasks, loadFiles, loadAnnotations])
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" /></div>
   if (!project) return <div className="text-center py-16"><h2 className="text-lg text-slate-500">Project not found</h2></div>
@@ -131,7 +136,7 @@ export default function ProjectDetailPage() {
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
           {activeTab === "overview" && <OverviewTab project={project} tasks={tasks} files={files} />}
-          {activeTab === "activity" && <ActivityTimeline activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject(); broadcastChange("activity-added") }} />}
+          {activeTab === "activity" && <ActivityTimeline activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject(); broadcastChange("activity-added") }} annotations={annotations} currentUserId={session?.user?.id || ""} onAnnotationAdded={loadAnnotations} />}
           {activeTab === "tasks" && <TasksTab tasks={tasks} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadTasks(); loadActivities(); broadcastChange("task-updated") }} />}
           {activeTab === "files" && <FilesTab files={files} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadFiles(); loadActivities(); broadcastChange("file-uploaded") }} />}
           {activeTab === "team" && <TeamTab project={project} />}

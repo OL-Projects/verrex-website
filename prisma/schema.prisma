@@ -32,6 +32,7 @@ model User {
   receivedMessages Message[]           @relation("ReceivedMessages")
   leads            Lead[]              @relation("AssignedLeads")
   activities       ProjectActivity[]
+  annotations      ClientAnnotation[]
   assignedTasks    ProjectTask[]
   uploadedFiles    ProjectAttachment[]
   teamMemberships  ProjectTeamMember[]
@@ -71,6 +72,7 @@ model Project {
   appointments  Appointment[]
   invoices      Invoice[]
   activities    ProjectActivity[]
+  annotations   ClientAnnotation[]
   tasks         ProjectTask[]
   attachments   ProjectAttachment[]
   teamMembers   ProjectTeamMember[]
@@ -97,6 +99,8 @@ model ProjectActivity {
 
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  annotations ClientAnnotation[]
 
   createdAt DateTime @default(now())
 
@@ -276,4 +280,28 @@ model Lead {
   @@index([createdAt])
   @@index([name])
   @@index([email])
+}
+
+// ─── Client Annotations (Dual-Timeline Feedback Rail) ───
+model ClientAnnotation {
+  id             String   @id @default(cuid())
+  position       String   // "before" | "at" | "after" — relative to the activity card
+  type           String   // "note" | "photo" | "attachment"
+  content        String?  @db.Text
+  attachmentUrls String?  // JSON array of Vercel Blob URLs
+
+  activityId     String
+  activity       ProjectActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  authorId       String
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime @default(now())
+
+  @@index([activityId])
+  @@index([projectId])
+  @@index([authorId])
 }
