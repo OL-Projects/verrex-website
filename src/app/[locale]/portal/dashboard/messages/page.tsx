@@ -5,8 +5,9 @@ import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   MessageSquare, Send, Loader2, Search, ArrowLeft, RefreshCw, AlertCircle,
-  User, Clock,
+  User, Clock, Wifi, WifiOff,
 } from "lucide-react"
+import { useRealtimeMessages } from "@/hooks/useRealtimeMessages"
 
 interface Thread {
   id: string; partnerId: string; partnerName: string; partnerRole: string
@@ -37,7 +38,35 @@ export default function MessagesPage() {
   const [draft, setDraft] = useState("")
   const [search, setSearch] = useState("")
   const [error, setError] = useState("")
+  const [partnerTyping, setPartnerTyping] = useState(false)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+
+  // ─── Supabase Realtime ───
+  const { isConnected, onlineUsers, broadcastMessage, sendTypingIndicator } = useRealtimeMessages({
+    userId,
+    partnerId: activeThread?.partnerId,
+    onNewMessage: (msg) => {
+      // Live message arrived — add to chat
+      setMessages(prev => {
+        if (prev.some(m => m.id === msg.id)) return prev
+        return [...prev, { ...msg, isMine: msg.senderId === userId }]
+      })
+      // Update thread preview
+      setThreads(prev => prev.map(t =>
+        t.partnerId === msg.senderId
+          ? { ...t, lastMessage: msg.content, lastAt: msg.createdAt, unreadCount: t.partnerId === activeThread?.partnerId ? 0 : t.unreadCount + 1 }
+          : t
+      ))
+    },
+    onTypingChange: (isTyping) => {
+      setPartnerTyping(isTyping)
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+      if (isTyping) {
+        typingTimeoutRef.current = setTimeout(() => setPartnerTyping(false), 3000)
+      }
+    },
+  })
 
   // Fetch threads
   const fetchThreads = useCallback(async () => {
@@ -86,8 +115,12 @@ export default function MessagesPage() {
       })
       if (res.ok) {
         const data = await res.json()
-        setMessages(prev => [...prev, { ...data.message, isMine: true }])
+        const newMsg = { ...data.message, isMine: true }
+        setMessages(prev => [...prev, newMsg])
         setDraft("")
+        sendTypingIndicator(false)
+        // Broadcast to partner via Supabase Realtime
+        broadcastMessage(data.message)
         // Update thread preview
         setThreads(prev => prev.map(t =>
           t.id === activeThread.id ? { ...t, lastMessage: draft.trim(), lastAt: new Date().toISOString(), messageCount: t.messageCount + 1 } : t
@@ -189,11 +222,27 @@ export default function MessagesPage() {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
                 {activeThread.partnerName.charAt(0)}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">{activeThread.partnerName}</p>
-                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${roleBadge[activeThread.partnerRole] || "bg-slate-100 text-slate-600"}`}>
-                  {activeThread.partnerRole}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${roleBadge[activeThread.partnerRole] || "bg-slate-100 text-slate-600"}`}>
+                    {activeThread.partnerRole}
+                  </span>
+                  {onlineUsers.includes(activeThread.partnerId) && (
+                    <span className="flex items-center gap-1 text-[10px] text-emerald-500">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> online
+                    </span>
+                  )}
+                  {partnerTyping && (
+                    <span className="text-[10px] text-blue-400 italic animate-pulse">typing…</span>
+                  )}
+                </div>
+              </div>
+              {/* Realtime connection indicator */}
+              <div className="shrink-0" title={isConnected ? "Live connection active" : "Connecting…"}>
+                {isConnected
+                  ? <Wifi className="h-3.5 w-3.5 text-emerald-500" />
+                  : <WifiOff className="h-3.5 w-3.5 text-slate-400 animate-pulse" />}
               </div>
             </div>
 
@@ -232,7 +281,7 @@ export default function MessagesPage() {
             {/* Send bar */}
             <div className="p-3 border-t border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-2">
-                <input type="text" value={draft} onChange={e => setDraft(e.target.value)}
+                <input type="text" value={draft} onChange={e => { setDraft(e.target.value); sendTypingIndicator(e.target.value.length > 0) }}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
                   placeholder="Type a message…"
                   className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40" />
