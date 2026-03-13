@@ -31,10 +31,10 @@ interface Props {
   onAnnotationAdded: () => void
 }
 
-const TYPE_OPTIONS: { type: AnnotationType; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
-  { type: "note", label: "Note", icon: MessageSquare, color: "text-blue-500 bg-blue-100 dark:bg-blue-500/15" },
-  { type: "photo", label: "Photo", icon: Camera, color: "text-purple-500 bg-purple-100 dark:bg-purple-500/15" },
-  { type: "attachment", label: "Attachment", icon: Paperclip, color: "text-indigo-500 bg-indigo-100 dark:bg-indigo-500/15" },
+const TYPE_OPTIONS: { type: AnnotationType; label: string; icon: React.ComponentType<{ className?: string }>; color: string; bg: string; textColor: string }[] = [
+  { type: "note", label: "Note", icon: MessageSquare, color: "text-teal-500 bg-teal-100 dark:bg-teal-500/15", bg: "bg-teal-100 dark:bg-teal-500/15", textColor: "text-teal-600 dark:text-teal-400" },
+  { type: "photo", label: "Photo", icon: Camera, color: "text-emerald-500 bg-emerald-100 dark:bg-emerald-500/15", bg: "bg-emerald-100 dark:bg-emerald-500/15", textColor: "text-emerald-600 dark:text-emerald-400" },
+  { type: "attachment", label: "Attachment", icon: Paperclip, color: "text-cyan-500 bg-cyan-100 dark:bg-cyan-500/15", bg: "bg-cyan-100 dark:bg-cyan-500/15", textColor: "text-cyan-600 dark:text-cyan-400" },
 ]
 
 // ─── Main Rail ──────────────────────────────────────────
@@ -144,7 +144,7 @@ export function ActivityBullets({
   )
 }
 
-// ─── Annotation Card (displayed when filled) ────────────
+// ─── Annotation Card — same layout as admin ActivityCard but teal hue ──
 function AnnotationCard({ annotation, projectId, currentUserId, onDeleted }: {
   annotation: Annotation; projectId: string; currentUserId: string; onDeleted: () => void
 }) {
@@ -153,6 +153,7 @@ function AnnotationCard({ annotation, projectId, currentUserId, onDeleted }: {
   const canDelete = annotation.authorId === currentUserId
   const typeCfg = TYPE_OPTIONS.find(t => t.type === annotation.type) || TYPE_OPTIONS[0]
   const TypeIcon = typeCfg.icon
+  const time = new Date(annotation.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 
   const handleDelete = async () => {
     setDeleting(true)
@@ -161,42 +162,56 @@ function AnnotationCard({ annotation, projectId, currentUserId, onDeleted }: {
   }
 
   return (
-    <div className="mb-2.5 p-4 rounded-xl bg-white/80 dark:bg-white/5 border border-emerald-200/50 dark:border-emerald-500/10 backdrop-blur-sm group shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${typeCfg.color}`}>
-          <TypeIcon className="h-4.5 w-4.5" />
-        </div>
-        <div className="flex-1 min-w-0">
-          {annotation.content && (
-            <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{annotation.content}</p>
-          )}
-          {urls.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {urls.map((url, i) => {
-                const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(url)
-                return isImage ? (
-                  <a key={i} href={url} target="_blank" rel="noreferrer" className="h-10 w-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
-                    <img src={url} alt="" className="h-full w-full object-cover" />
-                  </a>
-                ) : (
-                  <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-[10px] text-slate-600 dark:text-slate-400 hover:bg-slate-200">
-                    <FileText className="h-3 w-3" /> {url.split("/").pop()?.slice(0, 20)}
-                  </a>
-                )
-              })}
-            </div>
-          )}
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-[9px] text-slate-400">{annotation.author.name} • {new Date(annotation.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="relative flex gap-3 group mb-2">
+      {/* Icon — same h-8 w-8 as admin cards */}
+      <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${typeCfg.bg} ${typeCfg.textColor}`}>
+        <TypeIcon className="h-4 w-4" />
+      </div>
+      {/* Card body — same structure as admin cards, teal-tinted border */}
+      <div className="flex-1 p-3 rounded-xl bg-teal-50/40 dark:bg-teal-500/5 border border-teal-200/40 dark:border-teal-500/10">
+        {/* Header row: type label + delete + time */}
+        <div className="flex items-center justify-between mb-1">
+          <span className={`text-[10px] font-medium uppercase tracking-wide ${typeCfg.textColor}`}>
+            Client {typeCfg.label}
+          </span>
+          <div className="flex items-center gap-2">
             {canDelete && (
-              <button onClick={handleDelete} disabled={deleting} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all">
-                <Trash2 className="h-3 w-3" />
+              <button onClick={handleDelete} disabled={deleting}
+                className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
+                <Trash2 className="h-3.5 w-3.5" />
               </button>
             )}
+            <span className="text-[10px] text-slate-400">{time}</span>
           </div>
         </div>
+        {/* Content */}
+        {annotation.content && (
+          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{annotation.content}</p>
+        )}
+        {/* Photos — grid like admin photo card */}
+        {urls.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {urls.map((url, i) => {
+              const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(url)
+              return isImage ? (
+                <a key={i} href={url} target="_blank" rel="noreferrer"
+                  className="h-16 w-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 hover:ring-2 hover:ring-teal-500/40 transition-all">
+                  <img src={url} alt="" className="h-full w-full object-cover" />
+                </a>
+              ) : (
+                <a key={i} href={url} target="_blank" rel="noreferrer"
+                  className="flex items-center gap-2 p-2 rounded-lg bg-teal-50/50 dark:bg-teal-500/5 border border-teal-200/40 dark:border-teal-500/10 hover:bg-teal-50 transition-colors">
+                  <FileText className="h-5 w-5 text-cyan-500 shrink-0" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400 truncate">{url.split("/").pop()?.slice(0, 25)}</span>
+                </a>
+              )
+            })}
+          </div>
+        )}
+        {/* Author line */}
+        <p className="text-[10px] text-teal-400/70 mt-1">— {annotation.author.name}</p>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
