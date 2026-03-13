@@ -91,6 +91,25 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     } catch { return {} }
   })()
 
+  // Message unread badge (works for all roles, fetches from API)
+  const [msgUnread, setMsgUnread] = useState(0)
+  useEffect(() => {
+    let active = true
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch('/api/portal/conversations')
+        if (res.ok && active) {
+          const convos = await res.json()
+          const total = convos.reduce((sum: number, c: any) => sum + (c.unreadCount || 0), 0)
+          setMsgUnread(total)
+        }
+      } catch {}
+    }
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 10000) // poll every 10s
+    return () => { active = false; clearInterval(interval) }
+  }, [])
+
 const [collapsed, setCollapsed] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [pulseEstimates, setPulseEstimates] = useState(false)
@@ -279,11 +298,14 @@ const [collapsed, setCollapsed] = useState(false)
                         <span className="truncate">{tLabel(item.label)}</span>
                       )}
 
-                      {!collapsed && item.badge && item.badge > 0 && (
-                        <span className="ml-auto text-[10px] font-bold bg-blue-600 text-white rounded-full h-5 min-w-5 flex items-center justify-center px-1.5 shadow-sm">
-                          {item.badge}
-                        </span>
-                      )}
+                      {!collapsed && (() => {
+                        const dynamicBadge = storeBadges[item.href] || (item.label === 'Messages' ? msgUnread : 0) || item.badge || 0
+                        return dynamicBadge > 0 ? (
+                          <span className="ml-auto text-[10px] font-bold bg-blue-600 text-white rounded-full h-5 min-w-5 flex items-center justify-center px-1.5 shadow-sm">
+                            {dynamicBadge}
+                          </span>
+                        ) : null
+                      })()}
                     </IntlLink>
 
                     {/* Tooltip on collapsed hover */}

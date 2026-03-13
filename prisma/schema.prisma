@@ -273,6 +273,10 @@ model Message {
   senderId       String
   sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
+  replyToId      String?      // ID of message being replied to
+  editedAt       DateTime?    // When message was last edited
+  deletedAt      DateTime?    // Soft delete timestamp
+
   createdAt      DateTime     @default(now())
 
   @@index([conversationId, createdAt])
