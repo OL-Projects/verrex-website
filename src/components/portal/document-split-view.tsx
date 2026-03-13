@@ -87,9 +87,10 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
     setPdfError(false)
 
     const url = selected?.fileUrl?.trim() || ""
-    const looksLikePdf = url.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(url)
+    const looksLikePdf = url.toLowerCase().endsWith(".pdf")
     const looksLikeImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
-    const isAccessible = url.startsWith("http") || url.startsWith("/") || url.startsWith("blob:")
+    // Only load actual uploaded files (http/blob), NOT /api/ placeholder routes
+    const isAccessible = (url.startsWith("http") || url.startsWith("blob:")) && !url.includes("/api/")
     const isLoadable = isAccessible && (looksLikePdf || looksLikeImage)
 
     if (selected && isLoadable) {
@@ -118,12 +119,13 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
   // Status filter tabs
   const statuses = ["all", ...new Set(documents.map(d => d.status))]
 
-  // File type detection — URL must look like an actual accessible file
+  // File type detection — only real uploaded files (http URLs or blob URLs)
+  // Exclude /api/ routes which are placeholders for non-existent PDF generators
   const fileUrl = selected?.fileUrl?.trim() || ""
-  const isRealFile = fileUrl.length > 0 && (fileUrl.startsWith("http") || fileUrl.startsWith("/") || fileUrl.startsWith("blob:"))
-  // Detect PDF: ends with .pdf OR is an API route with /pdf in the path (e.g. /api/portal/estimates/abc/pdf)
-  const isPdf = fileUrl.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(fileUrl)
-  const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl)
+  const isUploadedFile = fileUrl.length > 0 && (fileUrl.startsWith("http") || fileUrl.startsWith("blob:")) && !fileUrl.includes("/api/")
+  const isRealFile = isUploadedFile
+  const isPdf = isUploadedFile && (fileUrl.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(fileUrl))
+  const isImage = isUploadedFile && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl)
 
   const handleIframeLoad = () => {
     setPdfLoading(false)
@@ -419,16 +421,62 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center p-8">
-                  <div className="text-center">
-                    <div className={`h-20 w-20 rounded-2xl ${typeCfg.bg} flex items-center justify-center mx-auto mb-4`}>
-                      <TypeIcon className={`h-10 w-10 ${typeCfg.color}`} />
+                /* ── Rich Document Preview (no PDF attached) ── */
+                <div className="flex-1 overflow-y-auto">
+                  {/* Simulated document header */}
+                  <div className="bg-white dark:bg-slate-900 border-b border-slate-200/60 dark:border-white/5 px-8 py-6">
+                    <div className="max-w-xl mx-auto">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`h-12 w-12 rounded-xl ${typeCfg.bg} flex items-center justify-center`}>
+                          <TypeIcon className={`h-6 w-6 ${typeCfg.color}`} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">{typeCfg.label}</p>
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white">{selected.title}</h3>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase font-medium">From</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">{selected.sender.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-400 uppercase font-medium">Date</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {new Date(selected.createdAt).toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" })}
+                          </p>
+                        </div>
+                        {selected.project && (
+                          <div className="col-span-2">
+                            <p className="text-[10px] text-slate-400 uppercase font-medium">Project</p>
+                            <p className="font-semibold text-slate-900 dark:text-white">{selected.project.title}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-300 mb-2">{typeCfg.label} Received</h3>
-                    <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                      This {typeCfg.label.toLowerCase()} was sent by {selected.sender.name}. 
-                      No PDF file is attached — review the details on the left.
-                    </p>
+                  </div>
+                  {/* Document body */}
+                  <div className="px-8 py-6">
+                    <div className="max-w-xl mx-auto">
+                      {selected.description ? (
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{selected.description}</p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <TypeIcon className={`h-12 w-12 mx-auto ${typeCfg.color} opacity-20 mb-3`} />
+                          <p className="text-sm text-slate-400">No additional details provided.</p>
+                          <p className="text-xs text-slate-400 mt-1">Review the summary on the left panel.</p>
+                        </div>
+                      )}
+                      {/* Status bar */}
+                      <div className="mt-8 pt-4 border-t border-dashed border-slate-200 dark:border-white/10">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
+                          <span>Status: <span className="font-semibold capitalize">{(statusConfig[selected.status] || statusConfig.sent).label}</span></span>
+                          {selected.readAt && <span>Viewed {new Date(selected.readAt).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}</span>}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
