@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   MessageSquare, Camera, Paperclip, Plus, X, Send, Upload,
-  FileText, Trash2,
+  FileText, Trash2, ArrowRight,
 } from "lucide-react"
 
 // ─── Types (exported for ActivityTimeline) ───────────────
@@ -94,27 +94,38 @@ export function ActivityBullets({
         const isActive = activeForm?.activityId === activityId && activeForm?.position === pos
 
         return (
-          <div key={pos} className="relative flex items-center gap-2">
-            {/* Bullet dot */}
+          <div key={pos} className="relative flex items-center gap-1.5">
+            {/* Arrow connector (mermaid-style) — line + arrowhead */}
             <button
               onClick={() => {
                 if (isActive) setActiveForm(null)
                 else setActiveForm({ activityId, position: pos })
               }}
-              className={`relative z-10 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+              className={`relative z-10 shrink-0 flex items-center transition-all ${
                 existing.length > 0
-                  ? "bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/20"
+                  ? "text-teal-500"
                   : isActive
-                    ? "bg-teal-500 border-teal-400 text-white shadow-lg shadow-teal-500/20 scale-110"
-                    : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:border-teal-400 dark:hover:border-teal-500 hover:scale-110"
+                    ? "text-teal-500 scale-110"
+                    : "text-slate-300 dark:text-slate-600 hover:text-teal-400 dark:hover:text-teal-500 hover:scale-110"
               }`}
-              title={`Add ${pos} annotation`}
+              title={`${existing.length > 0 ? `${existing.length} annotation(s)` : `Add ${pos} annotation`}`}
             >
-              {existing.length > 0 ? (
-                <span className="text-[8px] font-bold">{existing.length}</span>
-              ) : (
-                <Plus className="h-2.5 w-2.5 text-slate-400" />
-              )}
+              {/* Horizontal line segment */}
+              <div className={`w-5 h-0.5 rounded-full transition-colors ${
+                existing.length > 0
+                  ? "bg-teal-400 dark:bg-teal-500"
+                  : isActive
+                    ? "bg-teal-400 dark:bg-teal-500"
+                    : "bg-slate-200 dark:bg-slate-700 group-hover:bg-teal-300"
+              }`} />
+              {/* Arrowhead */}
+              <ArrowRight className={`h-4 w-4 -ml-1 transition-colors ${
+                existing.length > 0
+                  ? "text-teal-500 dark:text-teal-400"
+                  : isActive
+                    ? "text-teal-500 dark:text-teal-400"
+                    : "text-slate-300 dark:text-slate-600"
+              }`} />
             </button>
 
             {/* Existing annotations + inline form */}
