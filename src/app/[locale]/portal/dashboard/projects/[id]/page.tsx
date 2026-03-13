@@ -52,21 +52,24 @@ export default function ProjectDetailPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
   const [loading, setLoading] = useState(true)
 
+  // Role-based API prefix: admins use admin routes (full CRUD), others use portal routes (access-gated)
+  const apiBase = isAdmin ? `/api/admin/projects/${id}` : `/api/portal/my-projects/${id}`
+
   const loadProject = useCallback(() => {
-    fetch(`/api/admin/projects/${id}`).then(r => r.json()).then(setProject).catch(console.error)
-  }, [id])
+    fetch(apiBase).then(r => r.json()).then(setProject).catch(console.error)
+  }, [apiBase])
 
   const loadActivities = useCallback(() => {
-    fetch(`/api/admin/projects/${id}/activity`).then(r => r.json()).then(d => setActivities(Array.isArray(d) ? d : [])).catch(console.error)
-  }, [id])
+    fetch(`${apiBase}/activity`).then(r => r.json()).then(d => setActivities(Array.isArray(d) ? d : [])).catch(console.error)
+  }, [apiBase])
 
   const loadTasks = useCallback(() => {
-    fetch(`/api/admin/projects/${id}/tasks`).then(r => r.json()).then(d => setTasks(Array.isArray(d) ? d : [])).catch(console.error)
-  }, [id])
+    fetch(`${apiBase}/tasks`).then(r => r.json()).then(d => setTasks(Array.isArray(d) ? d : [])).catch(console.error)
+  }, [apiBase])
 
   const loadFiles = useCallback(() => {
-    fetch(`/api/admin/projects/${id}/files`).then(r => r.json()).then(d => setFiles(Array.isArray(d) ? d : [])).catch(console.error)
-  }, [id])
+    fetch(`${apiBase}/files`).then(r => r.json()).then(d => setFiles(Array.isArray(d) ? d : [])).catch(console.error)
+  }, [apiBase])
 
   useEffect(() => {
     Promise.all([loadProject(), loadActivities(), loadTasks(), loadFiles()])
