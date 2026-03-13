@@ -66,10 +66,16 @@ export default function AppointmentsPage() {
   const isFormOpen = (showForm && !editingApt) || !!editingApt
 
   const handleDateClick = (dateStr: string) => {
-    setSelectedDate(dateStr.split("T")[0])
+    const d = dateStr.split("T")[0]
+    setSelectedDate(d)
     setEditingApt(null)
     setShowForm(true)
   }
+
+  // Appointments for the selected day (shown below calendar)
+  const selectedDayApts = selectedDate
+    ? store.appointments.filter(a => a.date === selectedDate && a.status !== "cancelled")
+    : []
 
   const upcoming = store.appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
   const past = store.appointments.filter(a => a.status === "completed" || a.status === "cancelled")
@@ -156,9 +162,78 @@ export default function AppointmentsPage() {
         {/* View Panel — shrinks when form is open */}
         <div className={`min-w-0 transition-all duration-300 ease-in-out ${isFormOpen ? "flex-1" : "w-full"}`}>
           {view === "calendar" && (
-            <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts}
-              onEventClick={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) { setShowForm(false); setEditingApt(apt) } }}
-              onDateClick={handleDateClick} />
+            <>
+              <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts}
+                onEventClick={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) { setShowForm(false); setEditingApt(apt) } }}
+                onDateClick={handleDateClick} />
+
+              {/* Day Detail Panel — shows selected date's appointments */}
+              {selectedDate && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200/60 dark:border-white/10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-500/15 flex items-center justify-center">
+                        <CalendarDays className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                          {new Date(selectedDate + "T12:00:00").toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                        </h3>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{selectedDayApts.length} appointment{selectedDayApts.length !== 1 ? "s" : ""}</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setSelectedDate("")} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-slate-600 transition-colors">
+                      <XCircle className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {selectedDayApts.length === 0 ? (
+                    <div className="px-5 py-8 text-center">
+                      <CalendarDays className="h-8 w-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                      <p className="text-sm text-slate-400 dark:text-slate-500">No appointments scheduled</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-600 mt-0.5">Click + New to add one for this date</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 dark:divide-white/5">
+                      {selectedDayApts.sort((a, b) => a.time.localeCompare(b.time)).map(apt => {
+                        const TypeIcon = typeIcons[apt.type] || CalendarDays
+                        const hasConflict = conflicts.includes(apt.id)
+                        return (
+                          <div key={apt.id} className={`px-5 py-4 hover:bg-slate-50/50 dark:hover:bg-white/3 transition-colors ${hasConflict ? "bg-red-50/30 dark:bg-red-500/5" : ""}`}>
+                            <div className="flex items-start gap-3">
+                              <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${typeColors[apt.type]}`}>
+                                <TypeIcon className="h-4 w-4" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{apt.clientName}</h4>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium uppercase ${typeColors[apt.type]}`}>{apt.type}</span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[apt.status]}`}>{apt.status}</span>
+                                  {hasConflict && <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-red-100 dark:bg-red-500/15 text-red-600 dark:text-red-400 flex items-center gap-1"><AlertTriangle className="h-2.5 w-2.5" />Conflict</span>}
+                                </div>
+                                <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                                  <span className="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300"><Clock className="h-3 w-3 text-blue-500" />{apt.time} — {apt.duration}min</span>
+                                  <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{apt.address}</span>
+                                  <span className="flex items-center gap-1"><User className="h-3 w-3" />{apt.assignedName}</span>
+                                </div>
+                                {apt.notes && (
+                                  <div className="mt-2 px-3 py-2 rounded-lg bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5">
+                                    <p className="text-[11px] text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{apt.notes}</p>
+                                  </div>
+                                )}
+                              </div>
+                              <button onClick={() => { setShowForm(false); setEditingApt(apt) }}
+                                className="shrink-0 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </>
           )}
 
           {view === "gantt" && (
@@ -174,7 +249,7 @@ export default function AppointmentsPage() {
 
         {/* Inline Form Panel — appears on the right, independent scroll */}
         {isFormOpen && (
-          <div className="w-[420px] shrink-0 sticky top-4 h-[calc(100vh-2rem)]">
+          <div className="w-[420px] shrink-0 sticky top-4 h-[770px]">
             {showForm && !editingApt && (
               <AppointmentForm key={`create-${selectedDate}`} open={true} onClose={() => { setShowForm(false); setSelectedDate("") }} userId={userId}
                 initialDate={selectedDate}

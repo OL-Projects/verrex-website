@@ -174,7 +174,7 @@ export default function CalendarView({ appointments, typeBgColors, conflicts, on
         }}
         events={events}
         height="auto"
-        contentHeight={560}
+        contentHeight={680}
         editable={false}
         selectable={true}
         eventClick={(info) => { if (onEventClick) onEventClick(info.event.id) }}
