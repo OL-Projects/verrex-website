@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { VEREXLogo } from "@/components/ui/verrex-logo"
 import { SIDEBAR_NAV } from "@/types/portal"
 import { usePortalStore } from "@/lib/portal-store"
+import { useDocumentBadges } from "@/hooks/useClientDocuments"
 import type { UserRole } from "@/types/portal"
 import { useProfilePhoto } from "@/lib/use-profile-photo"
 import {
@@ -74,16 +75,17 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
   const T = usePortalT()
   
-  // ── Badge Counts (for client role) ──
+  // ── Badge Counts (for client role) — merge local store + API document badges ──
+  const apiBadges = useDocumentBadges()
   const storeBadges = (() => {
     try {
       const store = usePortalStore()
       const cid = session?.user ? (session.user as any).id || '' : ''
       const r = session?.user ? ((session.user as any).role || 'client') : 'client'
       if (r !== 'client') return {}
-      const unreadInvoices = store.invoices.filter(i => i.clientId === cid && i.status !== 'draft' && !i.readByClient).length
-      const unsignedContracts = store.contracts.filter(c => (c as any).clientId === cid && c.status === 'sent' && !c.readByClient).length
-      const pendingEstimates = store.estimations.filter(e => e.clientId === cid && e.status === 'sent' && !e.readByClient).length
+      const unreadInvoices = store.invoices.filter(i => i.clientId === cid && i.status !== 'draft' && !i.readByClient).length + apiBadges.invoices
+      const unsignedContracts = store.contracts.filter(c => (c as any).clientId === cid && c.status === 'sent' && !c.readByClient).length + apiBadges.contracts
+      const pendingEstimates = store.estimations.filter(e => e.clientId === cid && e.status === 'sent' && !e.readByClient).length + apiBadges.estimates
       return {
         '/portal/dashboard/invoices': unreadInvoices,
         '/portal/dashboard/contracts': unsignedContracts,

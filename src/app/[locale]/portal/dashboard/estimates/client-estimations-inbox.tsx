@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react"
 import { usePortalStore } from "@/lib/portal-store"
-import { FileText, ChevronLeft, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
+import { useClientDocuments } from "@/hooks/useClientDocuments"
+import { FileText, ChevronLeft, Clock, CheckCircle2, XCircle, AlertCircle, ExternalLink, Inbox } from "lucide-react"
 import type { Estimation } from "@/types/portal"
 import RevisionRequestModal from "@/components/portal/revision-request-modal"
 
@@ -16,6 +17,7 @@ const statusConfig: Record<string, { cls: string; label: string }> = {
 
 export default function ClientEstimationsInbox({ clientId }: { clientId: string }) {
   const store = usePortalStore()
+  const { docs: apiDocs, markAsRead, unreadCount: apiUnread } = useClientDocuments("estimation")
   const [selected, setSelected] = useState<Estimation | null>(null)
   const [showRevision, setShowRevision] = useState(false)
   const [confirmAction, setConfirmAction] = useState<"accept" | "reject" | null>(null)
@@ -175,7 +177,44 @@ export default function ClientEstimationsInbox({ clientId }: { clientId: string 
         </div>
       </div>
       <div className="flex-1 overflow-auto p-4 space-y-3">
-        {myEstimations.length === 0 ? (
+        {/* ── API Documents (sent via Send-To system) ── */}
+        {apiDocs.length > 0 && (
+          <>
+            <div className="flex items-center gap-2 px-1 pt-1 pb-2">
+              <Inbox className="h-4 w-4 text-indigo-500" />
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">Received from Admin ({apiDocs.length})</span>
+              {apiUnread > 0 && <span className="text-[10px] font-bold bg-indigo-600 text-white rounded-full px-1.5 py-0.5">{apiUnread} new</span>}
+            </div>
+            {apiDocs.map(doc => (
+              <a key={doc.id} href={doc.fileUrl} target="_blank" rel="noopener noreferrer"
+                onClick={() => { if (!doc.readAt) markAsRead(doc.id) }}
+                className={`block w-full text-left p-4 rounded-xl border transition-all hover:shadow-md ${!doc.readAt ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-500/5 dark:border-indigo-500/20" : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10"}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      {!doc.readAt && <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />}
+                      <span className="font-semibold text-slate-900 dark:text-white text-sm truncate">{doc.title}</span>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${!doc.readAt ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-600"}`}>
+                        {!doc.readAt ? "New" : "Viewed"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">From: {doc.sender.name} · {new Date(doc.createdAt).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}</p>
+                    {doc.description && <p className="text-xs text-slate-400 mt-1 truncate">{doc.description}</p>}
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-slate-400 shrink-0 mt-1" />
+                </div>
+              </a>
+            ))}
+            {myEstimations.length > 0 && (
+              <div className="flex items-center gap-2 px-1 pt-3 pb-2">
+                <FileText className="h-4 w-4 text-indigo-500" />
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">Generated Estimates ({myEstimations.length})</span>
+              </div>
+            )}
+          </>
+        )}
+
+        {myEstimations.length === 0 && apiDocs.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="font-medium">No estimates yet</p>
