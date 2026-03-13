@@ -1,14 +1,8 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import type { TimelineContextType, TimelineEventType, TimelineEvent } from "@/types/portal"
-import {
-  getUniversalTimeline,
-  getTimelineByLead,
-  getTimelineByClient,
-  getTimelineByProject,
-} from "@/lib/portal-data"
 import { TimelineContextSelector } from "@/components/portal/timeline-context-selector"
 import { HybridTimelineView } from "@/components/portal/hybrid-timeline-view"
 import {
@@ -60,6 +54,22 @@ export default function TimelinePage() {
   const [flaggedOnly, setFlaggedOnly] = useState(false)
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
+  const [allEvents, setAllEvents] = useState<TimelineEvent[]>([])
+  const [timelineLoading, setTimelineLoading] = useState(true)
+
+  // Fetch real timeline from API
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/portal/timeline")
+        if (res.ok) {
+          const data = await res.json()
+          setAllEvents(data.events || [])
+        }
+      } catch { /* silent */ }
+      finally { setTimelineLoading(false) }
+    })()
+  }, [])
 
   const hasActiveFilters = activeCategories.size > 0 || activeRoles.size > 0 || stageChangesOnly || attachmentsOnly || flaggedOnly || dateFrom || dateTo
 
@@ -73,15 +83,13 @@ export default function TimelinePage() {
     setDateTo("")
   }, [])
 
-  // Raw events from data layer
+  // Filter events by context
   const rawEvents = useMemo((): TimelineEvent[] => {
-    if (contextType === "all") return getUniversalTimeline(userRole)
-    if (contextType === "lead" && contextId) return getTimelineByLead(contextId, userRole)
-    if (contextType === "client" && contextId) return getTimelineByClient(contextId, userRole)
-    if (contextType === "project" && contextId) return getTimelineByProject(contextId, userRole)
+    if (contextType === "all") return allEvents
+    if (contextId && contextType === "project") return allEvents.filter(e => e.projectId === contextId)
     if (!contextId) return []
-    return getUniversalTimeline(userRole)
-  }, [contextType, contextId, userRole])
+    return allEvents
+  }, [contextType, contextId, allEvents])
 
   // Filtered events
   const events = useMemo(() => {
