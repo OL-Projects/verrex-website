@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion"
 import {
   MessageSquare, Loader2, Search, ArrowLeft, Plus, Users, User,
-  X, ChevronDown, Eye, EyeOff,
+  X, ChevronDown, Eye, EyeOff, Download, Maximize2, FileText, Film,
 } from "lucide-react"
 import {
   useMessages, type Conversation, type ChatMessage, type PortalUser,
@@ -26,8 +26,20 @@ export default function MessagesPage() {
   const [filter, setFilter] = useState<"all" | "direct" | "group">("all")
   const [showNewConvo, setShowNewConvo] = useState(false)
   const [lightbox, setLightbox] = useState<{ url: string; all: string[] } | null>(null)
+  const [previewFile, setPreviewFile] = useState<{ url: string; name: string; type: "image" | "pdf" | "video" | "file"; allUrls?: string[] } | null>(null)
   const [showScrollBtn, setShowScrollBtn] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Determine file type from URL
+  const openPreview = (url: string, allUrls?: string[]) => {
+    const lower = url.toLowerCase()
+    const name = url.split("/").pop()?.split("?")[0] || "file"
+    const type = /\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(lower) ? "image" as const
+      : /\.pdf(\?|$)/i.test(lower) ? "pdf" as const
+      : /\.(mp4|webm|mov|avi)(\?|$)/i.test(lower) ? "video" as const
+      : "file" as const
+    setPreviewFile({ url, name, type, allUrls })
+  }
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -99,8 +111,10 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* ═══ RIGHT: Chat Area ═══ */}
-      <div className={`${hook.activeConvo ? "flex" : "hidden md:flex"} flex-col flex-1 relative`}>
+      {/* ═══ RIGHT: Chat + Preview Split ═══ */}
+      <div className={`${hook.activeConvo ? "flex" : "hidden md:flex"} flex-1 min-w-0`}>
+        {/* ── Chat Column ── */}
+        <div className="flex flex-col flex-1 min-w-0 relative">
         {!hook.activeConvo ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -147,7 +161,7 @@ export default function MessagesPage() {
                       )}
                       <MessageBubble msg={m} isMine={m.senderId === userId} isGroup={hook.activeConvo?.type === "group"} showSender={showSender}
                         onReply={hook.setReplyTo} onEdit={hook.setEditingMsg} onDelete={hook.deleteMessage}
-                        onImageClick={(url, all) => setLightbox({ url, all })} />
+                        onImageClick={(url, all) => openPreview(url, all)} />
                     </div>
                   )
                 })
@@ -172,7 +186,91 @@ export default function MessagesPage() {
               editingMsg={hook.editingMsg} onEdit={hook.editMessage} onCancelEdit={() => hook.setEditingMsg(null)} />
           </>
         )}
-      </div>
+        </div>{/* /Chat Column */}
+
+        {/* ── Preview Panel (slides in from right) ── */}
+        <AnimatePresence>
+          {previewFile && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 380, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="hidden md:flex flex-col border-l border-slate-200/60 dark:border-white/10 bg-white dark:bg-slate-900 overflow-hidden"
+              style={{ minWidth: 0 }}
+            >
+              {/* Preview header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/5 shrink-0">
+                <div className="flex items-center gap-2 min-w-0">
+                  {previewFile.type === "image" ? <Maximize2 className="h-4 w-4 text-blue-500 shrink-0" />
+                    : previewFile.type === "pdf" ? <FileText className="h-4 w-4 text-red-500 shrink-0" />
+                    : previewFile.type === "video" ? <Film className="h-4 w-4 text-purple-500 shrink-0" />
+                    : <FileText className="h-4 w-4 text-slate-500 shrink-0" />}
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{decodeURIComponent(previewFile.name)}</span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  {previewFile.type === "image" && previewFile.allUrls && (
+                    <button onClick={() => setLightbox({ url: previewFile.url, all: previewFile.allUrls! })}
+                      className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors" title="Fullscreen">
+                      <Maximize2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  <a href={previewFile.url} download target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors" title="Download">
+                    <Download className="h-3.5 w-3.5" />
+                  </a>
+                  <button onClick={() => setPreviewFile(null)}
+                    className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors" title="Close">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview content — own scroll */}
+              <div className="flex-1 overflow-y-auto">
+                {previewFile.type === "image" && (
+                  <div className="p-3">
+                    <img src={previewFile.url} alt={previewFile.name} className="w-full rounded-xl object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                      onClick={() => previewFile.allUrls && setLightbox({ url: previewFile.url, all: previewFile.allUrls })} />
+                    {/* Image gallery navigation */}
+                    {previewFile.allUrls && previewFile.allUrls.length > 1 && (
+                      <div className="mt-3 flex gap-1.5 overflow-x-auto pb-2">
+                        {previewFile.allUrls.map((u, i) => (
+                          <button key={i} onClick={() => setPreviewFile({ ...previewFile, url: u })}
+                            className={`h-14 w-14 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${u === previewFile.url ? "border-blue-500 shadow-md" : "border-transparent opacity-60 hover:opacity-100"}`}>
+                            <img src={u} alt="" className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {previewFile.type === "pdf" && (
+                  <iframe src={previewFile.url} className="w-full h-full min-h-[600px]" title="PDF Preview" />
+                )}
+                {previewFile.type === "video" && (
+                  <div className="p-3">
+                    <video src={previewFile.url} controls className="w-full rounded-xl" />
+                  </div>
+                )}
+                {previewFile.type === "file" && (
+                  <div className="flex-1 flex items-center justify-center p-8">
+                    <div className="text-center">
+                      <FileText className="h-16 w-16 mx-auto text-slate-200 mb-4" />
+                      <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{decodeURIComponent(previewFile.name)}</p>
+                      <p className="text-xs text-slate-400 mb-4">Preview not available</p>
+                      <a href={previewFile.url} download target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
+                        <Download className="h-4 w-4" /> Download File
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>{/* /Chat + Preview Split */}
 
       {/* Modals */}
       <AnimatePresence>
