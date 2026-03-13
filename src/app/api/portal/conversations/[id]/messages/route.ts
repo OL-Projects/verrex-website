@@ -24,7 +24,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       conversationId: id,
       ...(before ? { createdAt: { lt: new Date(before) } } : {}),
     },
-    include: { sender: { select: { id: true, name: true, role: true } } },
+    include: {
+      sender: { select: { id: true, name: true, role: true } },
+      reactions: { include: { user: { select: { id: true, name: true } } }, orderBy: { createdAt: "asc" } },
+    },
     orderBy: { createdAt: "desc" },
     take: limit,
   })
@@ -106,7 +109,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const msg = await prisma.message.findUnique({ where: { id: messageId } })
   if (!msg) return NextResponse.json({ error: "Message not found" }, { status: 404 })
   if (msg.senderId !== userId) return NextResponse.json({ error: "Can only edit own messages" }, { status: 403 })
-  if (Date.now() - msg.createdAt.getTime() > 15 * 60 * 1000) return NextResponse.json({ error: "Edit window expired (15 min)" }, { status: 403 })
+  if (Date.now() - msg.createdAt.getTime() > 5 * 60 * 1000) return NextResponse.json({ error: "Edit window expired (5 min)" }, { status: 403 })
 
   const updated = await prisma.message.update({
     where: { id: messageId },

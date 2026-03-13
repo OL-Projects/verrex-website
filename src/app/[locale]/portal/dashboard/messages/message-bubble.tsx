@@ -2,17 +2,21 @@
 
 import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Reply, Pencil, Trash2, Copy, Check, CheckCheck, Ban, Download, FileText, Film } from "lucide-react"
-import { type ChatMessage, type ParsedAttachment, parseAttachments, fmtTime, canEdit, ROLE_BUBBLE_COLORS } from "./use-messages"
+import { Reply, Pencil, Trash2, Copy, Check, CheckCheck, Ban, Download, FileText, Film, Share2, Info, SmilePlus, X } from "lucide-react"
+import { type ChatMessage, type MessageReaction, type ParsedAttachment, parseAttachments, fmtTime, canEdit, ROLE_BUBBLE_COLORS } from "./use-messages"
+
+const QUICK_EMOJIS = ["👍", "❤️", "😂", "😮", "🙏", "🔥"]
 
 interface Props {
   msg: ChatMessage
   isMine: boolean
+  userId: string
   isGroup: boolean
   showSender: boolean
   onReply: (msg: ChatMessage) => void
   onEdit: (msg: ChatMessage) => void
   onDelete: (msgId: string) => void
+  onReact: (msgId: string, emoji: string) => void
   onImageClick: (url: string, allUrls: string[]) => void
 }
 
@@ -23,8 +27,10 @@ function ReadReceipt({ isMine }: { isMine: boolean }) {
   return <CheckCheck className="h-[14px] w-[14px] text-blue-300 shrink-0" />
 }
 
-export default function MessageBubble({ msg, isMine, isGroup, showSender, onReply, onEdit, onDelete, onImageClick }: Props) {
+export default function MessageBubble({ msg, isMine, userId, isGroup, showSender, onReply, onEdit, onDelete, onReact, onImageClick }: Props) {
   const [showMenu, setShowMenu] = useState(false)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [copied, setCopied] = useState(false)
   const longPressRef = useRef<NodeJS.Timeout | null>(null)
   const attachments = parseAttachments(msg.attachmentUrls)
@@ -39,6 +45,23 @@ export default function MessageBubble({ msg, isMine, isGroup, showSender, onRepl
     setCopied(true)
     setTimeout(() => { setCopied(false); setShowMenu(false) }, 1200)
   }
+
+  const handleShare = async () => {
+    setShowMenu(false)
+    const shareData: ShareData = { text: msg.content || undefined }
+    if (images.length > 0) shareData.url = images[0].url
+    if (navigator.share) { try { await navigator.share(shareData) } catch {} }
+    else { navigator.clipboard.writeText(msg.content || images[0]?.url || ""); setCopied(true); setTimeout(() => setCopied(false), 1200) }
+  }
+
+  // Group reactions by emoji
+  const reactionGroups = (msg.reactions || []).reduce<Record<string, { emoji: string; users: { id: string; name: string }[]; myReaction: boolean }>>((acc, r) => {
+    if (!acc[r.emoji]) acc[r.emoji] = { emoji: r.emoji, users: [], myReaction: false }
+    acc[r.emoji].users.push(r.user)
+    if (r.userId === userId) acc[r.emoji].myReaction = true
+    return acc
+  }, {})
+  const reactionList = Object.values(reactionGroups)
 
   const handleLongPressStart = () => {
     longPressRef.current = setTimeout(() => setShowMenu(true), 500)
@@ -103,9 +126,32 @@ export default function MessageBubble({ msg, isMine, isGroup, showSender, onRepl
           </div>
 
           {/* Hover actions */}
-          <HoverActions isMine={isMine} msg={msg} onReply={onReply} onEdit={onEdit} />
+          <HoverActions isMine={isMine} msg={msg} onReply={onReply} onEdit={onEdit} onShowEmoji={() => setShowEmojiPicker(true)} />
+
+          {/* Reaction pills */}
+          <ReactionPills reactions={reactionList} onReact={(emoji) => onReact(msg.id, emoji)} />
+
+          {/* Emoji picker */}
+          <AnimatePresence>
+            {showEmojiPicker && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowEmojiPicker(false)} />
+                <motion.div initial={{ opacity: 0, scale: 0.8, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }}
+                  className={`absolute z-50 ${isMine ? "right-0" : "left-0"} -bottom-2 translate-y-full flex items-center gap-0.5 bg-white dark:bg-slate-800 rounded-full shadow-2xl border border-slate-100 dark:border-white/10 px-1.5 py-1`}>
+                  {QUICK_EMOJIS.map(e => (
+                    <button key={e} onClick={() => { onReact(msg.id, e); setShowEmojiPicker(false) }}
+                      className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-125">{e}</button>
+                  ))}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
-        <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied} onCopy={handleCopy} onReply={onReply} onEdit={onEdit} onDelete={onDelete} onClose={() => setShowMenu(false)} />
+        <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied}
+          onCopy={handleCopy} onReply={onReply} onEdit={onEdit} onDelete={onDelete}
+          onShare={handleShare} onInfo={() => { setShowMenu(false); setShowInfo(true) }}
+          onReact={() => { setShowMenu(false); setShowEmojiPicker(true) }}
+          onClose={() => setShowMenu(false)} />
       </div>
     )
   }
@@ -199,18 +245,102 @@ export default function MessageBubble({ msg, isMine, isGroup, showSender, onRepl
         </div>
 
         {/* Hover actions */}
-        <HoverActions isMine={isMine} msg={msg} onReply={onReply} onEdit={onEdit} />
+        <HoverActions isMine={isMine} msg={msg} onReply={onReply} onEdit={onEdit} onShowEmoji={() => setShowEmojiPicker(true)} />
+
+        {/* Reaction pills */}
+        <ReactionPills reactions={reactionList} onReact={(emoji) => onReact(msg.id, emoji)} />
+
+        {/* Emoji picker popover */}
+        <AnimatePresence>
+          {showEmojiPicker && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowEmojiPicker(false)} />
+              <motion.div initial={{ opacity: 0, scale: 0.8, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8 }}
+                className={`absolute z-50 ${isMine ? "right-0" : "left-0"} -bottom-2 translate-y-full flex items-center gap-0.5 bg-white dark:bg-slate-800 rounded-full shadow-2xl border border-slate-100 dark:border-white/10 px-1.5 py-1`}>
+                {QUICK_EMOJIS.map(e => (
+                  <button key={e} onClick={() => { onReact(msg.id, e); setShowEmojiPicker(false) }}
+                    className="h-8 w-8 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-lg transition-transform hover:scale-125">{e}</button>
+                ))}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
 
-      <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied} onCopy={handleCopy} onReply={onReply} onEdit={onEdit} onDelete={onDelete} onClose={() => setShowMenu(false)} />
+      <ContextMenu show={showMenu} isMine={isMine} msg={msg} copied={copied}
+        onCopy={handleCopy} onReply={onReply} onEdit={onEdit} onDelete={onDelete}
+        onShare={handleShare} onInfo={() => { setShowMenu(false); setShowInfo(true) }}
+        onReact={() => { setShowMenu(false); setShowEmojiPicker(true) }}
+        onClose={() => setShowMenu(false)} />
+
+      {/* Message Info Sheet */}
+      <AnimatePresence>
+        {showInfo && (
+          <>
+            <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setShowInfo(false)} />
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+              className={`absolute z-50 ${isMine ? "right-0" : "left-0"} top-0 mt-10 w-72 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden`}
+              onClick={e => e.stopPropagation()}>
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Message Info</h4>
+                <button onClick={() => setShowInfo(false)} className="text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="p-4 space-y-3">
+                <div><p className="text-[10px] font-medium text-slate-400 uppercase">From</p><p className="text-sm text-slate-700 dark:text-slate-300">{msg.sender.name} <span className="text-slate-400">({msg.sender.role})</span></p></div>
+                <div><p className="text-[10px] font-medium text-slate-400 uppercase">Sent</p><p className="text-sm text-slate-700 dark:text-slate-300">{new Date(msg.createdAt).toLocaleString()}</p></div>
+                {msg.editedAt && <div><p className="text-[10px] font-medium text-slate-400 uppercase">Edited</p><p className="text-sm text-slate-700 dark:text-slate-300">{new Date(msg.editedAt).toLocaleString()}</p></div>}
+                {reactionList.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-medium text-slate-400 uppercase mb-2">Reactions</p>
+                    <div className="space-y-1.5">
+                      {reactionList.map(r => (
+                        <div key={r.emoji} className="flex items-center gap-2">
+                          <span className="text-lg">{r.emoji}</span>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">{r.users.map(u => u.name).join(", ")}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {reactionList.length === 0 && <p className="text-xs text-slate-400 italic">No reactions yet</p>}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ── Reaction Pills (below bubble) ── */
+function ReactionPills({ reactions, onReact }: { reactions: { emoji: string; users: { id: string; name: string }[]; myReaction: boolean }[]; onReact: (emoji: string) => void }) {
+  if (reactions.length === 0) return null
+  return (
+    <div className="flex flex-wrap gap-1 mt-1 px-1">
+      {reactions.map(r => (
+        <button key={r.emoji} onClick={() => onReact(r.emoji)}
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all ${
+            r.myReaction
+              ? "bg-blue-100 dark:bg-blue-500/20 border border-blue-300 dark:border-blue-500/40 shadow-sm"
+              : "bg-slate-100 dark:bg-white/10 border border-slate-200/60 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/15"
+          }`}>
+          <span className="text-sm">{r.emoji}</span>
+          <span className={`text-[10px] font-medium ${r.myReaction ? "text-blue-700 dark:text-blue-400" : "text-slate-500"}`}>{r.users.length}</span>
+        </button>
+      ))}
     </div>
   )
 }
 
 /* ── Hover action buttons ── */
-function HoverActions({ isMine, msg, onReply, onEdit }: { isMine: boolean; msg: ChatMessage; onReply: (m: ChatMessage) => void; onEdit: (m: ChatMessage) => void }) {
+function HoverActions({ isMine, msg, onReply, onEdit, onShowEmoji }: {
+  isMine: boolean; msg: ChatMessage; onReply: (m: ChatMessage) => void; onEdit: (m: ChatMessage) => void; onShowEmoji: () => void
+}) {
   return (
     <div className={`absolute top-1 ${isMine ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} hidden group-hover:flex items-center gap-0.5 z-10`}>
+      <button onClick={onShowEmoji} className="p-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-white/10 shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-all hover:scale-105" title="React">
+        <SmilePlus className="h-3.5 w-3.5 text-slate-500" />
+      </button>
       <button onClick={() => onReply(msg)} className="p-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-white/10 shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-all hover:scale-105" title="Reply">
         <Reply className="h-3.5 w-3.5 text-slate-500" />
       </button>
@@ -224,9 +354,10 @@ function HoverActions({ isMine, msg, onReply, onEdit }: { isMine: boolean; msg: 
 }
 
 /* ── Context menu (right-click / long-press) ── */
-function ContextMenu({ show, isMine, msg, copied, onCopy, onReply, onEdit, onDelete, onClose }: {
+function ContextMenu({ show, isMine, msg, copied, onCopy, onReply, onEdit, onDelete, onShare, onInfo, onReact, onClose }: {
   show: boolean; isMine: boolean; msg: ChatMessage; copied: boolean
-  onCopy: () => void; onReply: (m: ChatMessage) => void; onEdit: (m: ChatMessage) => void; onDelete: (id: string) => void; onClose: () => void
+  onCopy: () => void; onReply: (m: ChatMessage) => void; onEdit: (m: ChatMessage) => void; onDelete: (id: string) => void
+  onShare: () => void; onInfo: () => void; onReact: () => void; onClose: () => void
 }) {
   return (
     <AnimatePresence>
@@ -234,20 +365,32 @@ function ContextMenu({ show, isMine, msg, copied, onCopy, onReply, onEdit, onDel
         <>
           <div className="fixed inset-0 z-50" onClick={onClose} />
           <motion.div initial={{ opacity: 0, scale: 0.9, y: -4 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}
-            className={`absolute z-50 ${isMine ? "right-4" : "left-4"} top-0 mt-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 py-2 min-w-[170px] overflow-hidden`}>
-            {[
-              { icon: Reply, label: "Reply", action: () => { onReply(msg); onClose() }, show: true },
-              { icon: copied ? Check : Copy, label: copied ? "Copied!" : "Copy text", action: onCopy, show: !!msg.content },
-              { icon: Pencil, label: "Edit", action: () => { onEdit(msg); onClose() }, show: isMine && canEdit(msg) },
-              { icon: Trash2, label: "Delete", action: () => { if (confirm("Delete this message?")) { onDelete(msg.id); onClose() } }, show: isMine, danger: true },
-            ].filter(a => a.show).map((action, i) => (
-              <button key={i} onClick={action.action}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-[12px] font-medium transition-colors ${
-                  (action as any).danger ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                }`}>
-                <action.icon className="h-4 w-4" /> {action.label}
-              </button>
-            ))}
+            className={`absolute z-50 ${isMine ? "right-4" : "left-4"} top-0 mt-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden`}>
+            {/* Quick emoji row */}
+            <div className="flex items-center gap-0.5 px-3 py-2 border-b border-slate-100 dark:border-white/5">
+              {QUICK_EMOJIS.map(e => (
+                <button key={e} onClick={() => { onReact(); }} className="h-7 w-7 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-base transition-transform hover:scale-125">{e}</button>
+              ))}
+            </div>
+            {/* Action items */}
+            <div className="py-1 min-w-[180px]">
+              {[
+                { icon: SmilePlus, label: "React", action: onReact, show: true },
+                { icon: Reply, label: "Reply", action: () => { onReply(msg); onClose() }, show: true },
+                { icon: copied ? Check : Copy, label: copied ? "Copied!" : "Copy", action: onCopy, show: !!msg.content },
+                { icon: Share2, label: "Share", action: onShare, show: true },
+                { icon: Info, label: "Info", action: onInfo, show: true },
+                { icon: Pencil, label: `Edit (5 min)`, action: () => { onEdit(msg); onClose() }, show: isMine && canEdit(msg) },
+                { icon: Trash2, label: "Delete", action: () => { if (confirm("Delete this message?")) { onDelete(msg.id); onClose() } }, show: isMine, danger: true },
+              ].filter(a => a.show).map((action, i) => (
+                <button key={i} onClick={action.action}
+                  className={`w-full flex items-center gap-3 px-4 py-2 text-[12px] font-medium transition-colors ${
+                    (action as any).danger ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10" : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
+                  }`}>
+                  <action.icon className="h-4 w-4" /> {action.label}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </>
       )}

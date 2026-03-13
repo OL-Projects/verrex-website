@@ -159,8 +159,9 @@ export default function MessagesPage() {
                           <span className="px-3 py-1 rounded-full bg-slate-200/60 dark:bg-white/10 text-[10px] font-medium text-slate-500">{fmtDate(m.createdAt)}</span>
                         </div>
                       )}
-                      <MessageBubble msg={m} isMine={m.senderId === userId} isGroup={hook.activeConvo?.type === "group"} showSender={showSender}
+                      <MessageBubble msg={m} isMine={m.senderId === userId} userId={userId} isGroup={hook.activeConvo?.type === "group"} showSender={showSender}
                         onReply={hook.setReplyTo} onEdit={hook.setEditingMsg} onDelete={hook.deleteMessage}
+                        onReact={hook.toggleReaction}
                         onImageClick={(url, all) => openPreview(url, all)} />
                     </div>
                   )

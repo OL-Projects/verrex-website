@@ -38,6 +38,7 @@ model User {
   conversations    ConversationParticipant[]
   sentDocuments    Document[]          @relation("SentDocuments")
   receivedDocuments Document[]         @relation("ReceivedDocuments")
+  reactions         MessageReaction[]  @relation("UserReactions")
 }
 
 model PasswordReset {
@@ -281,6 +282,21 @@ model Message {
 
   @@index([conversationId, createdAt])
   @@index([senderId])
+
+  reactions MessageReaction[]
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  emoji     String   // e.g. "👍", "❤️", "😂"
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("UserReactions", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, userId, emoji]) // one reaction per emoji per user per message
+  @@index([messageId])
 }
 
 // ─── Documents (Inbox: Contracts, Estimations, Invoices as PDFs) ──

@@ -12,6 +12,10 @@ export interface Conversation {
   unreadCount: number; updatedAt: string
   isMarkedUnread?: boolean
 }
+export interface MessageReaction {
+  id: string; emoji: string; userId: string; user: { id: string; name: string }; createdAt: string
+}
+
 export interface ChatMessage {
   id: string; content: string; attachmentUrls: string | null
   senderId: string; sender: { id: string; name: string; role: string }
@@ -20,6 +24,7 @@ export interface ChatMessage {
   deletedAt?: string | null
   replyToId?: string | null
   replyTo?: { id: string; content: string; sender: { name: string } } | null
+  reactions?: MessageReaction[]
 }
 export interface PortalUser { id: string; name: string; email: string; role: string; company: string | null }
 
@@ -63,7 +68,7 @@ export function isSameDay(a: string, b: string) {
   return new Date(a).toDateString() === new Date(b).toDateString()
 }
 export function canEdit(msg: ChatMessage) {
-  return Date.now() - new Date(msg.createdAt).getTime() < 15 * 60 * 1000 // 15 min
+  return Date.now() - new Date(msg.createdAt).getTime() < 5 * 60 * 1000 // 5 min (WhatsApp-style)
 }
 
 // ─── Parse Attachments ──────────────────────────────────
@@ -250,6 +255,30 @@ export function useMessages(userId: string) {
     }
   }, [activeConvo])
 
+  // ── Toggle Reaction ──
+  const toggleReaction = useCallback(async (msgId: string, emoji: string) => {
+    if (!activeConvo) return
+    // Optimistic update
+    setMessages(prev => prev.map(m => {
+      if (m.id !== msgId) return m
+      const reactions = [...(m.reactions || [])]
+      const idx = reactions.findIndex(r => r.emoji === emoji && r.userId === userId)
+      if (idx >= 0) {
+        reactions.splice(idx, 1) // remove
+      } else {
+        reactions.push({ id: `temp-${Date.now()}`, emoji, userId, user: { id: userId, name: "You" }, createdAt: new Date().toISOString() })
+      }
+      return { ...m, reactions }
+    }))
+    // API call
+    try {
+      await fetch(`/api/portal/conversations/${activeConvo.id}/reactions`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: msgId, emoji }),
+      })
+    } catch { /* optimistic already applied */ }
+  }, [activeConvo, userId])
+
   // ── Mark Read / Unread ──
   const toggleReadStatus = useCallback((convoId: string) => {
     setConversations(prev => prev.map(c =>
@@ -265,7 +294,7 @@ export function useMessages(userId: string) {
   return {
     conversations, messages, activeConvo, loading, msgsLoading, sending,
     replyTo, setReplyTo, editingMsg, setEditingMsg, chatEndRef, totalUnread,
-    fetchConvos, openConvo, setActiveConvo, sendMessage, editMessage, deleteMessage, toggleReadStatus,
+    fetchConvos, openConvo, setActiveConvo, sendMessage, editMessage, deleteMessage, toggleReaction, toggleReadStatus,
     setConversations,
   }
 }
