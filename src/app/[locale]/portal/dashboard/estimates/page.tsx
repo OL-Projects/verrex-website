@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Pencil, Globe } from "lucide-react"
+import { Plus, Trash2, FileText, RotateCcw, Download, ChevronDown, ChevronUp, ImagePlus, Paperclip, X, Sun, Moon, Settings, Eye, DoorOpen, PanelTop, Send, Undo2, Redo2, Save, Pencil, Globe, Loader2 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useLocale } from "next-intl"
 import { useRouter, usePathname } from "@/i18n/navigation"
@@ -18,6 +18,7 @@ import { EstimatePDFDocument } from "@/components/portal/estimate-pdf-doc"
 import { useSession } from "next-auth/react"
 import ClientEstimationsInbox from "./client-estimations-inbox"
 import { SendDocumentModal } from "@/components/portal/send-document-modal"
+import { uploadPdfBlob } from "@/lib/upload-pdf"
 import {
   type EstimateState, type EstimateItem, type Room, type TrimRateSettings,
   WINDOW_TYPES, PRODUCTS, createBlankEstimate, createItem, createRoom,
@@ -156,6 +157,8 @@ export default function EstimatesPage() {
   const [showSendModal, setShowSendModal] = useState(false)
   const [pdfReady, setPdfReady] = useState(false)
   const [sendToModal, setSendToModal] = useState(false)
+  const [sendToPdfUrl, setSendToPdfUrl] = useState("")
+  const [sendToUploading, setSendToUploading] = useState(false)
 
   const sendEstimate = useCallback(async () => {
     setPdfReady(false)
@@ -798,8 +801,16 @@ export default function EstimatesPage() {
         <button onClick={sendEstimate} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition flex items-center gap-1.5" title="Send estimate via email">
           <Send className="h-4 w-4" /><span className="hidden sm:inline">{T.est.send}</span>
         </button>
-        <button onClick={() => setSendToModal(true)} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition flex items-center gap-1.5" title="Send to contacts">
-          <Eye className="h-4 w-4" /><span className="hidden sm:inline">Send to…</span>
+        <button onClick={async () => {
+          setSendToUploading(true); try {
+            const { pdf: renderPdf } = await import("@react-pdf/renderer")
+            const pdfDoc = <EstimatePDFDocument est={est} logo={logo || undefined} sigs={sigs} glassSettings={estCfg} gstRate={estCfg.gstRate} qstRate={estCfg.qstRate} showInstallation={estCfg.showInstallation} showDelivery={estCfg.showDelivery} showGST={estCfg.showGST} showQST={estCfg.showQST} paymentStages={estCfg.paymentStages} locale={locale} />
+            const blob = await renderPdf(pdfDoc).toBlob()
+            const url = await uploadPdfBlob(blob, "Estimate-" + est.estimateNumber + ".pdf")
+            setSendToPdfUrl(url); setSendToModal(true)
+          } catch (err) { console.error("PDF upload:", err); setSendToModal(true) } finally { setSendToUploading(false) }
+        }} disabled={sendToUploading} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 disabled:opacity-50 transition flex items-center gap-1.5" title="Send to contacts">
+          {sendToUploading ? <><Loader2 className="h-4 w-4 animate-spin" /><span className="hidden sm:inline">Preparing…</span></> : <><Eye className="h-4 w-4" /><span className="hidden sm:inline">Send to…</span></>}
         </button>
       </div>
     </div>
@@ -854,7 +865,7 @@ export default function EstimatesPage() {
     <SendDocumentModal
       open={sendToModal}
       onClose={() => setSendToModal(false)}
-      documents={[{ type: "estimation", title: `${est.estimateNumber} — ${est.clientName || "Client"}`, fileUrl: `/api/portal/estimates/${activeId}/pdf` }]}
+      documents={[{ type: "estimation", title: `${est.estimateNumber} — ${est.clientName || "Client"}`, fileUrl: sendToPdfUrl }]}
     />
 
     </>
