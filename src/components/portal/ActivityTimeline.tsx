@@ -10,7 +10,7 @@ import {
   AlertCircle, TrendingUp, Trophy, CreditCard, Banknote,
   ListTodo, CircleDot, Trash2,
 } from "lucide-react"
-import ClientAnnotationRail from "./ClientAnnotationRail"
+import { type Annotation, ActivityBullets } from "./ClientAnnotationRail"
 
 // ─── Types ──────────────────────────────────────────────
 interface Activity {
@@ -67,12 +67,6 @@ const FINANCIAL_TYPES = [
 ]
 
 // ─── Main Component ─────────────────────────────────────
-interface Annotation {
-  id: string; activityId: string; position: string; type: string
-  content: string | null; attachmentUrls: string | null; authorId: string
-  createdAt: string; author: { id: string; name: string; role: string }
-}
-
 export default function ActivityTimeline({
   activities, projectId, isAdmin, onRefresh,
   annotations = [], currentUserId = "", onAnnotationAdded,
@@ -83,6 +77,8 @@ export default function ActivityTimeline({
   const [sortNewest, setSortNewest] = useState(true)
   const [showInlineAdd, setShowInlineAdd] = useState(false)
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
+  // Annotation state (shared across all inline bullets)
+  const [activeForm, setActiveForm] = useState<{ activityId: string; position: "before" | "at" | "after" } | null>(null)
 
   // Sort activities
   const sorted = [...activities].sort((a, b) => {
@@ -100,9 +96,6 @@ export default function ActivityTimeline({
     grouped.find(g => g.date === date)!.entries.push(a)
   })
 
-  // Collect sorted activity IDs for the annotation rail
-  const sortedActivityIds = sorted.map(a => a.id)
-
   // Get open issues for the resolved picker
   const openIssues = activities.filter(a => {
     if (a.type !== "issue") return false
@@ -118,6 +111,14 @@ export default function ActivityTimeline({
 
   // Show annotation rail when there are activities and a userId
   const showAnnotationRail = activities.length > 0 && currentUserId
+
+  // Build annotation map for inline bullets (grouped by activityId:position)
+  const annotationMap = new Map<string, Annotation[]>()
+  annotations.forEach(a => {
+    const key = `${a.activityId}:${a.position}`
+    if (!annotationMap.has(key)) annotationMap.set(key, [])
+    annotationMap.get(key)!.push(a)
+  })
 
   return (
     <div className={showAnnotationRail ? "max-w-6xl" : "max-w-3xl"}>
@@ -175,10 +176,29 @@ export default function ActivityTimeline({
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{group.date}</span>
               </div>
 
-              {/* Activity cards */}
+              {/* Activity cards — with inline annotation bullets on the right */}
               <div className="space-y-3 ml-5 pl-8">
                 {group.entries.map(activity => (
-                  <ActivityCard key={activity.id} activity={activity} onLightbox={setLightboxUrl} />
+                  <div key={activity.id} className="flex items-stretch gap-4">
+                    {/* Left: Activity Card */}
+                    <div className="flex-1 min-w-0">
+                      <ActivityCard activity={activity} onLightbox={setLightboxUrl} />
+                    </div>
+                    {/* Right: 3 Annotation bullets aligned to card height (before=top, at=center, after=bottom) */}
+                    {showAnnotationRail && (
+                      <div className="w-56 shrink-0 hidden lg:flex flex-col justify-between">
+                        <ActivityBullets
+                          activityId={activity.id}
+                          annotationMap={annotationMap}
+                          projectId={projectId}
+                          currentUserId={currentUserId}
+                          activeForm={activeForm}
+                          setActiveForm={setActiveForm}
+                          onAnnotationAdded={onAnnotationAdded || (() => {})}
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -196,25 +216,6 @@ export default function ActivityTimeline({
           )}
           </div>
 
-          {/* ═══ RIGHT: Client Annotation Rail ═══ */}
-          {showAnnotationRail && (
-            <div className="w-64 shrink-0 hidden lg:block">
-              <div className="sticky top-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Your Notes</span>
-                  <span className="text-[10px] text-slate-400">({annotations.length})</span>
-                </div>
-                <ClientAnnotationRail
-                  activityIds={sortedActivityIds}
-                  annotations={annotations}
-                  projectId={projectId}
-                  currentUserId={currentUserId}
-                  onAnnotationAdded={onAnnotationAdded || (() => {})}
-                />
-              </div>
-            </div>
-          )}
         </div>
       )}
 

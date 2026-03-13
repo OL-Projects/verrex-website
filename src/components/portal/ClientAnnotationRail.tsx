@@ -7,8 +7,8 @@ import {
   FileText, Trash2,
 } from "lucide-react"
 
-// ─── Types ──────────────────────────────────────────────
-interface Annotation {
+// ─── Types (exported for ActivityTimeline) ───────────────
+export interface Annotation {
   id: string
   activityId: string
   position: string // "before" | "at" | "after"
@@ -34,7 +34,7 @@ interface Props {
 const TYPE_OPTIONS: { type: AnnotationType; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
   { type: "note", label: "Note", icon: MessageSquare, color: "text-blue-500 bg-blue-100 dark:bg-blue-500/15" },
   { type: "photo", label: "Photo", icon: Camera, color: "text-purple-500 bg-purple-100 dark:bg-purple-500/15" },
-  { type: "attachment", label: "File", icon: Paperclip, color: "text-indigo-500 bg-indigo-100 dark:bg-indigo-500/15" },
+  { type: "attachment", label: "Attachment", icon: Paperclip, color: "text-indigo-500 bg-indigo-100 dark:bg-indigo-500/15" },
 ]
 
 // ─── Main Rail ──────────────────────────────────────────
@@ -70,8 +70,8 @@ export default function ClientAnnotationRail({ activityIds, annotations, project
   )
 }
 
-// ─── Bullet Group for One Activity Card ─────────────────
-function ActivityBullets({
+// ─── Bullet Group for One Activity Card (exported for inline use) ──
+export function ActivityBullets({
   activityId, annotationMap, projectId, currentUserId, activeForm, setActiveForm, onAnnotationAdded,
 }: {
   activityId: string
@@ -85,7 +85,7 @@ function ActivityBullets({
   const positions: BulletPosition[] = ["before", "at", "after"]
 
   return (
-    <div className="flex flex-col gap-1 py-2 min-h-[80px] justify-center">
+    <div className="flex flex-col justify-between h-full py-1">
       {positions.map(pos => {
         const key = `${activityId}:${pos}`
         const existing = annotationMap.get(key) || []
