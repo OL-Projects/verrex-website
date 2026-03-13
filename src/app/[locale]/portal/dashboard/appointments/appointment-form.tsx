@@ -173,7 +173,16 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
 
   return (
     <div className="h-full flex flex-col bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-xl overflow-hidden inline-form-enter">
-      <style>{`@keyframes inline-form-slide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } } .inline-form-enter { animation: inline-form-slide 0.25s ease-out forwards; }`}</style>
+      <style>{`
+        @keyframes inline-form-slide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+        .inline-form-enter { animation: inline-form-slide 0.25s ease-out forwards; }
+        .form-scroll::-webkit-scrollbar { width: 4px; }
+        .form-scroll::-webkit-scrollbar-track { background: transparent; }
+        .form-scroll::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
+        .form-scroll::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.5); }
+        .dark .form-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        .dark .form-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+      `}</style>
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200/60 dark:border-white/10 shrink-0">
         <h2 className="text-sm font-bold text-slate-900 dark:text-white">{isEdit ? "Edit Appointment" : "New Appointment"}</h2>
@@ -186,7 +195,7 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{isEdit ? "Appointment Updated!" : "Appointment Created!"}</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-5 form-scroll">
             {/* Template Selector */}
             {!isEdit && templates.length > 0 && (
               <div>

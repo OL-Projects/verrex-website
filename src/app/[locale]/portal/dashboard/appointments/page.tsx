@@ -172,9 +172,9 @@ export default function AppointmentsPage() {
           )}
         </div>
 
-        {/* Inline Form Panel — appears on the right */}
+        {/* Inline Form Panel — appears on the right, independent scroll */}
         {isFormOpen && (
-          <div className="w-[420px] shrink-0 sticky top-4" style={{ maxHeight: "calc(100vh - 2rem)" }}>
+          <div className="w-[420px] shrink-0 sticky top-4 h-[calc(100vh-2rem)]">
             {showForm && !editingApt && (
               <AppointmentForm key={`create-${selectedDate}`} open={true} onClose={() => { setShowForm(false); setSelectedDate("") }} userId={userId}
                 initialDate={selectedDate}
