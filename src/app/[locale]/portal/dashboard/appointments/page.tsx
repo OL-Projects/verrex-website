@@ -61,6 +61,15 @@ export default function AppointmentsPage() {
   const [showSettings, setShowSettings] = useState(false)
   const [editingApt, setEditingApt] = useState<Appointment | null>(null)
   const [editHistoryMap, setEditHistoryMap] = useState<Record<string, EditRecord[]>>({})
+  const [selectedDate, setSelectedDate] = useState("")
+
+  const isFormOpen = (showForm && !editingApt) || !!editingApt
+
+  const handleDateClick = (dateStr: string) => {
+    setSelectedDate(dateStr.split("T")[0])
+    setEditingApt(null)
+    setShowForm(true)
+  }
 
   const upcoming = store.appointments.filter(a => a.status === "scheduled" || a.status === "confirmed")
   const past = store.appointments.filter(a => a.status === "completed" || a.status === "cancelled")
@@ -122,27 +131,6 @@ export default function AppointmentsPage() {
         </div>
       </motion.div>
 
-      {/* Create Form */}
-      <AppointmentForm open={showForm && !editingApt} onClose={() => setShowForm(false)} userId={userId}
-        checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime}
-        durationOptions={settings.durationOptions} startTimeOptions={settings.startTimeOptions} templates={settings.templates} />
-
-      {/* Edit Form */}
-      {editingApt && (
-        <AppointmentForm key={editingApt.id} open={!!editingApt} onClose={() => setEditingApt(null)} userId={userId}
-          mode="edit" appointment={editingApt} editHistory={editHistoryMap[editingApt.id] || []}
-          checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime}
-          durationOptions={settings.durationOptions} startTimeOptions={settings.startTimeOptions} templates={settings.templates}
-          onEditSave={(id, data, record) => {
-            const apt = store.appointments.find(a => a.id === id)
-            if (apt) {
-              Object.assign(apt, data) // Update in store
-              setEditHistoryMap(prev => ({ ...prev, [id]: [...(prev[id] || []), record] }))
-            }
-            setEditingApt(null)
-          }} />
-      )}
-
       {/* Settings */}
       <SettingsPanel open={showSettings} onClose={() => setShowSettings(false)} settings={settings} onSave={setSettings} />
 
@@ -163,21 +151,53 @@ export default function AppointmentsPage() {
         ))}
       </div>
 
-      {/* VIEWS */}
-      {view === "calendar" && (
-        <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts}
-          onEventClick={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) setEditingApt(apt) }} />
-      )}
+      {/* VIEWS + INLINE FORM */}
+      <div className="flex gap-4 items-start">
+        {/* View Panel — shrinks when form is open */}
+        <div className={`min-w-0 transition-all duration-300 ease-in-out ${isFormOpen ? "flex-1" : "w-full"}`}>
+          {view === "calendar" && (
+            <FullCalendarView appointments={store.appointments} typeBgColors={typeBgColors} conflicts={conflicts}
+              onEventClick={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) { setShowForm(false); setEditingApt(apt) } }}
+              onDateClick={handleDateClick} />
+          )}
 
-      {view === "gantt" && (
-        <GanttView appointments={store.appointments} technicians={technicians} typeBgColors={typeBgColors} conflicts={conflicts}
-          onEdit={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) setEditingApt(apt) }} />
-      )}
+          {view === "gantt" && (
+            <GanttView appointments={store.appointments} technicians={technicians} typeBgColors={typeBgColors} conflicts={conflicts}
+              onEdit={(id) => { const apt = store.appointments.find(a => a.id === id); if (apt) { setShowForm(false); setEditingApt(apt) } }} />
+          )}
 
-      {view === "list" && (
-        <ListView upcoming={upcoming} past={past} store={store} userId={userId} typeIcons={typeIcons} typeColors={typeColors} statusColors={statusColors} conflicts={conflicts}
-          onEdit={(apt) => setEditingApt(apt)} />
-      )}
+          {view === "list" && (
+            <ListView upcoming={upcoming} past={past} store={store} userId={userId} typeIcons={typeIcons} typeColors={typeColors} statusColors={statusColors} conflicts={conflicts}
+              onEdit={(apt) => { setShowForm(false); setEditingApt(apt) }} />
+          )}
+        </div>
+
+        {/* Inline Form Panel — appears on the right */}
+        {isFormOpen && (
+          <div className="w-[420px] shrink-0 sticky top-4" style={{ maxHeight: "calc(100vh - 2rem)" }}>
+            {showForm && !editingApt && (
+              <AppointmentForm key={`create-${selectedDate}`} open={true} onClose={() => { setShowForm(false); setSelectedDate("") }} userId={userId}
+                initialDate={selectedDate}
+                checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime}
+                durationOptions={settings.durationOptions} startTimeOptions={settings.startTimeOptions} templates={settings.templates} />
+            )}
+            {editingApt && (
+              <AppointmentForm key={editingApt.id} open={true} onClose={() => setEditingApt(null)} userId={userId}
+                mode="edit" appointment={editingApt} editHistory={editHistoryMap[editingApt.id] || []}
+                checklistItems={settings.checklistItems} defaultDuration={settings.defaultDuration} defaultStatus={settings.defaultStatus} defaultStartTime={settings.defaultStartTime}
+                durationOptions={settings.durationOptions} startTimeOptions={settings.startTimeOptions} templates={settings.templates}
+                onEditSave={(id, data, record) => {
+                  const apt = store.appointments.find(a => a.id === id)
+                  if (apt) {
+                    Object.assign(apt, data)
+                    setEditHistoryMap(prev => ({ ...prev, [id]: [...(prev[id] || []), record] }))
+                  }
+                  setEditingApt(null)
+                }} />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

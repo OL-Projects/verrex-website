@@ -33,6 +33,7 @@ interface Props {
   durationOptions?: { value: number; label: string }[]
   startTimeOptions?: string[]
   templates?: AppointmentTemplate[]
+  initialDate?: string
 }
 
 const aptTypes: { id: AppointmentType; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -62,7 +63,7 @@ const defaultChecklistItems = [
   "Client signature form", "Sample materials", "Site access key/code",
 ]
 
-export default function AppointmentForm({ open, onClose, userId, mode = "create", appointment, editHistory = [], onEditSave, checklistItems: customChecklist, defaultDuration = 60, defaultStatus = "scheduled", defaultStartTime = "09:00", durationOptions, startTimeOptions, templates = [] }: Props) {
+export default function AppointmentForm({ open, onClose, userId, mode = "create", appointment, editHistory = [], onEditSave, checklistItems: customChecklist, defaultDuration = 60, defaultStatus = "scheduled", defaultStartTime = "09:00", durationOptions, startTimeOptions, templates = [], initialDate = "" }: Props) {
   const store = usePortalStore()
   const isEdit = mode === "edit" && !!appointment
   const activeChecklist = customChecklist || defaultChecklistItems
@@ -74,7 +75,7 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
   const [clientName, setClientName] = useState(isEdit ? appointment.clientName : "")
   const [address, setAddress] = useState(isEdit ? appointment.address : "")
   const [aptType, setAptType] = useState<AppointmentType>(isEdit ? appointment.type : "consultation")
-  const [date, setDate] = useState(isEdit ? appointment.date : "")
+  const [date, setDate] = useState(isEdit ? appointment.date : initialDate)
   const [time, setTime] = useState(isEdit ? appointment.time : defaultStartTime)
   const [duration, setDuration] = useState(isEdit ? appointment.duration : defaultDuration)
   const [assignedTo, setAssignedTo] = useState(isEdit ? appointment.assignedTo : "")
@@ -171,24 +172,21 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm drawer-backdrop" onClick={onClose} />
-      <div className="relative w-full max-w-lg h-full bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto drawer-slide-in" style={{ animationName: "slide-in-right" }}>
-        <style>{`@keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } } .drawer-slide-in { animation: slide-in-right 0.3s ease-out forwards; }`}</style>
+    <div className="h-full flex flex-col bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 dark:border-white/10 shadow-xl overflow-hidden inline-form-enter">
+      <style>{`@keyframes inline-form-slide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } } .inline-form-enter { animation: inline-form-slide 0.25s ease-out forwards; }`}</style>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200/60 dark:border-white/10 shrink-0">
+        <h2 className="text-sm font-bold text-slate-900 dark:text-white">{isEdit ? "Edit Appointment" : "New Appointment"}</h2>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"><X className="h-4 w-4" /></button>
+      </div>
 
-        {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">{isEdit ? "Edit Appointment" : "New Appointment"}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"><X className="h-5 w-5" /></button>
+      {submitted ? (
+        <div className="flex flex-col items-center justify-center flex-1 gap-3">
+          <CheckCircle2 className="h-10 w-10 text-green-500" />
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">{isEdit ? "Appointment Updated!" : "Appointment Created!"}</p>
         </div>
-
-        {submitted ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-3">
-            <CheckCircle2 className="h-12 w-12 text-green-500" />
-            <p className="text-lg font-semibold text-slate-900 dark:text-white">{isEdit ? "Appointment Updated!" : "Appointment Created!"}</p>
-          </div>
-        ) : (
-          <div className="p-6 space-y-6">
+      ) : (
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
             {/* Template Selector */}
             {!isEdit && templates.length > 0 && (
               <div>
@@ -374,14 +372,13 @@ export default function AppointmentForm({ open, onClose, userId, mode = "create"
               </div>
             )}
 
-            {/* Submit */}
-            <button onClick={handleSubmit} disabled={!isValid}
-              className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${isValid ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25" : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed"}`}>
-              {isEdit ? "Save Changes" : "Create Appointment"}
-            </button>
-          </div>
-        )}
-      </div>
+          {/* Submit */}
+          <button onClick={handleSubmit} disabled={!isValid}
+            className={`w-full py-3 rounded-xl text-sm font-semibold transition-all ${isValid ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25" : "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed"}`}>
+            {isEdit ? "Save Changes" : "Create Appointment"}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

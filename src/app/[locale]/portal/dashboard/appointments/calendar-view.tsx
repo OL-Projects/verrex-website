@@ -12,9 +12,10 @@ interface Props {
   typeBgColors: Record<string, string>
   conflicts: string[]
   onEventClick?: (appointmentId: string) => void
+  onDateClick?: (date: string) => void
 }
 
-export default function CalendarView({ appointments, typeBgColors, conflicts, onEventClick }: Props) {
+export default function CalendarView({ appointments, typeBgColors, conflicts, onEventClick, onDateClick }: Props) {
   const events = appointments
     .filter(a => a.status !== "cancelled")
     .map(apt => {
@@ -177,6 +178,7 @@ export default function CalendarView({ appointments, typeBgColors, conflicts, on
         editable={false}
         selectable={true}
         eventClick={(info) => { if (onEventClick) onEventClick(info.event.id) }}
+        dateClick={(info) => { if (onDateClick) onDateClick(info.dateStr) }}
         dayMaxEvents={3}
         nowIndicator={true}
         eventDisplay="block"
