@@ -12,6 +12,7 @@ import {
   Users, Receipt, Paperclip,
 } from "lucide-react"
 import ActivityTimeline from "@/components/portal/ActivityTimeline"
+import { useRealtimeProject } from "@/hooks/useRealtimeProject"
 
 // ─── Types ──────────────────────────────────────────────
 interface ProjectDetail {
@@ -54,6 +55,19 @@ export default function ProjectDetailPage() {
 
   // Role-based API prefix: admins use admin routes (full CRUD), others use portal routes (access-gated)
   const apiBase = isAdmin ? `/api/admin/projects/${id}` : `/api/portal/my-projects/${id}`
+
+  // ─── Realtime: auto-sync when anyone updates this project ───
+  const { broadcastChange, viewers } = useRealtimeProject({
+    projectId: id,
+    userId: session?.user?.id || "",
+    onDataChanged: (event) => {
+      // Another user changed something — refresh the relevant data
+      if (event === "activity-added") { loadActivities(); loadProject() }
+      else if (event === "task-updated") { loadTasks(); loadActivities() }
+      else if (event === "file-uploaded") { loadFiles(); loadActivities() }
+      else if (event === "project-updated") { loadProject() }
+    },
+  })
 
   const loadProject = useCallback(() => {
     fetch(apiBase).then(r => r.json()).then(setProject).catch(console.error)
@@ -117,9 +131,9 @@ export default function ProjectDetailPage() {
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
           {activeTab === "overview" && <OverviewTab project={project} tasks={tasks} files={files} />}
-          {activeTab === "activity" && <ActivityTimeline activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject() }} />}
-          {activeTab === "tasks" && <TasksTab tasks={tasks} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadTasks(); loadActivities() }} />}
-          {activeTab === "files" && <FilesTab files={files} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadFiles(); loadActivities() }} />}
+          {activeTab === "activity" && <ActivityTimeline activities={activities} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadActivities(); loadProject(); broadcastChange("activity-added") }} />}
+          {activeTab === "tasks" && <TasksTab tasks={tasks} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadTasks(); loadActivities(); broadcastChange("task-updated") }} />}
+          {activeTab === "files" && <FilesTab files={files} projectId={id} isAdmin={isAdmin} onRefresh={() => { loadFiles(); loadActivities(); broadcastChange("file-uploaded") }} />}
           {activeTab === "team" && <TeamTab project={project} />}
           {activeTab === "invoices" && <InvoicesTab projectId={id} />}
         </motion.div>
