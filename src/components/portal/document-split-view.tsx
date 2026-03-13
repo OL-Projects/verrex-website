@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   FileText, Receipt, ClipboardSignature, Clock, CheckCircle2, AlertCircle,
@@ -74,10 +74,39 @@ const variantClasses: Record<string, string> = {
 export default function DocumentSplitView({ documents, loading, selected, onSelect, onMarkRead, docType, actions, emptyMessage }: Props) {
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<string>("all")
-  const [pdfLoading, setPdfLoading] = useState(true)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfError, setPdfError] = useState(false)
+  const iframeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const typeCfg = typeConfig[docType] || typeConfig.estimation
   const TypeIcon = typeCfg.icon
+
+  // Reset loading state when selected document changes
+  useEffect(() => {
+    if (iframeTimeoutRef.current) clearTimeout(iframeTimeoutRef.current)
+    setPdfError(false)
+
+    const url = selected?.fileUrl?.trim() || ""
+    const looksLikePdf = url.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(url)
+    const looksLikeImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url)
+    const isAccessible = url.startsWith("http") || url.startsWith("/") || url.startsWith("blob:")
+    const isLoadable = isAccessible && (looksLikePdf || looksLikeImage)
+
+    if (selected && isLoadable) {
+      setPdfLoading(true)
+      // Fallback timeout — if iframe doesn't load in 8s, stop spinner
+      iframeTimeoutRef.current = setTimeout(() => {
+        setPdfLoading(false)
+        setPdfError(true)
+      }, 8000)
+    } else {
+      setPdfLoading(false)
+    }
+
+    return () => {
+      if (iframeTimeoutRef.current) clearTimeout(iframeTimeoutRef.current)
+    }
+  }, [selected?.id])
 
   // Filter documents
   const filtered = documents.filter(d => {
@@ -89,11 +118,24 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
   // Status filter tabs
   const statuses = ["all", ...new Set(documents.map(d => d.status))]
 
-  // File type detection — any non-empty fileUrl is a valid file
-  const hasFile = !!selected?.fileUrl && selected.fileUrl.trim().length > 0
-  const isRealFile = hasFile
-  const isPdf = selected?.fileUrl?.toLowerCase().endsWith(".pdf")
-  const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(selected?.fileUrl || "")
+  // File type detection — URL must look like an actual accessible file
+  const fileUrl = selected?.fileUrl?.trim() || ""
+  const isRealFile = fileUrl.length > 0 && (fileUrl.startsWith("http") || fileUrl.startsWith("/") || fileUrl.startsWith("blob:"))
+  // Detect PDF: ends with .pdf OR is an API route with /pdf in the path (e.g. /api/portal/estimates/abc/pdf)
+  const isPdf = fileUrl.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(fileUrl)
+  const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl)
+
+  const handleIframeLoad = () => {
+    setPdfLoading(false)
+    setPdfError(false)
+    if (iframeTimeoutRef.current) clearTimeout(iframeTimeoutRef.current)
+  }
+
+  const handleImageLoad = () => {
+    setPdfLoading(false)
+    setPdfError(false)
+    if (iframeTimeoutRef.current) clearTimeout(iframeTimeoutRef.current)
+  }
 
   return (
     <div className="flex h-full rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
@@ -325,11 +367,24 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
 
                   {/* PDF render */}
                   <div className="flex-1 relative">
-                    {pdfLoading && (
+                    {pdfLoading && !pdfError && (
                       <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-950/50 z-10">
                         <div className="text-center">
                           <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-2" />
                           <p className="text-sm text-slate-400">Loading document…</p>
+                        </div>
+                      </div>
+                    )}
+                    {pdfError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-950/50 z-20">
+                        <div className="text-center">
+                          <FileText className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                          <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Document preview unavailable</p>
+                          <p className="text-xs text-slate-400 mb-4 max-w-[240px] mx-auto">The file could not be loaded. Review the details on the left panel.</p>
+                          <button onClick={() => downloadFile(selected.fileUrl, selected.title)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700">
+                            <Download className="h-4 w-4" /> Try Download
+                          </button>
                         </div>
                       </div>
                     )}
@@ -339,11 +394,12 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                         src={selected.fileUrl}
                         className="w-full h-full"
                         title={selected.title}
-                        onLoad={() => setPdfLoading(false)}
+                        onLoad={handleIframeLoad}
+                        onError={() => { setPdfLoading(false); setPdfError(true) }}
                       />
                     ) : isImage ? (
-                      <div className="flex-1 overflow-auto p-6 flex items-start justify-center" onLoad={() => setPdfLoading(false)}>
-                        <img src={selected.fileUrl} alt={selected.title} className="max-w-full rounded-xl shadow-lg" onLoad={() => setPdfLoading(false)} />
+                      <div className="flex-1 overflow-auto p-6 flex items-start justify-center">
+                        <img src={selected.fileUrl} alt={selected.title} className="max-w-full rounded-xl shadow-lg" onLoad={handleImageLoad} onError={() => { setPdfLoading(false); setPdfError(true) }} />
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center justify-center p-8">
