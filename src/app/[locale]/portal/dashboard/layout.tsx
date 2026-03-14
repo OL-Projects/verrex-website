@@ -26,7 +26,7 @@ export default function DashboardLayout({
 
   return (
     <PortalStoreProvider>
-        <div className="min-h-screen bg-slate-100/80 dark:bg-[#0a0f1a]">
+        <div className="min-h-screen bg-slate-100/80 dark:bg-slate-950">
         <Sidebar
           mobileOpen={mobileMenuOpen}
           onMobileClose={() => setMobileMenuOpen(false)}
