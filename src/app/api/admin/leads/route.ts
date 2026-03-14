@@ -36,7 +36,7 @@ export async function GET(request: Request) {
     ]
   }
 
-  const [leads, total] = await Promise.all([
+  const [leads, total, statusCounts] = await Promise.all([
     prisma.lead.findMany({
       where: where as any,
       include: { assignedTo: { select: { id: true, name: true } } },
@@ -45,16 +45,16 @@ export async function GET(request: Request) {
       take: limit,
     }),
     prisma.lead.count({ where: where as any }),
+    prisma.lead.groupBy({ by: ["status"], _count: { status: true } }),
   ])
+
+  const counts: Record<string, number> = {}
+  statusCounts.forEach(s => { counts[s.status] = s._count.status })
 
   return NextResponse.json({
     leads,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    counts,
   })
 }
 
