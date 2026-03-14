@@ -1,15 +1,40 @@
 # Active Context
 
-## Latest: Client Portal Financial Documents Overhaul (March 13, 2026)
+## Latest: Document Signing, Approval & Admin Notification System (March 13, 2026)
 
 ### What Was Done
-Added **Contracts** and **Estimations** client inbox pages alongside existing **Invoices**, creating a complete "Financial Documents" section in the portal sidebar. All three pages now:
+Implemented a complete **document signing, approval, and admin notification system** for the Financial Documents section of the client portal (Estimates, Contracts, Invoices).
+
+#### Database Changes
+- Added 6 new fields to the `Document` model: `signatureUrl`, `signedAt`, `acceptedAt`, `rejectedAt`, `revisionNote`, `clientIp`
+- Expanded status to support: `draft | sent | viewed | signed | accepted | rejected`
+
+#### API Route Enhancement (`/api/portal/documents/[id]`)
+- **sign** — Stores signature (base64), sets status → "signed", timestamps, notifies admin via email
+- **accept** — Sets status → "accepted" (with optional signature), notifies admin
+- **reject** — Sets status → "rejected", notifies admin
+- **revision** — Stores revision message, notifies admin (status unchanged)
+- IP address captured for audit trail on all client actions
+
+#### Admin Email Notifications (4 new templates in `email.ts`)
+- **Document Signed** — Branded email to admin when client signs a contract
+- **Document Accepted** — When client accepts an estimate or acknowledges an invoice
+- **Document Declined** — When client declines a document
+- **Revision Requested** — When client requests changes (includes their message)
+
+#### Client Inbox Pages Enhanced
+- **Estimates**: Added SignaturePad → "Accept & Sign Estimate" flow, wired revision request to API, added decline with API
+- **Contracts**: Wired revision request to API (signing already worked), added success banners
+- **Invoices**: Added "Acknowledge & Sign" with SignaturePad, wired revision request to API
+- All three pages now show **success banners** after actions confirming admin was notified
+
+### Previous: Financial Documents Overhaul
+All three pages (Estimates, Contracts, Invoices) already had:
 - Show **badge counts** on the sidebar for unread/pending documents (client role only)
 - Display a **client inbox view** (read-only reception) when the user has `role: client`
 - Display the **admin management view** (full CRUD) when the user has `role: admin`
 - Support **document signing** (contracts via SignaturePad component)
 - Support **revision requests** (contracts + estimations via RevisionRequestModal)
-- Support **acknowledge** action (invoices + estimations)
 - Track **read/unread** status with blue dot indicators
 
 ### Files Created

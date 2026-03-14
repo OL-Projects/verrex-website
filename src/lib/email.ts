@@ -467,3 +467,189 @@ export async function sendQuickQuoteConfirmationEmail(to: string, name: string, 
   })
   console.log("Quick quote confirmation sent:", to, result.data?.id)
 }
+
+// ═══════════════════════════════════════════════════════════
+// DOCUMENT SIGNED NOTIFICATION (to admin)
+// ═══════════════════════════════════════════════════════════
+export async function sendDocumentSignedEmail(
+  adminEmail: string,
+  details: { clientName: string; documentTitle: string; documentType: string; projectTitle?: string; signedAt: string }
+) {
+  const typeLabel = details.documentType === "estimation" ? "Estimate" : details.documentType === "contract" ? "Contract" : "Invoice"
+  const preheader = `${details.clientName} has signed ${details.documentTitle}.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&check;", "#dcfce7", "#16a34a")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Document Signed</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6"><strong>${details.clientName}</strong> has signed the following ${typeLabel.toLowerCase()}.</p>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:110px">Document</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.documentTitle}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Type</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${typeLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Client</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.clientName}</td></tr>
+        ${details.projectTitle ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Project</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.projectTitle}</td></tr>` : ""}
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Signed At</td><td style="padding:6px 0;color:#166534;font-weight:600;font-size:14px">${details.signedAt}</td></tr>
+      </table>
+    </div>
+
+    ${ctaButton("View in Portal", `${BASE_URL}/en/portal/dashboard/${details.documentType === "estimation" ? "estimates" : details.documentType + "s"}`, "#059669")}
+  `
+
+  const text = `Document Signed\n\n${details.clientName} signed ${details.documentTitle} (${typeLabel}).\n${details.projectTitle ? `Project: ${details.projectTitle}\n` : ""}Signed at: ${details.signedAt}\n\nView in portal: ${BASE_URL}/en/portal/dashboard`
+
+  const result = await getResend().emails.send({
+    from: FROM_PORTAL,
+    to: adminEmail,
+    subject: `✅ ${details.clientName} signed ${details.documentTitle}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Document signed notification sent:", adminEmail, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOCUMENT ACCEPTED NOTIFICATION (to admin)
+// ═══════════════════════════════════════════════════════════
+export async function sendDocumentAcceptedEmail(
+  adminEmail: string,
+  details: { clientName: string; documentTitle: string; documentType: string; projectTitle?: string; acceptedAt: string }
+) {
+  const typeLabel = details.documentType === "estimation" ? "Estimate" : details.documentType === "contract" ? "Contract" : "Invoice"
+  const preheader = `${details.clientName} has accepted ${details.documentTitle}.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&check;", "#dbeafe", "#2563eb")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">${typeLabel} Accepted</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6"><strong>${details.clientName}</strong> has accepted the following ${typeLabel.toLowerCase()}.</p>
+
+    <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:110px">Document</td><td style="padding:6px 0;color:#1e40af;font-weight:600;font-size:14px">${details.documentTitle}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Type</td><td style="padding:6px 0;color:#1e40af;font-weight:600;font-size:14px">${typeLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Client</td><td style="padding:6px 0;color:#1e40af;font-weight:600;font-size:14px">${details.clientName}</td></tr>
+        ${details.projectTitle ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Project</td><td style="padding:6px 0;color:#1e40af;font-weight:600;font-size:14px">${details.projectTitle}</td></tr>` : ""}
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Accepted At</td><td style="padding:6px 0;color:#1e40af;font-weight:600;font-size:14px">${details.acceptedAt}</td></tr>
+      </table>
+    </div>
+
+    ${ctaButton("View in Portal", `${BASE_URL}/en/portal/dashboard/${details.documentType === "estimation" ? "estimates" : details.documentType + "s"}`)}
+  `
+
+  const text = `${typeLabel} Accepted\n\n${details.clientName} accepted ${details.documentTitle}.\n${details.projectTitle ? `Project: ${details.projectTitle}\n` : ""}Accepted at: ${details.acceptedAt}\n\nView in portal: ${BASE_URL}/en/portal/dashboard`
+
+  const result = await getResend().emails.send({
+    from: FROM_PORTAL,
+    to: adminEmail,
+    subject: `✅ ${details.clientName} accepted ${details.documentTitle}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Document accepted notification sent:", adminEmail, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOCUMENT DECLINED NOTIFICATION (to admin)
+// ═══════════════════════════════════════════════════════════
+export async function sendDocumentDeclinedEmail(
+  adminEmail: string,
+  details: { clientName: string; documentTitle: string; documentType: string; projectTitle?: string; declinedAt: string }
+) {
+  const typeLabel = details.documentType === "estimation" ? "Estimate" : details.documentType === "contract" ? "Contract" : "Invoice"
+  const preheader = `${details.clientName} has declined ${details.documentTitle}.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&times;", "#fef2f2", "#dc2626")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">${typeLabel} Declined</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6"><strong>${details.clientName}</strong> has declined the following ${typeLabel.toLowerCase()}.</p>
+
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:110px">Document</td><td style="padding:6px 0;color:#991b1b;font-weight:600;font-size:14px">${details.documentTitle}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Type</td><td style="padding:6px 0;color:#991b1b;font-weight:600;font-size:14px">${typeLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Client</td><td style="padding:6px 0;color:#991b1b;font-weight:600;font-size:14px">${details.clientName}</td></tr>
+        ${details.projectTitle ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Project</td><td style="padding:6px 0;color:#991b1b;font-weight:600;font-size:14px">${details.projectTitle}</td></tr>` : ""}
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Declined At</td><td style="padding:6px 0;color:#991b1b;font-weight:600;font-size:14px">${details.declinedAt}</td></tr>
+      </table>
+    </div>
+
+    <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0 0 24px;text-align:center">You may want to follow up with the client to discuss their concerns.</p>
+
+    ${ctaButton("View in Portal", `${BASE_URL}/en/portal/dashboard/${details.documentType === "estimation" ? "estimates" : details.documentType + "s"}`, "#dc2626")}
+  `
+
+  const text = `${typeLabel} Declined\n\n${details.clientName} declined ${details.documentTitle}.\n${details.projectTitle ? `Project: ${details.projectTitle}\n` : ""}Declined at: ${details.declinedAt}\n\nView in portal: ${BASE_URL}/en/portal/dashboard`
+
+  const result = await getResend().emails.send({
+    from: FROM_PORTAL,
+    to: adminEmail,
+    subject: `❌ ${details.clientName} declined ${details.documentTitle}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Document declined notification sent:", adminEmail, result.data?.id)
+}
+
+// ═══════════════════════════════════════════════════════════
+// REVISION REQUESTED NOTIFICATION (to admin)
+// ═══════════════════════════════════════════════════════════
+export async function sendRevisionRequestedEmail(
+  adminEmail: string,
+  details: { clientName: string; documentTitle: string; documentType: string; projectTitle?: string; message: string; requestedAt: string }
+) {
+  const typeLabel = details.documentType === "estimation" ? "Estimate" : details.documentType === "contract" ? "Contract" : "Invoice"
+  const preheader = `${details.clientName} requested changes to ${details.documentTitle}.`
+
+  const content = `
+    <div style="text-align:center;margin:0 0 24px">
+      ${iconBadge("&loz;", "#fefce8", "#d97706")}
+    </div>
+
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Revision Requested</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px;text-align:center;line-height:1.6"><strong>${details.clientName}</strong> has requested changes to the following ${typeLabel.toLowerCase()}.</p>
+
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px;width:110px">Document</td><td style="padding:6px 0;color:#92400e;font-weight:600;font-size:14px">${details.documentTitle}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Type</td><td style="padding:6px 0;color:#92400e;font-weight:600;font-size:14px">${typeLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-size:13px">Client</td><td style="padding:6px 0;color:#92400e;font-weight:600;font-size:14px">${details.clientName}</td></tr>
+        ${details.projectTitle ? `<tr><td style="padding:6px 0;color:#64748b;font-size:13px">Project</td><td style="padding:6px 0;color:#92400e;font-weight:600;font-size:14px">${details.projectTitle}</td></tr>` : ""}
+      </table>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 8px;color:#475569;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Client's Message</p>
+      <p style="margin:0;color:#1e293b;font-size:14px;line-height:1.6;white-space:pre-wrap">${details.message}</p>
+    </div>
+
+    ${ctaButton("Review in Portal", `${BASE_URL}/en/portal/dashboard/${details.documentType === "estimation" ? "estimates" : details.documentType + "s"}`, "#d97706")}
+  `
+
+  const text = `Revision Requested\n\n${details.clientName} requested changes to ${details.documentTitle} (${typeLabel}).\n${details.projectTitle ? `Project: ${details.projectTitle}\n` : ""}\nClient's message:\n${details.message}\n\nReview in portal: ${BASE_URL}/en/portal/dashboard`
+
+  const result = await getResend().emails.send({
+    from: FROM_PORTAL,
+    to: adminEmail,
+    subject: `⚠️ ${details.clientName} requested changes to ${details.documentTitle}`,
+    html: emailLayout(content, preheader),
+    text,
+    replyTo: COMPANY.email,
+    headers: getDeliverabilityHeaders(),
+  })
+  console.log("Revision requested notification sent:", adminEmail, result.data?.id)
+}

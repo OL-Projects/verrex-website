@@ -307,7 +307,7 @@ model Document {
   title       String
   description String?   @db.Text
   fileUrl     String    // PDF URL (Vercel Blob / Supabase storage)
-  status      String    @default("sent") // draft | sent | viewed | signed
+  status      String    @default("sent") // draft | sent | viewed | signed | accepted | rejected
 
   projectId   String?
   project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
@@ -320,6 +320,14 @@ model Document {
 
   readAt      DateTime? // null = unread (inbox badge)
   recalledAt  DateTime? // soft-recall (unsend) timestamp; null = active
+
+  // Signing & Approval
+  signatureUrl  String?   @db.Text // base64 data URL of client's drawn signature
+  signedAt      DateTime? // when document was signed by client
+  acceptedAt    DateTime? // when estimate/invoice was accepted
+  rejectedAt    DateTime? // when document was declined
+  revisionNote  String?   @db.Text // client's revision request message
+  clientIp      String?   // IP address for audit trail
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
