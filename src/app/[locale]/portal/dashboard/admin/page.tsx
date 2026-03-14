@@ -117,7 +117,7 @@ export default function AdminDashboardPage() {
           { label: "Appointments", value: d.upcomingAppointments, sub: `upcoming`, icon: CalendarDays, accent: "text-cyan-600 dark:text-cyan-400" },
           { label: "Clients", value: d.totalClients, sub: `total`, icon: Users, accent: "text-slate-600 dark:text-slate-300" },
         ].map((kpi, i) => (
-          <div key={kpi.label} className="bg-white dark:bg-slate-800 px-3 py-2.5">
+          <div key={kpi.label} className="bg-white dark:bg-slate-900 px-3 py-2.5">
             <div className="flex items-center gap-1.5 mb-1">
               <kpi.icon className={`h-3 w-3 ${kpi.accent}`} />
               <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">{kpi.label}</span>
@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
         {/* Revenue Breakdown */}
-        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
             <DollarSign className="h-3 w-3" /> Revenue
           </h3>
@@ -161,7 +161,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Project Pipeline */}
-        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
             <FolderKanban className="h-3 w-3" /> Project Pipeline
           </h3>
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Lead Funnel */}
-        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
             <Target className="h-3 w-3" /> Lead Funnel
           </h3>
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
           { label: "IT Ops", href: "/portal/dashboard/it", icon: Monitor, color: "text-slate-600 dark:text-slate-400" },
         ].map(a => (
           <IntlLink key={a.label} href={a.href}
-            className="flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group">
+            className="flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
             <a.icon className={`h-4 w-4 ${a.color} group-hover:scale-110 transition-transform`} />
             <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 text-center leading-tight">{a.label}</span>
           </IntlLink>
@@ -246,7 +246,7 @@ export default function AdminDashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-5 gap-3">
 
         {/* Activity Feed — 3 cols */}
-        <div className="lg:col-span-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="lg:col-span-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
             <Clock className="h-3 w-3" /> Recent Activity
           </h3>
@@ -273,7 +273,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Upcoming Appointments — 2 cols */}
-        <div className="lg:col-span-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="lg:col-span-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
             <CalendarDays className="h-3 w-3" /> Upcoming
           </h3>
@@ -314,7 +314,7 @@ export default function AdminDashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-5 gap-3">
 
         {/* Document Stats — 2 cols */}
-        <div className="lg:col-span-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="lg:col-span-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
             <FileText className="h-3 w-3" /> Documents
           </h3>
@@ -350,7 +350,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Recent Clients — 3 cols */}
-        <div className="lg:col-span-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        <div className="lg:col-span-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
               <Users className="h-3 w-3" /> Recent Clients
@@ -400,7 +400,7 @@ export default function AdminDashboardPage() {
 
       {/* ── Row 6: Recent Leads ─────────────── */}
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-        className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-3 shadow-sm">
+        className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 p-3 shadow-sm dark:shadow-black/20">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
             <Target className="h-3 w-3" /> Recent Leads
