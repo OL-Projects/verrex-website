@@ -33,7 +33,7 @@ const NAV_GROUP_KEYS = [
   { key: "crm", items: ["Leads", "Projects"] },
   { key: "operations", items: ["Appointments", "Measurements", "Orders"] },
   { key: "communication", items: ["Messages"] },
-  { key: "financialDocs", items: ["Estimates", "Invoices", "Contracts", "Commissions", "All Documents"] },
+  { key: "financialDocs", items: ["Estimates", "Invoices", "Contracts", "All Documents"] },
   { key: "insights", items: ["Analytics", "Timeline", "AI Settings"] },
   { key: "support", items: ["IT"] },
 ]
