@@ -28,7 +28,7 @@ export function StatsCard({ title, value, change, icon: Icon, color = "blue", de
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4 }}
-      className="p-5 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 hover:border-blue-400/20 dark:hover:border-blue-400/15 transition-all group"
+      className="p-5 rounded-2xl bg-white/60 dark:bg-[rgba(22,23,29,0.85)] backdrop-blur-xl border border-slate-200/60 dark:border-[rgba(255,255,255,0.07)] hover:border-blue-400/20 dark:hover:border-[rgba(107,170,255,0.15)] transition-all group"
     >
       <div className="flex items-start justify-between mb-3">
         <div className={`h-10 w-10 rounded-xl ${colorMap[color]} flex items-center justify-center`}>

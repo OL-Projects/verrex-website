@@ -1,8 +1,25 @@
 # Active Context
 
-## Latest Session — March 13, 2026 (Evening)
+## Latest Session — March 13, 2026 (Late Night)
 
 ### Completed This Session
+1. **Portal Dark Mode Complete Overhaul — "Refined Night"**
+   - **Problem**: Dark mode used cold near-black (#020617, #030712) with inverted elevation (cards darker than background), harsh pure-white text, invisible borders, no depth hierarchy
+   - **Solution**: Created a portal-scoped dark mode CSS layer (`.dark .portal`) that completely redesigns the portal's dark palette without touching the Verrex website or light mode
+   - **New Palette**: Charcoal base #0C0D12 → Sidebar #111218 → Cards #16171D → Headers #1C1E27 → Inputs #22242E → Active #2A2C36
+   - **Proper Elevation**: Background is darkest, cards are lighter, elevated elements lighter still — creates visual depth
+   - **Text Hierarchy**: Off-white primary (#E8EAED), comfortable secondary (#8B919A), subtle muted (#5F6570) — no harsh pure white
+   - **Borders**: Subtle but visible rgba(255,255,255,0.07-0.12) — tuned per context
+   - **Accent Colors**: Richer blue (#6BAAFF), green (#4ADE80), amber (#FBBF24), etc — pop on dark surfaces
+   - **Shadows**: Deep but refined with subtle 1px white inner border for dimension
+   - **Inputs**: Clear contrast (#111218 bg) with blue glow focus rings
+   - **Files Changed**: globals.css (massive portal CSS section), dashboard layout.tsx (.portal class), sidebar.tsx (#111218), portal-topbar.tsx (glass effect), stats-card.tsx
+   - **Zero website impact**: All scoped to `.dark .portal` — website dark mode completely untouched
+   - **Inspired by**: Linear, Vercel Dashboard, Raycast, Arc Browser
+
+## Previous Session — March 13, 2026 (Evening)
+
+### Completed Previous Session
 1. **Profile dropdown z-index fix** — Added `relative z-[100]` to portal topbar so profile/notification dropdowns always appear above page content
 2. **Admin IT User Editor** — Full CRUD modal: edit name, display name, email, phone, company, address, role, status (active/suspended), notes, clear photo; PATCH/GET API with field validation
 3. **Removed Commissions page** — Deleted page, removed from sidebar nav and i18n references

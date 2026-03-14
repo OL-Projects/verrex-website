@@ -406,8 +406,8 @@ const [collapsed, setCollapsed] = useState(false)
       {/* Desktop sidebar */}
       <aside
         className={`hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 transition-all duration-300
-          bg-white dark:bg-slate-900
-          border-r border-slate-200 dark:border-white/10
+          bg-white dark:bg-[#111218]
+          border-r border-slate-200 dark:border-[rgba(255,255,255,0.07)]
           ${collapsed ? "w-[72px]" : "w-64"}`}
       >
         {sidebarContent}
@@ -430,8 +430,8 @@ const [collapsed, setCollapsed] = useState(false)
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="fixed inset-y-0 left-0 z-50 w-64
-                bg-white dark:bg-slate-900
-                border-r border-slate-200 dark:border-white/10 lg:hidden shadow-2xl"
+                bg-white dark:bg-[#111218]
+                border-r border-slate-200 dark:border-[rgba(255,255,255,0.07)] lg:hidden shadow-2xl"
             >
               {sidebarContent}
             </motion.aside>

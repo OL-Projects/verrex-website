@@ -748,6 +748,483 @@ html {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PORTAL DARK MODE OVERHAUL — "Refined Night"
+   ═══════════════════════════════════════════════════════════════
+   Scoped to .dark .portal — ZERO impact on website dark mode.
+   Palette: Charcoal base → layered elevation → soft white text.
+   Inspired by Linear, Vercel Dashboard, Raycast.
+
+   Elevation hierarchy (darkest → lightest):
+   #0C0D12 (page) → #111218 (sidebar) → #16171D (cards) →
+   #1C1E27 (headers) → #22242E (inputs/hover) → #2A2C36 (active)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- Portal Page Background --- */
+.dark .portal {
+  background-color: #0C0D12 !important;
+  color: #C8CBD0;
+}
+
+/* --- Portal Scrollbar --- */
+.dark .portal ::-webkit-scrollbar-track {
+  background: #0C0D12;
+}
+.dark .portal ::-webkit-scrollbar-thumb {
+  background: #22242E;
+}
+.dark .portal ::-webkit-scrollbar-thumb:hover {
+  background: #2E3040;
+}
+
+/* --- Surface Backgrounds (proper elevation) --- */
+.dark .portal .bg-white {
+  background-color: #16171D !important;
+}
+.dark .portal .bg-white\/60 {
+  background-color: rgba(22, 23, 29, 0.85) !important;
+}
+.dark .portal .bg-white\/70 {
+  background-color: rgba(22, 23, 29, 0.9) !important;
+}
+.dark .portal .bg-white\/80 {
+  background-color: rgba(22, 23, 29, 0.95) !important;
+}
+.dark .portal .bg-slate-50 {
+  background-color: #111218 !important;
+}
+.dark .portal .bg-slate-50\/50 {
+  background-color: rgba(17, 18, 24, 0.7) !important;
+}
+.dark .portal .bg-slate-50\/80 {
+  background-color: rgba(17, 18, 24, 0.9) !important;
+}
+.dark .portal .bg-slate-100 {
+  background-color: #1C1E27 !important;
+}
+.dark .portal .bg-slate-200 {
+  background-color: #22242E !important;
+}
+.dark .portal .bg-slate-800 {
+  background-color: #0C0D12 !important;
+}
+.dark .portal .bg-slate-900 {
+  background-color: #16171D !important;
+}
+.dark .portal .bg-slate-950 {
+  background-color: #0A0B0F !important;
+}
+
+/* --- Glass morphism refined --- */
+.dark .portal .backdrop-blur-xl {
+  --tw-backdrop-blur: blur(20px);
+}
+
+/* --- Card surfaces with alpha --- */
+.dark .portal .dark\:bg-white\/5 {
+  background-color: rgba(22, 23, 29, 0.85) !important;
+}
+.dark .portal .dark\:bg-white\/\[0\.03\] {
+  background-color: rgba(22, 23, 29, 0.6) !important;
+}
+.dark .portal .dark\:bg-white\/\[0\.02\] {
+  background-color: rgba(22, 23, 29, 0.45) !important;
+}
+.dark .portal .dark\:bg-white\/3 {
+  background-color: rgba(28, 30, 39, 0.6) !important;
+}
+.dark .portal .dark\:bg-white\/2 {
+  background-color: rgba(28, 30, 39, 0.4) !important;
+}
+.dark .portal .dark\:bg-white\/10 {
+  background-color: rgba(34, 36, 46, 0.7) !important;
+}
+
+/* --- Elevated headers / sub-surfaces --- */
+.dark .portal .dark\:bg-slate-800 {
+  background-color: #1C1E27 !important;
+}
+.dark .portal .dark\:bg-slate-800\/50 {
+  background-color: rgba(28, 30, 39, 0.5) !important;
+}
+.dark .portal .dark\:bg-slate-800\/60 {
+  background-color: rgba(28, 30, 39, 0.6) !important;
+}
+.dark .portal .dark\:bg-slate-800\/90 {
+  background-color: rgba(28, 30, 39, 0.9) !important;
+}
+.dark .portal .dark\:bg-slate-900 {
+  background-color: #16171D !important;
+}
+.dark .portal .dark\:bg-slate-900\/50 {
+  background-color: rgba(22, 23, 29, 0.5) !important;
+}
+.dark .portal .dark\:bg-slate-900\/30 {
+  background-color: rgba(22, 23, 29, 0.3) !important;
+}
+.dark .portal .dark\:bg-slate-900\/80 {
+  background-color: rgba(22, 23, 29, 0.8) !important;
+}
+.dark .portal .dark\:bg-slate-950 {
+  background-color: #0A0B0F !important;
+}
+.dark .portal .dark\:bg-slate-950\/30 {
+  background-color: rgba(10, 11, 15, 0.3) !important;
+}
+.dark .portal .dark\:bg-slate-950\/40 {
+  background-color: rgba(12, 13, 18, 0.75) !important;
+}
+.dark .portal .dark\:bg-slate-950\/50 {
+  background-color: rgba(10, 11, 15, 0.5) !important;
+}
+
+/* --- KPI grid gap color (between card cells) --- */
+.dark .portal .dark\:bg-slate-600 {
+  background-color: #1E2028 !important;
+}
+.dark .portal .dark\:bg-slate-700 {
+  background-color: #22242E !important;
+}
+
+/* --- Hover states --- */
+.dark .portal .dark\:hover\:bg-white\/5:hover {
+  background-color: rgba(34, 36, 46, 0.5) !important;
+}
+.dark .portal .dark\:hover\:bg-white\/10:hover {
+  background-color: rgba(34, 36, 46, 0.7) !important;
+}
+.dark .portal .dark\:hover\:bg-white\/15:hover {
+  background-color: rgba(42, 44, 54, 0.7) !important;
+}
+.dark .portal .dark\:hover\:bg-slate-800:hover {
+  background-color: #22242E !important;
+}
+.dark .portal .dark\:hover\:bg-slate-700:hover {
+  background-color: #2A2C36 !important;
+}
+.dark .portal .dark\:hover\:bg-slate-800\/50:hover {
+  background-color: rgba(34, 36, 46, 0.5) !important;
+}
+.dark .portal .dark\:hover\:bg-slate-100:hover {
+  background-color: #22242E !important;
+}
+
+/* --- Border Colors (subtle but visible) --- */
+.dark .portal .dark\:border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .portal .dark\:border-white\/15 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.dark .portal .dark\:border-white\/5 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark .portal .dark\:border-white\/3 {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+.dark .portal .dark\:border-white\/8 {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+.dark .portal .dark\:border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.dark .portal .dark\:border-slate-600 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+.dark .portal .dark\:border-slate-700 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+.dark .portal .dark\:border-slate-800 {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+.dark .portal .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+.dark .portal .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark .portal .border-slate-50 {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+.dark .portal .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* --- Divide colors --- */
+.dark .portal .dark\:divide-white\/5 > :not(:last-child) {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark .portal .divide-slate-100 > :not(:last-child) {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* --- Text Colors (comfortable off-white hierarchy) --- */
+.dark .portal .dark\:text-white {
+  color: #E8EAED !important;
+}
+.dark .portal .text-slate-900 {
+  color: #E8EAED !important;
+}
+.dark .portal .text-slate-800 {
+  color: #D5D7DB !important;
+}
+.dark .portal .text-slate-700 {
+  color: #B8BCC2 !important;
+}
+.dark .portal .text-slate-600 {
+  color: #9BA0A8 !important;
+}
+.dark .portal .text-slate-500 {
+  color: #7D828A !important;
+}
+.dark .portal .dark\:text-slate-200 {
+  color: #C8CBD0 !important;
+}
+.dark .portal .dark\:text-slate-300 {
+  color: #B0B4BB !important;
+}
+.dark .portal .dark\:text-slate-400 {
+  color: #8B919A !important;
+}
+.dark .portal .dark\:text-slate-500 {
+  color: #5F6570 !important;
+}
+.dark .portal .dark\:text-slate-600 {
+  color: #4A4F58 !important;
+}
+
+/* --- Accent Colors (richer on dark surface) --- */
+.dark .portal .dark\:text-blue-400 {
+  color: #6BAAFF !important;
+}
+.dark .portal .dark\:text-emerald-400,
+.dark .portal .dark\:text-green-400 {
+  color: #4ADE80 !important;
+}
+.dark .portal .dark\:text-amber-400 {
+  color: #FBBF24 !important;
+}
+.dark .portal .dark\:text-red-400 {
+  color: #F87171 !important;
+}
+.dark .portal .dark\:text-purple-400 {
+  color: #C084FC !important;
+}
+.dark .portal .dark\:text-cyan-400 {
+  color: #22D3EE !important;
+}
+.dark .portal .dark\:text-indigo-400 {
+  color: #818CF8 !important;
+}
+.dark .portal .dark\:text-orange-400 {
+  color: #FB923C !important;
+}
+
+/* --- Accent Backgrounds (subtle tinted surfaces) --- */
+.dark .portal .dark\:bg-blue-500\/10 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+.dark .portal .dark\:bg-blue-500\/5 {
+  background-color: rgba(59, 130, 246, 0.07) !important;
+}
+.dark .portal .dark\:bg-blue-500\/15 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+.dark .portal .dark\:bg-blue-500\/20 {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+}
+.dark .portal .dark\:bg-blue-900\/20 {
+  background-color: rgba(30, 64, 175, 0.20) !important;
+}
+.dark .portal .dark\:bg-emerald-500\/10,
+.dark .portal .dark\:bg-green-500\/10 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+.dark .portal .dark\:bg-emerald-500\/15,
+.dark .portal .dark\:bg-green-500\/15 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+.dark .portal .dark\:bg-amber-500\/15 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+.dark .portal .dark\:bg-red-500\/5 {
+  background-color: rgba(239, 68, 68, 0.07) !important;
+}
+.dark .portal .dark\:bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+.dark .portal .dark\:bg-purple-500\/15 {
+  background-color: rgba(168, 85, 247, 0.15) !important;
+}
+.dark .portal .dark\:bg-purple-900\/20 {
+  background-color: rgba(88, 28, 135, 0.20) !important;
+}
+.dark .portal .dark\:bg-cyan-500\/15 {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+}
+.dark .portal .dark\:bg-indigo-500\/20 {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+}
+.dark .portal .dark\:bg-orange-500\/15 {
+  background-color: rgba(249, 115, 22, 0.15) !important;
+}
+
+/* --- Shadows (deep but not harsh) --- */
+.dark .portal .shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+}
+.dark .portal .shadow-md {
+  box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+}
+.dark .portal .shadow-lg {
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+}
+.dark .portal .shadow-xl {
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+.dark .portal .shadow-2xl {
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+.dark .portal .dark\:shadow-black\/20 {
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+}
+
+/* --- Portal Input Fields (clear contrast on surface) --- */
+.dark .portal input,
+.dark .portal textarea,
+.dark .portal select {
+  background-color: #111218 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  color: #E8EAED !important;
+}
+.dark .portal input::placeholder,
+.dark .portal textarea::placeholder {
+  color: #5F6570 !important;
+}
+.dark .portal input:focus,
+.dark .portal textarea:focus,
+.dark .portal select:focus {
+  background-color: #16171D !important;
+  border-color: rgba(107, 170, 255, 0.4) !important;
+  box-shadow: 0 0 0 3px rgba(107, 170, 255, 0.12) !important;
+}
+.dark .portal input[type="date"],
+.dark .portal input[type="time"],
+.dark .portal input[type="datetime-local"] {
+  background-color: #111218 !important;
+  color: #E8EAED !important;
+  color-scheme: dark;
+}
+.dark .portal input[type="radio"],
+.dark .portal input[type="checkbox"] {
+  accent-color: #6BAAFF;
+}
+.dark .portal select option {
+  background-color: #16171D;
+  color: #E8EAED;
+}
+
+/* --- Ring colors --- */
+.dark .portal .dark\:ring-white\/10 {
+  --tw-ring-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .portal .dark\:ring-white\/20 {
+  --tw-ring-color: rgba(255, 255, 255, 0.12) !important;
+}
+.dark .portal .dark\:ring-offset-slate-900 {
+  --tw-ring-offset-color: #16171D !important;
+}
+
+/* --- Focus rings (visible blue glow) --- */
+.dark .portal *:focus-visible {
+  outline: 2px solid rgba(107, 170, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* --- Glass morphism (portal) --- */
+.dark .portal .glass {
+  background: rgba(22, 23, 29, 0.7);
+}
+
+/* --- Gradient text (portal) --- */
+.dark .portal .gradient-text {
+  background: linear-gradient(135deg, #6BAAFF 0%, #93c5fd 50%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Frosted card (portal) --- */
+.dark .portal .frosted-card {
+  background: rgba(22, 23, 29, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* --- Portal dark mode glow effects --- */
+.dark .portal .glow-blue {
+  box-shadow: 0 0 15px rgba(107, 170, 255, 0.12), 0 0 45px rgba(107, 170, 255, 0.04);
+}
+
+/* --- Accent border colors (for status badges) --- */
+.dark .portal .dark\:border-blue-500\/20 {
+  border-color: rgba(59, 130, 246, 0.20) !important;
+}
+.dark .portal .dark\:border-emerald-500\/20 {
+  border-color: rgba(16, 185, 129, 0.20) !important;
+}
+.dark .portal .dark\:border-amber-500\/20 {
+  border-color: rgba(245, 158, 11, 0.20) !important;
+}
+.dark .portal .dark\:border-red-500\/20 {
+  border-color: rgba(239, 68, 68, 0.20) !important;
+}
+.dark .portal .dark\:border-purple-500\/20 {
+  border-color: rgba(168, 85, 247, 0.20) !important;
+}
+.dark .portal .dark\:border-cyan-500\/20 {
+  border-color: rgba(6, 182, 212, 0.20) !important;
+}
+.dark .portal .dark\:border-blue-500\/30 {
+  border-color: rgba(59, 130, 246, 0.30) !important;
+}
+.dark .portal .dark\:border-blue-600 {
+  border-color: rgba(59, 130, 246, 0.40) !important;
+}
+.dark .portal .dark\:border-blue-900\/40 {
+  border-color: rgba(30, 58, 138, 0.35) !important;
+}
+.dark .portal .dark\:border-emerald-500\/10,
+.dark .portal .dark\:border-green-500\/10 {
+  border-color: rgba(16, 185, 129, 0.12) !important;
+}
+.dark .portal .dark\:border-amber-500\/10 {
+  border-color: rgba(245, 158, 11, 0.12) !important;
+}
+.dark .portal .dark\:border-red-500\/40 {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+.dark .portal .dark\:border-indigo-500\/20 {
+  border-color: rgba(99, 102, 241, 0.20) !important;
+}
+.dark .portal .dark\:border-teal-500\/20 {
+  border-color: rgba(20, 184, 166, 0.20) !important;
+}
+
+/* --- Hover border accent colors --- */
+.dark .portal .dark\:hover\:border-blue-400\/15:hover {
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+.dark .portal .dark\:hover\:border-blue-500\/30:hover {
+  border-color: rgba(59, 130, 246, 0.30) !important;
+}
+.dark .portal .dark\:hover\:border-blue-800\/30:hover {
+  border-color: rgba(30, 64, 175, 0.30) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   END PORTAL DARK MODE OVERHAUL
+   ═══════════════════════════════════════════════════════════════ */
+
 /* ===== 3D CANVAS: drei Html overlay pointer-events fix ===== */
 /* drei's <Html> creates absolutely-positioned, CSS-transformed divs over the canvas.
    Even with style={{ pointerEvents: "none" }}, intermediate wrapper divs can block
