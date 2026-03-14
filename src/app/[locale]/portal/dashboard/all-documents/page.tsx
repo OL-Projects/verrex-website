@@ -19,6 +19,7 @@ interface SentDoc {
   title: string
   description?: string
   fileUrl: string
+  signedFileUrl?: string | null
   status: string
   projectId?: string
   senderId: string
@@ -357,11 +358,15 @@ export default function AllDocumentsPage() {
                       </button>
                     )}
                     <a
-                      href={doc.fileUrl}
+                      href={["signed", "accepted"].includes(doc.status) && doc.signedFileUrl ? doc.signedFileUrl : doc.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                      title="View PDF"
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        ["signed", "accepted"].includes(doc.status) && doc.signedFileUrl
+                          ? "text-green-500 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-500/10"
+                          : "text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                      }`}
+                      title={["signed", "accepted"].includes(doc.status) && doc.signedFileUrl ? "View Signed PDF" : "View PDF"}
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </a>

@@ -45,13 +45,15 @@ export default function ClientInvoicesInbox({ clientId }: { clientId: string }) 
     if (!selected) return
     setActionLoading(true)
     try {
-      const res = await fetch(`/api/portal/documents/${selected.id}`, {
-        method: "PATCH",
+      // Call sign-pdf API to burn signature onto PDF and upload signed copy
+      const res = await fetch(`/api/portal/documents/${selected.id}/sign-pdf`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "accept", signature: signatureData }),
       })
       if (res.ok) {
-        setSelected({ ...selected, status: "accepted" })
+        const data = await res.json()
+        setSelected({ ...selected, status: "accepted", signedFileUrl: data.signedFileUrl })
         showSuccess({ type: "accepted", title: selected.title })
         refetch()
       }

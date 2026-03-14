@@ -122,11 +122,15 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
 
   // File type detection — only real uploaded files (http URLs or blob URLs)
   // Exclude /api/ routes which are placeholders for non-existent PDF generators
-  const fileUrl = selected?.fileUrl?.trim() || ""
-  const isUploadedFile = fileUrl.length > 0 && (fileUrl.startsWith("http") || fileUrl.startsWith("blob:")) && !fileUrl.includes("/api/")
-  const isRealFile = isUploadedFile
-  const isPdf = isUploadedFile && (fileUrl.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(fileUrl))
-  const isImage = isUploadedFile && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl)
+    // Use signed PDF if available (signature burned on), otherwise original
+    const rawFileUrl = selected?.fileUrl?.trim() || ""
+    const signedUrl = (selected as any)?.signedFileUrl?.trim() || ""
+    const isSigned = ["signed", "accepted"].includes(selected?.status || "") && signedUrl.length > 0
+    const fileUrl = isSigned ? signedUrl : rawFileUrl
+    const isUploadedFile = fileUrl.length > 0 && (fileUrl.startsWith("http") || fileUrl.startsWith("blob:")) && !fileUrl.includes("/api/")
+    const isRealFile = isUploadedFile
+    const isPdf = isUploadedFile && (fileUrl.toLowerCase().endsWith(".pdf") || /\/pdf(\?|$)/i.test(fileUrl))
+    const isImage = isUploadedFile && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileUrl)
 
   const handleIframeLoad = () => {
     setPdfLoading(false)
@@ -357,10 +361,15 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText className={`h-4 w-4 ${typeCfg.color} shrink-0`} />
                       <span className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
-                        {decodeURIComponent(selected.fileUrl.split("/").pop()?.split("?")[0] || "Document")}
+                        {decodeURIComponent(fileUrl.split("/").pop()?.split("?")[0] || "Document")}
                       </span>
+                      {isSigned && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-400 text-[10px] font-bold shrink-0">
+                          <CheckCircle2 className="h-3 w-3" /> Signed Copy
+                        </span>
+                      )}
                     </div>
-                    <button onClick={() => downloadFile(selected.fileUrl, selected.title)}
+                    <button onClick={() => downloadFile(fileUrl, isSigned ? `Signed-${selected.title}` : selected.title)}
                       className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors" title="Download">
                       <Download className="h-3.5 w-3.5" />
                     </button>
@@ -391,8 +400,8 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                     )}
                     {isPdf ? (
                       <iframe
-                        key={selected.id}
-                        src={selected.fileUrl}
+                        key={`${selected.id}-${isSigned ? "signed" : "original"}`}
+                        src={fileUrl}
                         className="w-full h-full"
                         title={selected.title}
                         onLoad={handleIframeLoad}
@@ -400,7 +409,7 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                       />
                     ) : isImage ? (
                       <div className="flex-1 overflow-auto p-6 flex items-start justify-center">
-                        <img src={selected.fileUrl} alt={selected.title} className="max-w-full rounded-xl shadow-lg" onLoad={handleImageLoad} onError={() => { setPdfLoading(false); setPdfError(true) }} />
+                        <img src={fileUrl} alt={selected.title} className="max-w-full rounded-xl shadow-lg" onLoad={handleImageLoad} onError={() => { setPdfLoading(false); setPdfError(true) }} />
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center justify-center p-8">

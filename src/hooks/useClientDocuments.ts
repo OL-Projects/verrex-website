@@ -8,8 +8,10 @@ export interface ClientDocument {
   title: string
   description: string | null
   fileUrl: string
-  status: string // sent | viewed | signed
+  signedFileUrl?: string | null // URL of signed PDF with signature burned on it
+  status: string // sent | viewed | signed | accepted | rejected
   readAt: string | null
+  signedAt?: string | null
   createdAt: string
   updatedAt: string
   sender: { id: string; name: string; role: string; image?: string | null }

@@ -323,6 +323,7 @@ model Document {
 
   // Signing & Approval
   signatureUrl  String?   @db.Text // base64 data URL of client's drawn signature
+  signedFileUrl String?   // URL of signed PDF with signature burned on it
   signedAt      DateTime? // when document was signed by client
   acceptedAt    DateTime? // when estimate/invoice was accepted
   rejectedAt    DateTime? // when document was declined

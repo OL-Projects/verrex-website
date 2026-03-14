@@ -41,25 +41,27 @@ export default function ClientContractsInbox({ clientId }: { clientId: string })
     }
   }
 
-  const handleSign = async (signatureData: string) => {
-    if (!selected) return
-    setActionLoading(true)
-    try {
-      const res = await fetch(`/api/portal/documents/${selected.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "sign", signature: signatureData }),
-      })
-      if (res.ok) {
-        setSelected({ ...selected, status: "signed" })
-        showSuccess({ type: "signed", title: selected.title })
-        refetch()
-      }
-    } catch { /* silent */ } finally {
-      setActionLoading(false)
-      setShowSign(false)
-    }
-  }
+   const handleSign = async (signatureData: string) => {
+     if (!selected) return
+     setActionLoading(true)
+     try {
+       // Call sign-pdf API to burn signature onto PDF and upload signed copy
+       const res = await fetch(`/api/portal/documents/${selected.id}/sign-pdf`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ action: "sign", signature: signatureData }),
+       })
+       if (res.ok) {
+         const data = await res.json()
+         setSelected({ ...selected, status: "signed", signedFileUrl: data.signedFileUrl })
+         showSuccess({ type: "signed", title: selected.title })
+         refetch()
+       }
+     } catch { /* silent */ } finally {
+       setActionLoading(false)
+       setShowSign(false)
+     }
+   }
 
   // Actions for contracts: Sign + Request Changes
   const actions: DocumentAction[] = selected ? [
