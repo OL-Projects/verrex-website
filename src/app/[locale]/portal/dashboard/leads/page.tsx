@@ -40,6 +40,21 @@ const priorityColors: Record<string, string> = {
   medium: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400",
   low: "bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400",
 }
+const avatarColors: Record<string, string> = {
+  new: "from-blue-500 to-blue-600",
+  contacted: "from-amber-500 to-amber-600",
+  qualified: "from-purple-500 to-purple-600",
+  converted: "from-emerald-500 to-emerald-600",
+  lost: "from-slate-400 to-slate-500",
+}
+const ago = (d: string) => {
+  const ms = Date.now() - new Date(d).getTime()
+  if (ms < 60000) return "now"
+  if (ms < 3600000) return `${Math.floor(ms / 60000)}m ago`
+  if (ms < 86400000) return `${Math.floor(ms / 3600000)}h ago`
+  if (ms < 604800000) return `${Math.floor(ms / 86400000)}d ago`
+  return new Date(d).toLocaleDateString()
+}
 
 // ─── Main Component ─────────────────────────────────────
 export default function LeadsPage() {
@@ -221,38 +236,106 @@ export default function LeadsPage() {
                 <tr><td colSpan={9} className="p-12 text-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto" /></td></tr>
               ) : leads.length === 0 ? (
                 <tr><td colSpan={9} className="p-12 text-center text-slate-500 dark:text-slate-400">No leads found. {search || filterStatus ? "Try adjusting filters." : "Create your first lead."}</td></tr>
-              ) : leads.map(lead => (
+              ) : leads.map(lead => {
+                const initials = lead.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
+                const hasExtras = !!(lead.notes || lead.message || lead.projectType || lead.budget)
+                return (
                 <tr key={lead.id} className="border-b border-slate-100 dark:border-white/3 hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors cursor-pointer"
                   onClick={() => setEditingLead(lead)}>
-                  <td className="p-3" onClick={e => e.stopPropagation()}>
+                  <td className="p-3 align-top" onClick={e => e.stopPropagation()}>
                     <input type="checkbox" checked={selected.has(lead.id)}
-                      onChange={() => { const s = new Set(selected); s.has(lead.id) ? s.delete(lead.id) : s.add(lead.id); setSelected(s) }} className="rounded" />
+                      onChange={() => { const s = new Set(selected); s.has(lead.id) ? s.delete(lead.id) : s.add(lead.id); setSelected(s) }} className="rounded mt-1" />
                   </td>
-                  <td className="p-3">
-                    <p className="font-medium text-slate-900 dark:text-white">{lead.name}</p>
-                    {lead.city && <p className="text-[10px] text-slate-400 mt-0.5">{lead.city}{lead.postalCode ? `, ${lead.postalCode}` : ""}</p>}
+                  {/* Avatar + Name + Location + Tags */}
+                  <td className="p-3 align-top">
+                    <div className="flex items-start gap-2.5">
+                      <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${avatarColors[lead.status] || "from-slate-400 to-slate-500"} flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm`}>
+                        {initials}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900 dark:text-white text-[13px] leading-tight">{lead.name}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          {lead.city && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-slate-400">
+                              <MapPin className="h-2.5 w-2.5" />{lead.city}{lead.postalCode ? `, ${lead.postalCode}` : ""}
+                            </span>
+                          )}
+                          {lead.projectType && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium">{lead.projectType}</span>
+                          )}
+                          {lead.budget && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">{lead.budget}</span>
+                          )}
+                        </div>
+                        {/* Notes / Message preview */}
+                        {hasExtras && (
+                          <div className="mt-1 space-y-0.5">
+                            {lead.notes && (
+                              <p className="text-[10px] text-amber-600 dark:text-amber-400 leading-tight truncate max-w-[280px]" title={lead.notes}>
+                                📝 {lead.notes.slice(0, 80)}{lead.notes.length > 80 ? "…" : ""}
+                              </p>
+                            )}
+                            {lead.message && !lead.notes && (
+                              <p className="text-[10px] text-slate-400 leading-tight truncate max-w-[280px] italic" title={lead.message}>
+                                💬 {lead.message.slice(0, 70)}{lead.message.length > 70 ? "…" : ""}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </td>
-                  <td className="p-3 hidden md:table-cell">
-                    <p className="text-slate-600 dark:text-slate-400 text-xs">{lead.email}</p>
-                    {lead.phone && <p className="text-slate-400 text-[10px]">{lead.phone}</p>}
+                  {/* Contact */}
+                  <td className="p-3 hidden md:table-cell align-top">
+                    <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+                      <Mail className="h-3 w-3 text-slate-300 shrink-0" />
+                      <span className="truncate max-w-[160px]">{lead.email}</span>
+                    </div>
+                    {lead.phone && (
+                      <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                        <Phone className="h-2.5 w-2.5 text-slate-300 shrink-0" />
+                        {lead.phone}
+                      </div>
+                    )}
+                    {lead.assignedTo && (
+                      <div className="flex items-center gap-1 mt-1 text-[9px] text-slate-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
+                        Assigned: <span className="font-medium text-slate-500 dark:text-slate-300">{lead.assignedTo.name}</span>
+                      </div>
+                    )}
                   </td>
-                  <td className="p-3 hidden lg:table-cell text-slate-600 dark:text-slate-400 text-xs">{lead.company || "—"}</td>
-                  <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
+                  {/* Company */}
+                  <td className="p-3 hidden lg:table-cell align-top">
+                    {lead.company ? (
+                      <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+                        <Building2 className="h-3 w-3 text-slate-300 shrink-0" />
+                        {lead.company}
+                      </div>
+                    ) : <span className="text-[10px] text-slate-300">—</span>}
+                  </td>
+                  {/* Status */}
+                  <td className="p-3 text-center align-top" onClick={e => e.stopPropagation()}>
                     <select value={lead.status} onChange={e => updateLeadStatus(lead.id, e.target.value)}
                       className={`text-[10px] px-2 py-1 rounded-full font-bold border-0 cursor-pointer ${statusColors[lead.status] || ""}`}>
                       {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
                     </select>
                   </td>
-                  <td className="p-3 text-center hidden sm:table-cell">
+                  {/* Priority */}
+                  <td className="p-3 text-center hidden sm:table-cell align-top">
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${priorityColors[lead.priority] || ""}`}>{lead.priority}</span>
                   </td>
-                  <td className="p-3 text-center hidden lg:table-cell">
+                  {/* Source */}
+                  <td className="p-3 text-center hidden lg:table-cell align-top">
                     <span className="text-[10px] text-slate-500 capitalize">{lead.source.replace(/_/g, " ")}</span>
                   </td>
-                  <td className="p-3 text-right text-[10px] text-slate-400 whitespace-nowrap">{new Date(lead.createdAt).toLocaleDateString()}</td>
-                  <td className="p-3 text-center"><MoreHorizontal className="h-4 w-4 text-slate-300" /></td>
+                  {/* Date */}
+                  <td className="p-3 text-right align-top">
+                    <p className="text-[10px] text-slate-500 whitespace-nowrap">{ago(lead.createdAt)}</p>
+                    <p className="text-[9px] text-slate-300 mt-0.5">{new Date(lead.createdAt).toLocaleDateString()}</p>
+                  </td>
+                  <td className="p-3 text-center align-top"><MoreHorizontal className="h-4 w-4 text-slate-300" /></td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

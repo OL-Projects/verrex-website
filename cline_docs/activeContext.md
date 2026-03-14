@@ -1,5 +1,36 @@
 # Active Context
 
+## Latest Session — March 13, 2026 (Evening)
+
+### Completed This Session
+1. **Profile dropdown z-index fix** — Added `relative z-[100]` to portal topbar so profile/notification dropdowns always appear above page content
+2. **Admin IT User Editor** — Full CRUD modal: edit name, display name, email, phone, company, address, role, status (active/suspended), notes, clear photo; PATCH/GET API with field validation
+3. **Removed Commissions page** — Deleted page, removed from sidebar nav and i18n references
+4. **Enterprise CRM Admin Dashboard** — Complete overhaul:
+   - KPI strip (6 live stats: revenue, projects, leads, invoices, appointments, clients)
+   - Revenue breakdown with progress bars (collected/pending/overdue)
+   - Project pipeline visualization (active/pending/completed)
+   - Lead funnel (new→contacted→qualified→converted) + source breakdown
+   - Quick actions grid (8 shortcuts)
+   - Activity feed from ProjectActivity with author names
+   - Upcoming appointments with date cards
+   - Document stats (total/viewed/signed + overdue/paid badges)
+   - Recent clients table with avatar + company + counts
+   - Recent leads compact cards with status badges
+   - Design: thin borders, compact spacing, tabular-nums, engineer-grade look
+5. **Enhanced /api/admin/stats** — 28 parallel database queries for comprehensive dashboard data
+
+### Commits Pushed
+- `a02159c` — Profile dropdown z-index fix
+- `aa5b0f1` — Admin IT user profile editor
+- `08fe6b2` — Enterprise CRM admin dashboard + remove commissions
+
+### Next Steps
+- Client portal Financial Documents: signing/approval workflow with admin notifications
+- Further design language refinements across portal pages
+- Document signing PDF workflow (already has signature-pad component)
+
+
 ## Latest: Document Signing, Approval & Admin Notification System (March 13, 2026)
 
 ### What Was Done

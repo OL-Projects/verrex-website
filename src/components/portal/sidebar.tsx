@@ -29,12 +29,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 // Navigation group keys (labels are translated at render time)
 const NAV_GROUP_KEYS = [
-  { key: "overview", items: ["Dashboard"] },
+  { key: "overview", items: ["Dashboard", "Timeline"] },
   { key: "crm", items: ["Leads", "Projects"] },
   { key: "operations", items: ["Appointments", "Measurements", "Orders"] },
   { key: "communication", items: ["Messages"] },
   { key: "financialDocs", items: ["Estimates", "Invoices", "Contracts", "All Documents"] },
-  { key: "insights", items: ["Analytics", "Timeline", "AI Settings"] },
+  { key: "insights", items: ["Analytics", "AI Settings"] },
   { key: "support", items: ["IT"] },
 ]
 
