@@ -21,6 +21,10 @@ model User {
   postalCode     String?
   notes          String?
   image          String?         // profile photo URL or base64
+  displayName    String?         // admin-set display name override (shows in UI instead of name)
+  displayEmail   String?         // admin-set display email (cosmetic only — login email unchanged)
+  status         String          @default("active") // active | suspended
+  lastLoginAt    DateTime?       // last successful login timestamp
   isDemo         Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
