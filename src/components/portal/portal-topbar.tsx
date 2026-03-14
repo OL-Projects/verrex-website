@@ -23,7 +23,7 @@ interface PortalTopbarProps {
 
 export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
   const { data: session } = useSession()
-  const profilePhoto = useProfilePhoto(session?.user?.id || "")
+  const profilePhoto = useProfilePhoto(session?.user?.id || "", true)
   const T = usePortalT()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)

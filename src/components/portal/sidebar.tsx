@@ -138,7 +138,7 @@ const [collapsed, setCollapsed] = useState(false)
   }, [])
   const userRole = (session?.user?.role || "client") as UserRole
   const userName = session?.user?.name || "User"
-  const profilePhoto = useProfilePhoto(session?.user?.id || "")
+  const profilePhoto = useProfilePhoto(session?.user?.id || "", true)
   const userEmail = session?.user?.email || ""
 
   const filteredNav = SIDEBAR_NAV.filter((item) =>

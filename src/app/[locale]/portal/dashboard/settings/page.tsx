@@ -11,6 +11,7 @@ import {
   LayoutGrid, Languages, CalendarClock, ToggleLeft, ToggleRight,
 } from "lucide-react"
 import { loadPreferences, savePreferences, NOTIFICATION_PRESETS, type UserPreferences, type NotificationPrefs } from "./user-preferences"
+import { compressImage, dispatchPhotoChanged } from "@/lib/use-profile-photo"
 
 type ProfileData = { name: string; email: string; role: string; company: string; phone: string; createdAt: string; updatedAt: string }
 
@@ -56,14 +57,53 @@ export default function SettingsPage() {
     updatePrefs({ notifications: { ...prefs.notifications, ...updates } })
   }
 
-  // Photo upload handler
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Photo upload handler — accepts PNG, JPEG, SVG; auto-compresses >2MB
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 2 * 1024 * 1024) { alert("Photo must be under 2MB"); return }
-    const reader = new FileReader()
-    reader.onload = (ev) => { updatePrefs({ profilePhoto: ev.target?.result as string }) }
-    reader.readAsDataURL(file)
+
+    // Validate file type
+    const validTypes = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml"]
+    if (!validTypes.includes(file.type)) {
+      alert("Please upload a PNG, JPEG, or SVG image.")
+      return
+    }
+
+    setPhotoUploading(true)
+    try {
+      let dataUrl: string
+
+      if (file.size > 2 * 1024 * 1024) {
+        // Auto-compress large images using canvas
+        dataUrl = await compressImage(file)
+      } else {
+        // Small enough — read directly
+        dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = (ev) => resolve(ev.target?.result as string)
+          reader.onerror = () => reject(new Error("Failed to read file"))
+          reader.readAsDataURL(file)
+        })
+      }
+
+      // Save to prefs (localStorage) + dispatch same-tab event for instant refresh
+      updatePrefs({ profilePhoto: dataUrl })
+      dispatchPhotoChanged(userId, dataUrl)
+
+      // Sync to DB in background
+      fetch("/api/portal/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl }),
+      }).catch(() => {})
+    } catch {
+      alert("Failed to process image. Please try a different file.")
+    } finally {
+      setPhotoUploading(false)
+      // Reset input so same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
   }
 
   // Fetch profile
@@ -144,7 +184,7 @@ export default function SettingsPage() {
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-5 flex items-center gap-2"><User className="h-5 w-5 text-blue-500" />Profile</h3>
         <div className="flex items-center gap-5 mb-6">
           {/* Photo Upload */}
-          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <div className="relative group cursor-pointer" onClick={() => !photoUploading && fileInputRef.current?.click()}>
             {prefs.profilePhoto ? (
               <img src={prefs.profilePhoto} alt="Profile" className="h-20 w-20 rounded-2xl object-cover shadow-lg ring-2 ring-white dark:ring-slate-800" />
             ) : (
@@ -152,10 +192,10 @@ export default function SettingsPage() {
                 {profile?.name?.charAt(0)?.toUpperCase() || "?"}
               </div>
             )}
-            <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Camera className="h-6 w-6 text-white" />
+            <div className={`absolute inset-0 rounded-2xl transition-opacity flex items-center justify-center ${photoUploading ? "bg-black/50 opacity-100" : "bg-black/40 opacity-0 group-hover:opacity-100"}`}>
+              {photoUploading ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : <Camera className="h-6 w-6 text-white" />}
             </div>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+            <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml" className="hidden" onChange={handlePhotoUpload} />
           </div>
           <div className="flex-1">
             <p className="text-lg font-semibold text-slate-900 dark:text-white">{profile?.name}</p>
@@ -163,9 +203,9 @@ export default function SettingsPage() {
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 font-medium capitalize">{profile?.role}</span>
               <span className="text-xs text-slate-400">Since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString("en", { month: "long", year: "numeric" }) : "—"}</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Click photo to upload (max 2MB)</p>
+            <p className="text-[11px] text-slate-400 mt-1">PNG, JPEG or SVG — auto-compressed if over 2MB</p>
           </div>
-          {prefs.profilePhoto && <button onClick={() => updatePrefs({ profilePhoto: "" })} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>}
+          {prefs.profilePhoto && <button onClick={() => { updatePrefs({ profilePhoto: "" }); dispatchPhotoChanged(userId, "") }} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>}
         </div>
 
         <form onSubmit={handleProfileSave} className="space-y-4">
