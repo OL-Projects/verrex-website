@@ -166,7 +166,7 @@ export default function LeadsPage() {
 
       {/* ── KPI Strip ───────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}
-        className="grid grid-cols-3 sm:grid-cols-6 gap-px bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 shadow-sm">
+        className="grid grid-cols-3 sm:grid-cols-6 gap-px bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-500/50 shadow-sm dark:shadow-black/20">
         {[
           { label: "Total", value: totalAll, accent: "text-slate-700 dark:text-white" },
           { label: "New", value: counts.new || 0, accent: kpiAccent.new },
@@ -189,7 +189,7 @@ export default function LeadsPage() {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search name, email, phone, company, city…"
-            className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-[11px] text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400" />
+            className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-500/50 text-[11px] text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400" />
         </div>
         <div className="flex gap-1.5 flex-wrap">
           {[
@@ -198,7 +198,7 @@ export default function LeadsPage() {
             { val: filterSource, set: setFilterSource, opts: SOURCES, placeholder: "Source" },
           ].map(f => (
             <select key={f.placeholder} value={f.val} onChange={e => f.set(e.target.value)}
-              className="px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-[11px] text-slate-600 dark:text-slate-200 shadow-sm">
+              className="px-2 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-500/50 text-[11px] text-slate-600 dark:text-slate-200 shadow-sm">
               <option value="">All {f.placeholder}s</option>
               {f.opts.map(s => <option key={s} value={s}>{s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</option>)}
             </select>
@@ -219,7 +219,7 @@ export default function LeadsPage() {
 
       {/* ── Table ───────────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+        className="rounded-lg border border-slate-200 dark:border-slate-500/50 bg-white dark:bg-slate-800 shadow-sm dark:shadow-black/20 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

@@ -108,7 +108,7 @@ export default function AdminDashboardPage() {
 
       {/* ── KPI Strip ───────────────────────── */}
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}
-        className="grid grid-cols-3 sm:grid-cols-6 gap-px bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+        className="grid grid-cols-3 sm:grid-cols-6 gap-px bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-500/50 shadow-sm dark:shadow-black/20">
         {[
           { label: "Revenue", value: fmt(d.totalRevenue), sub: `${fmt(d.paidRevenue)} collected`, icon: DollarSign, accent: "text-emerald-600 dark:text-emerald-400" },
           { label: "Projects", value: d.totalProjects, sub: `${d.activeProjects} active`, icon: FolderKanban, accent: "text-blue-600 dark:text-blue-400" },
