@@ -8,6 +8,7 @@ import {
   Loader2, MessageSquare,
 } from "lucide-react"
 import type { ClientDocument } from "@/hooks/useClientDocuments"
+import UserAvatar from "@/components/portal/user-avatar"
 
 // ─── Config ────────────────────────────────────────────
 const typeConfig: Record<string, { icon: typeof FileText; color: string; label: string; bg: string; gradient: string }> = {
@@ -278,9 +279,7 @@ export default function DocumentSplitView({ documents, loading, selected, onSele
                 {/* Metadata grid */}
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center shrink-0">
-                      <User className="h-3.5 w-3.5 text-slate-500" />
-                    </div>
+                    <UserAvatar image={selected.sender.image} name={selected.sender.name} size="md" className="rounded-lg" />
                     <div>
                       <p className="text-[10px] text-slate-400 uppercase font-medium">Sent By</p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">{selected.sender.name}</p>

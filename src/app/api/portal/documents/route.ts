@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     where,
     include: {
       sender: { select: { id: true, name: true, role: true, image: true } },
-      recipient: { select: { id: true, name: true, role: true, company: true } },
+      recipient: { select: { id: true, name: true, role: true, company: true, image: true } },
       project: { select: { id: true, title: true } },
     },
     orderBy: { createdAt: "desc" },

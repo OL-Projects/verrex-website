@@ -133,7 +133,7 @@ const [collapsed, setCollapsed] = useState(false)
     const onStorage = (e: StorageEvent) => { if (e.key === "vx_nav_pulse_estimates") check() }
     window.addEventListener("storage", onStorage)
     // Also poll briefly (same-tab writes don't fire storage event)
-    const interval = setInterval(check, 500)
+    const interval = setInterval(check, 5000) // 500ms→5s: storage event handles cross-tab, this catches same-tab writes
     return () => { window.removeEventListener("storage", onStorage); clearInterval(interval) }
   }, [])
   const userRole = (session?.user?.role || "client") as UserRole

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
 // ─── Types ──────────────────────────────────────────────
-export interface Participant { id: string; name: string; role: string; company: string | null; image?: string | null }
+export interface Participant { id: string; name: string; role: string; company: string | null; image?: string | null; }
 export interface ConvoLastMsg { id: string; content: string; senderId: string; senderName: string; createdAt: string; attachmentUrls?: string | null }
 export interface Conversation {
   id: string; type: "direct" | "group"; name: string | null
@@ -145,9 +145,10 @@ export function useMessages(userId: string) {
 
   useEffect(() => { fetchConvos() }, [fetchConvos])
 
-  // ── Poll ──
+  // ── Visibility-aware polling (pause when tab hidden) ──
   useEffect(() => {
-    pollRef.current = setInterval(() => {
+    const poll = () => {
+      if (document.hidden) return // Skip poll when tab is not visible
       fetchConvos()
       if (activeConvo) {
         fetch(`/api/portal/conversations/${activeConvo.id}/messages?limit=100`)
@@ -155,8 +156,15 @@ export function useMessages(userId: string) {
           .then(msgs => setMessages(msgs))
           .catch(() => {})
       }
-    }, 4000)
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+    }
+    pollRef.current = setInterval(poll, 8000)
+    // Resume immediately when tab becomes visible
+    const onVisibility = () => { if (!document.hidden) poll() }
+    document.addEventListener("visibilitychange", onVisibility)
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+      document.removeEventListener("visibilitychange", onVisibility)
+    }
   }, [fetchConvos, activeConvo])
 
   // ── Open Conversation ──

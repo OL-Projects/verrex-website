@@ -14,6 +14,7 @@ import {
 import MessageBubble from "./message-bubble"
 import MessageComposer from "./message-composer"
 import ImageLightbox from "./image-lightbox"
+import UserAvatar from "@/components/portal/user-avatar"
 
 // ═══════════════════════════════════════════════════════
 // Main Page
@@ -446,7 +447,7 @@ function NewConversationModal({ userId, onClose, onCreated }: {
               const sel = selected.some(s => s.id === u.id)
               return <button key={u.id} onClick={() => toggleUser(u)}
                 className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition-colors ${sel ? "bg-blue-50 dark:bg-blue-500/10 ring-1 ring-blue-500/30" : "hover:bg-slate-50 dark:hover:bg-white/5"}`}>
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">{u.name.charAt(0)}</div>
+                <UserAvatar image={u.image} name={u.name} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{u.name}</p>
                   <p className="text-[10px] text-slate-400">{u.email} · <span className={`font-medium px-1 py-0.5 rounded ${ROLE_COLORS[u.role] || ""}`}>{u.role}</span></p>

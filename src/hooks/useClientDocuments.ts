@@ -12,8 +12,8 @@ export interface ClientDocument {
   readAt: string | null
   createdAt: string
   updatedAt: string
-  sender: { id: string; name: string; role: string }
-  recipient: { id: string; name: string; role: string; company?: string }
+  sender: { id: string; name: string; role: string; image?: string | null }
+  recipient: { id: string; name: string; role: string; company?: string; image?: string | null }
   project?: { id: string; title: string } | null
 }
 
@@ -47,8 +47,12 @@ export function useClientDocuments(type?: string) {
   useEffect(() => {
     if (!isBrowser) return // SSR guard
     fetchDocs()
-    const interval = setInterval(fetchDocs, 15000)
-    return () => clearInterval(interval)
+    // Visibility-aware polling: skip when tab hidden, resume on focus
+    const poll = () => { if (!document.hidden) fetchDocs() }
+    const interval = setInterval(poll, 15000)
+    const onVisibility = () => { if (!document.hidden) fetchDocs() }
+    document.addEventListener("visibilitychange", onVisibility)
+    return () => { clearInterval(interval); document.removeEventListener("visibilitychange", onVisibility) }
   }, [fetchDocs, isBrowser])
 
   const markAsRead = useCallback(async (docId: string) => {
