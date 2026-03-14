@@ -47,7 +47,7 @@ export function PortalTopbar({ onMenuClick }: PortalTopbarProps) {
   }, [])
 
   return (
-    <div className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6">
+    <div className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-950/40 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 relative z-[100]">
       {/* Left: mobile menu + page context */}
       <div className="flex items-center gap-3">
         <button
