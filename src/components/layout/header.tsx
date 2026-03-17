@@ -61,13 +61,13 @@ export function Header() {
                 <Phone className="h-3.5 w-3.5" />
                 {companyInfo.phone}
               </a>
-              <IntlLink
-                href="/contact?focus=message"
+              <a
+                href={`mailto:${companyInfo.email}`}
                 className="hidden sm:flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
                 {companyInfo.email}
-              </IntlLink>
+              </a>
             </div>
             <div className="flex items-center gap-4">
               <span className="hidden md:inline text-slate-500 dark:text-slate-300/80">

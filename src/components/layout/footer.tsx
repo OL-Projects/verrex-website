@@ -22,7 +22,6 @@ export function Footer() {
     products: [
       { name: t('residentialWindows'), href: "/products?category=residential" },
       { name: t('commercialGlass'), href: "/products?category=commercial" },
-      { name: t('industrialSolutions'), href: "/products?category=industrial" },
       { name: t('allProducts'), href: "/products" },
     ],
     services: [
@@ -82,10 +81,15 @@ export function Footer() {
                 <Mail className="h-4 w-4 text-blue-400" />
                 {companyInfo.email}
               </a>
-              <div className="flex items-center gap-3 text-sm text-slate-300">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=135+Evergreen+Dr+Beaconsfield+QC"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-sm text-slate-300 hover:text-blue-400 transition-colors"
+              >
                 <MapPin className="h-4 w-4 text-blue-400 shrink-0" />
                 {companyInfo.address}
-              </div>
+              </a>
               <div className="flex items-center gap-3 text-sm text-slate-300">
                 <Clock className="h-4 w-4 text-blue-400" />
                 {t('products') === 'Produits' ? 'Lun-Ven: ' : 'Mon-Fri: '}{companyInfo.hours.weekdays}

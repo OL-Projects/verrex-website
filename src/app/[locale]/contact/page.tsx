@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { companyInfo } from "@/lib/data"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Phone, Mail, MapPin, Clock, Send, MessageSquare, Video, Loader2 } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Send, Loader2 } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import { Link as IntlLink } from '@/i18n/navigation'
 import { useToast } from "@/components/ui/use-toast"
@@ -152,7 +152,7 @@ function ContactPageContent() {
                 {[
                   { icon: Phone, label: t('phoneLabel'), value: companyInfo.phone, href: `tel:${companyInfo.phone}`, key: "phone" },
                   { icon: Mail, label: t('emailLabel'), value: companyInfo.email, href: `mailto:${companyInfo.email}`, key: "email" },
-                  { icon: MapPin, label: t('addressLabel'), value: companyInfo.address, href: "#", key: "address" },
+                  { icon: MapPin, label: t('addressLabel'), value: companyInfo.address, href: "https://www.google.com/maps/search/?api=1&query=135+Evergreen+Dr+Beaconsfield+QC", key: "address" },
                 ].map((item) => (
                   <a key={item.key} href={item.href} className="flex items-start gap-4 p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center shrink-0">
@@ -179,23 +179,6 @@ function ContactPageContent() {
                   </div>
                 </CardContent>
               </Card>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Card className="cursor-pointer hover:shadow-md transition-all">
-                  <CardContent className="p-4 text-center">
-                    <MessageSquare className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <p className="text-sm font-medium">{t('liveChat')}</p>
-                    <p className="text-xs text-slate-500">{t('comingSoon')}</p>
-                  </CardContent>
-                </Card>
-                <Card className="cursor-pointer hover:shadow-md transition-all">
-                  <CardContent className="p-4 text-center">
-                    <Video className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                    <p className="text-sm font-medium">{t('videoCall')}</p>
-                    <p className="text-xs text-slate-500">{t('bookOnline')}</p>
-                  </CardContent>
-                </Card>
-              </div>
             </div>
 
             {/* Contact Form */}
