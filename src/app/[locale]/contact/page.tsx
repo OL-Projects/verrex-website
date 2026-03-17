@@ -23,6 +23,7 @@ function ContactPageContent() {
   const [fadeOut, setFadeOut] = useState(false)
   const [formEntering, setFormEntering] = useState(false)
   const [messageGlow, setMessageGlow] = useState(false)
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
   const searchParams = useSearchParams()
   const messageRef = useRef<HTMLTextAreaElement>(null)
   const fromEmail = searchParams.get("focus") === "message"
@@ -190,23 +191,28 @@ function ContactPageContent() {
                     e.preventDefault()
                     setSending(true)
                     const form = e.currentTarget
-                    const formData = new FormData(form)
+                    const fd = new FormData(form)
                     try {
+                      // Build FormData with files for attachment support
+                      const payload = new FormData()
+                      payload.append("type", "contact")
+                      payload.append("name", fd.get("name") as string || "")
+                      payload.append("email", fd.get("email") as string || "")
+                      payload.append("phone", fd.get("phone") as string || "")
+                      payload.append("subject", fd.get("subject") as string || "")
+                      payload.append("message", fd.get("message") as string || "")
+                      payload.append("contactMethod", fd.get("contactMethod") as string || "")
+                      // Append attached files
+                      for (const file of attachedFiles) {
+                        payload.append("attachments", file, file.name)
+                      }
                       const res = await fetch("/api/send-email", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          type: "contact",
-                          name: formData.get("name"),
-                          email: formData.get("email"),
-                          phone: formData.get("phone"),
-                          subject: formData.get("subject"),
-                          message: formData.get("message"),
-                          contactMethod: formData.get("contactMethod"),
-                        }),
+                        body: payload,
                       })
                       if (!res.ok) throw new Error("Failed to send")
                       setSubmitted(true)
+                      setAttachedFiles([])
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     } catch {
                       toast({ title: t('toastFailedTitle'), description: t('toastFailedDesc'), variant: "error" })
@@ -254,7 +260,7 @@ function ContactPageContent() {
                     <div>
                       <Label>{t('attachments')}</Label>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">{t('attachmentsDesc')}</p>
-                      <FileUpload maxFiles={5} maxSizeMB={10} />
+                      <FileUpload maxFiles={5} maxSizeMB={10} onFilesChange={setAttachedFiles} />
                     </div>
                     <div>
                       <Label>{t('preferredContact')}</Label>

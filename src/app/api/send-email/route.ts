@@ -193,10 +193,73 @@ function getSubjectLine(type: FormType, data: Record<string, unknown>): string {
   }
 }
 
+// ─── Helper: Parse body as FormData or JSON ───
+async function parseRequest(req: NextRequest): Promise<{ data: Record<string, unknown>; files: File[] }> {
+  const contentType = req.headers.get("content-type") || "";
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await req.formData();
+    const data: Record<string, unknown> = {};
+    const files: File[] = [];
+    for (const [key, value] of formData.entries()) {
+      if (key === "attachments" && value instanceof File) {
+        files.push(value);
+      } else {
+        data[key] = value;
+      }
+    }
+    return { data, files };
+  }
+  // Fallback: JSON body (quote, appointment, quick-quote forms)
+  const body = await req.json();
+  return { data: body, files: [] };
+}
+
+// ─── Helper: Convert File to Resend attachment ───
+async function fileToAttachment(file: File): Promise<{ filename: string; content: Buffer }> {
+  const bytes = await file.arrayBuffer();
+  let buffer = Buffer.from(bytes);
+  let filename = file.name;
+
+  // Optimize images > 500KB for email (compress to JPEG)
+  if (file.type.startsWith("image/") && !file.type.includes("svg") && buffer.length > 500 * 1024) {
+    try {
+      const sharp = (await import("sharp")).default;
+      buffer = Buffer.from(
+        await sharp(new Uint8Array(buffer))
+          .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
+          .jpeg({ quality: 78, mozjpeg: true })
+          .toBuffer()
+      );
+      filename = filename.replace(/\.[^.]+$/, ".jpg");
+    } catch {
+      // If sharp fails, use original
+    }
+  }
+
+  return { filename, content: buffer };
+}
+
+// ─── Helper: Build attachment info HTML for admin email ───
+function attachmentInfoHtml(files: File[]): string {
+  if (!files.length) return "";
+  const formatSize = (bytes: number) => bytes < 1024 ? `${bytes} B` : bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  const fileRows = files.map(f => {
+    const isImg = f.type.startsWith("image/");
+    const icon = isImg ? "&#128247;" : "&#128206;";
+    return `<tr><td style="padding:6px 0;font-size:13px;color:#1e293b">${icon} ${f.name}</td><td style="padding:6px 0;font-size:12px;color:#94a3b8;text-align:right">${formatSize(f.size)}</td></tr>`;
+  }).join("");
+  return `
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 12px;color:#0c4a6e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Attachments (${files.length})</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${fileRows}</table>
+      <p style="margin:12px 0 0;color:#64748b;font-size:11px">Files are attached to this email</p>
+    </div>`;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { type, ...data } = body as { type: FormType } & Record<string, unknown>;
+    const { data, files } = await parseRequest(req);
+    const type = data.type as FormType;
 
     if (!type || !data.email) {
       return NextResponse.json(
@@ -223,12 +286,25 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Invalid form type" }, { status: 400 });
     }
 
+    // If there are file attachments, inject info into admin email and prepare for Resend
+    if (files.length > 0) {
+      // Insert attachment info before the closing "Sent from" line
+      html = html.replace(
+        /(<p[^>]*>Sent from VEREX website)/,
+        `${attachmentInfoHtml(files)}$1`
+      );
+    }
+
+    // Convert files to Resend attachment format
+    const attachments = await Promise.all(files.map(fileToAttachment));
+
     const { error } = await getResend().emails.send({
       from: "VEREX Website <noreply@verex.ca>",
       to: [ADMIN_EMAIL],
       subject: getSubjectLine(type, data),
       html,
       replyTo: data.email as string,
+      ...(attachments.length > 0 ? { attachments } : {}),
     });
 
     if (error) {
