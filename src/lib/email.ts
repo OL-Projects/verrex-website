@@ -262,7 +262,7 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&oplus;", "#fef3c7", "#d97706")}
+      ${iconBadge("&#8635;", "#fef3c7", "#d97706")}
     </div>
     
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Password Reset Request</h1>
@@ -341,7 +341,7 @@ export async function sendContactConfirmationEmail(to: string, name: string, sub
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&hearts;", "#dbeafe", "#2563eb")}
+      ${iconBadge("&#9993;", "#dbeafe", "#2563eb")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">We Received Your Message</h1>
@@ -382,7 +382,7 @@ export async function sendQuoteConfirmationEmail(to: string, name: string, proje
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&equiv;", "#f3e8ff", "#7c3aed")}
+      ${iconBadge("&#9998;", "#f3e8ff", "#7c3aed")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Quote Request Received</h1>
@@ -443,7 +443,7 @@ export async function sendAppointmentConfirmationEmail(
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&squ;", "#dcfce7", "#059669")}
+      ${iconBadge("&#10003;", "#dcfce7", "#059669")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Appointment Confirmed</h1>
@@ -494,7 +494,7 @@ export async function sendQuickQuoteConfirmationEmail(to: string, name: string, 
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&raquo;", "#e0f2fe", "#0369a1")}
+      ${iconBadge("&#8594;", "#e0f2fe", "#0369a1")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Quick Quote Received</h1>
@@ -680,7 +680,7 @@ export async function sendRevisionRequestedEmail(
 
   const content = `
     <div style="text-align:center;margin:0 0 24px">
-      ${iconBadge("&loz;", "#fefce8", "#d97706")}
+      ${iconBadge("&#9998;", "#fefce8", "#d97706")}
     </div>
 
     <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800;text-align:center">Revision Requested</h1>
