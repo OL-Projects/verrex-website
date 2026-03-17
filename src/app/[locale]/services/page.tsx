@@ -57,10 +57,10 @@ export default async function ServicesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { icon: Award, value: "500+", label: t('statProjectsCompleted') },
-              { icon: Users, value: "15+", label: t('statYearsExperience') },
+              { icon: Award, value: "126+", label: t('statProjectsCompleted') },
+              { icon: Users, value: "2M+", label: t('statYearsExperience') },
               { icon: Star, value: "5★", label: t('statOnTime') },
-              { icon: ShieldCheck, value: "100%", label: t('statSatisfaction') },
+              { icon: ShieldCheck, value: "14+", label: t('statSatisfaction') },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">

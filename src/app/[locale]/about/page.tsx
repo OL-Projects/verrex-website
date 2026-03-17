@@ -44,10 +44,10 @@ export default async function AboutPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: "500+", label: t('projectsCompleted') },
-              { value: "50+", label: t('expertTeamMembers') },
-              { value: "2M+", label: t('sqFtInstalled') },
-              { value: "5★", label: t('onTimeDelivery') },
+              { value: "126+", label: t('projectsCompleted') },
+              { value: "2M+", label: t('expertTeamMembers') },
+              { value: "5★", label: t('sqFtInstalled') },
+              { value: "14+", label: t('onTimeDelivery') },
             ].map((stat, i) => (
               <div key={i}>
                 <p className="text-3xl md:text-4xl font-black text-blue-600 dark:text-blue-400">{stat.value}</p>
