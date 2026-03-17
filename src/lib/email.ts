@@ -41,29 +41,59 @@ export function emailLayout(content: string, preheader: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="x-apple-disable-message-reformatting">
-  <meta name="color-scheme" content="light">
-  <meta name="supported-color-schemes" content="light">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
   <title>VEREX</title>
   <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
   <style>
+    :root{color-scheme:light only}
     body,table,td{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
-    body{margin:0;padding:0;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#f1f5f9}
+    body{margin:0;padding:0;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#f1f5f9!important}
     img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic}
     table{border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0}
     a{color:#2563eb;text-decoration:none}
+    .vx-body{background-color:#f1f5f9!important}
+    .vx-card{background-color:#ffffff!important}
+    .vx-header{background:linear-gradient(160deg,#091b32 0%,#0f2847 35%,#142f52 70%,#1a3a5f 100%)!important}
+    .vx-content{background-color:#ffffff!important}
+    .vx-h1{color:#0f172a!important}
+    .vx-text{color:#64748b!important}
+    .vx-dark{color:#1e293b!important}
+    .vx-warranty{background:linear-gradient(135deg,#ecfdf5,#f0fdf4)!important}
+    .vx-footer-text{color:#94a3b8!important}
     @media only screen and (max-width:600px){.container{width:100%!important;padding:16px!important}}
+    @media (prefers-color-scheme:dark){
+      .vx-body{background-color:#f1f5f9!important}
+      .vx-card{background-color:#ffffff!important}
+      .vx-header{background:linear-gradient(160deg,#091b32 0%,#0f2847 35%,#142f52 70%,#1a3a5f 100%)!important}
+      .vx-content{background-color:#ffffff!important}
+      .vx-h1{color:#0f172a!important}
+      .vx-text{color:#64748b!important}
+      .vx-dark{color:#1e293b!important}
+      .vx-warranty{background:linear-gradient(135deg,#ecfdf5,#f0fdf4)!important}
+      .vx-info{background-color:#f8fafc!important}
+      .vx-footer-text{color:#94a3b8!important}
+      u~div .vx-body{background-color:#f1f5f9!important}
+      u~div .vx-card{background-color:#ffffff!important}
+    }
+    [data-ogsc] .vx-body{background-color:#f1f5f9!important}
+    [data-ogsc] .vx-card{background-color:#ffffff!important}
+    [data-ogsc] .vx-content{background-color:#ffffff!important}
+    [data-ogsc] .vx-h1{color:#0f172a!important}
+    [data-ogsc] .vx-text{color:#64748b!important}
+    [data-ogsc] .vx-dark{color:#1e293b!important}
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
+<body class="vx-body" style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
   <div style="display:none;font-size:1px;color:#f1f5f9;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">${preheader}</div>
   
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 16px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="vx-body" style="background-color:#f1f5f9;padding:40px 16px">
     <tr>
       <td align="center">
-        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 40px rgba(15,40,71,0.08)">
+        <table role="presentation" class="container vx-card" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 40px rgba(15,40,71,0.08)">
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(160deg,#091b32 0%,#0f2847 35%,#142f52 70%,#1a3a5f 100%);padding:0">
+            <td class="vx-header" style="background:linear-gradient(160deg,#091b32 0%,#0f2847 35%,#142f52 70%,#1a3a5f 100%);padding:0">
               <!-- Top accent line -->
               <div style="height:3px;background:linear-gradient(90deg,#2563eb,#60a5fa,#2563eb)"></div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -96,12 +126,12 @@ export function emailLayout(content: string, preheader: string): string {
           </tr>
           <!-- Content -->
           <tr>
-            <td style="padding:36px 40px 24px">${content}</td>
+            <td class="vx-content" style="padding:36px 40px 24px;background-color:#ffffff">${content}</td>
           </tr>
           <!-- Lifetime Warranty Badge -->
           <tr>
             <td style="padding:0 40px">
-              <div style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;border-radius:10px;padding:14px 20px;text-align:center">
+              <div class="vx-warranty" style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;border-radius:10px;padding:14px 20px;text-align:center">
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
                   <tr>
                     <td style="vertical-align:middle;padding-right:10px">
