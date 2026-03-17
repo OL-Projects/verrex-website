@@ -72,8 +72,8 @@ export default function HomePage() {
 
   const categoryCards = [
     { title: t('categoryResidential'), description: t('categoryResidentialDesc'), icon: Home, href: "/products?category=residential", image: "/images/hero/hero-residential.jpg" },
-    { title: t('categoryCommercial'), description: t('categoryCommercialDesc'), icon: Landmark, href: "/products?category=commercial", image: "/images/hero/hero-commercial.jpg" },
-    { title: t('categoryIndustrial'), description: t('categoryIndustrialDesc'), icon: Factory, href: "/products?category=industrial", image: "/images/hero/hero-industrial.jpg" },
+    { title: t('categoryMultiFamily'), description: t('categoryMultiFamilyDesc'), icon: Building2, href: "/products?category=residential", image: "/images/hero/hero-commercial.jpg" },
+    { title: t('categoryCommercial'), description: t('categoryCommercialDesc'), icon: Landmark, href: "/products?category=commercial", image: "/images/hero/hero-industrial.jpg" },
   ]
   const featuredProducts = products.filter((p) => p.isFeatured).slice(0, 4)
 
@@ -456,6 +456,35 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Lifetime Warranty Banner */}
+      <RevealSection className="py-16 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 dark:from-emerald-950/20 dark:via-[#030712] dark:to-emerald-950/20 border-y border-emerald-200/40 dark:border-emerald-800/20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <FadeIn>
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              <div className="shrink-0">
+                <div className="h-24 w-24 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                  <Shield className="h-12 w-12 text-white" />
+                </div>
+              </div>
+              <div className="text-center md:text-left flex-1">
+                <Badge variant="secondary" className="mb-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40">
+                  {t('warrantyBadge')}
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{t('warrantyTitle')}</h2>
+                <p className="mt-3 text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{t('warrantyDesc')}</p>
+              </div>
+              <div className="shrink-0">
+                <IntlLink href="/quote">
+                  <Button variant="primary" size="lg" className="hover:scale-[1.03] active:scale-[0.97] transition-transform">
+                    {t('getFreeQuote')} <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </IntlLink>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </RevealSection>
 
       {/* Testimonials */}
       <RevealSection className="py-20 bg-slate-50 dark:bg-[#020617]">

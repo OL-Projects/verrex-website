@@ -318,7 +318,7 @@ export default function WindowTypesPage() {
                   <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-center">
                     <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mx-auto mb-1" />
                     <p className="text-[10px] text-slate-500 dark:text-slate-400">Warranty</p>
-                    <p className="text-xs font-semibold text-slate-900 dark:text-white">25 Years</p>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-white">Lifetime</p>
                   </div>
                   <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-center">
                     <Thermometer className="h-5 w-5 text-amber-600 dark:text-amber-400 mx-auto mb-1" />
