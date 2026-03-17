@@ -25,15 +25,15 @@ const COMPANY = {
   website: "www.verex.ca",
 }
 
-// ─── Icon Badge Helper (replaces emojis) ────────────────────
+// ─── Icon Badge Helper (SF-style solid circles with universal glyphs) ───
 function iconBadge(symbol: string, bgColor: string, textColor: string): string {
-  return `<div style="display:inline-block;background:${bgColor};border-radius:50%;width:56px;height:56px;line-height:56px;text-align:center">
-    <span style="color:${textColor};font-size:24px;font-weight:700;font-family:Georgia,serif">${symbol}</span>
+  return `<div style="display:inline-block;background:${bgColor};border-radius:14px;width:56px;height:56px;line-height:56px;text-align:center">
+    <span style="color:${textColor};font-size:22px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">${symbol}</span>
   </div>`
 }
 
 // ─── Shared Email Layout ────────────────────────────────────
-function emailLayout(content: string, preheader: string): string {
+export function emailLayout(content: string, preheader: string): string {
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -80,24 +80,47 @@ function emailLayout(content: string, preheader: string): string {
           <tr>
             <td style="padding:36px 40px 24px">${content}</td>
           </tr>
+          <!-- Lifetime Warranty Badge -->
+          <tr>
+            <td style="padding:0 40px">
+              <div style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;border-radius:10px;padding:14px 20px;text-align:center">
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
+                  <tr>
+                    <td style="vertical-align:middle;padding-right:10px">
+                      <div style="display:inline-block;background:#059669;border-radius:50%;width:28px;height:28px;line-height:28px;text-align:center">
+                        <span style="color:#fff;font-size:14px;font-weight:700">&#10003;</span>
+                      </div>
+                    </td>
+                    <td style="vertical-align:middle">
+                      <span style="color:#065f46;font-size:13px;font-weight:700">Lifetime Warranty</span>
+                      <span style="color:#047857;font-size:12px"> &mdash; All VEREX products are backed by our lifetime warranty</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding:0 40px 32px">
+            <td style="padding:20px 40px 32px">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="border-top:1px solid #e2e8f0;padding-top:24px">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="font-size:12px;color:#94a3b8;line-height:1.6">
-                          <p style="margin:0 0 4px"><strong style="color:#64748b">${COMPANY.name}</strong></p>
-                          <p style="margin:0 0 4px">${COMPANY.address}</p>
+                        <td style="font-size:12px;color:#94a3b8;line-height:1.8">
+                          <p style="margin:0 0 6px"><strong style="color:#475569;font-size:13px">${COMPANY.name}</strong></p>
                           <p style="margin:0 0 4px">
-                            <a href="tel:${COMPANY.phone}" style="color:#94a3b8;text-decoration:none">${COMPANY.phone}</a>
-                            &nbsp;&middot;&nbsp;
-                            <a href="mailto:${COMPANY.email}" style="color:#94a3b8;text-decoration:none">${COMPANY.email}</a>
+                            <a href="https://maps.google.com/?q=135+Evergreen+Dr+Beaconsfield+QC" style="color:#94a3b8;text-decoration:none">${COMPANY.address}</a>
                           </p>
-                          <p style="margin:0 0 12px"><a href="${BASE_URL}" style="color:#2563eb">${COMPANY.website}</a></p>
-                          <p style="margin:0;color:#cbd5e1;font-size:11px">&copy; ${new Date().getFullYear()} ${COMPANY.name} &mdash; All rights reserved.</p>
+                          <p style="margin:0 0 4px">
+                            <a href="tel:${COMPANY.phone}" style="color:#64748b;text-decoration:none;font-weight:600">${COMPANY.phone}</a>
+                            &nbsp;&middot;&nbsp;
+                            <a href="mailto:${COMPANY.email}" style="color:#64748b;text-decoration:none">${COMPANY.email}</a>
+                          </p>
+                          <p style="margin:0 0 6px"><a href="${BASE_URL}" style="color:#2563eb;font-weight:600">${COMPANY.website}</a></p>
+                          <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;letter-spacing:0.3px">ENERGY STAR &middot; NFRC &middot; CSA Certified &middot; CE Marked</p>
+                          <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px">&copy; ${new Date().getFullYear()} ${COMPANY.name} &mdash; All rights reserved.</p>
                         </td>
                       </tr>
                     </table>
@@ -504,7 +527,7 @@ export async function sendDocumentSignedEmail(
   const result = await getResend().emails.send({
     from: FROM_PORTAL,
     to: adminEmail,
-    subject: `✅ ${details.clientName} signed ${details.documentTitle}`,
+    subject: `Document Signed — ${details.clientName}: ${details.documentTitle}`,
     html: emailLayout(content, preheader),
     text,
     replyTo: COMPANY.email,
@@ -549,7 +572,7 @@ export async function sendDocumentAcceptedEmail(
   const result = await getResend().emails.send({
     from: FROM_PORTAL,
     to: adminEmail,
-    subject: `✅ ${details.clientName} accepted ${details.documentTitle}`,
+    subject: `${typeLabel} Accepted — ${details.clientName}: ${details.documentTitle}`,
     html: emailLayout(content, preheader),
     text,
     replyTo: COMPANY.email,
@@ -596,7 +619,7 @@ export async function sendDocumentDeclinedEmail(
   const result = await getResend().emails.send({
     from: FROM_PORTAL,
     to: adminEmail,
-    subject: `❌ ${details.clientName} declined ${details.documentTitle}`,
+    subject: `${typeLabel} Declined — ${details.clientName}: ${details.documentTitle}`,
     html: emailLayout(content, preheader),
     text,
     replyTo: COMPANY.email,
@@ -645,7 +668,7 @@ export async function sendRevisionRequestedEmail(
   const result = await getResend().emails.send({
     from: FROM_PORTAL,
     to: adminEmail,
-    subject: `⚠️ ${details.clientName} requested changes to ${details.documentTitle}`,
+    subject: `Revision Requested — ${details.clientName}: ${details.documentTitle}`,
     html: emailLayout(content, preheader),
     text,
     replyTo: COMPANY.email,

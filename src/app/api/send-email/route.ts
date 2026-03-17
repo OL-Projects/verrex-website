@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import {
+  emailLayout,
   sendContactConfirmationEmail,
   sendQuoteConfirmationEmail,
   sendAppointmentConfirmationEmail,
@@ -66,124 +67,114 @@ interface QuickQuoteData {
 }
 
 function buildContactEmail(data: ContactData): string {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 24px; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">📩 New Contact Form Submission</h1>
-      </div>
-      <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Email</td><td style="padding: 8px 0;"><a href="mailto:${data.email}" style="color: #2563eb;">${data.email}</a></td></tr>
-          ${data.phone ? `<tr><td style="padding: 8px 0; color: #64748b;">Phone</td><td style="padding: 8px 0;"><a href="tel:${data.phone}" style="color: #2563eb;">${data.phone}</a></td></tr>` : ""}
-          ${data.subject ? `<tr><td style="padding: 8px 0; color: #64748b;">Subject</td><td style="padding: 8px 0; text-transform: capitalize;">${data.subject}</td></tr>` : ""}
-          ${data.contactMethod ? `<tr><td style="padding: 8px 0; color: #64748b;">Preferred Contact</td><td style="padding: 8px 0; text-transform: capitalize;">${data.contactMethod}</td></tr>` : ""}
-        </table>
-        ${data.message ? `
-          <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 8px; color: #64748b; font-size: 13px; font-weight: 600;">Message:</p>
-            <p style="margin: 0; white-space: pre-wrap;">${data.message}</p>
-          </div>
-        ` : ""}
-        <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Sent from VEREX website contact form</p>
-      </div>
+  const content = `
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800">New Contact Form Submission</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px">A visitor submitted the contact form on verex.ca</p>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:140px">Name</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.name}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${data.email}" style="color:#2563eb;font-weight:600;font-size:14px">${data.email}</a></td></tr>
+        ${data.phone ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Phone</td><td style="padding:8px 0"><a href="tel:${data.phone}" style="color:#2563eb;font-size:14px">${data.phone}</a></td></tr>` : ""}
+        ${data.subject ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Subject</td><td style="padding:8px 0;color:#1e293b;font-size:14px;text-transform:capitalize">${data.subject}</td></tr>` : ""}
+        ${data.contactMethod ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Preferred Contact</td><td style="padding:8px 0;color:#1e293b;font-size:14px;text-transform:capitalize">${data.contactMethod}</td></tr>` : ""}
+      </table>
     </div>
+    ${data.message ? `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 8px;color:#475569;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Message</p>
+      <p style="margin:0;color:#1e293b;font-size:14px;line-height:1.6;white-space:pre-wrap">${data.message}</p>
+    </div>` : ""}
+    <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center">Sent from VEREX website contact form</p>
   `;
+  return emailLayout(content, `New contact from ${data.name} — ${data.subject || "General Inquiry"}`);
 }
 
 function buildQuoteEmail(data: QuoteData): string {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: linear-gradient(135deg, #7c3aed, #a855f7); padding: 24px; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">📋 New Quote Request</h1>
-      </div>
-      <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-        <h3 style="margin: 0 0 12px; color: #1e293b;">Contact Information</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Email</td><td style="padding: 8px 0;"><a href="mailto:${data.email}" style="color: #2563eb;">${data.email}</a></td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Phone</td><td style="padding: 8px 0;"><a href="tel:${data.phone}" style="color: #2563eb;">${data.phone}</a></td></tr>
-          ${data.address ? `<tr><td style="padding: 8px 0; color: #64748b;">Address</td><td style="padding: 8px 0;">${data.address}</td></tr>` : ""}
-        </table>
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
-        <h3 style="margin: 0 0 12px; color: #1e293b;">Project Details</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-          ${data.projectType ? `<tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Project Type</td><td style="padding: 8px 0; text-transform: capitalize; font-weight: 600;">${data.projectType}</td></tr>` : ""}
-          ${data.serviceType ? `<tr><td style="padding: 8px 0; color: #64748b;">Service</td><td style="padding: 8px 0; text-transform: capitalize;">${data.serviceType}</td></tr>` : ""}
-          ${data.budget ? `<tr><td style="padding: 8px 0; color: #64748b;">Budget</td><td style="padding: 8px 0;">${data.budget}</td></tr>` : ""}
-          ${data.preferredDate ? `<tr><td style="padding: 8px 0; color: #64748b;">Preferred Date</td><td style="padding: 8px 0;">${data.preferredDate}</td></tr>` : ""}
-          ${data.preferredTime ? `<tr><td style="padding: 8px 0; color: #64748b;">Preferred Time</td><td style="padding: 8px 0; text-transform: capitalize;">${data.preferredTime}</td></tr>` : ""}
-        </table>
-        ${data.description ? `
-          <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 8px; color: #64748b; font-size: 13px; font-weight: 600;">Description:</p>
-            <p style="margin: 0; white-space: pre-wrap;">${data.description}</p>
-          </div>
-        ` : ""}
-        <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Sent from VEREX website quote form</p>
-      </div>
+  const content = `
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800">New Quote Request</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px">A visitor submitted a quote request on verex.ca</p>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:0 0 16px">
+      <p style="margin:0 0 12px;color:#475569;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Contact Information</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:140px">Name</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.name}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${data.email}" style="color:#2563eb;font-weight:600;font-size:14px">${data.email}</a></td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Phone</td><td style="padding:8px 0"><a href="tel:${data.phone}" style="color:#2563eb;font-size:14px">${data.phone}</a></td></tr>
+        ${data.address ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Address</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.address}</td></tr>` : ""}
+      </table>
     </div>
+    <div style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #ddd6fe;border-radius:12px;padding:24px;margin:0 0 24px">
+      <p style="margin:0 0 12px;color:#5b21b6;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Project Details</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${data.projectType ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:140px">Project Type</td><td style="padding:8px 0;color:#5b21b6;font-weight:600;font-size:14px;text-transform:capitalize">${data.projectType}</td></tr>` : ""}
+        ${data.serviceType ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Service</td><td style="padding:8px 0;color:#1e293b;font-size:14px;text-transform:capitalize">${data.serviceType}</td></tr>` : ""}
+        ${data.budget ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Budget</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.budget}</td></tr>` : ""}
+        ${data.preferredDate ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Preferred Date</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.preferredDate}</td></tr>` : ""}
+        ${data.preferredTime ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Preferred Time</td><td style="padding:8px 0;color:#1e293b;font-size:14px;text-transform:capitalize">${data.preferredTime}</td></tr>` : ""}
+      </table>
+    </div>
+    ${data.description ? `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 8px;color:#475569;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Description</p>
+      <p style="margin:0;color:#1e293b;font-size:14px;line-height:1.6;white-space:pre-wrap">${data.description}</p>
+    </div>` : ""}
+    <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center">Sent from VEREX website quote form</p>
   `;
+  return emailLayout(content, `New quote request from ${data.name} — ${data.projectType || "Unspecified"}`);
 }
 
 function buildAppointmentEmail(data: AppointmentData): string {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 24px; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">📅 New Appointment Booking</h1>
-      </div>
-      <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-        ${data.appointmentType ? `
-          <div style="margin-bottom: 16px; padding: 12px 16px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0;">
-            <p style="margin: 0; font-weight: 600; color: #065f46; text-transform: capitalize;">🏷️ ${data.appointmentType.replace(/-/g, " ")}</p>
-          </div>
-        ` : ""}
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Email</td><td style="padding: 8px 0;"><a href="mailto:${data.email}" style="color: #2563eb;">${data.email}</a></td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Phone</td><td style="padding: 8px 0;"><a href="tel:${data.phone}" style="color: #2563eb;">${data.phone}</a></td></tr>
-          ${data.location ? `<tr><td style="padding: 8px 0; color: #64748b;">Location</td><td style="padding: 8px 0;">${data.location}</td></tr>` : ""}
-          ${data.date ? `<tr><td style="padding: 8px 0; color: #64748b;">Date</td><td style="padding: 8px 0; font-weight: 600;">${data.date}</td></tr>` : ""}
-          ${data.time ? `<tr><td style="padding: 8px 0; color: #64748b;">Time</td><td style="padding: 8px 0; font-weight: 600;">${data.time}</td></tr>` : ""}
-        </table>
-        ${data.notes ? `
-          <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 8px; color: #64748b; font-size: 13px; font-weight: 600;">Notes:</p>
-            <p style="margin: 0; white-space: pre-wrap;">${data.notes}</p>
-          </div>
-        ` : ""}
-        <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Sent from VEREX website appointment form</p>
-      </div>
+  const aptType = data.appointmentType?.replace(/-/g, " ") || "consultation";
+  const content = `
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800">New Appointment Booking</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px">A visitor booked an appointment on verex.ca</p>
+    ${data.appointmentType ? `
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px 20px;margin:0 0 20px;text-align:center">
+      <span style="color:#065f46;font-size:15px;font-weight:700;text-transform:capitalize">${aptType}</span>
+    </div>` : ""}
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:0 0 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:140px">Name</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.name}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${data.email}" style="color:#2563eb;font-weight:600;font-size:14px">${data.email}</a></td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Phone</td><td style="padding:8px 0"><a href="tel:${data.phone}" style="color:#2563eb;font-size:14px">${data.phone}</a></td></tr>
+        ${data.location ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Location</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.location}</td></tr>` : ""}
+        ${data.date ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Date</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.date}</td></tr>` : ""}
+        ${data.time ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Time</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.time}</td></tr>` : ""}
+      </table>
     </div>
+    ${data.notes ? `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 8px;color:#475569;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Notes</p>
+      <p style="margin:0;color:#1e293b;font-size:14px;line-height:1.6;white-space:pre-wrap">${data.notes}</p>
+    </div>` : ""}
+    <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center">Sent from VEREX website appointment form</p>
   `;
+  return emailLayout(content, `New appointment from ${data.name} — ${aptType}`);
 }
 
 function buildQuickQuoteEmail(data: QuickQuoteData): string {
   const productList = data.products?.length
-    ? data.products.map((p) => `<li style="padding: 4px 0;">${p}</li>`).join("")
-    : "<li>None selected</li>";
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: linear-gradient(135deg, #0369a1, #0ea5e9); padding: 24px; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 22px;">⚡ Quick Quote Request</h1>
-      </div>
-      <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; color: #64748b; width: 140px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
-          <tr><td style="padding: 8px 0; color: #64748b;">Email</td><td style="padding: 8px 0;"><a href="mailto:${data.email}" style="color: #2563eb;">${data.email}</a></td></tr>
-          ${data.phone ? `<tr><td style="padding: 8px 0; color: #64748b;">Phone</td><td style="padding: 8px 0;"><a href="tel:${data.phone}" style="color: #2563eb;">${data.phone}</a></td></tr>` : ""}
-          ${data.city ? `<tr><td style="padding: 8px 0; color: #64748b;">City</td><td style="padding: 8px 0;">${data.city}</td></tr>` : ""}
-          ${data.postalCode ? `<tr><td style="padding: 8px 0; color: #64748b;">Postal Code</td><td style="padding: 8px 0;">${data.postalCode}</td></tr>` : ""}
-          ${data.quantity ? `<tr><td style="padding: 8px 0; color: #64748b;">Quantity</td><td style="padding: 8px 0;">${data.quantity} units</td></tr>` : ""}
-        </table>
-        <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <p style="margin: 0 0 8px; color: #64748b; font-size: 13px; font-weight: 600;">Products Interested In:</p>
-          <ul style="margin: 0; padding-left: 20px;">${productList}</ul>
-        </div>
-        <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Sent from VEREX website homepage quick quote</p>
-      </div>
+    ? data.products.map((p) => `<li style="padding:4px 0;color:#1e293b;font-size:14px">${p}</li>`).join("")
+    : "<li style='color:#94a3b8'>None selected</li>";
+  const content = `
+    <h1 style="color:#0f172a;margin:0 0 8px;font-size:24px;font-weight:800">Quick Quote Request</h1>
+    <p style="color:#64748b;margin:0 0 24px;font-size:15px">A visitor submitted a quick quote from the homepage</p>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:0 0 20px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:140px">Name</td><td style="padding:8px 0;color:#1e293b;font-weight:600;font-size:14px">${data.name}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b;font-size:13px">Email</td><td style="padding:8px 0"><a href="mailto:${data.email}" style="color:#2563eb;font-weight:600;font-size:14px">${data.email}</a></td></tr>
+        ${data.phone ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Phone</td><td style="padding:8px 0"><a href="tel:${data.phone}" style="color:#2563eb;font-size:14px">${data.phone}</a></td></tr>` : ""}
+        ${data.city ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">City</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.city}</td></tr>` : ""}
+        ${data.postalCode ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Postal Code</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.postalCode}</td></tr>` : ""}
+        ${data.quantity ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Quantity</td><td style="padding:8px 0;color:#1e293b;font-size:14px">${data.quantity} units</td></tr>` : ""}
+      </table>
     </div>
+    <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:12px;padding:20px 24px;margin:0 0 24px">
+      <p style="margin:0 0 12px;color:#0c4a6e;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Products Interested In</p>
+      <ul style="margin:0;padding-left:20px">${productList}</ul>
+    </div>
+    <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center">Sent from VEREX website homepage quick quote</p>
   `;
+  return emailLayout(content, `Quick quote from ${data.name}`);
 }
 
 function getSubjectLine(type: FormType, data: Record<string, unknown>): string {
