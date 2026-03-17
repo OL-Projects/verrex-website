@@ -57,20 +57,38 @@ export function emailLayout(content: string, preheader: string): string {
 <body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
   <div style="display:none;font-size:1px;color:#f1f5f9;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">${preheader}</div>
   
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:32px 16px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 16px">
     <tr>
       <td align="center">
-        <table role="presentation" class="container" width="580" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 40px rgba(15,40,71,0.08)">
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#0f2847 0%,#1e3a5f 40%,#2563eb 100%);padding:36px 40px;text-align:center">
+            <td style="background:linear-gradient(160deg,#091b32 0%,#0f2847 35%,#142f52 70%,#1a3a5f 100%);padding:0">
+              <!-- Top accent line -->
+              <div style="height:3px;background:linear-gradient(90deg,#2563eb,#60a5fa,#2563eb)"></div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td align="center">
-                    <div style="display:inline-block;background:rgba(255,255,255,0.12);border-radius:12px;padding:10px 24px;margin-bottom:12px">
-                      <span style="color:#ffffff;font-size:32px;font-weight:800;letter-spacing:3px">VEREX</span>
-                    </div>
-                    <p style="color:#93c5fd;margin:0;font-size:13px;letter-spacing:1.5px;text-transform:uppercase">Premium Windows &amp; Doors</p>
+                  <td style="padding:32px 40px 28px;text-align:center">
+                    <!-- Logo -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto">
+                      <tr>
+                        <td style="vertical-align:middle;padding-right:14px">
+                          <img src="${BASE_URL}/images/vx-logo.svg" alt="VEREX" width="44" height="44" style="display:block;width:44px;height:44px;filter:brightness(0) invert(1)" />
+                        </td>
+                        <td style="vertical-align:middle">
+                          <span style="color:#ffffff;font-size:30px;font-weight:800;letter-spacing:4px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">VEREX</span>
+                        </td>
+                      </tr>
+                    </table>
+                    <!-- Separator -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:14px auto 0">
+                      <tr>
+                        <td style="width:40px;height:1px;background:rgba(255,255,255,0.12)"></td>
+                        <td style="padding:0 10px"><div style="width:4px;height:4px;border-radius:50%;background:rgba(147,197,253,0.5)"></div></td>
+                        <td style="width:40px;height:1px;background:rgba(255,255,255,0.12)"></td>
+                      </tr>
+                    </table>
+                    <p style="color:rgba(147,197,253,0.85);margin:12px 0 0;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500">Premium Windows &amp; Doors</p>
                   </td>
                 </tr>
               </table>
@@ -102,26 +120,48 @@ export function emailLayout(content: string, preheader: string): string {
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding:20px 40px 32px">
+            <td style="padding:24px 40px 36px">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="border-top:1px solid #e2e8f0;padding-top:24px">
+                  <td style="border-top:1px solid #e2e8f0;padding-top:28px">
+                    <!-- Footer logo + company -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px">
+                      <tr>
+                        <td style="vertical-align:middle;padding-right:10px">
+                          <img src="${BASE_URL}/images/vx-logo.svg" alt="VEREX" width="24" height="24" style="display:block;width:24px;height:24px;opacity:0.5" />
+                        </td>
+                        <td style="vertical-align:middle">
+                          <span style="color:#475569;font-size:14px;font-weight:700;letter-spacing:1px">${COMPANY.name}</span>
+                        </td>
+                      </tr>
+                    </table>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="font-size:12px;color:#94a3b8;line-height:1.8">
-                          <p style="margin:0 0 6px"><strong style="color:#475569;font-size:13px">${COMPANY.name}</strong></p>
-                          <p style="margin:0 0 4px">
+                        <td style="font-size:12px;color:#94a3b8;line-height:2">
+                          <p style="margin:0 0 2px">
                             <a href="https://maps.google.com/?q=135+Evergreen+Dr+Beaconsfield+QC" style="color:#94a3b8;text-decoration:none">${COMPANY.address}</a>
                           </p>
-                          <p style="margin:0 0 4px">
+                          <p style="margin:0 0 2px">
                             <a href="tel:${COMPANY.phone}" style="color:#64748b;text-decoration:none;font-weight:600">${COMPANY.phone}</a>
-                            &nbsp;&middot;&nbsp;
+                            <span style="color:#cbd5e1;padding:0 6px">|</span>
                             <a href="mailto:${COMPANY.email}" style="color:#64748b;text-decoration:none">${COMPANY.email}</a>
+                            <span style="color:#cbd5e1;padding:0 6px">|</span>
+                            <a href="${BASE_URL}" style="color:#2563eb;font-weight:600">${COMPANY.website}</a>
                           </p>
-                          <p style="margin:0 0 6px"><a href="${BASE_URL}" style="color:#2563eb;font-weight:600">${COMPANY.website}</a></p>
-                          <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;letter-spacing:0.3px">ENERGY STAR &middot; NFRC &middot; CSA Certified &middot; CE Marked</p>
-                          <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px">&copy; ${new Date().getFullYear()} ${COMPANY.name} &mdash; All rights reserved.</p>
                         </td>
+                      </tr>
+                    </table>
+                    <!-- Divider -->
+                    <div style="height:1px;background:linear-gradient(90deg,#e2e8f0,#f1f5f9);margin:16px 0"></div>
+                    <!-- Certifications + Copyright -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size:11px;color:#94a3b8;letter-spacing:0.5px">
+                          ENERGY STAR<span style="color:#cbd5e1;padding:0 5px">&middot;</span>NFRC<span style="color:#cbd5e1;padding:0 5px">&middot;</span>CSA<span style="color:#cbd5e1;padding:0 5px">&middot;</span>CE Marked
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:11px;color:#cbd5e1;padding-top:6px">&copy; ${new Date().getFullYear()} ${COMPANY.name}. All rights reserved.</td>
                       </tr>
                     </table>
                   </td>
