@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { getLocalizedServices } from "@/lib/data-i18n"
 import {
   ArrowRight, Clock, CheckCircle2, MessageSquare, Ruler, Wrench,
-  Search, Sparkles, Settings, Phone, Award, Users, Timer, ShieldCheck,
+  Search, Sparkles, Settings, Phone, Award, Users, Star, Timer, ShieldCheck,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import type { Metadata } from "next"
@@ -59,7 +59,7 @@ export default async function ServicesPage() {
             {[
               { icon: Award, value: "500+", label: t('statProjectsCompleted') },
               { icon: Users, value: "15+", label: t('statYearsExperience') },
-              { icon: Timer, value: "98%", label: t('statOnTime') },
+              { icon: Star, value: "5★", label: t('statOnTime') },
               { icon: ShieldCheck, value: "100%", label: t('statSatisfaction') },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-3">

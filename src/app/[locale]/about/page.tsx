@@ -47,7 +47,7 @@ export default async function AboutPage() {
               { value: "500+", label: t('projectsCompleted') },
               { value: "50+", label: t('expertTeamMembers') },
               { value: "2M+", label: t('sqFtInstalled') },
-              { value: "98%", label: t('onTimeDelivery') },
+              { value: "5★", label: t('onTimeDelivery') },
             ].map((stat, i) => (
               <div key={i}>
                 <p className="text-3xl md:text-4xl font-black text-blue-600 dark:text-blue-400">{stat.value}</p>
